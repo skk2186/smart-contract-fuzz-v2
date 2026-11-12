@@ -6,14 +6,20 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.metadata
+import io
 import json
+import logging
+import os
 import re
+import tempfile
 from collections import defaultdict, deque
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
 from crytic_compile import CryticCompile
 from crytic_compile.crytic_compile import get_platforms
+from crytic_compile.platform.foundry import Foundry
 from crytic_compile.platform.solc import Solc
 from slither import Slither
 from slither.analyses.data_dependency.data_dependency import is_dependent
@@ -43,8 +49,36 @@ def state_id(variable: Any) -> str:
     return str(getattr(variable, "canonical_name", str(variable)))
 
 
+def property_context_id(contract: Any, function: Any) -> str:
+    """继承属性在不同分析合约中仍须有不同身份。"""
+    key = "\0".join((getattr(contract, "name", "?"), location(contract),
+                     name(function), location(function)))
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()[:20]
+
+
 def unique_states(values: Any) -> list[str]:
     return sorted({state_id(value) for value in values})
+
+
+def receiver_step(caller: Any, ir: Any, node: Any) -> dict[str, str | None]:
+    """保留接收者的定义身份；文本同名不能作为实例身份。"""
+    destination = ir.destination
+    return {
+        "caller_contract": getattr(caller.contract, "name", "?"),
+        "expression": str(destination),
+        "kind": "state_slot" if isinstance(destination, StateVariable) else "unresolved",
+        "state_slot": state_id(destination) if isinstance(destination, StateVariable) else None,
+        "state_slot_source": location(destination) if isinstance(destination, StateVariable) else None,
+        "source": location(node),
+    }
+
+
+def rooted_receiver_path(route: Any) -> tuple[str, ...] | None:
+    """仅当每一跳都来自静态状态槽时返回符号路径，不推断运行时地址。"""
+    if not route or any(step["kind"] != "state_slot" for step in route):
+        return None
+    return tuple(f"{step['caller_contract']}:{step['state_slot']}@{step['state_slot_source']}"
+                 for step in route)
 
 
 def source_index_accesses(expression: Any) -> list[str]:
@@ -64,21 +98,53 @@ def source_index_accesses(expression: Any) -> list[str]:
     return sorted(set(accesses))
 
 
-def partial_property(function: Any, exc: Exception) -> dict[str, Any]:
+def partial_property(function: Any, exc: Exception,
+                     prior_unknowns: Any = (),
+                     analysis_contract: Any | None = None) -> dict[str, Any]:
+    contract = analysis_contract or getattr(function, "contract", None)
     try:
         read_states = unique_states(function.all_state_variables_read())
     except Exception:
         read_states = []
+    read_sites = []
+    call_sites = []
+    try:
+        try:
+            nodes = function.all_nodes()
+        except Exception:
+            nodes = function.nodes
+        for node in nodes:
+            if node.state_variables_read:
+                read_sites.append({
+                    "function": name(node.function),
+                    "states": unique_states(node.state_variables_read),
+                    "expression": str(node.expression or node),
+                    "source": location(node),
+                })
+            for ir in node.irs:
+                if isinstance(ir, (HighLevelCall, LowLevelCall)):
+                    call_sites.append({"call": str(ir), "source": location(node),
+                                       "kind": type(ir).__name__})
+    except Exception:
+        pass
     return {
         "property": name(function), "source": location(function),
-        "read_states": read_states, "candidate_actions": [],
+        "property_id": property_context_id(contract, function),
+        "analysis_contract": getattr(contract, "name", "?"),
+        "analysis_contract_source": location(contract),
+        "read_states": read_states, "read_sites": read_sites,
+        "call_sites": call_sites, "candidate_actions": [],
+        "evidence_ids": [],
         "cross_contract": {
             "observations": [], "candidate_actions": [],
             "unmatched_observations": [], "unresolved_observations": [],
             "alias_unproven_observations": [], "opaque_call_candidates": [],
         },
         "analysis_class": "dependency_unknown", "analysis_status": "partial",
-        "unknowns": [f"属性分析中断: {type(exc).__name__}: {exc}"],
+        "context_status": "partial_evidence_only", "dependency_status": "unknown",
+        "unknowns": sorted(set(prior_unknowns) | {
+            f"属性分析中断: {type(exc).__name__}: {exc}"}),
+        "exception": {"type": type(exc).__name__, "message": str(exc)},
     }
 
 
@@ -257,12 +323,16 @@ class PropertyAdapter:
                     returns.append({
                         "function": name(function),
                         "result_expression": str(inner_node.expression),
-                        "branch_paths": self._raw_return_paths(function, inner_node),
+                        "branch_paths": sorted(
+                            self._raw_return_paths(function, inner_node),
+                            key=lambda path: json.dumps(path, ensure_ascii=False)),
                         "source": location(inner_node),
                     })
                 for ir in inner_node.irs:
                     if isinstance(ir, (HighLevelCall, LowLevelCall)):
                         external.add(f"{name(function)}: {ir}")
+        returns.sort(key=lambda item: (item["function"], item["source"],
+                                       item["result_expression"]))
         return states, sorted(calls), sorted(external), sorted(logic), returns
 
     def _guard(self, function: Any, node: Any, kind: str, branch: str | None) -> dict[str, Any]:
@@ -285,6 +355,9 @@ class PropertyAdapter:
             "expression": str(node.expression or node),
             "branch": branch,
             "state_reads": unique_states(states),
+            "state_read_definitions": sorted(
+                ({"state": state_id(state), "source": location(state)} for state in states),
+                key=lambda item: (item["state"], item["source"])),
             "variables_read": unique(variables),
             "data_dependencies": dependencies,
             "predicate_calls": predicate_calls,
@@ -522,14 +595,13 @@ class PropertyAdapter:
                             continue
                         if not isinstance(ir, HighLevelCall):
                             continue
-                        step = {
-                            "caller": name(caller), "receiver": str(ir.destination),
-                            "source": location(node),
-                        }
+                        step = receiver_step(caller, ir, node)
+                        step["caller"] = name(caller)
                         item = {
                             "path": path, "call": ir, "route": route + (step,),
                             "receiver": str(ir.destination),
                             "receiver_scope": getattr(caller.contract, "name", "?"),
+                            "receiver_path": rooted_receiver_path(route + (step,)),
                         }
                         calls.append(item)
                         target = ir.function
@@ -589,6 +661,7 @@ class PropertyAdapter:
                     "state": state_id(variable), "receiver": item["receiver"],
                     "receiver_scope": item["receiver_scope"],
                     "external_route": list(item["route"]),
+                    "receiver_path": item["receiver_path"],
                     "writer": name(target_function),
                     "expression": str(node.expression or node),
                     "index_accesses": self._index_accesses(node),
@@ -608,8 +681,10 @@ class PropertyAdapter:
             call = item["call"]
             states = self._external_state_variables(call, "read")
             observation = {
+                "observation_id": f"call_{len(observations)}",
                 "receiver": item["receiver"],
                 "receiver_scope": item["receiver_scope"],
+                "receiver_path": item["receiver_path"],
                 "external_route": list(item["route"]),
                 "target": name(call.function) if isinstance(call.function, Function) else str(call.function),
                 "read_states": unique_states(states),
@@ -625,66 +700,81 @@ class PropertyAdapter:
             elif observation["resolution"] == "unresolved_target":
                 unresolved.append(observation)
         candidates = []
-        prerequisite_states: dict[tuple[str, str], dict[str, Any]] = {}
-        matched_states: set[Any] = set()
-        exact_states: set[Any] = set()
+        prerequisite_states: dict[tuple[str, str, str], dict[str, Any]] = {}
+        matched_observations: set[tuple[str, str]] = set()
+        confirmed_observations: set[tuple[str, str]] = set()
         for action in self.actions:
-            action_matches: list[tuple[dict[str, Any], Any, str]] = []
+            action_matches: list[tuple[dict[str, Any], Any, dict[str, Any], str]] = []
             for item in self._typed_call_paths(action):
                 for state in self._external_state_variables(item["call"], "write"):
                     if state not in scoped_reads:
                         continue
-                    same_receiver = any(
-                        obs["receiver"] == item["receiver"]
-                        and obs["receiver_scope"] == item["receiver_scope"]
-                        for obs in scoped_reads[state]
-                    )
-                    relation = ("same_static_receiver" if same_receiver else
-                                "state_overlap_alias_unproven")
-                    action_matches.append((item, state, relation))
+                    for observation in scoped_reads[state]:
+                        static_path = item["receiver_path"]
+                        relation = ("confirmed_static_path" if static_path is not None
+                                    and static_path == observation["receiver_path"] else
+                                    "possible_instance_alias")
+                        action_matches.append((item, state, observation, relation))
             if not action_matches:
                 continue
-            matched_states.update(state for _, state, _ in action_matches)
-            exact_states.update(state for _, state, relation in action_matches
-                                if relation == "same_static_receiver")
+            matched_observations.update(
+                (obs["observation_id"], state_id(state))
+                for _, state, obs, _ in action_matches)
+            confirmed_observations.update(
+                (obs["observation_id"], state_id(state))
+                for _, state, obs, relation in action_matches
+                if relation == "confirmed_static_path")
             effects: list[dict[str, Any]] = []
-            for item, state, _ in action_matches:
+            effect_pairs = {(id(item["call"]), state): (item, state)
+                            for item, state, _, _ in action_matches}
+            for item, state in effect_pairs.values():
                 effects.extend(self._typed_effects(item, state))
             for effect in effects:
                 for guard in effect["guards"]:
-                    for guard_state in guard["state_reads"]:
+                    for guard_definition in guard["state_read_definitions"]:
+                        guard_state = guard_definition["state"]
                         root_contracts = {self.contract.name} | {
                             inherited.name for inherited in self.contract.inheritance
                         }
                         guard_owner = guard["function"].split(".", 1)[0]
-                        scope = "self" if guard_owner in root_contracts else effect["receiver"]
-                        key = (scope, guard_state)
+                        scope = ("self" if guard_owner in root_contracts else
+                                 "/".join(effect["receiver_path"] or []) or "unresolved_instance")
+                        key = (scope, guard_state, guard_definition["source"])
                         prerequisite_states[key] = {
                             "receiver": scope, "state": guard_state,
-                            "target_entrypoint_writers": sorted({
+                            "state_source": guard_definition["source"],
+                            "possible_writers_by_definition": sorted({
                                 name(function)
                                 for contract in self.slither.contracts
                                 for function in contract.functions_entry_points
                                 if any(state_id(v) == guard_state
+                                       and location(v) == guard_definition["source"]
                                        for v in function.all_state_variables_written())
                             }),
-                            "note": "可选的状态建立函数；调用权限和对象别名需另行验证。",
+                            "instance_relation": ("same_root_contract" if scope == "self" else
+                                                  "unproven_for_definition_writers"),
+                            "source_route": effect["external_route"],
+                            "note": "仅按状态定义列出可能写入者；不能据此认定其操作同一实例。",
                         }
             candidates.append({
                 "function": name(action),
                 "matched_observations": [
-                    {"receiver": item["receiver"],
-                     "receiver_scope": item["receiver_scope"],
-                     "external_route": list(item["route"]),
+                    {"observation_id": obs["observation_id"],
+                     "observation_source": obs["source"],
+                     "observation_receiver_path": obs["receiver_path"],
+                     "action_receiver_path": item["receiver_path"],
+                     "action_route": list(item["route"]),
                      "state": state_id(state), "relation": relation,
-                     "property_calls": sorted({o["call"] for o in scoped_reads[state]})}
-                    for item, state, relation in action_matches
+                     "runtime_object_proven": False,
+                     "property_call": obs["call"]}
+                    for item, state, obs, relation in action_matches
                 ],
                 "effect_ids": sorted({e["id"] for e in effects}),
                 "status": ("target_write_site_unresolved" if not effects else
-                           "direct_static_candidate" if all(r == "same_static_receiver"
-                                                            for _, _, r in action_matches)
-                           else "alias_unproven_candidate"),
+                           "confirmed_static_path_candidate" if all(
+                               r == "confirmed_static_path"
+                               for _, _, _, r in action_matches)
+                           else "possible_instance_alias_candidate"),
                 "slither_conditional_state_reads": unique_states(
                     action.all_conditional_state_variables_read()),
                 "slither_is_protected_hint": action.is_protected(),
@@ -692,16 +782,21 @@ class PropertyAdapter:
         if unresolved:
             self.unknowns.add(f"{name(prop)}: 部分外部属性读取无法解析到目标状态")
         unmatched = [
-            {"state": state_id(state),
-             "property_calls": sorted({o["call"] for o in observations})}
+            {"observation_id": obs["observation_id"],
+             "receiver_path": obs["receiver_path"], "state": state_id(state),
+             "property_call": obs["call"], "source": obs["source"]}
             for state, observations in scoped_reads.items()
-            if state not in matched_states
+            for obs in observations
+            if (obs["observation_id"], state_id(state)) not in matched_observations
         ]
         alias_unproven = [
-            {"state": state_id(state),
-             "property_calls": sorted({o["call"] for o in observations})}
+            {"observation_id": obs["observation_id"],
+             "receiver_path": obs["receiver_path"], "state": state_id(state),
+             "property_call": obs["call"], "source": obs["source"]}
             for state, observations in scoped_reads.items()
-            if state in matched_states and state not in exact_states
+            for obs in observations
+            if ((obs["observation_id"], state_id(state)) in matched_observations
+                and (obs["observation_id"], state_id(state)) not in confirmed_observations)
         ]
         if unmatched:
             self.unknowns.add(f"{name(prop)}: 部分外部状态读取未找到解析后的写入入口")
@@ -723,7 +818,7 @@ class PropertyAdapter:
             "alias_unproven_observations": alias_unproven,
             "opaque_call_candidates": opaque_actions[:self.max_paths],
             "opaque_candidates_truncated": len(opaque_actions) > self.max_paths,
-            "matching_rule": "按 Slither 解析出的目标状态变量关联；接收者不一致时只列为别名未证明候选。",
+            "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。",
         }
 
     def _read_sites(self, property_function: Any) -> list[dict[str, Any]]:
@@ -778,9 +873,12 @@ class PropertyAdapter:
                     })
                     for effect in effects:
                         for guard in effect["guards"]:
-                            for guard_state in guard["state_reads"]:
+                            for guard_definition in guard["state_read_definitions"]:
+                                guard_state = guard_definition["state"]
                                 for actual in self.writers:
-                                    if state_id(actual) == guard_state and actual not in seen:
+                                    if (state_id(actual) == guard_state
+                                            and location(actual) == guard_definition["source"]
+                                            and actual not in seen):
                                         todo.append((actual, depth + 1))
             result.append(entry)
         return result
@@ -788,6 +886,7 @@ class PropertyAdapter:
     def analyze_property(self, prop: Any) -> dict[str, Any]:
         prior_unknowns = set(self.unknowns)
         read_states = set(prop.all_state_variables_read())
+        property_write_states = unique_states(prop.all_state_variables_written())
         cross_contract = self._cross_contract_context(prop)
         balance_observations = [
             {"function": name(function), "operation": str(ir), "source": location(node)}
@@ -806,7 +905,9 @@ class PropertyAdapter:
             for effect in effects:
                 for guard in effect["guards"]:
                     for state in self.writers:
-                        if state_id(state) in guard["state_reads"]:
+                        if any(state_id(state) == definition["state"]
+                               and location(state) == definition["source"]
+                               for definition in guard["state_read_definitions"]):
                             prerequisite_states.add(state)
             candidates.append({
                 "function": name(action),
@@ -851,6 +952,8 @@ class PropertyAdapter:
             unknowns.add("跨合约候选的对象别名、调用结果和执行可达性仍需验证")
         if cross_contract["opaque_property_calls"]:
             unknowns.add("属性自身含无法静态解析的调用；状态依赖可能不完整")
+        if property_write_states:
+            unknowns.add("属性函数自身写入状态；检查属性可能改变后续测试状态")
         if any(self.effect_catalog[effect_id]["external_calls_in_reachable_functions"]
                for candidate in candidates for effect_id in candidate["effect_ids"]):
             unknowns.add("候选调用链含外部调用；静态输出未证明其返回值或副作用")
@@ -875,32 +978,65 @@ class PropertyAdapter:
                for effect_id in c["effect_ids"]
                for g in self.effect_catalog[effect_id]["guards"]):
             unknowns.add("守卫含外部调用，返回值和副作用需结合部署环境确认")
+        has_observed_state = bool(read_states or any(
+            obs["read_states"] for obs in cross_contract["observations"]))
+        incomplete_relations = bool(
+            cross_contract["unmatched_observations"]
+            or cross_contract["alias_unproven_observations"]
+            or cross_contract["unresolved_observations"]
+            or cross_contract["opaque_property_calls"]
+            or property_write_states
+            or resolved_effect_links < len(candidates) + len(cross_contract["candidate_actions"])
+        )
+        evidence_ids = sorted({effect_id
+                               for candidate in candidates + cross_contract["candidate_actions"]
+                               for effect_id in candidate["effect_ids"]}
+                              | {effect_id
+                                 for state in setup_closure
+                                 for action in state["possible_setup_actions"]
+                                 for effect_id in action["effect_ids"]})
         return {
             "property": name(prop), "source": location(prop),
+            "property_id": property_context_id(self.contract, prop),
+            "analysis_contract": self.contract.name,
+            "analysis_contract_source": location(self.contract),
             "read_states": unique_states(read_states),
+            "property_write_states": property_write_states,
             "environment_reads": unique(prop.all_solidity_variables_read()),
             "balance_observations": balance_observations,
             "read_sites": self._read_sites(prop),
             "candidate_actions": candidates,
             "cross_contract": cross_contract,
+            "evidence_ids": evidence_ids,
             "evidence_summary": {
                 "candidate_links": len(candidates) + len(cross_contract["candidate_actions"]),
                 "links_with_write_site": resolved_effect_links,
                 "alias_unproven_links": sum(
-                    c["status"] == "alias_unproven_candidate"
+                    c["status"] == "possible_instance_alias_candidate"
                     for c in cross_contract["candidate_actions"]),
                 "unmatched_observations": len(cross_contract["unmatched_observations"]),
                 "opaque_call_candidates": len(cross_contract["opaque_call_candidates"]),
             },
             "analysis_class": (
                 "stateful_context_available" if has_candidate else
-                "stateful_dependency_unresolved" if read_states or any(
-                    obs["read_states"] for obs in cross_contract["observations"]) else
+                "stateful_dependency_unresolved" if has_observed_state else
                 "dependency_unknown" if cross_contract["unresolved_observations"]
                 or cross_contract["opaque_property_calls"] else
                 "stateless_or_input_only"
             ),
             "analysis_status": "analyzed",
+            "context_status": ("candidate_with_write_site" if resolved_effect_links else
+                               "candidate_without_write_site" if has_candidate else
+                               "observations_only" if has_observed_state else
+                               "unresolved_observation_only" if
+                               cross_contract["unresolved_observations"]
+                               or cross_contract["opaque_property_calls"] else "stateless"),
+            "dependency_status": ("not_applicable" if not has_observed_state and not
+                                  cross_contract["unresolved_observations"] and not
+                                  cross_contract["opaque_property_calls"] else
+                                  "incomplete" if incomplete_relations or not has_candidate else
+                                  "statically_supported_with_limits" if unknowns else
+                                  "statically_closed"),
             "unresolved_effect_actions": unresolved_effect_actions,
             "prerequisite_state_closure": setup_closure,
             "unknowns": sorted(unknowns),
@@ -911,19 +1047,27 @@ class PropertyAdapter:
         if not self.properties:
             self.unknowns.add(f"没有找到零参数、以 {self.prefix!r} 开头的显式属性")
         properties = []
+        global_unknowns = set(self.unknowns)
         for prop in self.properties:
+            self.unknowns = set()
+            self.effect_cache.clear()
             try:
                 properties.append(self.analyze_property(prop))
             except Exception as exc:
-                properties.append(partial_property(prop, exc))
+                properties.append(partial_property(prop, exc, self.unknowns,
+                                                   self.contract))
+            global_unknowns.update(self.unknowns)
+        referenced = {effect_id for prop in properties
+                      for effect_id in prop["evidence_ids"]}
         return {
-            "schema_version": "2.0",
+            "schema_version": "3.1",
             "input": {"target": self.target, "contract": self.contract.name,
                       "slither_version": importlib.metadata.version("slither-analyzer"),
                       "analysis_options": self.analysis_options},
             "properties": properties,
-            "effect_catalog": dict(sorted(self.effect_catalog.items())),
-            "global_unknowns": sorted(self.unknowns),
+            "effect_catalog": {effect_id: self.effect_catalog[effect_id]
+                               for effect_id in sorted(referenced)},
+            "global_unknowns": sorted(global_unknowns),
         }
 
 
@@ -937,7 +1081,9 @@ def _build_compile_kwargs(args: Any) -> dict[str, Any]:
         if "=" not in item:
             raise ValueError(f"编译选项应为 NAME=VALUE: {item}")
         key, value = item.split("=", 1)
-        kwargs[key.lstrip("-").replace("-", "_")] = value
+        kwargs[key.lstrip("-").replace("-", "_")] = (
+            value.lower() == "true" if value.lower() in {"true", "false"} else value
+        )
     return kwargs
 
 
@@ -963,6 +1109,39 @@ def _framework_root(target: str) -> tuple[str | None, str | None]:
     return None, None
 
 
+def _foundry_property_sources(root: str, prefix: str) -> list[str]:
+    """使用 Foundry 的原生目录配置，仅以属性声明定位待编译源码。"""
+    config = Foundry.config(root)
+    pattern = re.compile(r"\bfunction\s+" + re.escape(prefix) + r"\w*\s*\(")
+    sources: set[Path] = set()
+    for directory in (config.src_path, config.tests_path, config.scripts_path):
+        if not directory:
+            continue
+        source_root = Path(root) / directory
+        for source in source_root.rglob("*.sol") if source_root.is_dir() else ():
+            if pattern.search(source.read_text(encoding="utf-8", errors="replace")):
+                sources.add(source.resolve())
+    return [str(source) for source in sorted(sources)]
+
+
+@contextmanager
+def _isolated_foundry_output(enabled: bool):
+    """防止不同定向构建的 build-info 互相污染，退出后恢复环境。"""
+    if not enabled:
+        yield
+        return
+    previous = os.environ.get("FOUNDRY_OUT")
+    with tempfile.TemporaryDirectory(prefix="property-foundry-") as temporary:
+        os.environ["FOUNDRY_OUT"] = str(Path(temporary) / "out")
+        try:
+            yield
+        finally:
+            if previous is None:
+                os.environ.pop("FOUNDRY_OUT", None)
+            else:
+                os.environ["FOUNDRY_OUT"] = previous
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("target", help="Solidity 文件或可由 crytic-compile 构建的项目目录")
@@ -986,7 +1165,7 @@ def main() -> int:
     if args.project_root:
         project_root, detected_framework = str(Path(args.project_root).resolve()), "user_selected"
     report: dict[str, Any] = {
-        "schema_version": "2.0", "status": "compilation_failed",
+        "schema_version": "3.1", "status": "compilation_failed",
         "input": {"target": args.target, "contract": args.contract,
                   "project_root": project_root, "detected_framework": detected_framework,
                   "compile_options": args.compile_option,
@@ -994,57 +1173,108 @@ def main() -> int:
                   "crytic_compile_version": importlib.metadata.version("crytic-compile")},
         "contracts_discovered": [], "contracts_analyzed": [],
         "properties": [], "effect_catalog": {}, "global_unknowns": [],
-        "contract_issues": [], "errors": [],
+        "contract_issues": [], "source_issues": [], "errors": [],
     }
     try:
         kwargs = _build_compile_kwargs(args)
-        if project_root and Path(args.target).is_file():
-            kwargs["cwd"] = project_root
-        compiled = CryticCompile(args.target, **kwargs)
-        report["input"]["compilation_platform"] = compiled.platform.NAME
-        slither = Slither(compiled)
-        report["contracts_discovered"] = [
-            {"name": c.name, "source": location(c)} for c in slither.contracts
-        ]
-        contracts = [c for c in slither.contracts
-                     if (args.contract is None or c.name == args.contract)
-                     and (args.contract_source is None or args.contract_source in location(c))]
-        if args.contract is None:
-            contracts = [c for c in contracts if any(
-                f.name.startswith(args.property_prefix) for f in c.functions_entry_points)]
-        if not contracts:
-            report["status"] = "no_matching_contract_or_property"
-            report["global_unknowns"].append("未找到符合筛选条件的属性合约；已保留发现的合约列表")
+        foundry_directory = bool(project_root and Path(args.target).is_dir()
+                                 and (Path(project_root) / "foundry.toml").is_file())
+        property_sources = (_foundry_property_sources(project_root, args.property_prefix)
+                            if foundry_directory and "foundry_compile_all" not in kwargs
+                            else [])
+        targets = property_sources or [args.target]
+        report["input"]["analysis_targets"] = targets
+        report["input"]["foundry_target_mode"] = (
+            "property_sources" if property_sources else "project_or_file")
+        report["input"]["foundry_compile_all"] = kwargs.get("foundry_compile_all")
+        discovered: set[tuple[str, str]] = set()
+        analyzed: set[tuple[str, str]] = set()
+        completed_targets = 0
+        for target in targets:
+            compile_log = io.StringIO()
+            handler = logging.StreamHandler(compile_log)
+            handler.setLevel(logging.ERROR)
+            compiler_logger = logging.getLogger("CryticCompile")
+            compiler_logger.addHandler(handler)
+            try:
+                local_kwargs = dict(kwargs)
+                if project_root and Path(target).is_file():
+                    local_kwargs["cwd"] = project_root
+                with _isolated_foundry_output(bool(property_sources)):
+                    compiled = CryticCompile(target, **local_kwargs)
+                    report["input"]["compilation_platform"] = compiled.platform.NAME
+                    slither = Slither(compiled)
+                    completed_targets += 1
+                    for contract in slither.contracts:
+                        key = (contract.name, location(contract))
+                        if key not in discovered:
+                            report["contracts_discovered"].append(
+                                {"name": contract.name, "source": location(contract)})
+                            discovered.add(key)
+                    contracts = [c for c in slither.contracts
+                                 if (args.contract is None or c.name == args.contract)
+                                 and (args.contract_source is None
+                                      or args.contract_source in location(c))]
+                    if args.contract is None:
+                        contracts = [c for c in contracts if any(
+                            f.name.startswith(args.property_prefix)
+                            for f in c.functions_entry_points)]
+                    for contract in contracts:
+                        key = (contract.name, location(contract))
+                        if key in analyzed:
+                            continue
+                        analyzed.add(key)
+                        report["contracts_analyzed"].append(
+                            {"name": contract.name, "source": location(contract)})
+                        try:
+                            adapter = PropertyAdapter(
+                                slither, contract, args.target, args.solc_remaps, args.solc,
+                                args.compile_option, args.property_prefix,
+                                args.max_call_depth, args.max_setup_depth, args.max_paths)
+                            part = adapter.run()
+                            report["properties"].extend(part["properties"])
+                            report["effect_catalog"].update(part["effect_catalog"])
+                            report["global_unknowns"].extend(part["global_unknowns"])
+                        except Exception as exc:
+                            report["contract_issues"].append({
+                                "contract": contract.name, "source": location(contract),
+                                "type": type(exc).__name__, "message": str(exc),
+                            })
+                            report["properties"].extend(
+                                partial_property(prop, exc,
+                                                 analysis_contract=contract)
+                                for prop in contract.functions_entry_points
+                                if prop.name.startswith(args.property_prefix))
+            except Exception as exc:
+                report["source_issues"].append({
+                    "target": target, "type": type(exc).__name__, "message": str(exc),
+                    "compiler_log": compile_log.getvalue().strip(),
+                })
+            finally:
+                compiler_logger.removeHandler(handler)
+        if completed_targets == 0:
+            report["status"] = "compilation_or_analysis_failed"
+            report["errors"] = list(report["source_issues"])
+        elif not report["contracts_analyzed"]:
+            report["status"] = ("partial" if report["source_issues"] else
+                                "no_matching_contract_or_property")
+            report["global_unknowns"].append(
+                "部分属性源码分析失败，无法确定是否有匹配合约" if
+                report["source_issues"] else
+                "未找到符合筛选条件的属性合约；已保留发现的合约列表")
         else:
-            for contract in contracts:
-                report["contracts_analyzed"].append(
-                    {"name": contract.name, "source": location(contract)})
-                try:
-                    adapter = PropertyAdapter(
-                        slither, contract, args.target, args.solc_remaps, args.solc,
-                        args.compile_option, args.property_prefix, args.max_call_depth,
-                        args.max_setup_depth, args.max_paths)
-                    part = adapter.run()
-                    report["properties"].extend(part["properties"])
-                    report["effect_catalog"].update(part["effect_catalog"])
-                    report["global_unknowns"].extend(part["global_unknowns"])
-                except Exception as exc:
-                    report["contract_issues"].append({
-                        "contract": contract.name, "source": location(contract),
-                        "type": type(exc).__name__, "message": str(exc),
-                    })
-                    report["properties"].extend(
-                        partial_property(prop, exc)
-                        for prop in contract.functions_entry_points
-                        if prop.name.startswith(args.property_prefix))
-            report["global_unknowns"] = sorted(set(report["global_unknowns"]))
-            report["status"] = ("partial" if report["contract_issues"] or any(
-                p["analysis_status"] == "partial" for p in report["properties"]) else
+            report["status"] = ("partial" if report["source_issues"]
+                                or report["contract_issues"] or any(
+                                    p["analysis_status"] == "partial"
+                                    for p in report["properties"]) else
                                 "complete" if report["properties"] else
                                 "no_matching_property")
+        report["global_unknowns"] = sorted(set(report["global_unknowns"]))
     except Exception as exc:
         report["status"] = "compilation_or_analysis_failed"
         report["errors"].append({"type": type(exc).__name__, "message": str(exc)})
+    report["execution_status"] = ("failed" if report["errors"] else
+                                  "partial" if report["status"] == "partial" else "success")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"分析状态 {report['status']}，属性 {len(report['properties'])} 条，结果: {output}")
@@ -1052,7 +1282,7 @@ def main() -> int:
         print(f"  {prop['property']}: 自身状态 {len(prop['candidate_actions'])} 个候选，"
               f"跨合约 {len(prop['cross_contract']['candidate_actions'])} 个候选，"
               f"分类 {prop['analysis_class']}，状态 {prop['analysis_status']}")
-    return 1 if report["errors"] else 0
+    return 1 if report["errors"] or report["source_issues"] else 0
 
 
 if __name__ == "__main__":
