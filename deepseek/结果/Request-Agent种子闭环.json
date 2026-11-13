@@ -1,0 +1,362 @@
+{
+  "project": "Request",
+  "property_ids": [
+    "c451c42790194538cf50"
+  ],
+  "property_count": 1,
+  "action_counts": {
+    "c451c42790194538cf50": 3
+  },
+  "agent_a": {
+    "at_utc": "2026-11-13T03:13:39.657512+00:00",
+    "tag": "AgentA_Request_c451c42790194538cf50",
+    "model_requested": "deepseek-flash",
+    "thinking": "disabled",
+    "request_sha256": "5b1f115c88aaab6ed479732948525ddc1f5b1245a7ace358419534793dc7e4d6",
+    "attempt": 1,
+    "max_tokens": 4096,
+    "http_status": 200,
+    "response_id": "19954311-f2ad-4fac-be28-6465175afeed",
+    "model_returned": "deepseek-flash",
+    "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+    "usage": {
+      "prompt_tokens": 4441,
+      "prompt_cache_hit_tokens": 128,
+      "prompt_cache_miss_tokens": 4313,
+      "completion_tokens": 450,
+      "total_tokens": 4891,
+      "estimated_cost_usd": {
+        "offpeak": "0.000917334",
+        "peak": "0.001834668"
+      },
+      "pricing_date": "2026-11-13",
+      "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "cost_is_estimate": true
+    },
+    "finish_reason": "stop",
+    "response_json": {
+      "property_sequences": [
+        {
+          "property_id": "c451c42790194538cf50",
+          "candidate_id": "c451c42790194538cf50-seq-1",
+          "steps": [
+            {
+              "function": "driver_authorizePayment(uint256,uint256,uint16)",
+              "rationale": "先铸造代币到 wrapper 测试合约并授权 escrow，使 token 供应量与已计入余额（this、PAYER、MERCHANT、OPERATOR、FEE_RECEIVER、wrapper、mockEscrow）同步增加，为守恒检查建立非零基线。"
+            },
+            {
+              "function": "driver_chargePayment(uint256,uint16)",
+              "rationale": "在已有授权基础上执行 charge，触发 mint、approve 与 wrapper.chargePayment 的转账/费用分配，检验供应量与各角色余额之和在捕获与费用路径下仍相等。"
+            },
+            {
+              "function": "driver_refundPayment(uint256,uint256)",
+              "rationale": "在存在 paymentRefCounter 后执行退款，向 operator 铸造退款代币并调用 wrapper.refundPayment，检验退款路径下供应量与各账户余额之和保持一致。"
+            }
+          ]
+        }
+      ],
+      "shared_prefixes": [],
+      "assumptions": [
+        "driver_* 函数内部通过 token.mint 增加 totalSupply 与对应余额，因此单次调用本身不破坏守恒；序列用于覆盖授权、捕获/收费、退款等外部调用路径，观察 wrapper 与 mockEscrow 间转账是否仍使 accountedFor 等于 supply。",
+        "paymentRefCounter 在 driver_authorizePayment 或 driver_chargePayment 成功后递增，故 refund 步骤需排在至少一次授权/收费之后；具体参数由 fuzzer 绑定，未在此具体化。",
+        "属性读取的 PAYER、MERCHANT、OPERATOR、FEE_RECEIVER、wrapper、mockEscrow 地址由部署环境固定；若 wrapper 或 mockEscrow 持有未计入地址的代币，守恒可能因环境而非序列失败。",
+        "未使用 driver_capturePayment、driver_reclaimPayment、driver_voidPayment，因为候选列表未将其标记为 seed_compatible=true，且 max_steps_per_sequence 限制为 5。"
+      ]
+    },
+    "ok": true,
+    "elapsed_seconds": 3.365
+  },
+  "agent_a_output": {
+    "property_sequences": [
+      {
+        "property_id": "c451c42790194538cf50",
+        "candidate_id": "c451c42790194538cf50-seq-1",
+        "steps": [
+          {
+            "function": "driver_authorizePayment(uint256,uint256,uint16)",
+            "rationale": "先铸造代币到 wrapper 测试合约并授权 escrow，使 token 供应量与已计入余额（this、PAYER、MERCHANT、OPERATOR、FEE_RECEIVER、wrapper、mockEscrow）同步增加，为守恒检查建立非零基线。"
+          },
+          {
+            "function": "driver_chargePayment(uint256,uint16)",
+            "rationale": "在已有授权基础上执行 charge，触发 mint、approve 与 wrapper.chargePayment 的转账/费用分配，检验供应量与各角色余额之和在捕获与费用路径下仍相等。"
+          },
+          {
+            "function": "driver_refundPayment(uint256,uint256)",
+            "rationale": "在存在 paymentRefCounter 后执行退款，向 operator 铸造退款代币并调用 wrapper.refundPayment，检验退款路径下供应量与各账户余额之和保持一致。"
+          }
+        ]
+      }
+    ],
+    "shared_prefixes": [],
+    "assumptions": [
+      "driver_* 函数内部通过 token.mint 增加 totalSupply 与对应余额，因此单次调用本身不破坏守恒；序列用于覆盖授权、捕获/收费、退款等外部调用路径，观察 wrapper 与 mockEscrow 间转账是否仍使 accountedFor 等于 supply。",
+      "paymentRefCounter 在 driver_authorizePayment 或 driver_chargePayment 成功后递增，故 refund 步骤需排在至少一次授权/收费之后；具体参数由 fuzzer 绑定，未在此具体化。",
+      "属性读取的 PAYER、MERCHANT、OPERATOR、FEE_RECEIVER、wrapper、mockEscrow 地址由部署环境固定；若 wrapper 或 mockEscrow 持有未计入地址的代币，守恒可能因环境而非序列失败。",
+      "未使用 driver_capturePayment、driver_reclaimPayment、driver_voidPayment，因为候选列表未将其标记为 seed_compatible=true，且 max_steps_per_sequence 限制为 5。"
+    ]
+  },
+  "candidates": [
+    {
+      "candidate_id": "c451c42790194538cf50-seq-1",
+      "property_id": "c451c42790194538cf50",
+      "plan": [
+        {
+          "function": "driver_authorizePayment(uint256,uint256,uint16)",
+          "rationale": "先铸造代币到 wrapper 测试合约并授权 escrow，使 token 供应量与已计入余额（this、PAYER、MERCHANT、OPERATOR、FEE_RECEIVER、wrapper、mockEscrow）同步增加，为守恒检查建立非零基线。"
+        },
+        {
+          "function": "driver_chargePayment(uint256,uint16)",
+          "rationale": "在已有授权基础上执行 charge，触发 mint、approve 与 wrapper.chargePayment 的转账/费用分配，检验供应量与各角色余额之和在捕获与费用路径下仍相等。"
+        },
+        {
+          "function": "driver_refundPayment(uint256,uint256)",
+          "rationale": "在存在 paymentRefCounter 后执行退款，向 operator 铸造退款代币并调用 wrapper.refundPayment，检验退款路径下供应量与各账户余额之和保持一致。"
+        }
+      ],
+      "seed": {
+        "property_id": "c451c42790194538cf50",
+        "candidate_id": "c451c42790194538cf50-seq-1",
+        "transactions": [
+          {
+            "function": "driver_authorizePayment(uint256,uint256,uint16)",
+            "arguments": [
+              1000000000000000000,
+              1000000000000000000,
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0
+          },
+          {
+            "function": "driver_chargePayment(uint256,uint16)",
+            "arguments": [
+              1000000000000000000,
+              100
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0
+          },
+          {
+            "function": "driver_refundPayment(uint256,uint256)",
+            "arguments": [
+              0,
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000030000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0
+          }
+        ],
+        "assumptions": [
+          "driver_authorizePayment 内部将 amount 经 _boundAmount 处理，传入 1e18 假定落在非零有效区间，从而触发 mint 与 wrapper.authorizePayment 调用。",
+          "driver_chargePayment 的 feeBps 经 %10001 处理，传入 100 假定为有效费率，chargePayment 可能成功或回滚，但 mint 与 approve 在 try 之前已执行。",
+          "driver_refundPayment 依赖 paymentRefCounter 非零，前两笔交易假定已递增该计数器；paymentIndex=0 映射到 paymentRef=1。",
+          "refundAmount 经 _boundAmount 处理，传入 1e18 假定非零，从而触发 mint 与 wrapper.refundPayment 调用。",
+          "属性读取的 PAYER/OPERATOR 等地址与 wrapper 测试合约地址(this)的别名关系由实际部署决定，静态无法确认；守恒是否成立取决于 wrapper/mockEscrow 的实际转账与费用分配。",
+          "未声称该序列已验证可执行或可违反属性；验证器将实际回放并检查 echidna_token_conservation()。"
+        ],
+        "execution_feedback": null
+      },
+      "agent_b_calls": [
+        {
+          "at_utc": "2026-11-13T03:13:43.076493+00:00",
+          "tag": "AgentB_Request_c451c42790194538cf50-seq-1_try1",
+          "model_requested": "deepseek-flash",
+          "thinking": "disabled",
+          "request_sha256": "44ca3be513431e943114097f774e0bc4fb736d39642f51332264d5fae7569595",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "http_status": 200,
+          "response_id": "194b321d-c348-4770-8243-528b5ce90bf1",
+          "model_returned": "deepseek-flash",
+          "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+          "usage": {
+            "prompt_tokens": 8648,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 8648,
+            "completion_tokens": 451,
+            "total_tokens": 9099,
+            "estimated_cost_usd": {
+              "offpeak": "0.0015678",
+              "peak": "0.0031356"
+            },
+            "pricing_date": "2026-11-13",
+            "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+            "cost_is_estimate": true
+          },
+          "finish_reason": "stop",
+          "response_json": {
+            "property_id": "c451c42790194538cf50",
+            "candidate_id": "c451c42790194538cf50-seq-1",
+            "transactions": [
+              {
+                "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                "arguments": [
+                  1000000000000000000,
+                  1000000000000000000,
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              },
+              {
+                "function": "driver_chargePayment(uint256,uint16)",
+                "arguments": [
+                  1000000000000000000,
+                  100
+                ],
+                "sender": "0x0000000000000000000000000000000000020000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              },
+              {
+                "function": "driver_refundPayment(uint256,uint256)",
+                "arguments": [
+                  0,
+                  1000000000000000000
+                ],
+                "sender": "0x0000000000000000000000000000000000030000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              }
+            ],
+            "assumptions": [
+              "driver_authorizePayment 内部将 amount 经 _boundAmount 处理，传入 1e18 假定落在非零有效区间，从而触发 mint 与 wrapper.authorizePayment 调用。",
+              "driver_chargePayment 的 feeBps 经 %10001 处理，传入 100 假定为有效费率，chargePayment 可能成功或回滚，但 mint 与 approve 在 try 之前已执行。",
+              "driver_refundPayment 依赖 paymentRefCounter 非零，前两笔交易假定已递增该计数器；paymentIndex=0 映射到 paymentRef=1。",
+              "refundAmount 经 _boundAmount 处理，传入 1e18 假定非零，从而触发 mint 与 wrapper.refundPayment 调用。",
+              "属性读取的 PAYER/OPERATOR 等地址与 wrapper 测试合约地址(this)的别名关系由实际部署决定，静态无法确认；守恒是否成立取决于 wrapper/mockEscrow 的实际转账与费用分配。",
+              "未声称该序列已验证可执行或可违反属性；验证器将实际回放并检查 echidna_token_conservation()。"
+            ],
+            "execution_feedback": null
+          },
+          "ok": true,
+          "elapsed_seconds": 2.861
+        }
+      ],
+      "replay": {
+        "project": "Request",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "c451c42790194538cf50-seq-1",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "transactions": [
+          {
+            "index": 1,
+            "function": "driver_authorizePayment(uint256,uint256,uint16)",
+            "arguments": [
+              1000000000000000000,
+              1000000000000000000,
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "cb6800cb474965558891f7a738311a23ad5be6f8af20f8069b63688b675e5708",
+            "block_number": 2,
+            "status": "success",
+            "gas_used": 367704,
+            "observed_view_state_changed": true,
+            "observed_view_count": 17,
+            "tracked_contract_count": 8,
+            "tracked_contract_types": [
+              "ERC20CommerceEscrowWrapper",
+              "Harness",
+              "IAuthCaptureEscrow",
+              "IERC20",
+              "IERC20FeeProxy",
+              "MockAuthCaptureEscrow",
+              "MockERC20",
+              "MockERC20FeeProxy"
+            ],
+            "state_fingerprint_before": "54f58d9aac6740a3e45f196d3a462619c915cd70890139ad504703085495e38f",
+            "state_fingerprint_after": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+            "target_property": true,
+            "property_error": null
+          },
+          {
+            "index": 2,
+            "function": "driver_chargePayment(uint256,uint16)",
+            "arguments": [
+              1000000000000000000,
+              100
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "2127f56fd290d0e6aa9b2f19860cecdaf7cc3ebe3819d81de6798dbdaa3baed6",
+            "block_number": 3,
+            "status": "success",
+            "gas_used": 422725,
+            "observed_view_state_changed": true,
+            "observed_view_count": 17,
+            "tracked_contract_count": 8,
+            "tracked_contract_types": [
+              "ERC20CommerceEscrowWrapper",
+              "Harness",
+              "IAuthCaptureEscrow",
+              "IERC20",
+              "IERC20FeeProxy",
+              "MockAuthCaptureEscrow",
+              "MockERC20",
+              "MockERC20FeeProxy"
+            ],
+            "state_fingerprint_before": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+            "state_fingerprint_after": "b7221dbbdf174861217426fbc04896b685154af860531ad1ed9c17f2ef0f24dc",
+            "target_property": true,
+            "property_error": null
+          },
+          {
+            "index": 3,
+            "function": "driver_refundPayment(uint256,uint256)",
+            "arguments": [
+              0,
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000030000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "9d7aedf2e5a886d4d8cb91d5dfe7a1643d8e9016699768668ef905100578dfc8",
+            "block_number": 4,
+            "status": "success",
+            "gas_used": 158267,
+            "observed_view_state_changed": true,
+            "observed_view_count": 17,
+            "tracked_contract_count": 8,
+            "tracked_contract_types": [
+              "ERC20CommerceEscrowWrapper",
+              "Harness",
+              "IAuthCaptureEscrow",
+              "IERC20",
+              "IERC20FeeProxy",
+              "MockAuthCaptureEscrow",
+              "MockERC20",
+              "MockERC20FeeProxy"
+            ],
+            "state_fingerprint_before": "b7221dbbdf174861217426fbc04896b685154af860531ad1ed9c17f2ef0f24dc",
+            "state_fingerprint_after": "2117961d2983da0c1ed2882028f844c7abafaf0a902eb900ea5629e92973733a",
+            "target_property": true,
+            "property_error": null
+          }
+        ]
+      },
+      "corpus_file": "deepseek/结果/Agent种子/Request/coverage/c451c42790194538cf50-seq-1.txt",
+      "status": "abi_encoded_and_replayed"
+    }
+  ],
+  "echidna": null,
+  "elapsed_seconds": 7.06
+}

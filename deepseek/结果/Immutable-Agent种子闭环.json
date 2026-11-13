@@ -1,0 +1,221 @@
+{
+  "project": "Immutable",
+  "property_ids": [
+    "18762080be886c35e1a0"
+  ],
+  "property_count": 1,
+  "action_counts": {
+    "18762080be886c35e1a0": 1
+  },
+  "agent_a": {
+    "at_utc": "2026-11-13T03:14:04.618256+00:00",
+    "tag": "AgentA_Immutable_18762080be886c35e1a0",
+    "model_requested": "deepseek-flash",
+    "thinking": "disabled",
+    "request_sha256": "6060a66efad45a1df0869123adcc52000fab616b4bb37c6eb4de841855f18ec9",
+    "attempt": 1,
+    "max_tokens": 4096,
+    "http_status": 200,
+    "response_id": "a7e1904f-e61d-4b05-bfc1-68b91a91f737",
+    "model_returned": "deepseek-flash",
+    "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+    "usage": {
+      "prompt_tokens": 2512,
+      "prompt_cache_hit_tokens": 128,
+      "prompt_cache_miss_tokens": 2384,
+      "completion_tokens": 212,
+      "total_tokens": 2724,
+      "estimated_cost_usd": {
+        "offpeak": "0.000485184",
+        "peak": "0.000970368"
+      },
+      "pricing_date": "2026-11-13",
+      "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "cost_is_estimate": true
+    },
+    "finish_reason": "stop",
+    "response_json": {
+      "property_sequences": [
+        {
+          "property_id": "18762080be886c35e1a0",
+          "candidate_id": "mintForTest(address,uint256)",
+          "steps": [
+            {
+              "function": "mintForTest(address,uint256)",
+              "rationale": "唯一 seed_compatible 且直接写入 minted 与 totalMinted 的候选；通过多次调用使 totalMinted 跨越 GROUP_SIZE 边界，从而让 echidna_group_occupancy 的 groupOccupancy 累加路径被覆盖，检验每组活跃 token 数是否超过 GROUP_SIZE。"
+            }
+          ]
+        }
+      ],
+      "shared_prefixes": [],
+      "assumptions": [
+        "未对参数具体化；假设 fuzz 可选取 quantity 使 totalMinted 增长到至少 GROUP_SIZE+1 以触发跨组索引。",
+        "burned 状态无 seed_compatible 写入候选，故序列不覆盖 burn 后占用减少的分支。",
+        "属性函数自身写 groupOccupancy，但每次调用先清零，故不视为持久污染。"
+      ]
+    },
+    "ok": true,
+    "elapsed_seconds": 2.029
+  },
+  "agent_a_output": {
+    "property_sequences": [
+      {
+        "property_id": "18762080be886c35e1a0",
+        "candidate_id": "mintForTest(address,uint256)",
+        "steps": [
+          {
+            "function": "mintForTest(address,uint256)",
+            "rationale": "唯一 seed_compatible 且直接写入 minted 与 totalMinted 的候选；通过多次调用使 totalMinted 跨越 GROUP_SIZE 边界，从而让 echidna_group_occupancy 的 groupOccupancy 累加路径被覆盖，检验每组活跃 token 数是否超过 GROUP_SIZE。"
+          }
+        ]
+      }
+    ],
+    "shared_prefixes": [],
+    "assumptions": [
+      "未对参数具体化；假设 fuzz 可选取 quantity 使 totalMinted 增长到至少 GROUP_SIZE+1 以触发跨组索引。",
+      "burned 状态无 seed_compatible 写入候选，故序列不覆盖 burn 后占用减少的分支。",
+      "属性函数自身写 groupOccupancy，但每次调用先清零，故不视为持久污染。"
+    ]
+  },
+  "candidates": [
+    {
+      "candidate_id": "mintForTest(address,uint256)",
+      "property_id": "18762080be886c35e1a0",
+      "plan": [
+        {
+          "function": "mintForTest(address,uint256)",
+          "rationale": "唯一 seed_compatible 且直接写入 minted 与 totalMinted 的候选；通过多次调用使 totalMinted 跨越 GROUP_SIZE 边界，从而让 echidna_group_occupancy 的 groupOccupancy 累加路径被覆盖，检验每组活跃 token 数是否超过 GROUP_SIZE。"
+        }
+      ],
+      "seed": {
+        "property_id": "18762080be886c35e1a0",
+        "candidate_id": "mintForTest(address,uint256)",
+        "transactions": [
+          {
+            "function": "mintForTest(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0
+          }
+        ],
+        "assumptions": [
+          "GROUP_SIZE 未在输入中给出具体值；假设其为大于 0 的常量，单次 mint 1 个 token 不会使任一组活跃 token 数超过 GROUP_SIZE。",
+          "mintForTest 内部调用 _mint 可能含内联汇编，但按源码 minted[tokenId]=true 与 totalMinted+=quantity 直接生效。",
+          "burned 映射未被任何交易修改，保持默认 false。",
+          "属性函数自身写入 groupOccupancy，回放时属性检查可能改变后续状态，但本序列仅一笔交易。",
+          "未声称已验证可执行；由验证器实际回放检查目标属性。"
+        ],
+        "execution_feedback": "上次响应未通过本地 ABI/交易结构校验。请按同一计划修正。错误：ValueError: 交易数必须与 Agent A 规划完全一致"
+      },
+      "agent_b_calls": [
+        {
+          "ok": false,
+          "error_kind": "ValueError",
+          "error": "ValueError: 交易数必须与 Agent A 规划完全一致"
+        },
+        {
+          "at_utc": "2026-11-13T03:14:09.087978+00:00",
+          "tag": "AgentB_Immutable_mintForTest(address,uint256)_try2",
+          "model_requested": "deepseek-flash",
+          "thinking": "disabled",
+          "request_sha256": "fff2c9ddba11ede3699dfd2254429bbb9a733ef4cb61ca1e2a142746f1c1b01a",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "http_status": 200,
+          "response_id": "959650c9-72aa-4c32-9746-3feb47eff2f6",
+          "model_returned": "deepseek-flash",
+          "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+          "usage": {
+            "prompt_tokens": 3900,
+            "prompt_cache_hit_tokens": 3712,
+            "prompt_cache_miss_tokens": 188,
+            "completion_tokens": 238,
+            "total_tokens": 4138,
+            "estimated_cost_usd": {
+              "offpeak": "0.000182136",
+              "peak": "0.000364272"
+            },
+            "pricing_date": "2026-11-13",
+            "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+            "cost_is_estimate": true
+          },
+          "finish_reason": "stop",
+          "response_json": {
+            "property_id": "18762080be886c35e1a0",
+            "candidate_id": "mintForTest(address,uint256)",
+            "transactions": [
+              {
+                "function": "mintForTest(address,uint256)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  1
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              }
+            ],
+            "assumptions": [
+              "GROUP_SIZE 未在输入中给出具体值；假设其为大于 0 的常量，单次 mint 1 个 token 不会使任一组活跃 token 数超过 GROUP_SIZE。",
+              "mintForTest 内部调用 _mint 可能含内联汇编，但按源码 minted[tokenId]=true 与 totalMinted+=quantity 直接生效。",
+              "burned 映射未被任何交易修改，保持默认 false。",
+              "属性函数自身写入 groupOccupancy，回放时属性检查可能改变后续状态，但本序列仅一笔交易。",
+              "未声称已验证可执行；由验证器实际回放检查目标属性。"
+            ],
+            "execution_feedback": "上次响应未通过本地 ABI/交易结构校验。请按同一计划修正。错误：ValueError: 交易数必须与 Agent A 规划完全一致"
+          },
+          "ok": true,
+          "elapsed_seconds": 1.682
+        }
+      ],
+      "replay": {
+        "project": "Immutable",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "mintForTest(address,uint256)",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "transactions": [
+          {
+            "index": 1,
+            "function": "mintForTest(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "12ac5827b59125b834963690d409a186f520c2fddea1c7eab19cdfbd8f3fa68b",
+            "block_number": 2,
+            "status": "success",
+            "gas_used": 170311,
+            "observed_view_state_changed": true,
+            "observed_view_count": 20,
+            "tracked_contract_count": 3,
+            "tracked_contract_types": [
+              "Harness",
+              "MaliciousReceiver",
+              "TestReceiver"
+            ],
+            "state_fingerprint_before": "eb8a507e8ed4de5e0c816af6fe40ae4f084a5c68281b552f901c0634ce470121",
+            "state_fingerprint_after": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+            "target_property": true,
+            "property_error": null
+          }
+        ]
+      },
+      "corpus_file": "deepseek/结果/Agent种子/Immutable/coverage/mintForTest(address,uint256).txt",
+      "status": "abi_encoded_and_replayed"
+    }
+  ],
+  "echidna": null,
+  "elapsed_seconds": 6.602
+}

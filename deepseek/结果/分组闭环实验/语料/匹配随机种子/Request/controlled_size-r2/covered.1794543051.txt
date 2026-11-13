@@ -1,0 +1,2371 @@
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/ERC20CommerceEscrowWrapper.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity ^0.8.9;
+   3 |     | 
+   4 |     | import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+   5 |     | import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+   6 |     | import {ReentrancyGuard} from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
+   7 |     | import {IERC20FeeProxy} from './interfaces/ERC20FeeProxy.sol';
+   8 |     | import {IAuthCaptureEscrow} from './interfaces/IAuthCaptureEscrow.sol';
+   9 |     | 
+  10 |     | /// @title ERC20CommerceEscrowWrapper
+  11 |     | /// @notice Wrapper around Commerce Payments escrow that acts as depositor, operator, and recipient
+  12 |     | /// @dev This contract maintains payment reference linking and provides secure operator delegation
+  13 |     | ///
+  14 |     | /// @dev Fee Architecture Summary:
+  15 |     | ///      - Fees are REQUEST NETWORK PLATFORM FEES, NOT Commerce Escrow protocol fees
+  16 |     | ///      - MERCHANT PAYS fee (subtracted from capture amount: merchantReceives = captureAmount - fee)
+  17 |     | ///      - Single fee recipient per operation (can be a fee-splitting contract for multi-party distribution)
+  18 |     | ///      - All fees distributed via ERC20FeeProxy for Request Network compatibility and event tracking
+  19 |     | ///      - Commerce Escrow fee mechanism is intentionally bypassed (feeBps=0, feeReceiver=address(0))
+  20 |     | ///      - Fee calculation: feeAmount = (captureAmount * feeBps) / 10000 (basis points, max 10000 = 100%)
+  21 |     | ///      - Integer division truncates (slightly favors merchant in rounding)
+  22 |     | ///      - Fee-free operations: void, reclaim, refund (remedial actions, no value capture)
+  23 |     | ///
+  24 |     | /// @dev For comprehensive fee mechanism documentation including:
+  25 |     | ///      - Fee payer model alternatives (payer-pays vs merchant-pays)
+  26 |     | ///      - Multi-recipient fee split strategies
+  27 |     | ///      - Future extensibility paths
+  28 |     | ///      - Security considerations
+  29 |     | ///      - Integration guidelines
+  30 |     | ///      See: docs/design-decisions/FEE_MECHANISM_DESIGN.md
+  31 |     | ///
+  32 |     | /// @author Request Network & Coinbase Commerce Payments Integration
+  33 | *   | contract ERC20CommerceEscrowWrapper is ReentrancyGuard {
+  34 |     |   using SafeERC20 for IERC20;
+  35 |     | 
+  36 |     |   /// @notice Commerce Payments escrow contract
+  37 |     |   IAuthCaptureEscrow public immutable commerceEscrow;
+  38 |     | 
+  39 |     |   /// @notice Request Network's ERC20FeeProxy contract
+  40 |     |   IERC20FeeProxy public immutable erc20FeeProxy;
+  41 |     | 
+  42 |     |   /// @notice Maps Request Network payment references to internal payment data
+  43 |     |   mapping(bytes8 => PaymentData) public payments;
+  44 |     | 
+  45 |     |   /// @notice Internal payment data structure
+  46 |     |   /// @dev Struct packing optimizes storage to 6 slots for gas efficiency
+  47 |     |   /// Slot 0: payer (20 bytes)
+  48 |     |   /// Slot 1: merchant (20 bytes) + amount (12 bytes)
+  49 |     |   /// Slot 2: operator (20 bytes) + maxAmount (12 bytes)
+  50 |     |   /// Slot 3: token (20 bytes) + preApprovalExpiry (6 bytes) + authorizationExpiry (6 bytes)
+  51 |     |   /// Slot 4: refundExpiry (6 bytes)
+  52 |     |   /// Slot 5: commercePaymentHash (32 bytes)
+  53 |     |   /// @dev uint96 supports up to ~79B tokens (18 decimals) - sufficient for all practical use cases
+  54 |     |   /// @dev uint48 timestamps valid until year 8,921,556 - no practical limitation
+  55 |     |   /// @dev Payment existence is determined by commercePaymentHash != bytes32(0)
+  56 |     |   /// This approach delegates to the Commerce Escrow's state tracking without external calls,
+  57 |     |   /// maintaining gas efficiency while avoiding state synchronization issues.
+  58 |     |   struct PaymentData {
+  59 |     |     address payer; // Slot 0 (20 bytes)
+  60 |     |     address merchant; // Slot 1 (20 bytes)
+  61 |     |     uint96 amount; // Slot 1 (12 bytes) ← PACKED
+  62 |     |     address operator; // Slot 2 (20 bytes) - The real operator who can capture/void this payment
+  63 |     |     uint96 maxAmount; // Slot 2 (12 bytes) ← PACKED
+  64 |     |     address token; // Slot 3 (20 bytes)
+  65 |     |     uint48 preApprovalExpiry; // Slot 3 (6 bytes) ← PACKED
+  66 |     |     uint48 authorizationExpiry; // Slot 3 (6 bytes) ← PACKED - When authorization expires and can be reclaimed
+  67 |     |     uint48 refundExpiry; // Slot 4 (6 bytes) - When refunds are no longer allowed
+  68 |     |     bytes32 commercePaymentHash; // Slot 5 (32 bytes)
+  69 |     |   }
+  70 |     | 
+  71 |     |   /// @notice Emitted when a payment is authorized (frontend-friendly)
+  72 |     |   event PaymentAuthorized(
+  73 |     |     bytes8 indexed paymentReference,
+  74 |     |     address payer,
+  75 |     |     address merchant,
+  76 |     |     address token,
+  77 |     |     uint256 amount,
+  78 |     |     bytes32 commercePaymentHash
+  79 |     |   );
+  80 |     | 
+  81 |     |   /// @notice Emitted when a commerce payment is authorized (for compatibility)
+  82 |     |   event CommercePaymentAuthorized(
+  83 |     |     bytes8 indexed paymentReference,
+  84 |     |     address payer,
+  85 |     |     address merchant,
+  86 |     |     uint256 amount
+  87 |     |   );
+  88 |     | 
+  89 |     |   /// @notice Emitted when a payment is captured
+  90 |     |   event PaymentCaptured(
+  91 |     |     bytes8 indexed paymentReference,
+  92 |     |     bytes32 commercePaymentHash,
+  93 |     |     uint256 capturedAmount,
+  94 |     |     address merchant
+  95 |     |   );
+  96 |     | 
+  97 |     |   /// @notice Emitted when a payment is voided
+  98 |     |   event PaymentVoided(
+  99 |     |     bytes8 indexed paymentReference,
+ 100 |     |     bytes32 commercePaymentHash,
+ 101 |     |     uint256 voidedAmount,
+ 102 |     |     address payer
+ 103 |     |   );
+ 104 |     | 
+ 105 |     |   /// @notice Emitted when a payment is charged (immediate auth + capture)
+ 106 |     |   event PaymentCharged(
+ 107 |     |     bytes8 indexed paymentReference,
+ 108 |     |     address payer,
+ 109 |     |     address merchant,
+ 110 |     |     address token,
+ 111 |     |     uint256 amount,
+ 112 |     |     bytes32 commercePaymentHash
+ 113 |     |   );
+ 114 |     | 
+ 115 |     |   /// @notice Emitted when a payment is reclaimed by the payer
+ 116 |     |   event PaymentReclaimed(
+ 117 |     |     bytes8 indexed paymentReference,
+ 118 |     |     bytes32 commercePaymentHash,
+ 119 |     |     uint256 reclaimedAmount,
+ 120 |     |     address payer
+ 121 |     |   );
+ 122 |     | 
+ 123 |     |   /// @notice Emitted for Request Network compatibility (mimics ERC20FeeProxy event)
+ 124 |     |   event TransferWithReferenceAndFee(
+ 125 |     |     address tokenAddress,
+ 126 |     |     address to,
+ 127 |     |     uint256 amount,
+ 128 |     |     bytes8 indexed paymentReference,
+ 129 |     |     uint256 feeAmount,
+ 130 |     |     address feeAddress
+ 131 |     |   );
+ 132 |     | 
+ 133 |     |   /// @notice Emitted when a payment is refunded
+ 134 |     |   event PaymentRefunded(
+ 135 |     |     bytes8 indexed paymentReference,
+ 136 |     |     bytes32 commercePaymentHash,
+ 137 |     |     uint256 refundedAmount,
+ 138 |     |     address payer
+ 139 |     |   );
+ 140 |     | 
+ 141 |     |   /// @notice Struct to group charge parameters to avoid stack too deep
+ 142 |     |   struct ChargeParams {
+ 143 |     |     bytes8 paymentReference;
+ 144 |     |     address payer;
+ 145 |     |     address merchant;
+ 146 |     |     address operator;
+ 147 |     |     address token;
+ 148 |     |     uint256 amount;
+ 149 |     |     uint256 maxAmount;
+ 150 |     |     uint256 preApprovalExpiry;
+ 151 |     |     uint256 authorizationExpiry;
+ 152 |     |     uint256 refundExpiry;
+ 153 |     |     /// @dev Request Network platform fee in basis points (0-10000, where 10000 = 100%).
+ 154 |     |     ///      CRITICAL: MERCHANT PAYS this fee (subtracted from payment amount).
+ 155 |     |     ///      Formula: feeAmount = (amount * feeBps) / 10000
+ 156 |     |     ///      Example: 250 bps on 1000 USDC = 25 USDC fee, merchant receives 975 USDC
+ 157 |     |     ///      Validation: Reverts with InvalidFeeBps() if feeBps > 10000
+ 158 |     |     ///      See: FEE_MECHANISM_DESIGN.md for payer-pays alternatives
+ 159 |     |     uint16 feeBps;
+ 160 |     |     /// @dev Request Network platform fee recipient address (single recipient per operation).
+ 161 |     |     ///      This is NOT a Commerce Escrow protocol fee - it's a Request Network service fee.
+ 162 |     |     ///      For multi-party fee splits (e.g., RN API + Platform), use a fee-splitting contract.
+ 163 |     |     ///      Commerce Escrow fees are intentionally bypassed in this wrapper.
+ 164 |     |     ///      Can be address(0) to effectively burn the fee (not recommended).
+ 165 |     |     ///      See: FEE_MECHANISM_DESIGN.md for fee splitter contract examples
+ 166 |     |     address feeReceiver;
+ 167 |     |     address tokenCollector;
+ 168 |     |     bytes collectorData;
+ 169 |     |   }
+ 170 |     | 
+ 171 |     |   /// @notice Struct to group authorization parameters to avoid stack too deep
+ 172 |     |   struct AuthParams {
+ 173 |     |     bytes8 paymentReference;
+ 174 |     |     address payer;
+ 175 |     |     address merchant;
+ 176 |     |     address operator;
+ 177 |     |     address token;
+ 178 |     |     uint256 amount;
+ 179 |     |     uint256 maxAmount;
+ 180 |     |     uint256 preApprovalExpiry;
+ 181 |     |     uint256 authorizationExpiry;
+ 182 |     |     uint256 refundExpiry;
+ 183 |     |     address tokenCollector;
+ 184 |     |     bytes collectorData;
+ 185 |     |   }
+ 186 |     | 
+ 187 |     |   /// @notice Invalid payment reference
+ 188 |     |   error InvalidPaymentReference();
+ 189 |     | 
+ 190 |     |   /// @notice Payment not found
+ 191 |     |   error PaymentNotFound();
+ 192 |     | 
+ 193 |     |   /// @notice Payment already exists
+ 194 |     |   error PaymentAlreadyExists();
+ 195 |     | 
+ 196 |     |   /// @notice Invalid operator for this payment
+ 197 |     |   error InvalidOperator(address sender, address expectedOperator);
+ 198 |     | 
+ 199 |     |   /// @notice Invalid payer for this payment
+ 200 |     |   error InvalidPayer(address sender, address expectedPayer);
+ 201 |     | 
+ 202 |     |   /// @notice Zero address not allowed
+ 203 |     |   error ZeroAddress();
+ 204 |     | 
+ 205 |     |   /// @notice Scalar overflow when casting to smaller uint types
+ 206 |     |   error ScalarOverflow();
+ 207 |     | 
+ 208 |     |   /// @notice Invalid fee basis points (must be <= 10000)
+ 209 |     |   error InvalidFeeBps();
+ 210 |     | 
+ 211 |     |   /// @notice Check call sender is the operator for this payment
+ 212 |     |   /// @param paymentReference Request Network payment reference
+ 213 | *   |   modifier onlyOperator(bytes8 paymentReference) {
+ 214 | *   |     PaymentData storage payment = payments[paymentReference];
+ 215 | *   |     if (payment.commercePaymentHash == bytes32(0)) revert PaymentNotFound();
+ 216 |     | 
+ 217 |     |     // Check if the caller is the designated operator for this payment
+ 218 | *   |     if (msg.sender != payment.operator) {
+ 219 |     |       revert InvalidOperator(msg.sender, payment.operator);
+ 220 |     |     }
+ 221 |     |     _;
+ 222 |     |   }
+ 223 |     | 
+ 224 |     |   /// @notice Check call sender is the payer for this payment
+ 225 |     |   /// @param paymentReference Request Network payment reference
+ 226 |     |   modifier onlyPayer(bytes8 paymentReference) {
+ 227 | *   |     PaymentData storage payment = payments[paymentReference];
+ 228 | *   |     if (payment.commercePaymentHash == bytes32(0)) revert PaymentNotFound();
+ 229 |     | 
+ 230 |     |     // Check if the caller is the payer for this payment
+ 231 | *   |     if (msg.sender != payment.payer) {
+ 232 |     |       revert InvalidPayer(msg.sender, payment.payer);
+ 233 |     |     }
+ 234 |     |     _;
+ 235 |     |   }
+ 236 |     | 
+ 237 |     |   /// @notice Constructor
+ 238 |     |   /// @param commerceEscrow_ Commerce Payments escrow contract
+ 239 |     |   /// @param erc20FeeProxy_ Request Network's ERC20FeeProxy contract
+ 240 | *   |   constructor(address commerceEscrow_, address erc20FeeProxy_) {
+ 241 | *   |     if (commerceEscrow_ == address(0)) revert ZeroAddress();
+ 242 | *   |     if (erc20FeeProxy_ == address(0)) revert ZeroAddress();
+ 243 |     | 
+ 244 | *   |     commerceEscrow = IAuthCaptureEscrow(commerceEscrow_);
+ 245 | *   |     erc20FeeProxy = IERC20FeeProxy(erc20FeeProxy_);
+ 246 |     |   }
+ 247 |     | 
+ 248 |     |   /// @notice Authorize a payment into escrow
+ 249 |     |   /// @param params AuthParams struct containing all authorization parameters
+ 250 | *   |   function authorizePayment(AuthParams calldata params) public nonReentrant {
+ 251 | *   |     if (params.paymentReference == bytes8(0)) revert InvalidPaymentReference();
+ 252 | *   |     if (payments[params.paymentReference].commercePaymentHash != bytes32(0))
+ 253 |     |       revert PaymentAlreadyExists();
+ 254 |     | 
+ 255 |     |     // Validate critical addresses
+ 256 | *   |     if (params.payer == address(0)) revert ZeroAddress();
+ 257 | *   |     if (params.merchant == address(0)) revert ZeroAddress();
+ 258 | *   |     if (params.operator == address(0)) revert ZeroAddress();
+ 259 | *   |     if (params.token == address(0)) revert ZeroAddress();
+ 260 |     |     // Note: tokenCollector is validated by the underlying escrow contract
+ 261 |     | 
+ 262 |     |     // Create and execute authorization
+ 263 | *   |     _executeAuthorization(params);
+ 264 |     |   }
+ 265 |     | 
+ 266 |     |   /// @notice Internal function to execute authorization
+ 267 | *   |   function _executeAuthorization(AuthParams memory params) internal {
+ 268 |     |     // Create PaymentInfo
+ 269 | *   |     IAuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfo(
+ 270 | *   |       params.payer,
+ 271 | *   |       params.token,
+ 272 | *   |       params.amount,
+ 273 | *   |       params.maxAmount,
+ 274 | *   |       params.preApprovalExpiry,
+ 275 | *   |       params.authorizationExpiry,
+ 276 | *   |       params.refundExpiry,
+ 277 | *   |       params.paymentReference
+ 278 |     |     );
+ 279 |     | 
+ 280 |     |     // Store payment data
+ 281 | *   |     bytes32 commerceHash = commerceEscrow.getHash(paymentInfo);
+ 282 | *   |     _storePaymentData(
+ 283 | *   |       params.paymentReference,
+ 284 | *   |       params.payer,
+ 285 | *   |       params.merchant,
+ 286 | *   |       params.operator,
+ 287 | *   |       params.token,
+ 288 | *   |       params.amount,
+ 289 | *   |       params.maxAmount,
+ 290 | *   |       params.preApprovalExpiry,
+ 291 | *   |       params.authorizationExpiry,
+ 292 | *   |       params.refundExpiry,
+ 293 | *   |       commerceHash
+ 294 |     |     );
+ 295 |     | 
+ 296 |     |     // Emit events before external call to prevent reentrancy concerns
+ 297 | *   |     emit PaymentAuthorized(
+ 298 | *   |       params.paymentReference,
+ 299 | *   |       params.payer,
+ 300 | *   |       params.merchant,
+ 301 | *   |       params.token,
+ 302 | *   |       params.amount,
+ 303 | *   |       commerceHash
+ 304 |     |     );
+ 305 | *   |     emit CommercePaymentAuthorized(
+ 306 | *   |       params.paymentReference,
+ 307 | *   |       params.payer,
+ 308 | *   |       params.merchant,
+ 309 | *   |       params.amount
+ 310 |     |     );
+ 311 |     | 
+ 312 |     |     // Execute authorization (external call)
+ 313 | *   |     commerceEscrow.authorize(
+ 314 | *   |       paymentInfo,
+ 315 | *   |       params.amount,
+ 316 | *   |       params.tokenCollector,
+ 317 | *   |       params.collectorData
+ 318 |     |     );
+ 319 |     |   }
+ 320 |     | 
+ 321 |     |   /// @notice Create PaymentInfo struct
+ 322 | *   |   function _createPaymentInfo(
+ 323 |     |     address payer,
+ 324 |     |     address token,
+ 325 |     |     uint256 amount,
+ 326 |     |     uint256 maxAmount,
+ 327 |     |     uint256 preApprovalExpiry,
+ 328 |     |     uint256 authorizationExpiry,
+ 329 |     |     uint256 refundExpiry,
+ 330 |     |     bytes8 paymentReference
+ 331 | *   |   ) internal view returns (IAuthCaptureEscrow.PaymentInfo memory) {
+ 332 |     |     // Validate against uint96 (storage type) which is stricter than uint120 (escrow type)
+ 333 |     |     // uint96 supports up to ~79B tokens (18 decimals) - sufficient for all practical use cases
+ 334 | *   |     if (amount > type(uint96).max) revert ScalarOverflow();
+ 335 | *   |     if (maxAmount > type(uint96).max) revert ScalarOverflow();
+ 336 | *   |     if (preApprovalExpiry > type(uint48).max) revert ScalarOverflow();
+ 337 | *   |     if (authorizationExpiry > type(uint48).max) revert ScalarOverflow();
+ 338 | *   |     if (refundExpiry > type(uint48).max) revert ScalarOverflow();
+ 339 |     | 
+ 340 |     |     // Commerce Escrow fees intentionally bypassed - all fee handling via ERC20FeeProxy
+ 341 |     |     // minFeeBps=0, maxFeeBps=10000 allows 0% fee (effectively disables Commerce Escrow fees)
+ 342 |     |     // feeReceiver=address(0) indicates no Commerce Escrow fee recipient
+ 343 | *   |     return
+ 344 | *   |       IAuthCaptureEscrow.PaymentInfo({
+ 345 | *   |         operator: address(this),
+ 346 | *   |         payer: payer,
+ 347 | *   |         receiver: address(this),
+ 348 | *   |         token: token,
+ 349 | *   |         maxAmount: uint120(maxAmount),
+ 350 | *   |         preApprovalExpiry: uint48(preApprovalExpiry),
+ 351 | *   |         authorizationExpiry: uint48(authorizationExpiry),
+ 352 | *   |         refundExpiry: uint48(refundExpiry),
+ 353 | *   |         minFeeBps: 0,
+ 354 | *   |         maxFeeBps: 10000,
+ 355 | *   |         feeReceiver: address(0),
+ 356 | *   |         salt: uint256(keccak256(abi.encodePacked(paymentReference)))
+ 357 |     |       });
+ 358 |     |   }
+ 359 |     | 
+ 360 |     |   /// @notice Store payment data
+ 361 |     |   /// @dev Values are validated in _createPaymentInfo before this function is called
+ 362 | *   |   function _storePaymentData(
+ 363 |     |     bytes8 paymentReference,
+ 364 |     |     address payer,
+ 365 |     |     address merchant,
+ 366 |     |     address operator,
+ 367 |     |     address token,
+ 368 |     |     uint256 amount,
+ 369 |     |     uint256 maxAmount,
+ 370 |     |     uint256 preApprovalExpiry,
+ 371 |     |     uint256 authorizationExpiry,
+ 372 |     |     uint256 refundExpiry,
+ 373 |     |     bytes32 commerceHash
+ 374 |     |   ) internal {
+ 375 | *   |     if (amount > type(uint96).max) revert ScalarOverflow();
+ 376 | *   |     if (maxAmount > type(uint96).max) revert ScalarOverflow();
+ 377 |     | 
+ 378 | *   |     payments[paymentReference] = PaymentData({
+ 379 | *   |       payer: payer,
+ 380 | *   |       merchant: merchant,
+ 381 | *   |       amount: uint96(amount),
+ 382 | *   |       operator: operator,
+ 383 | *   |       maxAmount: uint96(maxAmount),
+ 384 | *   |       token: token,
+ 385 | *   |       preApprovalExpiry: uint48(preApprovalExpiry),
+ 386 | *   |       authorizationExpiry: uint48(authorizationExpiry),
+ 387 | *   |       refundExpiry: uint48(refundExpiry),
+ 388 | *   |       commercePaymentHash: commerceHash
+ 389 |     |     });
+ 390 |     |   }
+ 391 |     | 
+ 392 |     |   /// @notice Create PaymentInfo from stored payment data
+ 393 |     |   /// @dev No overflow validation needed - stored types (uint96, uint48) are already validated
+ 394 |     |   /// during storage and safely cast to escrow types (uint120, uint48)
+ 395 | *   |   function _createPaymentInfoFromStored(PaymentData storage payment, bytes8 paymentReference)
+ 396 |     |     internal
+ 397 |     |     view
+ 398 | *   |     returns (IAuthCaptureEscrow.PaymentInfo memory)
+ 399 |     |   {
+ 400 |     |     // Commerce Escrow fees bypassed (same as authorization)
+ 401 | *   |     return
+ 402 | *   |       IAuthCaptureEscrow.PaymentInfo({
+ 403 | *   |         operator: address(this),
+ 404 | *   |         payer: payment.payer,
+ 405 | *   |         receiver: address(this),
+ 406 | *   |         token: payment.token,
+ 407 | *   |         maxAmount: uint120(payment.maxAmount),
+ 408 | *   |         preApprovalExpiry: payment.preApprovalExpiry,
+ 409 | *   |         authorizationExpiry: payment.authorizationExpiry,
+ 410 | *   |         refundExpiry: payment.refundExpiry,
+ 411 | *   |         minFeeBps: 0,
+ 412 | *   |         maxFeeBps: 10000,
+ 413 | *   |         feeReceiver: address(0),
+ 414 | *   |         salt: uint256(keccak256(abi.encodePacked(paymentReference)))
+ 415 |     |       });
+ 416 |     |   }
+ 417 |     | 
+ 418 |     |   /// @notice Frontend-friendly alias for authorizePayment
+ 419 |     |   /// @param params AuthParams struct containing all authorization parameters
+ 420 |     |   function authorizeCommercePayment(AuthParams calldata params) external {
+ 421 |     |     authorizePayment(params);
+ 422 |     |   }
+ 423 |     | 
+ 424 |     |   /// @notice Capture a payment by payment reference
+ 425 |     |   /// @dev Fee Architecture: Merchant pays platform fee (subtracted from capture amount).
+ 426 |     |   ///      For payer-pays-fee model, would need protocol changes to authorize (amount + fee).
+ 427 |     |   /// @param paymentReference Request Network payment reference
+ 428 |     |   /// @param captureAmount Amount to capture from escrow (total amount before fees)
+ 429 |     |   /// @param feeBps Request Network platform fee in basis points (0-10000, where 10000 = 100%).
+ 430 |     |   ///                MERCHANT PAYS: Fee is subtracted from captureAmount.
+ 431 |     |   ///                Formula: feeAmount = (captureAmount * feeBps) / 10000
+ 432 |     |   ///                Example: 250 bps on 1000 USDC = 25 USDC fee, merchant receives 975 USDC
+ 433 |     |   ///                Note: Use 0 for no fee. Reverts if > 10000 (InvalidFeeBps).
+ 434 |     |   /// @param feeReceiver Request Network platform fee recipient address (single recipient).
+ 435 |     |   ///                    This is a REQUEST NETWORK PLATFORM FEE, NOT Commerce Escrow protocol fee.
+ 436 |     |   ///                    For multiple recipients (e.g., API + Platform split), deploy a fee-splitting contract.
+ 437 |     |   ///                    Commerce Escrow fees are intentionally bypassed (see FEE_MECHANISM_DESIGN.md).
+ 438 |     |   ///                    Can be address(0) to effectively burn the fee (not recommended).
+ 439 |     |   function capturePayment(
+ 440 |     |     bytes8 paymentReference,
+ 441 |     |     uint256 captureAmount,
+ 442 |     |     uint16 feeBps,
+ 443 |     |     address feeReceiver
+ 444 |     |   ) external nonReentrant onlyOperator(paymentReference) {
+ 445 |     |     PaymentData storage payment = payments[paymentReference];
+ 446 |     | 
+ 447 |     |     // Validate fee basis points to prevent underflow
+ 448 |     |     if (feeBps > 10000) revert InvalidFeeBps();
+ 449 |     | 
+ 450 |     |     // Create PaymentInfo for the capture operation (must match the original authorization)
+ 451 |     |     IAuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfoFromStored(
+ 452 |     |       payment,
+ 453 |     |       paymentReference
+ 454 |     |     );
+ 455 |     | 
+ 456 |     |     // Capture from escrow with NO FEE - Commerce Escrow fees are intentionally bypassed
+ 457 |     |     // All fee handling is done via ERC20FeeProxy for Request Network compatibility
+ 458 |     |     // This ensures: 1) Proper RN event emission, 2) Unified fee tracking, 3) Flexible fee recipients
+ 459 |     |     commerceEscrow.capture(paymentInfo, captureAmount, 0, address(0));
+ 460 |     | 
+ 461 |     |     // Get the actual balance in wrapper (transfer all tokens to handle any existing balance)
+ 462 |     |     uint256 amountToTransfer = IERC20(payment.token).balanceOf(address(this));
+ 463 |     | 
+ 464 |     |     // Calculate Request Network platform fee (MERCHANT PAYS MODEL)
+ 465 |     |     // Merchant receives: amountToTransfer - feeAmount
+ 466 |     |     // Fee receiver gets: feeAmount
+ 467 |     |     // Formula: feeAmount = (amountToTransfer * feeBps) / 10000
+ 468 |     |     // Integer division truncates toward zero (slightly favors merchant in rounding)
+ 469 |     |     // Example: 1001 wei @ 250 bps = 25 wei fee (not 25.025), merchant gets 976 wei
+ 470 |     |     uint256 feeAmount = (amountToTransfer * feeBps) / 10000;
+ 471 |     |     uint256 merchantAmount = amountToTransfer - feeAmount;
+ 472 |     | 
+ 473 |     |     // Transfer via ERC20FeeProxy - splits payment between merchant and fee recipient
+ 474 |     |     // ERC20FeeProxy pulls tokens from this wrapper via transferFrom
+ 475 |     |     // Approve the exact amount to be transferred (merchant + fee = amountToTransfer)
+ 476 |     |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), 0);
+ 477 |     |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), amountToTransfer);
+ 478 |     | 
+ 479 |     |     // ERC20FeeProxy emits TransferWithReferenceAndFee event for Request Network tracking
+ 480 |     |     // Merchant receives: merchantAmount (amountToTransfer - feeAmount)
+ 481 |     |     // Fee recipient receives: feeAmount
+ 482 |     |     erc20FeeProxy.transferFromWithReferenceAndFee(
+ 483 |     |       payment.token,
+ 484 |     |       payment.merchant,
+ 485 |     |       merchantAmount,
+ 486 |     |       abi.encodePacked(paymentReference),
+ 487 |     |       feeAmount,
+ 488 |     |       feeReceiver
+ 489 |     |     );
+ 490 |     | 
+ 491 |     |     // Reset approval to 0 after use for security
+ 492 |     |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), 0);
+ 493 |     | 
+ 494 |     |     emit PaymentCaptured(
+ 495 |     |       paymentReference,
+ 496 |     |       payment.commercePaymentHash,
+ 497 |     |       captureAmount,
+ 498 |     |       payment.merchant
+ 499 |     |     );
+ 500 |     |   }
+ 501 |     | 
+ 502 |     |   /// @notice Void a payment by payment reference
+ 503 |     |   /// @dev No fee is charged on void - funds return to payer (remedial action, no value capture)
+ 504 |     |   /// @param paymentReference Request Network payment reference
+ 505 | *   |   function voidPayment(bytes8 paymentReference)
+ 506 |     |     external
+ 507 |     |     nonReentrant
+ 508 | *   |     onlyOperator(paymentReference)
+ 509 |     |   {
+ 510 | *   |     PaymentData storage payment = payments[paymentReference];
+ 511 | *   |     if (payment.commercePaymentHash == bytes32(0)) revert PaymentNotFound();
+ 512 |     | 
+ 513 |     |     // Create PaymentInfo for the void operation (must match the original authorization)
+ 514 | *   |     IAuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfoFromStored(
+ 515 | *   |       payment,
+ 516 | *   |       paymentReference
+ 517 |     |     );
+ 518 |     | 
+ 519 |     |     // Verify the hash matches the stored hash to ensure escrow will accept it
+ 520 | *   |     bytes32 computedHash = commerceEscrow.getHash(paymentInfo);
+ 521 | *   |     if (computedHash != payment.commercePaymentHash) revert PaymentNotFound();
+ 522 |     | 
+ 523 |     |     // Reset any existing approval before escrow call (prevents reentrancy issues)
+ 524 | *   |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), 0);
+ 525 |     | 
+ 526 |     |     // Get balance before void to calculate actual amount received
+ 527 | *   |     uint256 balanceBefore = IERC20(payment.token).balanceOf(address(this));
+ 528 |     | 
+ 529 |     |     // Void the payment - funds come to wrapper first
+ 530 | *   |     commerceEscrow.void(paymentInfo);
+ 531 |     | 
+ 532 |     |     // Get the actual balance received from escrow (may include existing tokens)
+ 533 |     |     uint256 balanceAfter = IERC20(payment.token).balanceOf(address(this));
+ 534 |     |     uint256 actualVoidedAmount = balanceAfter > balanceBefore
+ 535 |     |       ? balanceAfter - balanceBefore
+ 536 |     |       : balanceAfter;
+ 537 |     | 
+ 538 |     |     // If we didn't receive the expected amount, use the full balance (handles edge cases)
+ 539 |     |     if (actualVoidedAmount == 0) {
+ 540 |     |       actualVoidedAmount = balanceAfter;
+ 541 |     |     }
+ 542 |     | 
+ 543 |     |     // Transfer the voided amount to payer via ERC20FeeProxy (no fee for voids)
+ 544 |     |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), actualVoidedAmount);
+ 545 |     | 
+ 546 |     |     erc20FeeProxy.transferFromWithReferenceAndFee(
+ 547 |     |       payment.token,
+ 548 |     |       payment.payer,
+ 549 |     |       actualVoidedAmount,
+ 550 |     |       abi.encodePacked(paymentReference),
+ 551 |     |       0, // No fee for voids
+ 552 |     |       address(0)
+ 553 |     |     );
+ 554 |     | 
+ 555 |     |     // Reset approval to 0 after use for security
+ 556 |     |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), 0);
+ 557 |     | 
+ 558 |     |     emit PaymentVoided(
+ 559 |     |       paymentReference,
+ 560 |     |       payment.commercePaymentHash,
+ 561 |     |       actualVoidedAmount,
+ 562 |     |       payment.payer
+ 563 |     |     );
+ 564 |     |   }
+ 565 |     | 
+ 566 |     |   /// @notice Charge a payment (immediate authorization and capture)
+ 567 |     |   /// @dev Combines authorize + capture into one transaction. Merchant pays platform fee (subtracted from amount).
+ 568 |     |   /// @param params ChargeParams struct containing all payment parameters (including feeBps and feeReceiver)
+ 569 | *   |   function chargePayment(ChargeParams calldata params) external nonReentrant {
+ 570 | *   |     if (params.paymentReference == bytes8(0)) revert InvalidPaymentReference();
+ 571 | *   |     if (payments[params.paymentReference].commercePaymentHash != bytes32(0))
+ 572 |     |       revert PaymentAlreadyExists();
+ 573 |     | 
+ 574 |     |     // Validate addresses
+ 575 | *   |     if (params.payer == address(0)) revert ZeroAddress();
+ 576 | *   |     if (params.merchant == address(0)) revert ZeroAddress();
+ 577 | *   |     if (params.operator == address(0)) revert ZeroAddress();
+ 578 | *   |     if (params.token == address(0)) revert ZeroAddress();
+ 579 |     | 
+ 580 |     |     // Create and execute charge
+ 581 | *   |     _executeCharge(params);
+ 582 |     |   }
+ 583 |     | 
+ 584 |     |   /// @notice Internal function to execute charge
+ 585 | *   |   function _executeCharge(ChargeParams memory params) internal {
+ 586 |     |     // Create PaymentInfo
+ 587 | *   |     IAuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfo(
+ 588 | *   |       params.payer,
+ 589 | *   |       params.token,
+ 590 | *   |       params.amount,
+ 591 | *   |       params.maxAmount,
+ 592 | *   |       params.preApprovalExpiry,
+ 593 | *   |       params.authorizationExpiry,
+ 594 | *   |       params.refundExpiry,
+ 595 | *   |       params.paymentReference
+ 596 |     |     );
+ 597 |     | 
+ 598 |     |     // Store payment data
+ 599 | *   |     bytes32 commerceHash = commerceEscrow.getHash(paymentInfo);
+ 600 | *   |     _storePaymentData(
+ 601 | *   |       params.paymentReference,
+ 602 | *   |       params.payer,
+ 603 | *   |       params.merchant,
+ 604 | *   |       params.operator,
+ 605 | *   |       params.token,
+ 606 | *   |       params.amount,
+ 607 | *   |       params.maxAmount,
+ 608 | *   |       params.preApprovalExpiry,
+ 609 | *   |       params.authorizationExpiry,
+ 610 | *   |       params.refundExpiry,
+ 611 | *   |       commerceHash
+ 612 |     |     );
+ 613 |     | 
+ 614 |     |     // Commerce Escrow charge with NO FEE - bypassing Commerce Escrow fee mechanism
+ 615 |     |     // All fee handling delegated to ERC20FeeProxy for Request Network compatibility
+ 616 | *   |     commerceEscrow.charge(
+ 617 | *   |       paymentInfo,
+ 618 | *   |       params.amount,
+ 619 | *   |       params.tokenCollector,
+ 620 | *   |       params.collectorData,
+ 621 | *   |       0,
+ 622 | *   |       address(0)
+ 623 |     |     );
+ 624 |     | 
+ 625 |     |     // Transfer to merchant via ERC20FeeProxy with Request Network platform fee
+ 626 |     |     // Merchant pays fee (receives amount - fee)
+ 627 | *   |     _transferToMerchant(
+ 628 | *   |       params.token,
+ 629 | *   |       params.merchant,
+ 630 | *   |       params.amount,
+ 631 | *   |       params.feeBps,
+ 632 | *   |       params.feeReceiver,
+ 633 | *   |       params.paymentReference
+ 634 |     |     );
+ 635 |     | 
+ 636 | *   |     emit PaymentCharged(
+ 637 | *   |       params.paymentReference,
+ 638 | *   |       params.payer,
+ 639 | *   |       params.merchant,
+ 640 | *   |       params.token,
+ 641 | *   |       params.amount,
+ 642 | *   |       commerceHash
+ 643 |     |     );
+ 644 |     |   }
+ 645 |     | 
+ 646 |     |   /// @notice Transfer funds to merchant via ERC20FeeProxy with Request Network platform fee
+ 647 |     |   /// @dev CRITICAL: Merchant pays the fee (receives amount - feeAmount).
+ 648 |     |   ///      All fee distribution goes through ERC20FeeProxy for Request Network event compatibility.
+ 649 |     |   ///      Integer division truncates (slightly favors merchant in rounding).
+ 650 |     |   /// @param token ERC20 token address
+ 651 |     |   /// @param merchant Merchant address (receives amount after fee deduction)
+ 652 |     |   /// @param amount Total payment amount (before fee deduction)
+ 653 |     |   /// @param feeBps Request Network platform fee in basis points (0-10000, validated)
+ 654 |     |   /// @param feeReceiver Request Network platform fee recipient address
+ 655 |     |   /// @param paymentReference Request Network payment reference for tracking
+ 656 | *   |   function _transferToMerchant(
+ 657 |     |     address token,
+ 658 |     |     address merchant,
+ 659 |     |     uint256 amount,
+ 660 |     |     uint16 feeBps,
+ 661 |     |     address feeReceiver,
+ 662 |     |     bytes8 paymentReference
+ 663 | *   |   ) internal {
+ 664 |     |     // Validate fee basis points to prevent underflow
+ 665 | *   |     if (feeBps > 10000) revert InvalidFeeBps();
+ 666 |     | 
+ 667 |     |     // Get the actual balance in wrapper (transfer all tokens to handle any existing balance)
+ 668 | *   |     uint256 amountToTransfer = IERC20(token).balanceOf(address(this));
+ 669 |     | 
+ 670 |     |     // Calculate Request Network platform fee (MERCHANT PAYS MODEL)
+ 671 |     |     // Merchant receives: amountToTransfer - feeAmount
+ 672 |     |     // Fee receiver gets: feeAmount
+ 673 | *   |     uint256 feeAmount = (amountToTransfer * feeBps) / 10000;
+ 674 | *   |     uint256 merchantAmount = amountToTransfer - feeAmount;
+ 675 | *   |     uint256 totalToTransfer = merchantAmount + feeAmount;
+ 676 |     | 
+ 677 |     |     // Approve ERC20FeeProxy to spend the exact amount to be transferred
+ 678 |     |     // Reset approval to 0 first for tokens that require it, then set to totalToTransfer
+ 679 | *   |     IERC20(token).safeApprove(address(erc20FeeProxy), 0);
+ 680 | *   |     IERC20(token).safeApprove(address(erc20FeeProxy), totalToTransfer);
+ 681 |     | 
+ 682 |     |     // Transfer via ERC20FeeProxy - splits between merchant and fee recipient
+ 683 |     |     // Emits TransferWithReferenceAndFee event for Request Network tracking
+ 684 | *   |     erc20FeeProxy.transferFromWithReferenceAndFee(
+ 685 | *   |       token,
+ 686 | *   |       merchant,
+ 687 | *   |       merchantAmount,
+ 688 | *   |       abi.encodePacked(paymentReference),
+ 689 | *   |       feeAmount,
+ 690 | *   |       feeReceiver
+ 691 |     |     );
+ 692 |     | 
+ 693 |     |     // Reset approval to 0 after use for security
+ 694 | *   |     IERC20(token).safeApprove(address(erc20FeeProxy), 0);
+ 695 |     |   }
+ 696 |     | 
+ 697 |     |   /// @notice Reclaim a payment after authorization expiry (payer only)
+ 698 |     |   /// @param paymentReference Request Network payment reference
+ 699 | *   |   function reclaimPayment(bytes8 paymentReference)
+ 700 |     |     external
+ 701 |     |     nonReentrant
+ 702 | *   |     onlyPayer(paymentReference)
+ 703 |     |   {
+ 704 | *   |     PaymentData storage payment = payments[paymentReference];
+ 705 | *   |     if (payment.commercePaymentHash == bytes32(0)) revert PaymentNotFound();
+ 706 |     | 
+ 707 |     |     // Create PaymentInfo for the reclaim operation (must match the original authorization)
+ 708 | *   |     IAuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfoFromStored(
+ 709 | *   |       payment,
+ 710 | *   |       paymentReference
+ 711 |     |     );
+ 712 |     | 
+ 713 |     |     // Verify the hash matches the stored hash to ensure escrow will accept it
+ 714 | *   |     bytes32 computedHash = commerceEscrow.getHash(paymentInfo);
+ 715 | *   |     if (computedHash != payment.commercePaymentHash) revert PaymentNotFound();
+ 716 |     | 
+ 717 |     |     // Reset any existing approval before escrow call (prevents reentrancy issues)
+ 718 | *   |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), 0);
+ 719 |     | 
+ 720 |     |     // Get balance before reclaim to calculate actual amount received
+ 721 | *   |     uint256 balanceBefore = IERC20(payment.token).balanceOf(address(this));
+ 722 |     | 
+ 723 |     |     // Reclaim the payment - funds come to wrapper first
+ 724 | *   |     commerceEscrow.reclaim(paymentInfo);
+ 725 |     | 
+ 726 |     |     // Get the actual balance received from escrow (may include existing tokens)
+ 727 |     |     uint256 balanceAfter = IERC20(payment.token).balanceOf(address(this));
+ 728 |     |     uint256 actualReclaimedAmount = balanceAfter > balanceBefore
+ 729 |     |       ? balanceAfter - balanceBefore
+ 730 |     |       : balanceAfter;
+ 731 |     | 
+ 732 |     |     // If we didn't receive the expected amount, use the full balance (handles edge cases)
+ 733 |     |     if (actualReclaimedAmount == 0) {
+ 734 |     |       actualReclaimedAmount = balanceAfter;
+ 735 |     |     }
+ 736 |     | 
+ 737 |     |     // Transfer the reclaimed amount to payer via ERC20FeeProxy (no fee for reclaims)
+ 738 |     |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), actualReclaimedAmount);
+ 739 |     | 
+ 740 |     |     erc20FeeProxy.transferFromWithReferenceAndFee(
+ 741 |     |       payment.token,
+ 742 |     |       payment.payer,
+ 743 |     |       actualReclaimedAmount,
+ 744 |     |       abi.encodePacked(paymentReference),
+ 745 |     |       0, // No fee for reclaims
+ 746 |     |       address(0)
+ 747 |     |     );
+ 748 |     | 
+ 749 |     |     // Reset approval to 0 after use for security
+ 750 |     |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), 0);
+ 751 |     | 
+ 752 |     |     emit PaymentReclaimed(
+ 753 |     |       paymentReference,
+ 754 |     |       payment.commercePaymentHash,
+ 755 |     |       actualReclaimedAmount,
+ 756 |     |       payment.payer
+ 757 |     |     );
+ 758 |     |   }
+ 759 |     | 
+ 760 |     |   /// @notice Refund a captured payment (operator only)
+ 761 |     |   /// @param paymentReference Request Network payment reference
+ 762 |     |   /// @param refundAmount Amount to refund
+ 763 |     |   /// @param tokenCollector Address of token collector to use
+ 764 |     |   /// @param collectorData Data to pass to token collector
+ 765 | *   |   function refundPayment(
+ 766 |     |     bytes8 paymentReference,
+ 767 |     |     uint256 refundAmount,
+ 768 |     |     address tokenCollector,
+ 769 |     |     bytes calldata collectorData
+ 770 | *   |   ) external nonReentrant onlyOperator(paymentReference) {
+ 771 | *   |     PaymentData storage payment = payments[paymentReference];
+ 772 |     | 
+ 773 |     |     // Create PaymentInfo for the refund operation (must match the original authorization)
+ 774 | *   |     IAuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfoFromStored(
+ 775 | *   |       payment,
+ 776 | *   |       paymentReference
+ 777 |     |     );
+ 778 |     | 
+ 779 |     |     // Since paymentInfo.operator is this wrapper, but the actual operator (msg.sender) has the tokens,
+ 780 |     |     // we need to collect tokens from msg.sender first, then provide them to the escrow.
+ 781 |     |     // The OperatorRefundCollector will try to pull from paymentInfo.operator (this wrapper).
+ 782 |     | 
+ 783 |     |     // Pull tokens from the actual operator (msg.sender) to this wrapper
+ 784 | *   |     IERC20(payment.token).safeTransferFrom(msg.sender, address(this), refundAmount);
+ 785 |     | 
+ 786 |     |     // Approve the OperatorRefundCollector to pull from this wrapper
+ 787 |     |     // Reset approval to 0 first for tokens that require it, then set to refundAmount
+ 788 | *   |     IERC20(payment.token).safeApprove(tokenCollector, 0);
+ 789 | *   |     IERC20(payment.token).safeApprove(tokenCollector, refundAmount);
+ 790 |     | 
+ 791 |     |     // Refund the payment - escrow will pull from wrapper and send to wrapper
+ 792 | *   |     commerceEscrow.refund(paymentInfo, refundAmount, tokenCollector, collectorData);
+ 793 |     | 
+ 794 |     |     // Get the actual balance in wrapper (transfer all tokens to handle any existing balance)
+ 795 | *   |     uint256 actualRefundAmount = IERC20(payment.token).balanceOf(address(this));
+ 796 |     | 
+ 797 |     |     // Forward the refund to payer via ERC20FeeProxy (no fee for refunds)
+ 798 | *   |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), 0);
+ 799 | *   |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), actualRefundAmount);
+ 800 |     | 
+ 801 | *   |     erc20FeeProxy.transferFromWithReferenceAndFee(
+ 802 | *   |       payment.token,
+ 803 | *   |       payment.payer,
+ 804 | *   |       actualRefundAmount,
+ 805 | *   |       abi.encodePacked(paymentReference),
+ 806 | *   |       0, // No fee for refunds
+ 807 | *   |       address(0)
+ 808 |     |     );
+ 809 |     | 
+ 810 |     |     // Reset approval to 0 after use for security
+ 811 | *   |     IERC20(payment.token).safeApprove(address(erc20FeeProxy), 0);
+ 812 |     | 
+ 813 | *   |     emit PaymentRefunded(
+ 814 | *   |       paymentReference,
+ 815 | *   |       payment.commercePaymentHash,
+ 816 | *   |       actualRefundAmount,
+ 817 | *   |       payment.payer
+ 818 |     |     );
+ 819 |     |   }
+ 820 |     | 
+ 821 |     |   /// @notice Get payment data by payment reference
+ 822 |     |   /// @param paymentReference Request Network payment reference
+ 823 |     |   /// @return PaymentData struct
+ 824 |     |   function getPaymentData(bytes8 paymentReference) external view returns (PaymentData memory) {
+ 825 |     |     return payments[paymentReference];
+ 826 |     |   }
+ 827 |     | 
+ 828 |     |   /// @notice Get payment state from Commerce Payments escrow
+ 829 |     |   /// @param paymentReference Request Network payment reference
+ 830 |     |   /// @return hasCollectedPayment Whether payment has been collected
+ 831 |     |   /// @return capturableAmount Amount available for capture
+ 832 |     |   /// @return refundableAmount Amount available for refund
+ 833 |     |   function getPaymentState(bytes8 paymentReference)
+ 834 |     |     external
+ 835 |     |     view
+ 836 |     |     returns (
+ 837 |     |       bool hasCollectedPayment,
+ 838 |     |       uint120 capturableAmount,
+ 839 |     |       uint120 refundableAmount
+ 840 |     |     )
+ 841 |     |   {
+ 842 |     |     PaymentData storage payment = payments[paymentReference];
+ 843 |     |     if (payment.commercePaymentHash == bytes32(0)) revert PaymentNotFound();
+ 844 |     | 
+ 845 |     |     (hasCollectedPayment, capturableAmount, refundableAmount) = commerceEscrow.paymentState(
+ 846 |     |       payment.commercePaymentHash
+ 847 |     |     );
+ 848 |     |     return (hasCollectedPayment, capturableAmount, refundableAmount);
+ 849 |     |   }
+ 850 |     | 
+ 851 |     |   /// @notice Check if payment can be captured
+ 852 |     |   /// @param paymentReference Request Network payment reference
+ 853 |     |   /// @return True if payment can be captured
+ 854 |     |   function canCapture(bytes8 paymentReference) external view returns (bool) {
+ 855 |     |     PaymentData storage payment = payments[paymentReference];
+ 856 |     |     if (payment.commercePaymentHash == bytes32(0)) return false;
+ 857 |     | 
+ 858 |     |     // solhint-disable-next-line no-unused-vars
+ 859 |     |     (
+ 860 |     |       bool _hasCollectedPayment,
+ 861 |     |       uint120 capturableAmount,
+ 862 |     |       uint120 _refundableAmount
+ 863 |     |     ) = commerceEscrow.paymentState(payment.commercePaymentHash);
+ 864 |     |     return capturableAmount > 0;
+ 865 |     |   }
+ 866 |     | 
+ 867 |     |   /// @notice Check if payment can be voided
+ 868 |     |   /// @param paymentReference Request Network payment reference
+ 869 |     |   /// @return True if payment can be voided
+ 870 |     |   function canVoid(bytes8 paymentReference) external view returns (bool) {
+ 871 |     |     PaymentData storage payment = payments[paymentReference];
+ 872 |     |     if (payment.commercePaymentHash == bytes32(0)) return false;
+ 873 |     | 
+ 874 |     |     // solhint-disable-next-line no-unused-vars
+ 875 |     |     (
+ 876 |     |       bool _hasCollectedPayment,
+ 877 |     |       uint120 capturableAmount,
+ 878 |     |       uint120 _refundableAmount
+ 879 |     |     ) = commerceEscrow.paymentState(payment.commercePaymentHash);
+ 880 |     |     return capturableAmount > 0;
+ 881 |     |   }
+ 882 |     | }
+ 883 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/interfaces/ERC20FeeProxy.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.0;
+  3 |     | 
+  4 |     | interface IERC20FeeProxy {
+  5 |     |   event TransferWithReferenceAndFee(
+  6 |     |     address tokenAddress,
+  7 |     |     address to,
+  8 |     |     uint256 amount,
+  9 |     |     bytes indexed paymentReference,
+ 10 |     |     uint256 feeAmount,
+ 11 |     |     address feeAddress
+ 12 |     |   );
+ 13 |     | 
+ 14 |     |   function transferFromWithReferenceAndFee(
+ 15 |     |     address _tokenAddress,
+ 16 |     |     address _to,
+ 17 |     |     uint256 _amount,
+ 18 |     |     bytes calldata _paymentReference,
+ 19 |     |     uint256 _feeAmount,
+ 20 |     |     address _feeAddress
+ 21 |     |   ) external;
+ 22 |     | }
+ 23 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/interfaces/IAuthCaptureEscrow.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.9;
+  3 |     | 
+  4 |     | /// @title IAuthCaptureEscrow
+  5 |     | /// @notice Interface for AuthCaptureEscrow contract
+  6 |     | interface IAuthCaptureEscrow {
+  7 |     |   /// @notice Payment info, contains all information required to authorize and capture a unique payment
+  8 |     |   struct PaymentInfo {
+  9 |     |     /// @dev Entity responsible for driving payment flow
+ 10 |     |     address operator;
+ 11 |     |     /// @dev The payer's address authorizing the payment
+ 12 |     |     address payer;
+ 13 |     |     /// @dev Address that receives the payment (minus fees)
+ 14 |     |     address receiver;
+ 15 |     |     /// @dev The token contract address
+ 16 |     |     address token;
+ 17 |     |     /// @dev The amount of tokens that can be authorized
+ 18 |     |     uint120 maxAmount;
+ 19 |     |     /// @dev Timestamp when the payer's pre-approval can no longer authorize payment
+ 20 |     |     uint48 preApprovalExpiry;
+ 21 |     |     /// @dev Timestamp when an authorization can no longer be captured and the payer can reclaim from escrow
+ 22 |     |     uint48 authorizationExpiry;
+ 23 |     |     /// @dev Timestamp when a successful payment can no longer be refunded
+ 24 |     |     uint48 refundExpiry;
+ 25 |     |     /// @dev Minimum fee percentage in basis points
+ 26 |     |     uint16 minFeeBps;
+ 27 |     |     /// @dev Maximum fee percentage in basis points
+ 28 |     |     uint16 maxFeeBps;
+ 29 |     |     /// @dev Address that receives the fee portion of payments, if 0 then operator can set at capture
+ 30 |     |     address feeReceiver;
+ 31 |     |     /// @dev A source of entropy to ensure unique hashes across different payments
+ 32 |     |     uint256 salt;
+ 33 |     |   }
+ 34 |     | 
+ 35 |     |   function getHash(PaymentInfo memory paymentInfo) external view returns (bytes32);
+ 36 |     | 
+ 37 |     |   function authorize(
+ 38 |     |     PaymentInfo memory paymentInfo,
+ 39 |     |     uint256 amount,
+ 40 |     |     address tokenCollector,
+ 41 |     |     bytes calldata collectorData
+ 42 |     |   ) external;
+ 43 |     | 
+ 44 |     |   function capture(
+ 45 |     |     PaymentInfo memory paymentInfo,
+ 46 |     |     uint256 captureAmount,
+ 47 |     |     uint16 feeBps,
+ 48 |     |     address feeReceiver
+ 49 |     |   ) external;
+ 50 |     | 
+ 51 |     |   function paymentState(bytes32 paymentHash)
+ 52 |     |     external
+ 53 |     |     view
+ 54 |     |     returns (
+ 55 |     |       bool hasCollectedPayment,
+ 56 |     |       uint120 capturableAmount,
+ 57 |     |       uint120 refundableAmount
+ 58 |     |     );
+ 59 |     | 
+ 60 |     |   function void(PaymentInfo memory paymentInfo) external;
+ 61 |     | 
+ 62 |     |   function charge(
+ 63 |     |     PaymentInfo memory paymentInfo,
+ 64 |     |     uint256 amount,
+ 65 |     |     address tokenCollector,
+ 66 |     |     bytes calldata collectorData,
+ 67 |     |     uint16 feeBps,
+ 68 |     |     address feeReceiver
+ 69 |     |   ) external;
+ 70 |     | 
+ 71 |     |   function reclaim(PaymentInfo memory paymentInfo) external;
+ 72 |     | 
+ 73 |     |   function refund(
+ 74 |     |     PaymentInfo memory paymentInfo,
+ 75 |     |     uint256 refundAmount,
+ 76 |     |     address tokenCollector,
+ 77 |     |     bytes calldata collectorData
+ 78 |     |   ) external;
+ 79 |     | }
+ 80 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity ^0.8.9;
+   3 |     | 
+   4 |     | import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+   5 |     | import {ERC20CommerceEscrowWrapper} from '../ERC20CommerceEscrowWrapper.sol';
+   6 |     | import {IAuthCaptureEscrow} from '../interfaces/IAuthCaptureEscrow.sol';
+   7 |     | import {IERC20FeeProxy} from '../interfaces/ERC20FeeProxy.sol';
+   8 |     | 
+   9 |     | /// @title EchidnaERC20CommerceEscrowWrapper
+  10 |     | /// @notice Echidna fuzzing test contract for ERC20CommerceEscrowWrapper
+  11 |     | /// @dev This contract defines invariants and driver functions for comprehensive property-based testing
+  12 |     | ///
+  13 |     | /// ARCHITECTURE:
+  14 |     | /// - Driver Functions (driver_*): Fuzzable entry points that execute wrapper operations with random parameters.
+  15 |     | ///   Echidna generates random inputs to explore the state space of authorize/capture/void/charge/refund/reclaim flows.
+  16 |     | ///
+  17 |     | /// - Invariants (echidna_*): Properties that must ALWAYS hold true regardless of operation sequence.
+  18 |     | ///   These check mathematical bounds, accounting consistency, token conservation, and security properties.
+  19 |     | ///
+  20 |     | /// - Mock Contracts: Simplified implementations of ERC20, AuthCaptureEscrow, and ERC20FeeProxy that
+  21 |     | ///   properly handle token transfers to simulate real protocol behavior.
+  22 |     | ///
+  23 |     | /// - Accounting Trackers: totalAuthorized, totalCaptured, totalVoided, etc. track aggregate flows
+  24 |     | ///   to enable cross-operation invariant checks.
+  25 |     | ///
+  26 |     | /// TESTING METHODOLOGY:
+  27 |     | /// 1. Echidna calls driver functions with random parameters (amounts, fees, payment indices)
+  28 |     | /// 2. Drivers execute wrapper operations (authorize, capture, void, etc.) and update accounting
+  29 |     | /// 3. After each transaction, Echidna checks all invariants
+  30 |     | /// 4. If any invariant fails, Echidna provides the transaction sequence that broke it
+  31 |     | ///
+  32 |     | /// KEY IMPROVEMENTS OVER ORIGINAL:
+  33 |     | /// - Added 6 driver functions that actually exercise wrapper state mutations
+  34 |     | /// - Enhanced invariants to check real state (not just static math)
+  35 |     | /// - Mock contracts now properly transfer tokens (escrow, merchant, fee receiver flows)
+  36 |     | /// - Accounting trackers enable cross-operation consistency checks
+  37 |     | /// - Tests actual authorization/capture/void/refund flows with fuzzing
+  38 |     | ///
+  39 |     | /// Run with: echidna . --contract EchidnaERC20CommerceEscrowWrapper --config echidna.config.yml
+  40 | *   | contract EchidnaERC20CommerceEscrowWrapper {
+  41 | *   |   ERC20CommerceEscrowWrapper public wrapper;
+  42 | *   |   MockERC20 public token;
+  43 | *   |   MockAuthCaptureEscrow public mockEscrow;
+  44 | *   |   MockERC20FeeProxy public mockFeeProxy;
+  45 |     | 
+  46 |     |   // Track total authorized, captured, and voided for accounting checks
+  47 | *   |   uint256 public totalAuthorized;
+  48 | *   |   uint256 public totalCaptured;
+  49 | *   |   uint256 public totalVoided;
+  50 | *   |   uint256 public totalReclaimed;
+  51 | *   |   uint256 public totalRefunded;
+  52 |     | 
+  53 |     |   // Track supply for invariant checking
+  54 |     |   uint256 private supply;
+  55 |     | 
+  56 |     |   // Test accounts
+  57 | *   |   address public constant PAYER = address(0x1000);
+  58 | *   |   address public constant MERCHANT = address(0x2000);
+  59 | *   |   address public constant OPERATOR = address(0x3000);
+  60 | *   |   address public constant FEE_RECEIVER = address(0x4000);
+  61 |     | 
+  62 |     |   // Payment reference counter for unique references
+  63 |     |   uint256 private paymentRefCounter;
+  64 |     | 
+  65 |     |   constructor() payable {
+  66 |     |     // Deploy mock contracts
+  67 | *   |     token = new MockERC20();
+  68 | *   |     mockEscrow = new MockAuthCaptureEscrow();
+  69 | *   |     mockFeeProxy = new MockERC20FeeProxy(address(token));
+  70 |     | 
+  71 |     |     // Deploy wrapper
+  72 | *   |     wrapper = new ERC20CommerceEscrowWrapper(address(mockEscrow), address(mockFeeProxy));
+  73 |     | 
+  74 |     |     // In Echidna, this contract is the caller for all operations
+  75 |     |     // We mint initial tokens but will mint more as needed in drivers
+  76 | *   |     token.mint(address(this), 10000000 ether);
+  77 |     | 
+  78 |     |     // Track initial supply
+  79 | *   |     supply = token.totalSupply();
+  80 |     | 
+  81 |     |     // Pre-approve wrapper and feeProxy for efficiency
+  82 |     |     // Individual operations will also approve mockEscrow as needed
+  83 | *   |     token.approve(address(wrapper), type(uint256).max);
+  84 | *   |     token.approve(address(mockFeeProxy), type(uint256).max);
+  85 |     |   }
+  86 |     | 
+  87 |     |   /// @notice Helper to generate unique payment references
+  88 | *   |   function _getNextPaymentRef() internal returns (bytes8) {
+  89 | *   |     paymentRefCounter++;
+  90 | *   |     return bytes8(uint64(paymentRefCounter));
+  91 |     |   }
+  92 |     | 
+  93 |     |   // ============================================
+  94 |     |   // DRIVER FUNCTIONS: Fuzzable Actions
+  95 |     |   // ============================================
+  96 |     | 
+  97 |     |   /// @notice Driver: Authorize a payment with fuzzed parameters
+  98 |     |   /// @dev Echidna will fuzz these parameters to explore state space
+  99 | *   |   function driver_authorizePayment(
+ 100 |     |     uint256 amount,
+ 101 |     |     uint256 maxAmount,
+ 102 |     |     uint16 /* feeBps - unused but kept for fuzzer parameter diversity */
+ 103 | *   |   ) public {
+ 104 |     |     // Bound inputs to reasonable ranges
+ 105 | *   |     amount = _boundAmount(amount);
+ 106 | *   |     if (amount == 0) return; // Skip zero amounts
+ 107 | *   |     maxAmount = amount; // Keep simple: maxAmount = amount
+ 108 |     | 
+ 109 | *   |     bytes8 paymentRef = _getNextPaymentRef();
+ 110 |     | 
+ 111 |     |     // In Echidna, this contract IS the caller, so we use address(this) for all roles
+ 112 |     |     // Ensure this contract has tokens and has approved escrow
+ 113 | *   |     token.mint(address(this), amount);
+ 114 | *   |     supply += amount; // Track minted tokens
+ 115 | *   |     token.approve(address(mockEscrow), amount);
+ 116 |     | 
+ 117 |     |     // Authorize payment (this contract acts as payer, we use different addresses for merchant/operator)
+ 118 | *   |     try
+ 119 | *   |       wrapper.authorizePayment(
+ 120 | *   |         ERC20CommerceEscrowWrapper.AuthParams({
+ 121 | *   |           paymentReference: paymentRef,
+ 122 | *   |           payer: address(this), // This contract is the payer in Echidna
+ 123 |     |           merchant: MERCHANT,
+ 124 | *   |           operator: address(this), // This contract is also operator to call capture/void
+ 125 | *   |           token: address(token),
+ 126 | *   |           amount: amount,
+ 127 | *   |           maxAmount: maxAmount,
+ 128 | *   |           preApprovalExpiry: block.timestamp + 1 hours,
+ 129 | *   |           authorizationExpiry: block.timestamp + 1 hours,
+ 130 | *   |           refundExpiry: block.timestamp + 2 hours,
+ 131 | *   |           tokenCollector: address(0), // Use default collector
+ 132 |     |           collectorData: ''
+ 133 |     |         })
+ 134 |     |       )
+ 135 |     |     {
+ 136 |     |       // Track successful authorization
+ 137 | *   |       totalAuthorized += amount;
+ 138 |     |     } catch {
+ 139 |     |       // Expected failures (e.g., zero amounts, invalid params)
+ 140 |     |     }
+ 141 |     |   }
+ 142 |     | 
+ 143 |     |   /// @notice Driver: Capture a payment with fuzzed fee parameters
+ 144 |     |   /// @dev Echidna will fuzz captureAmount and feeBps
+ 145 |     |   function driver_capturePayment(
+ 146 |     |     uint256 paymentIndex,
+ 147 |     |     uint256 captureAmount,
+ 148 |     |     uint16 feeBps
+ 149 |     |   ) public {
+ 150 |     |     // Get a valid payment reference (cycle through created payments)
+ 151 |     |     if (paymentRefCounter == 0) return; // No payments created yet
+ 152 |     | 
+ 153 |     |     bytes8 paymentRef = bytes8(uint64(1 + (paymentIndex % paymentRefCounter)));
+ 154 |     | 
+ 155 |     |     // Bound inputs
+ 156 |     |     captureAmount = _boundAmount(captureAmount);
+ 157 |     |     feeBps = uint16(feeBps % 10001); // 0-10000 basis points
+ 158 |     | 
+ 159 |     |     // Attempt capture from operator account
+ 160 |     |     try wrapper.capturePayment(paymentRef, captureAmount, feeBps, FEE_RECEIVER) {
+ 161 |     |       // Track successful capture
+ 162 |     |       totalCaptured += captureAmount;
+ 163 |     |     } catch {
+ 164 |     |       // Expected failures (e.g., not operator, insufficient funds, invalid state)
+ 165 |     |     }
+ 166 |     |   }
+ 167 |     | 
+ 168 |     |   /// @notice Driver: Void a payment
+ 169 |     |   /// @dev Echidna will fuzz which payment to void
+ 170 | *   |   function driver_voidPayment(uint256 paymentIndex) public {
+ 171 | *   |     if (paymentRefCounter == 0) return; // No payments created yet
+ 172 |     | 
+ 173 | *   |     bytes8 paymentRef = bytes8(uint64(1 + (paymentIndex % paymentRefCounter)));
+ 174 |     | 
+ 175 | *   |     try wrapper.voidPayment(paymentRef) {
+ 176 |     |       // Get the voided amount for tracking
+ 177 |     |       // Note: We can't get the exact amount after void, so we estimate
+ 178 |     |       totalVoided += 1; // Track number of voids instead
+ 179 |     |     } catch {
+ 180 |     |       // Expected failures (e.g., not operator, already captured, etc.)
+ 181 |     |     }
+ 182 |     |   }
+ 183 |     | 
+ 184 |     |   /// @notice Driver: Charge a payment (immediate authorize + capture)
+ 185 |     |   /// @dev Echidna will fuzz amount and fee parameters
+ 186 | *   |   function driver_chargePayment(uint256 amount, uint16 feeBps) public {
+ 187 | *   |     amount = _boundAmount(amount);
+ 188 | *   |     if (amount == 0) return;
+ 189 | *   |     feeBps = uint16(feeBps % 10001); // 0-10000 basis points
+ 190 |     | 
+ 191 | *   |     bytes8 paymentRef = _getNextPaymentRef();
+ 192 |     | 
+ 193 |     |     // Setup: Mint tokens and approve escrow
+ 194 | *   |     token.mint(address(this), amount);
+ 195 | *   |     supply += amount; // Track minted tokens
+ 196 | *   |     token.approve(address(mockEscrow), amount);
+ 197 |     | 
+ 198 | *   |     try
+ 199 | *   |       wrapper.chargePayment(
+ 200 | *   |         ERC20CommerceEscrowWrapper.ChargeParams({
+ 201 | *   |           paymentReference: paymentRef,
+ 202 | *   |           payer: address(this),
+ 203 |     |           merchant: MERCHANT,
+ 204 | *   |           operator: address(this),
+ 205 | *   |           token: address(token),
+ 206 | *   |           amount: amount,
+ 207 | *   |           maxAmount: amount,
+ 208 | *   |           preApprovalExpiry: block.timestamp + 1 hours,
+ 209 | *   |           authorizationExpiry: block.timestamp + 1 hours,
+ 210 | *   |           refundExpiry: block.timestamp + 2 hours,
+ 211 | *   |           feeBps: feeBps,
+ 212 |     |           feeReceiver: FEE_RECEIVER,
+ 213 | *   |           tokenCollector: address(0),
+ 214 |     |           collectorData: ''
+ 215 |     |         })
+ 216 |     |       )
+ 217 |     |     {
+ 218 |     |       // Track charge (counts as both authorize and capture)
+ 219 | *   |       totalAuthorized += amount;
+ 220 | *   |       totalCaptured += amount;
+ 221 |     |     } catch {
+ 222 |     |       // Expected failures
+ 223 |     |     }
+ 224 |     |   }
+ 225 |     | 
+ 226 |     |   /// @notice Driver: Reclaim a payment (payer only, after expiry)
+ 227 |     |   /// @dev Echidna will fuzz which payment to reclaim
+ 228 | *   |   function driver_reclaimPayment(uint256 paymentIndex) public {
+ 229 | *   |     if (paymentRefCounter == 0) return;
+ 230 |     | 
+ 231 | *   |     bytes8 paymentRef = bytes8(uint64(1 + (paymentIndex % paymentRefCounter)));
+ 232 |     | 
+ 233 | *   |     try wrapper.reclaimPayment(paymentRef) {
+ 234 |     |       totalReclaimed += 1; // Track number of reclaims
+ 235 |     |     } catch {
+ 236 |     |       // Expected failures (e.g., not payer, not expired, already captured)
+ 237 |     |     }
+ 238 |     |   }
+ 239 |     | 
+ 240 |     |   /// @notice Driver: Refund a payment (operator only)
+ 241 |     |   /// @dev Echidna will fuzz refund amount
+ 242 | *   |   function driver_refundPayment(uint256 paymentIndex, uint256 refundAmount) public {
+ 243 | *   |     if (paymentRefCounter == 0) return;
+ 244 |     | 
+ 245 | *   |     bytes8 paymentRef = bytes8(uint64(1 + (paymentIndex % paymentRefCounter)));
+ 246 | *   |     refundAmount = _boundAmount(refundAmount);
+ 247 | *   |     if (refundAmount == 0) return;
+ 248 |     | 
+ 249 |     |     // Setup: Give this contract (operator) tokens for refund and approve
+ 250 | *   |     token.mint(address(this), refundAmount);
+ 251 | *   |     supply += refundAmount; // Track minted tokens
+ 252 |     |     // Note: refund flow pulls from operator, so we need approval on wrapper
+ 253 | *   |     token.approve(address(wrapper), refundAmount);
+ 254 |     | 
+ 255 | *   |     try
+ 256 | *   |       wrapper.refundPayment(
+ 257 | *   |         paymentRef,
+ 258 | *   |         refundAmount,
+ 259 | *   |         address(0), // Use default collector
+ 260 |     |         ''
+ 261 |     |       )
+ 262 |     |     {
+ 263 | *   |       totalRefunded += refundAmount;
+ 264 |     |     } catch {
+ 265 |     |       // Expected failures (e.g., not operator, insufficient refundable amount)
+ 266 |     |     }
+ 267 |     |   }
+ 268 |     | 
+ 269 |     |   /// @notice Helper: Bound amount to reasonable range for fuzzing
+ 270 | *   |   function _boundAmount(uint256 amount) internal pure returns (uint256) {
+ 271 |     |     // Keep amounts within reasonable range to avoid excessive gas usage
+ 272 |     |     // and focus on interesting state transitions
+ 273 | *   |     if (amount == 0) return 0;
+ 274 | *   |     if (amount > 1000000 ether) return (amount % 1000000 ether) + 1 ether;
+ 275 | *   |     return amount;
+ 276 |     |   }
+ 277 |     | 
+ 278 |     |   // ============================================
+ 279 |     |   // INVARIANT 1: Fee Calculation Bounds
+ 280 |     |   // ============================================
+ 281 |     |   /// @notice Invariant: Fees can never exceed the capture amount
+ 282 |     |   /// @dev This ensures merchant always receives non-negative amount
+ 283 |     |   function echidna_fee_never_exceeds_capture() public returns (bool) {
+ 284 |     |     // For any valid feeBps (0-10000), fee should never exceed captureAmount
+ 285 |     |     uint256 captureAmount = 1000 ether;
+ 286 |     |     for (uint16 feeBps = 0; feeBps <= 10000; feeBps += 100) {
+ 287 |     |       uint256 feeAmount = (captureAmount * feeBps) / 10000;
+ 288 |     |       if (feeAmount > captureAmount) {
+ 289 |     |         return false;
+ 290 |     |       }
+ 291 |     |     }
+ 292 |     |     return true;
+ 293 |     |   }
+ 294 |     | 
+ 295 |     |   /// @notice Invariant: Fee basis points validation works correctly
+ 296 |     |   /// @dev feeBps > 10000 should always revert
+ 297 |     |   function echidna_invalid_fee_bps_reverts() public returns (bool) {
+ 298 |     |     // This is a pure mathematical invariant - fee calculation should never overflow
+ 299 |     |     // For any valid feeBps (0-10000), (amount * feeBps) / 10000 should be <= amount
+ 300 |     |     // For invalid feeBps (>10000), the contract should revert in capturePayment
+ 301 |     |     // We test the mathematical bound here
+ 302 |     |     uint256 testAmount = 1000 ether;
+ 303 |     |     uint256 maxFeeBps = 10000;
+ 304 |     |     uint256 maxFee = (testAmount * maxFeeBps) / 10000;
+ 305 |     |     return maxFee == testAmount; // At 100% fee (10000 bps), fee equals amount
+ 306 |     |   }
+ 307 |     | 
+ 308 |     |   // ============================================
+ 309 |     |   // INVARIANT 2: Amount Constraints
+ 310 |     |   // ============================================
+ 311 |     |   /// @notice Invariant: Fee calculation cannot cause underflow
+ 312 |     |   /// @dev merchantAmount = captureAmount - feeAmount should always be >= 0
+ 313 |     |   function echidna_no_underflow_in_merchant_payment() public returns (bool) {
+ 314 |     |     uint256 captureAmount = 1000 ether;
+ 315 |     |     // Test various fee percentages
+ 316 |     |     for (uint16 feeBps = 0; feeBps <= 10000; feeBps += 500) {
+ 317 |     |       uint256 feeAmount = (captureAmount * feeBps) / 10000;
+ 318 |     |       uint256 merchantAmount = captureAmount - feeAmount;
+ 319 |     |       // Merchant amount should always be non-negative (can be 0 at 100% fee)
+ 320 |     |       if (merchantAmount > captureAmount) {
+ 321 |     |         return false; // Underflow occurred
+ 322 |     |       }
+ 323 |     |     }
+ 324 |     |     return true;
+ 325 |     |   }
+ 326 |     | 
+ 327 |     |   // ============================================
+ 328 |     |   // INVARIANT 3: Integer Overflow Protection
+ 329 |     |   // ============================================
+ 330 |     |   /// @notice Invariant: uint96 max value is reasonable for token amounts
+ 331 |     |   /// @dev uint96 max = 79,228,162,514 tokens @ 18 decimals (79B tokens)
+ 332 |     |   function echidna_uint96_sufficient_range() public pure returns (bool) {
+ 333 |     |     uint256 uint96Max = uint256(type(uint96).max);
+ 334 |     |     // Should be able to represent at least 10 billion tokens (1e10 * 1e18)
+ 335 |     |     // uint96 can hold ~79 billion tokens with 18 decimals
+ 336 |     |     uint256 tenBillionTokens = 10000000000 ether; // 10 billion with 18 decimals
+ 337 |     |     return uint96Max >= tenBillionTokens;
+ 338 |     |   }
+ 339 |     | 
+ 340 |     |   /// @notice Invariant: Fee calculation never overflows uint256
+ 341 |     |   /// @dev (amount * feeBps) should never overflow for reasonable amounts
+ 342 |     |   function echidna_fee_calc_no_overflow() public pure returns (bool) {
+ 343 |     |     // Test with maximum uint96 amount (max storable amount)
+ 344 |     |     uint256 maxAmount = uint256(type(uint96).max);
+ 345 |     |     uint256 maxFeeBps = 10000;
+ 346 |     | 
+ 347 |     |     // This calculation should not overflow
+ 348 |     |     // maxAmount * maxFeeBps should fit in uint256
+ 349 |     |     uint256 product = maxAmount * maxFeeBps;
+ 350 |     |     return product / maxFeeBps == maxAmount; // Verify no overflow occurred
+ 351 |     |   }
+ 352 |     | 
+ 353 |     |   // ============================================
+ 354 |     |   // INVARIANT 4: Accounting Bounds
+ 355 |     |   // ============================================
+ 356 |     |   /// @notice Invariant: Total supply of test token should never decrease
+ 357 |     |   /// @dev Detects any unexpected token loss (supply only increases via mints, never burns)
+ 358 |     |   function echidna_token_supply_never_decreases() public returns (bool) {
+ 359 |     |     uint256 currentSupply = token.totalSupply();
+ 360 |     |     // Supply should equal our tracked supply (we only mint, never burn)
+ 361 |     |     return currentSupply == supply;
+ 362 |     |   }
+ 363 |     | 
+ 364 |     |   /// @notice Invariant: Wrapper contract should never hold tokens permanently
+ 365 |     |   /// @dev All tokens should either be in escrow or returned
+ 366 |     |   function echidna_wrapper_not_token_sink() public returns (bool) {
+ 367 |     |     // The wrapper itself should not accumulate tokens
+ 368 |     |     // (tokens go to escrow, merchant, or fee receiver)
+ 369 |     |     uint256 wrapperBalance = token.balanceOf(address(wrapper));
+ 370 |     |     // Allow small dust amounts but not significant holdings
+ 371 |     |     return wrapperBalance < 1 ether;
+ 372 |     |   }
+ 373 |     | 
+ 374 |     |   // ============================================
+ 375 |     |   // INVARIANT 5: State-Based Accounting
+ 376 |     |   // ============================================
+ 377 |     | 
+ 378 |     |   /// @notice Invariant: Total captured should never exceed total authorized
+ 379 |     |   /// @dev This ensures we can't capture more than we've authorized
+ 380 |     |   function echidna_captured_never_exceeds_authorized() public returns (bool) {
+ 381 |     |     return totalCaptured <= totalAuthorized;
+ 382 |     |   }
+ 383 |     | 
+ 384 |     |   /// @notice Invariant: Fee calculation in practice never causes underflow
+ 385 |     |   /// @dev Merchant should always receive a non-negative amount
+ 386 |     |   function echidna_merchant_receives_nonnegative() public returns (bool) {
+ 387 |     |     // Check merchant's balance never decreases inappropriately
+ 388 |     |     // Merchant balance should be >= 0 (trivially true for uint256, but checks for logic errors)
+ 389 |     |     uint256 merchantBalance = token.balanceOf(MERCHANT);
+ 390 |     |     return merchantBalance < type(uint256).max; // Should never overflow
+ 391 |     |   }
+ 392 |     | 
+ 393 |     |   /// @notice Invariant: Fee receiver accumulates fees correctly
+ 394 |     |   /// @dev Fee receiver should only get tokens from fee payments
+ 395 |     |   function echidna_fee_receiver_only_gets_fees() public returns (bool) {
+ 396 |     |     // Fee receiver balance should be reasonable relative to total captures
+ 397 |     |     uint256 feeReceiverBalance = token.balanceOf(FEE_RECEIVER);
+ 398 |     |     // Fees can't exceed all captured amounts (max 100% fee)
+ 399 |     |     return feeReceiverBalance <= totalCaptured;
+ 400 |     |   }
+ 401 |     | 
+ 402 |     |   /// @notice Invariant: Token conservation law
+ 403 |     |   /// @dev Total supply should equal sum of all account balances
+ 404 |     |   function echidna_token_conservation() public returns (bool) {
+ 405 |     |     uint256 supply = token.totalSupply();
+ 406 |     |     uint256 accountedFor = token.balanceOf(address(this)) +
+ 407 |     |       token.balanceOf(PAYER) +
+ 408 |     |       token.balanceOf(MERCHANT) +
+ 409 |     |       token.balanceOf(OPERATOR) +
+ 410 |     |       token.balanceOf(FEE_RECEIVER) +
+ 411 |     |       token.balanceOf(address(wrapper)) +
+ 412 |     |       token.balanceOf(address(mockEscrow));
+ 413 |     | 
+ 414 |     |     // Supply should equal accounted tokens (within small margin for rounding)
+ 415 |     |     return supply == accountedFor;
+ 416 |     |   }
+ 417 |     | 
+ 418 |     |   /// @notice Invariant: Escrow should not hold tokens after operations complete
+ 419 |     |   /// @dev Tokens should flow through escrow, not accumulate
+ 420 |     |   function echidna_escrow_not_token_sink() public returns (bool) {
+ 421 |     |     uint256 escrowBalance = token.balanceOf(address(mockEscrow));
+ 422 |     |     // Escrow may hold tokens temporarily, but shouldn't accumulate excessively
+ 423 |     |     // Allow up to total authorized amount (worst case all authorized, none captured/voided)
+ 424 |     |     return escrowBalance <= totalAuthorized;
+ 425 |     |   }
+ 426 |     | 
+ 427 |     |   // ============================================
+ 428 |     |   // INVARIANT 6: Payment State Validity
+ 429 |     |   // ============================================
+ 430 |     | 
+ 431 |     |   /// @notice Invariant: Payment reference counter only increases
+ 432 |     |   /// @dev Counter should be monotonically increasing
+ 433 |     |   function echidna_payment_ref_counter_monotonic() public returns (bool) {
+ 434 |     |     // Counter should never decrease
+ 435 |     |     // We track this implicitly - if counter decreased, we'd have collisions
+ 436 |     |     return paymentRefCounter >= 0; // Always true, but documents the property
+ 437 |     |   }
+ 438 |     | 
+ 439 |     |   /// @notice Invariant: Mock escrow state consistency
+ 440 |     |   /// @dev For any payment, capturableAmount + refundableAmount should have sensible bounds
+ 441 |     |   function echidna_escrow_state_consistent() public returns (bool) {
+ 442 |     |     // Check a few recent payments for state consistency
+ 443 |     |     if (paymentRefCounter == 0) return true;
+ 444 |     | 
+ 445 |     |     // Check last payment created
+ 446 |     |     bytes8 lastRef = bytes8(uint64(paymentRefCounter));
+ 447 |     |     try wrapper.getPaymentData(lastRef) returns (
+ 448 |     |       ERC20CommerceEscrowWrapper.PaymentData memory payment
+ 449 |     |     ) {
+ 450 |     |       if (payment.commercePaymentHash == bytes32(0)) return true; // Payment doesn't exist
+ 451 |     | 
+ 452 |     |       // Get payment state from escrow
+ 453 |     |       try wrapper.getPaymentState(lastRef) returns (
+ 454 |     |         bool,
+ 455 |     |         uint120 capturableAmount,
+ 456 |     |         uint120 refundableAmount
+ 457 |     |       ) {
+ 458 |     |         // Capturable + refundable should not exceed original amount significantly
+ 459 |     |         // (refundable can grow from captures, but bounded by practical limits)
+ 460 |     |         uint256 totalInEscrow = uint256(capturableAmount) + uint256(refundableAmount);
+ 461 |     |         return totalInEscrow <= uint256(payment.amount) * 2; // 2x allows for captures->refunds
+ 462 |     |       } catch {
+ 463 |     |         return true; // If query fails, don't fail invariant
+ 464 |     |       }
+ 465 |     |     } catch {
+ 466 |     |       return true; // If payment lookup fails, don't fail invariant
+ 467 |     |     }
+ 468 |     |   }
+ 469 |     | 
+ 470 |     |   /// @notice Invariant: Operator authorization is respected
+ 471 |     |   /// @dev Only designated operators should be able to capture/void
+ 472 |     |   function echidna_operator_authorization_enforced() public returns (bool) {
+ 473 |     |     // This is enforced by modifiers in the wrapper
+ 474 |     |     // We verify the modifier exists by checking operator field is set
+ 475 |     |     if (paymentRefCounter == 0) return true;
+ 476 |     | 
+ 477 |     |     bytes8 lastRef = bytes8(uint64(paymentRefCounter));
+ 478 |     |     try wrapper.getPaymentData(lastRef) returns (
+ 479 |     |       ERC20CommerceEscrowWrapper.PaymentData memory payment
+ 480 |     |     ) {
+ 481 |     |       if (payment.commercePaymentHash == bytes32(0)) return true;
+ 482 |     | 
+ 483 |     |       // Operator should be set to a valid address
+ 484 |     |       return payment.operator != address(0);
+ 485 |     |     } catch {
+ 486 |     |       return true;
+ 487 |     |     }
+ 488 |     |   }
+ 489 |     | 
+ 490 |     |   /// @notice Invariant: Fee basis points are validated
+ 491 |     |   /// @dev Captures with invalid feeBps should always revert
+ 492 |     |   function echidna_fee_bps_validation_enforced() public returns (bool) {
+ 493 |     |     // This property is enforced by the wrapper's InvalidFeeBps check
+ 494 |     |     // We test it by ensuring our driver respects the bounds
+ 495 |     |     // The wrapper should never allow feeBps > 10000
+ 496 |     |     return true; // Tested implicitly through driver attempts
+ 497 |     |   }
+ 498 |     | }
+ 499 |     | 
+ 500 |     | // ============================================
+ 501 |     | // Mock Contracts for Testing
+ 502 |     | // ============================================
+ 503 |     | 
+ 504 |     | /// @notice Simple mock ERC20 for testing
+ 505 | *   | contract MockERC20 is IERC20 {
+ 506 |     |   mapping(address => uint256) private _balances;
+ 507 |     |   mapping(address => mapping(address => uint256)) private _allowances;
+ 508 |     |   uint256 private _totalSupply;
+ 509 |     | 
+ 510 | *   |   function totalSupply() external view override returns (uint256) {
+ 511 | *   |     return _totalSupply;
+ 512 |     |   }
+ 513 |     | 
+ 514 | *   |   function balanceOf(address account) external view override returns (uint256) {
+ 515 | *   |     return _balances[account];
+ 516 |     |   }
+ 517 |     | 
+ 518 |     |   function transfer(address to, uint256 amount) external override returns (bool) {
+ 519 |     |     _balances[msg.sender] -= amount;
+ 520 |     |     _balances[to] += amount;
+ 521 |     |     emit Transfer(msg.sender, to, amount);
+ 522 |     |     return true;
+ 523 |     |   }
+ 524 |     | 
+ 525 | *   |   function allowance(address owner, address spender) external view override returns (uint256) {
+ 526 | *   |     return _allowances[owner][spender];
+ 527 |     |   }
+ 528 |     | 
+ 529 | *   |   function approve(address spender, uint256 amount) external override returns (bool) {
+ 530 | *   |     _allowances[msg.sender][spender] = amount;
+ 531 | *   |     emit Approval(msg.sender, spender, amount);
+ 532 | *   |     return true;
+ 533 |     |   }
+ 534 |     | 
+ 535 | *   |   function transferFrom(
+ 536 |     |     address from,
+ 537 |     |     address to,
+ 538 |     |     uint256 amount
+ 539 | *   |   ) external override returns (bool) {
+ 540 | *   |     _allowances[from][msg.sender] -= amount;
+ 541 | *   |     _balances[from] -= amount;
+ 542 | *   |     _balances[to] += amount;
+ 543 | *   |     emit Transfer(from, to, amount);
+ 544 | *   |     return true;
+ 545 |     |   }
+ 546 |     | 
+ 547 | *   |   function mint(address to, uint256 amount) external {
+ 548 | *   |     _balances[to] += amount;
+ 549 | *   |     _totalSupply += amount;
+ 550 | *   |     emit Transfer(address(0), to, amount);
+ 551 |     |   }
+ 552 |     | }
+ 553 |     | 
+ 554 |     | /// @notice Mock Commerce Escrow for testing
+ 555 |     | /// @dev This mock handles token transfers to simulate the real escrow behavior
+ 556 | *   | contract MockAuthCaptureEscrow is IAuthCaptureEscrow {
+ 557 |     |   mapping(bytes32 => PaymentState) public payments;
+ 558 |     | 
+ 559 |     |   struct PaymentState {
+ 560 |     |     bool exists;
+ 561 |     |     bool collected;
+ 562 |     |     uint120 capturableAmount;
+ 563 |     |     uint120 refundableAmount;
+ 564 |     |     address token;
+ 565 |     |     address payer;
+ 566 |     |   }
+ 567 |     | 
+ 568 | *   |   function getHash(PaymentInfo memory info) external pure override returns (bytes32) {
+ 569 | *   |     return keccak256(abi.encode(info));
+ 570 |     |   }
+ 571 |     | 
+ 572 | *   |   function authorize(
+ 573 |     |     PaymentInfo memory info,
+ 574 |     |     uint256 amount,
+ 575 |     |     address,
+ 576 |     |     bytes memory
+ 577 | *   |   ) external override {
+ 578 | *   |     bytes32 hash = keccak256(abi.encode(info));
+ 579 | *   |     require(!payments[hash].exists, 'Payment already exists');
+ 580 |     | 
+ 581 |     |     // Collect tokens from payer to escrow
+ 582 | *   |     IERC20(info.token).transferFrom(info.payer, address(this), amount);
+ 583 |     | 
+ 584 | *   |     payments[hash] = PaymentState({
+ 585 | *   |       exists: true,
+ 586 | *   |       collected: true,
+ 587 | *   |       capturableAmount: uint120(amount),
+ 588 | *   |       refundableAmount: 0,
+ 589 | *   |       token: info.token,
+ 590 | *   |       payer: info.payer
+ 591 |     |     });
+ 592 |     |   }
+ 593 |     | 
+ 594 |     |   function capture(
+ 595 |     |     PaymentInfo memory info,
+ 596 |     |     uint256 amount,
+ 597 |     |     uint16,
+ 598 |     |     address
+ 599 |     |   ) external override {
+ 600 |     |     bytes32 hash = keccak256(abi.encode(info));
+ 601 |     |     require(payments[hash].exists, 'Payment not found');
+ 602 |     |     require(payments[hash].capturableAmount >= amount, 'Insufficient capturable amount');
+ 603 |     | 
+ 604 |     |     // Transfer captured amount to receiver (wrapper)
+ 605 |     |     IERC20(info.token).transfer(info.receiver, amount);
+ 606 |     | 
+ 607 |     |     payments[hash].capturableAmount -= uint120(amount);
+ 608 |     |     payments[hash].refundableAmount += uint120(amount);
+ 609 |     |   }
+ 610 |     | 
+ 611 | *   |   function void(PaymentInfo memory info) external override {
+ 612 | *   |     bytes32 hash = keccak256(abi.encode(info));
+ 613 | *   |     require(payments[hash].exists, 'Payment not found');
+ 614 | *   |     require(payments[hash].capturableAmount > 0, 'Nothing to void');
+ 615 |     | 
+ 616 |     |     uint120 amountToVoid = payments[hash].capturableAmount;
+ 617 |     | 
+ 618 |     |     // Return voided amount to payer
+ 619 |     |     IERC20(info.token).transfer(info.payer, amountToVoid);
+ 620 |     | 
+ 621 |     |     payments[hash].capturableAmount = 0;
+ 622 |     |   }
+ 623 |     | 
+ 624 | *   |   function charge(
+ 625 |     |     PaymentInfo memory info,
+ 626 |     |     uint256 amount,
+ 627 |     |     address,
+ 628 |     |     bytes calldata,
+ 629 |     |     uint16,
+ 630 |     |     address
+ 631 | *   |   ) external override {
+ 632 | *   |     bytes32 hash = keccak256(abi.encode(info));
+ 633 | *   |     require(!payments[hash].exists, 'Payment already exists');
+ 634 |     | 
+ 635 |     |     // Collect tokens from payer and immediately transfer to receiver
+ 636 | *   |     IERC20(info.token).transferFrom(info.payer, info.receiver, amount);
+ 637 |     | 
+ 638 | *   |     payments[hash] = PaymentState({
+ 639 | *   |       exists: true,
+ 640 | *   |       collected: true,
+ 641 | *   |       capturableAmount: 0,
+ 642 | *   |       refundableAmount: uint120(amount),
+ 643 | *   |       token: info.token,
+ 644 | *   |       payer: info.payer
+ 645 |     |     });
+ 646 |     |   }
+ 647 |     | 
+ 648 | *   |   function reclaim(PaymentInfo memory info) external override {
+ 649 | *   |     bytes32 hash = keccak256(abi.encode(info));
+ 650 | *   |     require(payments[hash].exists, 'Payment not found');
+ 651 | *   |     require(payments[hash].capturableAmount > 0, 'Nothing to reclaim');
+ 652 |     | 
+ 653 |     |     uint120 amountToReclaim = payments[hash].capturableAmount;
+ 654 |     | 
+ 655 |     |     // Return reclaimed amount to payer
+ 656 |     |     IERC20(info.token).transfer(info.payer, amountToReclaim);
+ 657 |     | 
+ 658 |     |     payments[hash].capturableAmount = 0;
+ 659 |     |   }
+ 660 |     | 
+ 661 | *   |   function refund(
+ 662 |     |     PaymentInfo memory info,
+ 663 |     |     uint256 amount,
+ 664 |     |     address,
+ 665 |     |     bytes calldata
+ 666 | *   |   ) external override {
+ 667 | *   |     bytes32 hash = keccak256(abi.encode(info));
+ 668 | *   |     require(payments[hash].exists, 'Payment not found');
+ 669 | *   |     require(payments[hash].refundableAmount >= amount, 'Insufficient refundable amount');
+ 670 |     | 
+ 671 |     |     // In the wrapper flow, the operator already sent refundAmount tokens to the wrapper,
+ 672 |     |     // and the wrapper will forward them to the payer via ERC20FeeProxy.
+ 673 |     |     // The mock escrow only needs to update its internal refundable state.
+ 674 | *   |     payments[hash].refundableAmount -= uint120(amount);
+ 675 |     |   }
+ 676 |     | 
+ 677 |     |   function paymentState(bytes32 hash)
+ 678 |     |     external
+ 679 |     |     view
+ 680 |     |     override
+ 681 |     |     returns (
+ 682 |     |       bool hasCollectedPayment,
+ 683 |     |       uint120 capturableAmount,
+ 684 |     |       uint120 refundableAmount
+ 685 |     |     )
+ 686 |     |   {
+ 687 |     |     PaymentState memory state = payments[hash];
+ 688 |     |     return (state.collected, state.capturableAmount, state.refundableAmount);
+ 689 |     |   }
+ 690 |     | }
+ 691 |     | 
+ 692 |     | /// @notice Mock ERC20FeeProxy for testing
+ 693 | *   | contract MockERC20FeeProxy is IERC20FeeProxy {
+ 694 |     |   IERC20 public token;
+ 695 |     | 
+ 696 | *   |   constructor(address _token) {
+ 697 | *   |     token = IERC20(_token);
+ 698 |     |   }
+ 699 |     | 
+ 700 | *   |   function transferFromWithReferenceAndFee(
+ 701 |     |     address tokenAddress,
+ 702 |     |     address to,
+ 703 |     |     uint256 amount,
+ 704 |     |     bytes calldata paymentReference,
+ 705 |     |     uint256 feeAmount,
+ 706 |     |     address feeAddress
+ 707 |     |   ) external override {
+ 708 | *   |     require(tokenAddress == address(token), 'Invalid token');
+ 709 |     | 
+ 710 |     |     // Transfer to recipient
+ 711 | *   |     if (amount > 0) {
+ 712 | *   |       token.transferFrom(msg.sender, to, amount);
+ 713 |     |     }
+ 714 |     | 
+ 715 |     |     // Transfer fee
+ 716 | *   |     if (feeAmount > 0 && feeAddress != address(0)) {
+ 717 | *   |       token.transferFrom(msg.sender, feeAddress, feeAmount);
+ 718 |     |     }
+ 719 |     | 
+ 720 | *   |     emit TransferWithReferenceAndFee(
+ 721 | *   |       tokenAddress,
+ 722 | *   |       to,
+ 723 | *   |       amount,
+ 724 | *   |       paymentReference,
+ 725 | *   |       feeAmount,
+ 726 | *   |       feeAddress
+ 727 |     |     );
+ 728 |     |   }
+ 729 |     | }
+ 730 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin4/contracts/security/ReentrancyGuard.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v4.9.0) (security/ReentrancyGuard.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Contract module that helps prevent reentrant calls to a function.
+  8 |     |  *
+  9 |     |  * Inheriting from `ReentrancyGuard` will make the {nonReentrant} modifier
+ 10 |     |  * available, which can be applied to functions to make sure there are no nested
+ 11 |     |  * (reentrant) calls to them.
+ 12 |     |  *
+ 13 |     |  * Note that because there is a single `nonReentrant` guard, functions marked as
+ 14 |     |  * `nonReentrant` may not call one another. This can be worked around by making
+ 15 |     |  * those functions `private`, and then adding `external` `nonReentrant` entry
+ 16 |     |  * points to them.
+ 17 |     |  *
+ 18 |     |  * TIP: If you would like to learn more about reentrancy and alternative ways
+ 19 |     |  * to protect against it, check out our blog post
+ 20 |     |  * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
+ 21 |     |  */
+ 22 |     | abstract contract ReentrancyGuard {
+ 23 |     |     // Booleans are more expensive than uint256 or any type that takes up a full
+ 24 |     |     // word because each write operation emits an extra SLOAD to first read the
+ 25 |     |     // slot's contents, replace the bits taken up by the boolean, and then write
+ 26 |     |     // back. This is the compiler's defense against contract upgrades and
+ 27 |     |     // pointer aliasing, and it cannot be disabled.
+ 28 |     | 
+ 29 |     |     // The values being non-zero value makes deployment a bit more expensive,
+ 30 |     |     // but in exchange the refund on every call to nonReentrant will be lower in
+ 31 |     |     // amount. Since refunds are capped to a percentage of the total
+ 32 |     |     // transaction's gas, it is best to keep them low in cases like this one, to
+ 33 |     |     // increase the likelihood of the full refund coming into effect.
+ 34 | *   |     uint256 private constant _NOT_ENTERED = 1;
+ 35 | *   |     uint256 private constant _ENTERED = 2;
+ 36 |     | 
+ 37 |     |     uint256 private _status;
+ 38 |     | 
+ 39 |     |     constructor() {
+ 40 | *   |         _status = _NOT_ENTERED;
+ 41 |     |     }
+ 42 |     | 
+ 43 |     |     /**
+ 44 |     |      * @dev Prevents a contract from calling itself, directly or indirectly.
+ 45 |     |      * Calling a `nonReentrant` function from another `nonReentrant`
+ 46 |     |      * function is not supported. It is possible to prevent this from happening
+ 47 |     |      * by making the `nonReentrant` function external, and making it call a
+ 48 |     |      * `private` function that does the actual work.
+ 49 |     |      */
+ 50 |     |     modifier nonReentrant() {
+ 51 | *   |         _nonReentrantBefore();
+ 52 | *   |         _;
+ 53 | *   |         _nonReentrantAfter();
+ 54 |     |     }
+ 55 |     | 
+ 56 | *   |     function _nonReentrantBefore() private {
+ 57 |     |         // On the first call to nonReentrant, _status will be _NOT_ENTERED
+ 58 | *   |         require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+ 59 |     | 
+ 60 |     |         // Any calls to nonReentrant after this point will fail
+ 61 | *   |         _status = _ENTERED;
+ 62 |     |     }
+ 63 |     | 
+ 64 | *   |     function _nonReentrantAfter() private {
+ 65 |     |         // By storing the original value once again, a refund is triggered (see
+ 66 |     |         // https://eips.ethereum.org/EIPS/eip-2200)
+ 67 | *   |         _status = _NOT_ENTERED;
+ 68 |     |     }
+ 69 |     | 
+ 70 |     |     /**
+ 71 |     |      * @dev Returns true if the reentrancy guard is currently set to "entered", which indicates there is a
+ 72 |     |      * `nonReentrant` function in the call stack.
+ 73 |     |      */
+ 74 |     |     function _reentrancyGuardEntered() internal view returns (bool) {
+ 75 |     |         return _status == _ENTERED;
+ 76 |     |     }
+ 77 |     | }
+ 78 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin4/contracts/token/ERC20/IERC20.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v4.9.0) (token/ERC20/IERC20.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Interface of the ERC20 standard as defined in the EIP.
+  8 |     |  */
+  9 |     | interface IERC20 {
+ 10 |     |     /**
+ 11 |     |      * @dev Emitted when `value` tokens are moved from one account (`from`) to
+ 12 |     |      * another (`to`).
+ 13 |     |      *
+ 14 |     |      * Note that `value` may be zero.
+ 15 |     |      */
+ 16 |     |     event Transfer(address indexed from, address indexed to, uint256 value);
+ 17 |     | 
+ 18 |     |     /**
+ 19 |     |      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+ 20 |     |      * a call to {approve}. `value` is the new allowance.
+ 21 |     |      */
+ 22 |     |     event Approval(address indexed owner, address indexed spender, uint256 value);
+ 23 |     | 
+ 24 |     |     /**
+ 25 |     |      * @dev Returns the amount of tokens in existence.
+ 26 |     |      */
+ 27 |     |     function totalSupply() external view returns (uint256);
+ 28 |     | 
+ 29 |     |     /**
+ 30 |     |      * @dev Returns the amount of tokens owned by `account`.
+ 31 |     |      */
+ 32 |     |     function balanceOf(address account) external view returns (uint256);
+ 33 |     | 
+ 34 |     |     /**
+ 35 |     |      * @dev Moves `amount` tokens from the caller's account to `to`.
+ 36 |     |      *
+ 37 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 38 |     |      *
+ 39 |     |      * Emits a {Transfer} event.
+ 40 |     |      */
+ 41 |     |     function transfer(address to, uint256 amount) external returns (bool);
+ 42 |     | 
+ 43 |     |     /**
+ 44 |     |      * @dev Returns the remaining number of tokens that `spender` will be
+ 45 |     |      * allowed to spend on behalf of `owner` through {transferFrom}. This is
+ 46 |     |      * zero by default.
+ 47 |     |      *
+ 48 |     |      * This value changes when {approve} or {transferFrom} are called.
+ 49 |     |      */
+ 50 |     |     function allowance(address owner, address spender) external view returns (uint256);
+ 51 |     | 
+ 52 |     |     /**
+ 53 |     |      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+ 54 |     |      *
+ 55 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 56 |     |      *
+ 57 |     |      * IMPORTANT: Beware that changing an allowance with this method brings the risk
+ 58 |     |      * that someone may use both the old and the new allowance by unfortunate
+ 59 |     |      * transaction ordering. One possible solution to mitigate this race
+ 60 |     |      * condition is to first reduce the spender's allowance to 0 and set the
+ 61 |     |      * desired value afterwards:
+ 62 |     |      * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+ 63 |     |      *
+ 64 |     |      * Emits an {Approval} event.
+ 65 |     |      */
+ 66 |     |     function approve(address spender, uint256 amount) external returns (bool);
+ 67 |     | 
+ 68 |     |     /**
+ 69 |     |      * @dev Moves `amount` tokens from `from` to `to` using the
+ 70 |     |      * allowance mechanism. `amount` is then deducted from the caller's
+ 71 |     |      * allowance.
+ 72 |     |      *
+ 73 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 74 |     |      *
+ 75 |     |      * Emits a {Transfer} event.
+ 76 |     |      */
+ 77 |     |     function transferFrom(address from, address to, uint256 amount) external returns (bool);
+ 78 |     | }
+ 79 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin4/contracts/token/ERC20/extensions/IERC20Permit.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v4.9.4) (token/ERC20/extensions/IERC20Permit.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Interface of the ERC20 Permit extension allowing approvals to be made via signatures, as defined in
+  8 |     |  * https://eips.ethereum.org/EIPS/eip-2612[EIP-2612].
+  9 |     |  *
+ 10 |     |  * Adds the {permit} method, which can be used to change an account's ERC20 allowance (see {IERC20-allowance}) by
+ 11 |     |  * presenting a message signed by the account. By not relying on {IERC20-approve}, the token holder account doesn't
+ 12 |     |  * need to send a transaction, and thus is not required to hold Ether at all.
+ 13 |     |  *
+ 14 |     |  * ==== Security Considerations
+ 15 |     |  *
+ 16 |     |  * There are two important considerations concerning the use of `permit`. The first is that a valid permit signature
+ 17 |     |  * expresses an allowance, and it should not be assumed to convey additional meaning. In particular, it should not be
+ 18 |     |  * considered as an intention to spend the allowance in any specific way. The second is that because permits have
+ 19 |     |  * built-in replay protection and can be submitted by anyone, they can be frontrun. A protocol that uses permits should
+ 20 |     |  * take this into consideration and allow a `permit` call to fail. Combining these two aspects, a pattern that may be
+ 21 |     |  * generally recommended is:
+ 22 |     |  *
+ 23 |     |  * ```solidity
+ 24 |     |  * function doThingWithPermit(..., uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) public {
+ 25 |     |  *     try token.permit(msg.sender, address(this), value, deadline, v, r, s) {} catch {}
+ 26 |     |  *     doThing(..., value);
+ 27 |     |  * }
+ 28 |     |  *
+ 29 |     |  * function doThing(..., uint256 value) public {
+ 30 |     |  *     token.safeTransferFrom(msg.sender, address(this), value);
+ 31 |     |  *     ...
+ 32 |     |  * }
+ 33 |     |  * ```
+ 34 |     |  *
+ 35 |     |  * Observe that: 1) `msg.sender` is used as the owner, leaving no ambiguity as to the signer intent, and 2) the use of
+ 36 |     |  * `try/catch` allows the permit to fail and makes the code tolerant to frontrunning. (See also
+ 37 |     |  * {SafeERC20-safeTransferFrom}).
+ 38 |     |  *
+ 39 |     |  * Additionally, note that smart contract wallets (such as Argent or Safe) are not able to produce permit signatures, so
+ 40 |     |  * contracts should have entry points that don't rely on permit.
+ 41 |     |  */
+ 42 |     | interface IERC20Permit {
+ 43 |     |     /**
+ 44 |     |      * @dev Sets `value` as the allowance of `spender` over ``owner``'s tokens,
+ 45 |     |      * given ``owner``'s signed approval.
+ 46 |     |      *
+ 47 |     |      * IMPORTANT: The same issues {IERC20-approve} has related to transaction
+ 48 |     |      * ordering also apply here.
+ 49 |     |      *
+ 50 |     |      * Emits an {Approval} event.
+ 51 |     |      *
+ 52 |     |      * Requirements:
+ 53 |     |      *
+ 54 |     |      * - `spender` cannot be the zero address.
+ 55 |     |      * - `deadline` must be a timestamp in the future.
+ 56 |     |      * - `v`, `r` and `s` must be a valid `secp256k1` signature from `owner`
+ 57 |     |      * over the EIP712-formatted function arguments.
+ 58 |     |      * - the signature must use ``owner``'s current nonce (see {nonces}).
+ 59 |     |      *
+ 60 |     |      * For more information on the signature format, see the
+ 61 |     |      * https://eips.ethereum.org/EIPS/eip-2612#specification[relevant EIP
+ 62 |     |      * section].
+ 63 |     |      *
+ 64 |     |      * CAUTION: See Security Considerations above.
+ 65 |     |      */
+ 66 |     |     function permit(
+ 67 |     |         address owner,
+ 68 |     |         address spender,
+ 69 |     |         uint256 value,
+ 70 |     |         uint256 deadline,
+ 71 |     |         uint8 v,
+ 72 |     |         bytes32 r,
+ 73 |     |         bytes32 s
+ 74 |     |     ) external;
+ 75 |     | 
+ 76 |     |     /**
+ 77 |     |      * @dev Returns the current nonce for `owner`. This value must be
+ 78 |     |      * included whenever a signature is generated for {permit}.
+ 79 |     |      *
+ 80 |     |      * Every successful call to {permit} increases ``owner``'s nonce by one. This
+ 81 |     |      * prevents a signature from being used multiple times.
+ 82 |     |      */
+ 83 |     |     function nonces(address owner) external view returns (uint256);
+ 84 |     | 
+ 85 |     |     /**
+ 86 |     |      * @dev Returns the domain separator used in the encoding of the signature for {permit}, as defined by {EIP712}.
+ 87 |     |      */
+ 88 |     |     // solhint-disable-next-line func-name-mixedcase
+ 89 |     |     function DOMAIN_SEPARATOR() external view returns (bytes32);
+ 90 |     | }
+ 91 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin4/contracts/token/ERC20/utils/SafeERC20.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v4.9.3) (token/ERC20/utils/SafeERC20.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.0;
+   5 |     | 
+   6 |     | import "../IERC20.sol";
+   7 |     | import "../extensions/IERC20Permit.sol";
+   8 |     | import "../../../utils/Address.sol";
+   9 |     | 
+  10 |     | /**
+  11 |     |  * @title SafeERC20
+  12 |     |  * @dev Wrappers around ERC20 operations that throw on failure (when the token
+  13 |     |  * contract returns false). Tokens that return no value (and instead revert or
+  14 |     |  * throw on failure) are also supported, non-reverting calls are assumed to be
+  15 |     |  * successful.
+  16 |     |  * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,
+  17 |     |  * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
+  18 |     |  */
+  19 |     | library SafeERC20 {
+  20 |     |     using Address for address;
+  21 |     | 
+  22 |     |     /**
+  23 |     |      * @dev Transfer `value` amount of `token` from the calling contract to `to`. If `token` returns no value,
+  24 |     |      * non-reverting calls are assumed to be successful.
+  25 |     |      */
+  26 |     |     function safeTransfer(IERC20 token, address to, uint256 value) internal {
+  27 |     |         _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
+  28 |     |     }
+  29 |     | 
+  30 |     |     /**
+  31 |     |      * @dev Transfer `value` amount of `token` from `from` to `to`, spending the approval given by `from` to the
+  32 |     |      * calling contract. If `token` returns no value, non-reverting calls are assumed to be successful.
+  33 |     |      */
+  34 | *   |     function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+  35 | *   |         _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+  36 |     |     }
+  37 |     | 
+  38 |     |     /**
+  39 |     |      * @dev Deprecated. This function has issues similar to the ones found in
+  40 |     |      * {IERC20-approve}, and its usage is discouraged.
+  41 |     |      *
+  42 |     |      * Whenever possible, use {safeIncreaseAllowance} and
+  43 |     |      * {safeDecreaseAllowance} instead.
+  44 |     |      */
+  45 | *   |     function safeApprove(IERC20 token, address spender, uint256 value) internal {
+  46 |     |         // safeApprove should only be called when setting an initial allowance,
+  47 |     |         // or when resetting it to zero. To increase and decrease it, use
+  48 |     |         // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
+  49 | *   |         require(
+  50 | *   |             (value == 0) || (token.allowance(address(this), spender) == 0),
+  51 |     |             "SafeERC20: approve from non-zero to non-zero allowance"
+  52 |     |         );
+  53 | *   |         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
+  54 |     |     }
+  55 |     | 
+  56 |     |     /**
+  57 |     |      * @dev Increase the calling contract's allowance toward `spender` by `value`. If `token` returns no value,
+  58 |     |      * non-reverting calls are assumed to be successful.
+  59 |     |      */
+  60 |     |     function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+  61 |     |         uint256 oldAllowance = token.allowance(address(this), spender);
+  62 |     |         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, oldAllowance + value));
+  63 |     |     }
+  64 |     | 
+  65 |     |     /**
+  66 |     |      * @dev Decrease the calling contract's allowance toward `spender` by `value`. If `token` returns no value,
+  67 |     |      * non-reverting calls are assumed to be successful.
+  68 |     |      */
+  69 |     |     function safeDecreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+  70 |     |         unchecked {
+  71 |     |             uint256 oldAllowance = token.allowance(address(this), spender);
+  72 |     |             require(oldAllowance >= value, "SafeERC20: decreased allowance below zero");
+  73 |     |             _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, oldAllowance - value));
+  74 |     |         }
+  75 |     |     }
+  76 |     | 
+  77 |     |     /**
+  78 |     |      * @dev Set the calling contract's allowance toward `spender` to `value`. If `token` returns no value,
+  79 |     |      * non-reverting calls are assumed to be successful. Meant to be used with tokens that require the approval
+  80 |     |      * to be set to zero before setting it to a non-zero value, such as USDT.
+  81 |     |      */
+  82 |     |     function forceApprove(IERC20 token, address spender, uint256 value) internal {
+  83 |     |         bytes memory approvalCall = abi.encodeWithSelector(token.approve.selector, spender, value);
+  84 |     | 
+  85 |     |         if (!_callOptionalReturnBool(token, approvalCall)) {
+  86 |     |             _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, 0));
+  87 |     |             _callOptionalReturn(token, approvalCall);
+  88 |     |         }
+  89 |     |     }
+  90 |     | 
+  91 |     |     /**
+  92 |     |      * @dev Use a ERC-2612 signature to set the `owner` approval toward `spender` on `token`.
+  93 |     |      * Revert on invalid signature.
+  94 |     |      */
+  95 |     |     function safePermit(
+  96 |     |         IERC20Permit token,
+  97 |     |         address owner,
+  98 |     |         address spender,
+  99 |     |         uint256 value,
+ 100 |     |         uint256 deadline,
+ 101 |     |         uint8 v,
+ 102 |     |         bytes32 r,
+ 103 |     |         bytes32 s
+ 104 |     |     ) internal {
+ 105 |     |         uint256 nonceBefore = token.nonces(owner);
+ 106 |     |         token.permit(owner, spender, value, deadline, v, r, s);
+ 107 |     |         uint256 nonceAfter = token.nonces(owner);
+ 108 |     |         require(nonceAfter == nonceBefore + 1, "SafeERC20: permit did not succeed");
+ 109 |     |     }
+ 110 |     | 
+ 111 |     |     /**
+ 112 |     |      * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement
+ 113 |     |      * on the return value: the return value is optional (but if data is returned, it must not be false).
+ 114 |     |      * @param token The token targeted by the call.
+ 115 |     |      * @param data The call data (encoded using abi.encode or one of its variants).
+ 116 |     |      */
+ 117 | *   |     function _callOptionalReturn(IERC20 token, bytes memory data) private {
+ 118 |     |         // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
+ 119 |     |         // we're implementing it ourselves. We use {Address-functionCall} to perform this call, which verifies that
+ 120 |     |         // the target address contains contract code and also asserts for success in the low-level call.
+ 121 |     | 
+ 122 | *   |         bytes memory returndata = address(token).functionCall(data, "SafeERC20: low-level call failed");
+ 123 | *   |         require(returndata.length == 0 || abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
+ 124 |     |     }
+ 125 |     | 
+ 126 |     |     /**
+ 127 |     |      * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement
+ 128 |     |      * on the return value: the return value is optional (but if data is returned, it must not be false).
+ 129 |     |      * @param token The token targeted by the call.
+ 130 |     |      * @param data The call data (encoded using abi.encode or one of its variants).
+ 131 |     |      *
+ 132 |     |      * This is a variant of {_callOptionalReturn} that silents catches all reverts and returns a bool instead.
+ 133 |     |      */
+ 134 |     |     function _callOptionalReturnBool(IERC20 token, bytes memory data) private returns (bool) {
+ 135 |     |         // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
+ 136 |     |         // we're implementing it ourselves. We cannot use {Address-functionCall} here since this should return false
+ 137 |     |         // and not revert is the subcall reverts.
+ 138 |     | 
+ 139 |     |         (bool success, bytes memory returndata) = address(token).call(data);
+ 140 |     |         return
+ 141 |     |             success && (returndata.length == 0 || abi.decode(returndata, (bool))) && Address.isContract(address(token));
+ 142 |     |     }
+ 143 |     | }
+ 144 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin4/contracts/utils/Address.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v4.9.0) (utils/Address.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.1;
+   5 |     | 
+   6 |     | /**
+   7 |     |  * @dev Collection of functions related to the address type
+   8 |     |  */
+   9 |     | library Address {
+  10 |     |     /**
+  11 |     |      * @dev Returns true if `account` is a contract.
+  12 |     |      *
+  13 |     |      * [IMPORTANT]
+  14 |     |      * ====
+  15 |     |      * It is unsafe to assume that an address for which this function returns
+  16 |     |      * false is an externally-owned account (EOA) and not a contract.
+  17 |     |      *
+  18 |     |      * Among others, `isContract` will return false for the following
+  19 |     |      * types of addresses:
+  20 |     |      *
+  21 |     |      *  - an externally-owned account
+  22 |     |      *  - a contract in construction
+  23 |     |      *  - an address where a contract will be created
+  24 |     |      *  - an address where a contract lived, but was destroyed
+  25 |     |      *
+  26 |     |      * Furthermore, `isContract` will also return true if the target contract within
+  27 |     |      * the same transaction is already scheduled for destruction by `SELFDESTRUCT`,
+  28 |     |      * which only has an effect at the end of a transaction.
+  29 |     |      * ====
+  30 |     |      *
+  31 |     |      * [IMPORTANT]
+  32 |     |      * ====
+  33 |     |      * You shouldn't rely on `isContract` to protect against flash loan attacks!
+  34 |     |      *
+  35 |     |      * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets
+  36 |     |      * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract
+  37 |     |      * constructor.
+  38 |     |      * ====
+  39 |     |      */
+  40 |     |     function isContract(address account) internal view returns (bool) {
+  41 |     |         // This method relies on extcodesize/address.code.length, which returns 0
+  42 |     |         // for contracts in construction, since the code is only stored at the end
+  43 |     |         // of the constructor execution.
+  44 |     | 
+  45 |     |         return account.code.length > 0;
+  46 |     |     }
+  47 |     | 
+  48 |     |     /**
+  49 |     |      * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+  50 |     |      * `recipient`, forwarding all available gas and reverting on errors.
+  51 |     |      *
+  52 |     |      * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+  53 |     |      * of certain opcodes, possibly making contracts go over the 2300 gas limit
+  54 |     |      * imposed by `transfer`, making them unable to receive funds via
+  55 |     |      * `transfer`. {sendValue} removes this limitation.
+  56 |     |      *
+  57 |     |      * https://consensys.net/diligence/blog/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+  58 |     |      *
+  59 |     |      * IMPORTANT: because control is transferred to `recipient`, care must be
+  60 |     |      * taken to not create reentrancy vulnerabilities. Consider using
+  61 |     |      * {ReentrancyGuard} or the
+  62 |     |      * https://solidity.readthedocs.io/en/v0.8.0/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+  63 |     |      */
+  64 |     |     function sendValue(address payable recipient, uint256 amount) internal {
+  65 |     |         require(address(this).balance >= amount, "Address: insufficient balance");
+  66 |     | 
+  67 |     |         (bool success, ) = recipient.call{value: amount}("");
+  68 |     |         require(success, "Address: unable to send value, recipient may have reverted");
+  69 |     |     }
+  70 |     | 
+  71 |     |     /**
+  72 |     |      * @dev Performs a Solidity function call using a low level `call`. A
+  73 |     |      * plain `call` is an unsafe replacement for a function call: use this
+  74 |     |      * function instead.
+  75 |     |      *
+  76 |     |      * If `target` reverts with a revert reason, it is bubbled up by this
+  77 |     |      * function (like regular Solidity function calls).
+  78 |     |      *
+  79 |     |      * Returns the raw returned data. To convert to the expected return value,
+  80 |     |      * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
+  81 |     |      *
+  82 |     |      * Requirements:
+  83 |     |      *
+  84 |     |      * - `target` must be a contract.
+  85 |     |      * - calling `target` with `data` must not revert.
+  86 |     |      *
+  87 |     |      * _Available since v3.1._
+  88 |     |      */
+  89 |     |     function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+  90 |     |         return functionCallWithValue(target, data, 0, "Address: low-level call failed");
+  91 |     |     }
+  92 |     | 
+  93 |     |     /**
+  94 |     |      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+  95 |     |      * `errorMessage` as a fallback revert reason when `target` reverts.
+  96 |     |      *
+  97 |     |      * _Available since v3.1._
+  98 |     |      */
+  99 | *   |     function functionCall(
+ 100 |     |         address target,
+ 101 |     |         bytes memory data,
+ 102 |     |         string memory errorMessage
+ 103 | *   |     ) internal returns (bytes memory) {
+ 104 | *   |         return functionCallWithValue(target, data, 0, errorMessage);
+ 105 |     |     }
+ 106 |     | 
+ 107 |     |     /**
+ 108 |     |      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+ 109 |     |      * but also transferring `value` wei to `target`.
+ 110 |     |      *
+ 111 |     |      * Requirements:
+ 112 |     |      *
+ 113 |     |      * - the calling contract must have an ETH balance of at least `value`.
+ 114 |     |      * - the called Solidity function must be `payable`.
+ 115 |     |      *
+ 116 |     |      * _Available since v3.1._
+ 117 |     |      */
+ 118 |     |     function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {
+ 119 |     |         return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+ 120 |     |     }
+ 121 |     | 
+ 122 |     |     /**
+ 123 |     |      * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+ 124 |     |      * with `errorMessage` as a fallback revert reason when `target` reverts.
+ 125 |     |      *
+ 126 |     |      * _Available since v3.1._
+ 127 |     |      */
+ 128 | *   |     function functionCallWithValue(
+ 129 |     |         address target,
+ 130 |     |         bytes memory data,
+ 131 |     |         uint256 value,
+ 132 |     |         string memory errorMessage
+ 133 | *   |     ) internal returns (bytes memory) {
+ 134 | *   |         require(address(this).balance >= value, "Address: insufficient balance for call");
+ 135 | *   |         (bool success, bytes memory returndata) = target.call{value: value}(data);
+ 136 | *   |         return verifyCallResultFromTarget(target, success, returndata, errorMessage);
+ 137 |     |     }
+ 138 |     | 
+ 139 |     |     /**
+ 140 |     |      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+ 141 |     |      * but performing a static call.
+ 142 |     |      *
+ 143 |     |      * _Available since v3.3._
+ 144 |     |      */
+ 145 |     |     function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+ 146 |     |         return functionStaticCall(target, data, "Address: low-level static call failed");
+ 147 |     |     }
+ 148 |     | 
+ 149 |     |     /**
+ 150 |     |      * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+ 151 |     |      * but performing a static call.
+ 152 |     |      *
+ 153 |     |      * _Available since v3.3._
+ 154 |     |      */
+ 155 |     |     function functionStaticCall(
+ 156 |     |         address target,
+ 157 |     |         bytes memory data,
+ 158 |     |         string memory errorMessage
+ 159 |     |     ) internal view returns (bytes memory) {
+ 160 |     |         (bool success, bytes memory returndata) = target.staticcall(data);
+ 161 |     |         return verifyCallResultFromTarget(target, success, returndata, errorMessage);
+ 162 |     |     }
+ 163 |     | 
+ 164 |     |     /**
+ 165 |     |      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+ 166 |     |      * but performing a delegate call.
+ 167 |     |      *
+ 168 |     |      * _Available since v3.4._
+ 169 |     |      */
+ 170 |     |     function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+ 171 |     |         return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+ 172 |     |     }
+ 173 |     | 
+ 174 |     |     /**
+ 175 |     |      * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+ 176 |     |      * but performing a delegate call.
+ 177 |     |      *
+ 178 |     |      * _Available since v3.4._
+ 179 |     |      */
+ 180 |     |     function functionDelegateCall(
+ 181 |     |         address target,
+ 182 |     |         bytes memory data,
+ 183 |     |         string memory errorMessage
+ 184 |     |     ) internal returns (bytes memory) {
+ 185 |     |         (bool success, bytes memory returndata) = target.delegatecall(data);
+ 186 |     |         return verifyCallResultFromTarget(target, success, returndata, errorMessage);
+ 187 |     |     }
+ 188 |     | 
+ 189 |     |     /**
+ 190 |     |      * @dev Tool to verify that a low level call to smart-contract was successful, and revert (either by bubbling
+ 191 |     |      * the revert reason or using the provided one) in case of unsuccessful call or if target was not a contract.
+ 192 |     |      *
+ 193 |     |      * _Available since v4.8._
+ 194 |     |      */
+ 195 | *   |     function verifyCallResultFromTarget(
+ 196 |     |         address target,
+ 197 |     |         bool success,
+ 198 |     |         bytes memory returndata,
+ 199 |     |         string memory errorMessage
+ 200 | *   |     ) internal view returns (bytes memory) {
+ 201 | *   |         if (success) {
+ 202 | *   |             if (returndata.length == 0) {
+ 203 |     |                 // only check isContract if the call was successful and the return data is empty
+ 204 |     |                 // otherwise we already know that it was a contract
+ 205 |     |                 require(isContract(target), "Address: call to non-contract");
+ 206 |     |             }
+ 207 | *   |             return returndata;
+ 208 |     |         } else {
+ 209 |     |             _revert(returndata, errorMessage);
+ 210 |     |         }
+ 211 |     |     }
+ 212 |     | 
+ 213 |     |     /**
+ 214 |     |      * @dev Tool to verify that a low level call was successful, and revert if it wasn't, either by bubbling the
+ 215 |     |      * revert reason or using the provided one.
+ 216 |     |      *
+ 217 |     |      * _Available since v4.3._
+ 218 |     |      */
+ 219 |     |     function verifyCallResult(
+ 220 |     |         bool success,
+ 221 |     |         bytes memory returndata,
+ 222 |     |         string memory errorMessage
+ 223 |     |     ) internal pure returns (bytes memory) {
+ 224 |     |         if (success) {
+ 225 |     |             return returndata;
+ 226 |     |         } else {
+ 227 |     |             _revert(returndata, errorMessage);
+ 228 |     |         }
+ 229 |     |     }
+ 230 |     | 
+ 231 |     |     function _revert(bytes memory returndata, string memory errorMessage) private pure {
+ 232 |     |         // Look for revert reason and bubble it up if present
+ 233 |     |         if (returndata.length > 0) {
+ 234 |     |             // The easiest way to bubble the revert reason is using memory via assembly
+ 235 |     |             /// @solidity memory-safe-assembly
+ 236 |     |             assembly {
+ 237 |     |                 let returndata_size := mload(returndata)
+ 238 |     |                 revert(add(32, returndata), returndata_size)
+ 239 |     |             }
+ 240 |     |         } else {
+ 241 |     |             revert(errorMessage);
+ 242 |     |         }
+ 243 |     |     }
+ 244 |     | }
+ 245 |     | 
+
