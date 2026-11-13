@@ -8,6 +8,7 @@ import copy
 import hashlib
 import json
 import sys
+import time
 from pathlib import Path
 
 
@@ -106,7 +107,8 @@ def selected_effects(records, catalog):
     return {key: catalog[key] for key in keys}
 
 
-def build(report, grouping):
+def build(report, grouping, timings=None):
+    tick = time.perf_counter_ns()
     originals = {p["property_id"]: p for p in report["properties"]}
     if len(originals) != len(report["properties"]):
         raise ValueError("原报告存在重复 property_id")
@@ -134,6 +136,9 @@ def build(report, grouping):
                           for alt in original.get("cfg_guard_alternatives", [])]
         if restored_paths != original_paths:
             raise AssertionError(f"控制流守卫路径丢失: {effect_id}")
+    if timings is not None:
+        timings["context_projection_ms"] = (time.perf_counter_ns() - tick) / 1_000_000
+    tick = time.perf_counter_ns()
     blocks = {}
     records = {pid: project_property(prop, catalog, blocks)
                for pid, prop in projected.items()}
@@ -162,6 +167,8 @@ def build(report, grouping):
         grouped.append({"context_blocks": selected_blocks(subset, blocks),
                         "effect_catalog": selected_effects(subset, catalog),
                         "properties": subset})
+    if timings is not None:
+        timings["context_dedup_ms"] = (time.perf_counter_ns() - tick) / 1_000_000
     return {"independent": independent, "global_shared": global_shared,
             "grouped": grouped, "member_groups": members,
             "audit": {"properties": len(projected),

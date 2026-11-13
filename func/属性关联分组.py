@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import time
 from collections import defaultdict
 from itertools import combinations
 from pathlib import Path
@@ -60,21 +61,28 @@ def quality(groups: list[list[str]], edges: dict[tuple[str, str], dict],
     }
 
 
-def analyze(report: dict, trials: int, seed: int) -> dict:
+def analyze(report: dict, trials: int, seed: int, timings: dict | None = None) -> dict:
     properties = report["properties"]
     by_id = {prop["property_id"]: prop for prop in properties}
     if len(by_id) != len(properties):
         raise ValueError("property_id 不唯一，无法安全分组")
     mutable = {effect["state"] for effect in report["effect_catalog"].values()}
+    tick = time.perf_counter_ns()
     feats = {pid: features(prop, mutable) for pid, prop in by_id.items()}
+    if timings is not None:
+        timings["feature_extraction_ms"] = (time.perf_counter_ns() - tick) / 1_000_000
     contexts: dict[tuple[str, str], list[str]] = defaultdict(list)
     for pid, prop in by_id.items():
         contexts[(prop["analysis_contract"], prop["analysis_contract_source"])].append(pid)
     edges: dict[tuple[str, str], dict] = {}
+    tick = time.perf_counter_ns()
     for members in contexts.values():
         for left, right in combinations(sorted(members), 2):
             edges[(left, right)] = pair_evidence(feats[left], feats[right])
+    if timings is not None:
+        timings["dependency_graph_ms"] = (time.perf_counter_ns() - tick) / 1_000_000
     groups = [{pid} for pid in by_id]
+    tick = time.perf_counter_ns()
     for pair, evidence in sorted(edges.items(),
                                  key=lambda item: (-item[1]["score"], item[0])):
         if not evidence["supported"]:
@@ -92,6 +100,8 @@ def analyze(report: dict, trials: int, seed: int) -> dict:
     grouped = sorted((sorted(group) for group in groups),
                      key=lambda group: (by_id[group[0]]["analysis_contract_source"],
                                         by_id[group[0]]["analysis_contract"], group))
+    if timings is not None:
+        timings["property_merge_ms"] = (time.perf_counter_ns() - tick) / 1_000_000
     singleton = [[pid] for pid in by_id]
     rng = random.Random(seed)
     random_metrics = []
