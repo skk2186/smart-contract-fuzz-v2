@@ -12,6 +12,8 @@ from deepseek接口 import call_json
 
 SENDERS = [f"0x{i:040x}" for i in (0x10000, 0x20000, 0x30000, 0x40000, 0x50000)]
 ADDRESS_RE = re.compile(r"^0x[0-9a-fA-F]{40}$")
+HARNESS_ADDRESS = "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+PROPERTY_SENDER = "0x0000000000000000000000000000000000010000"
 
 
 def normalize_argument(kind: str, value: Any) -> Any:
@@ -53,7 +55,8 @@ def _abi_value(kind: str, value: Any) -> dict[str, Any]:
     return {"tag": tag, "contents": [bits, str(normalized)]}
 
 
-def _validator(context: dict[str, Any], candidate: dict[str, Any], feedback: str | None):
+def _validator(context: dict[str, Any], candidate: dict[str, Any], feedback: str | None,
+               fixed_prefix_transactions: list[dict[str, Any]] | None = None):
     property_context = next(p for p in context["properties"]
                             if p["property_id"] == candidate["property_id"])
     action_index = {action["abi_signature"]: action for action in property_context["candidate_actions"]
@@ -94,12 +97,24 @@ def _validator(context: dict[str, Any], candidate: dict[str, Any], feedback: str
                 if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 86400:
                     raise ValueError(f"{field} 必须是 0 到 86400 之间的整数")
                 tx[field] = value
+        if fixed_prefix_transactions:
+            if len(fixed_prefix_transactions) > len(transactions):
+                raise ValueError("固定共享前缀长于候选交易序列")
+            for index, fixed in enumerate(fixed_prefix_transactions):
+                actual = transactions[index]
+                for field in ("function", "arguments", "sender", "value_wei",
+                              "delay_seconds", "delay_blocks"):
+                    if actual.get(field) != fixed.get(field):
+                        raise ValueError(f"共享前缀第 {index + 1} 笔交易字段 {field} 与已实例化前缀不一致")
         data["execution_feedback"] = feedback
     return validate
 
 
 def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
-                          feedback: str | None = None, attempt: int = 1):
+                          feedback: str | None = None, attempt: int = 1,
+                          fixed_prefix_transactions: list[dict[str, Any]] | None = None,
+                          environment: dict[str, Any] | None = None,
+                          call_options: dict[str, Any] | None = None):
     property_context = next(p for p in context["properties"]
                             if p["property_id"] == candidate["property_id"])
     actions = {action["abi_signature"]: action for action in property_context["candidate_actions"]
@@ -122,38 +137,55 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
                         "dependency_status", "prerequisite_state_closure", "unknowns")}
     property_prompt["planned_actions"] = selected_actions
     property_prompt["unresolved_effect_actions_for_planned_actions"] = relevant_unresolved
+    shared_ids = list(dict.fromkeys(candidate.get("shared_prefix_property_ids", [])))
+    shared_contexts = [{key: item.get(key) for key in
+                        ("property_id", "property", "property_predicate", "read_states",
+                         "property_write_states", "unknowns")}
+                       for item in context["properties"] if item["property_id"] in shared_ids]
     prompt = {
         "task": "为指定交易序列生成可 ABI 编码并可回放的具体多交易种子。",
         "rules": [
             "必须逐笔遵循计划的 function 顺序，不能增删交易。",
+            "candidate.execution_constraints 中的样本级调用顺序与参数约束属于必需条件。",
             "arguments 必须按 inputs 顺序提供，uint/int 使用十进制字符串，address 使用 40 位十六进制地址，bool 使用 JSON 布尔值。",
             "sender 只能从 sender_pool 选择；payable=false 时 value_wei 必须为 0。",
+            "没有源码证据要求时，delay_seconds 与 delay_blocks 都设为 0。",
             "严格满足函数源码、guard、状态依赖和目标谓词；静态不确定项应写入 assumptions。",
             "不要声称已验证可执行；验证器会实际回放并检查目标属性。",
+            "若提供 fixed_shared_prefix_transactions，必须逐字段原样复用这些交易；不得改变函数、参数、sender、金额或延迟。",
             "严格输出 JSON 对象，字段为 property_id、candidate_id、transactions、assumptions。",
         ],
         "property": property_prompt,
+        "shared_property_contexts": shared_contexts,
+        "fixed_shared_prefix_transactions": fixed_prefix_transactions or [],
+        "shared_prefix_steps": candidate.get("shared_prefix_steps", []),
         "candidate": candidate,
         "transactions_to_instantiate": sequence,
         "sender_pool": SENDERS,
-        "environment": {"chain_id": 31337, "block_timestamp_policy": "Anvil 默认时间逐交易递增",
-                        "gas_limit_per_transaction": 12500000},
+        "environment": {"chain_id": 1, "initial_timestamp": 1524785992,
+                        "initial_block_number": 4370000,
+                        "evm_revision": "shanghai",
+                        "harness_address": HARNESS_ADDRESS,
+                        "property_sender": PROPERTY_SENDER,
+                        "gas_price_wei": 0, "gas_limit_per_transaction": 12500000,
+                        **(environment or {})},
         "previous_verifier_feedback": feedback,
         "attempt": attempt,
     }
 
     def validate(data: dict[str, Any]) -> None:
-        _validator(context, candidate, feedback)(data)
+        _validator(context, candidate, feedback, fixed_prefix_transactions)(data)
 
     return call_json(
         system="你是智能合约交易参数具体化器。只根据输入 ABI 与源码作答，必须输出合法 JSON。",
         user=json.dumps(prompt, ensure_ascii=False, separators=(",", ":")),
         tag=f"AgentB_{context['project']}_{candidate['candidate_id']}_try{attempt}",
-        max_tokens=4096, validator=validate)
+        max_tokens=4096, validator=validate, **(call_options or {}))
 
 
 def to_echidna_sequence(candidate: dict[str, Any], transactions: list[dict[str, Any]],
-                        context: dict[str, Any]) -> list[dict[str, Any]]:
+                        context: dict[str, Any], *,
+                        contract_address: str = HARNESS_ADDRESS) -> list[dict[str, Any]]:
     property_context = next(p for p in context["properties"]
                             if p["property_id"] == candidate["property_id"])
     actions = {action["abi_signature"]: action for action in property_context["candidate_actions"]
@@ -168,7 +200,7 @@ def to_echidna_sequence(candidate: dict[str, Any], transactions: list[dict[str, 
         sequence.append({
             "call": {"tag": "SolCall", "contents": [name, args]},
             "delay": [hex(tx["delay_seconds"]), hex(tx["delay_blocks"])],
-            "dst": "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
+            "dst": contract_address,
             "gas": 12500000,
             "gasprice": "0x0",
             "src": tx["sender"],

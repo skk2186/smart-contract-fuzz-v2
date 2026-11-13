@@ -36,6 +36,42 @@ class DeepSeekCallError(RuntimeError):
         self.event: dict[str, Any] | None = None
 
 
+class CallBudget:
+    """单条件模型预算。UTF-8 字节数作为输入 Token 的保守上界预检。"""
+    def __init__(self, max_tokens: int, deadline_monotonic: float | None = None):
+        if max_tokens <= 0:
+            raise ValueError("max_tokens 必须为正数")
+        self.max_tokens = max_tokens
+        self.deadline_monotonic = deadline_monotonic
+        self.spent_tokens = 0
+        self.calls = 0
+
+    def admit(self, upper_bound: int) -> None:
+        if self.deadline_monotonic is not None and time.monotonic() >= self.deadline_monotonic:
+            raise DeepSeekCallError("time_budget_exceeded", "已达到本条件墙钟时间预算")
+        if self.spent_tokens + upper_bound > self.max_tokens:
+            raise DeepSeekCallError(
+                "token_budget_exceeded",
+                f"本次请求最坏上界 {upper_bound} 将超过剩余 Token 预算 "
+                f"{self.max_tokens - self.spent_tokens}")
+
+    def charge(self, upper_bound: int, event: dict[str, Any]) -> None:
+        usage = event.get("usage") or {}
+        measured = usage.get("total_tokens")
+        amount = int(measured) if measured is not None else upper_bound
+        self.spent_tokens += amount
+        self.calls += 1
+        event["budget"] = {"max_tokens": self.max_tokens,
+                           "spent_tokens": self.spent_tokens,
+                           "charged_tokens": amount,
+                           "charge_source": "api_usage" if measured is not None else "request_upper_bound"}
+
+    def remaining_seconds(self) -> int | None:
+        if self.deadline_monotonic is None:
+            return None
+        return max(0, int(self.deadline_monotonic - time.monotonic()))
+
+
 def load_key() -> str:
     key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
     if not key and KEY_FILE.exists():
@@ -80,7 +116,8 @@ def call_json(*, system: str, user: str, tag: str, model: str = "deepseek-flash"
               max_tokens: int = 2048, thinking: str = "disabled",
               validator: Callable[[dict[str, Any]], None] | None = None,
               log_path: Path = DEFAULT_LOG, timeout: int = 120,
-              max_retries: int = 1) -> tuple[dict[str, Any], dict[str, Any]]:
+              max_retries: int = 1,
+              budget: CallBudget | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
     """返回已校验 JSON 与本次成功用量；所有尝试都写日志，不记录密钥/请求正文。"""
     if "json" not in (system + user).lower():
         raise ValueError("JSON 模式提示必须明确包含 JSON")
@@ -94,17 +131,33 @@ def call_json(*, system: str, user: str, tag: str, model: str = "deepseek-flash"
                "temperature": 0,
                "stream": False}
     request_hash = hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+    request_upper_bound = len(system.encode("utf-8")) + len(user.encode("utf-8")) + max_tokens
     for attempt in range(max_retries + 1):
         started = time.monotonic()
         event: dict[str, Any] = {"at_utc": datetime.now(timezone.utc).isoformat(),
                                   "tag": tag, "model_requested": model,
                                   "thinking": thinking, "request_sha256": request_hash,
                                   "attempt": attempt + 1, "max_tokens": max_tokens}
+        if budget:
+            try:
+                budget.admit(request_upper_bound)
+                remaining = budget.remaining_seconds()
+                if remaining == 0:
+                    raise DeepSeekCallError("time_budget_exceeded", "已达到本条件墙钟时间预算")
+                event["budget_preflight_upper_bound"] = request_upper_bound
+                event["budget_remaining_before_call"] = budget.max_tokens - budget.spent_tokens
+            except DeepSeekCallError as error:
+                event.update({"ok": False, "error_kind": error.kind, "error": str(error),
+                              "elapsed_seconds": 0})
+                _append_log(log_path, event)
+                error.event = event
+                raise
         try:
             response = requests.post(
                 "https://api.deepseek.com/chat/completions",
                 headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"},
-                json=payload, timeout=timeout)
+                json=payload,
+                timeout=min(timeout, remaining) if budget and remaining is not None else timeout)
             event["http_status"] = response.status_code
             if response.status_code != 200:
                 try:
@@ -138,6 +191,8 @@ def call_json(*, system: str, user: str, tag: str, model: str = "deepseek-flash"
                 validator(data)
             event["ok"] = True
             event["elapsed_seconds"] = round(time.monotonic() - started, 3)
+            if budget:
+                budget.charge(request_upper_bound, event)
             _append_log(log_path, event)
             return data, event
         except (requests.RequestException, ValueError, KeyError, IndexError, TypeError,
@@ -150,6 +205,8 @@ def call_json(*, system: str, user: str, tag: str, model: str = "deepseek-flash"
             event["error_kind"] = error.kind
             event["error"] = str(error).replace(key, "[REDACTED]")[:500]
             event["elapsed_seconds"] = round(time.monotonic() - started, 3)
+            if budget:
+                budget.charge(request_upper_bound, event)
             _append_log(log_path, event)
             error.event = event
             retryable = (isinstance(exc, requests.RequestException) or

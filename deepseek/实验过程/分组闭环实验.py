@@ -10,6 +10,8 @@ import re
 import shutil
 import statistics
 import time
+import uuid
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +23,7 @@ from deepseek接口 import DeepSeekCallError
 from 属性种子上下文 import (PROJECTS, compact_for_agent, load_project_context,
                            read_json)
 from 种子验证 import (AnvilSession, echidna_corpus_evidence, replay_seed,
-                     run_echidna, write_corpus)
+                     new_seed_id, run_echidna, write_corpus)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -37,6 +39,7 @@ DATASETS = {
 }
 METHODS = ("independent", "random_batch", "associated", "controlled_size")
 BASE_SEED = 20261113
+MAX_GROUP_SIZE = 6
 
 
 def _load_dataset(project: str) -> tuple[list[str], dict[str, Any]]:
@@ -50,7 +53,7 @@ def _partition(project: str, ids: list[str], method: str, repetition: int) -> li
     if method == "independent":
         return [[item] for item in ids]
     if method == "associated":
-        return [ids]
+        return [ids[i:i + MAX_GROUP_SIZE] for i in range(0, len(ids), MAX_GROUP_SIZE)]
     size = DATASETS[project]["random_k" if method == "random_batch" else "control_k"]
     arranged = list(ids)
     if method == "random_batch":
@@ -205,12 +208,18 @@ def run_condition(project: str, full_context: dict[str, Any], ids: list[str],
                 concrete, events = _retry_agent_b(full_context, candidate, repair_limit)
                 b_events.extend(events)
                 replay = replay_seed(project, candidate, concrete["transactions"], session=session)
-                corpus_file = write_corpus(project, candidate, concrete["transactions"],
-                                           full_context, corpus_root)
+                corpus_file = None
+                seed_id = None
+                if replay["replay_status"] == "executable":
+                    seed_id = new_seed_id()
+                    corpus_file = write_corpus(project, candidate, concrete["transactions"],
+                                               full_context, corpus_root,
+                                               replay=replay, seed_id=seed_id)
                 seed_rows.append({"property_id": property_id, "property": property_signature,
-                                  "candidate_id": candidate["candidate_id"], "plan": raw["steps"],
+                                  "candidate_id": candidate["candidate_id"], "seed_id": seed_id,
+                                  "plan": raw["steps"],
                                   "seed": concrete, "replay": replay,
-                                  "corpus_file": str(corpus_file.relative_to(ROOT)),
+                                  "corpus_file": str(corpus_file.relative_to(ROOT)) if corpus_file else None,
                                   "status": replay["replay_status"]})
             except DeepSeekCallError as exc:
                 if exc.event:
@@ -272,6 +281,7 @@ def run_experiment(*, repetitions: int, repair_limit: int, test_limit: int,
                    process_timeout: int, run_echidna_campaign: bool,
                    projects: list[str]) -> dict[str, Any]:
     started = time.perf_counter()
+    experiment_id = uuid.uuid4().hex
     group_data = read_json(GROUP_FILE)
     results = []
     preprocessing = {}
@@ -302,7 +312,7 @@ def run_experiment(*, repetitions: int, repair_limit: int, test_limit: int,
                         repair_limit=repair_limit, test_limit=test_limit,
                         process_timeout=process_timeout,
                         run_echidna_campaign=run_echidna_campaign,
-                        run_root=ROOT / "deepseek/结果/分组闭环实验/语料")
+                        run_root=ROOT / "deepseek/结果/分组闭环实验/语料" / experiment_id)
                     results.append(result)
                     print(f"完成 {project}/{method}/r{repetition}: "
                           f"A={result['agent_a']['calls']} calls, "
@@ -323,7 +333,8 @@ def run_experiment(*, repetitions: int, repair_limit: int, test_limit: int,
                                        group_data["projects"]["Hokusai"]["groups"][8]["members"]],
                         "reason": "当前 Hokusai 源码快照缺少 EchidnaAMMGraduation.sol 及其编译 Harness；不以 JSON 摘要代替真实 ABI/源码验证。"})
 
-    return {"schema_version": 1, "model": "deepseek-flash", "model_thinking": "disabled",
+    return {"schema_version": 1, "experiment_id": experiment_id,
+            "model": "deepseek-flash", "model_thinking": "disabled",
             "base_seed": BASE_SEED, "repetitions": repetitions,
             "same_attribute_sets_per_project": {project: _load_dataset(project)[0] for project in projects},
             "methods": list(METHODS), "preprocessing": preprocessing,
@@ -509,7 +520,8 @@ def augment_baselines(report: dict[str, Any], *, test_limit: int = 100,
         run["echidna"]["property_failures_not_prevalidated"] = sorted(failed - prevalidated)
 
         context = load_project_context(project, run["property_ids"])
-        seed_root = ROOT / "deepseek/结果/分组闭环实验/语料/匹配随机种子" / project / f"{method}-r{repetition}"
+        seed_root = (ROOT / "deepseek/结果/分组闭环实验/语料/匹配随机种子" /
+                     baseline_batch / project / f"{method}-r{repetition}")
         (seed_root / "coverage").mkdir(parents=True, exist_ok=True)
         random_rows = []
         seeds = [row for row in run.get("seed_candidates", []) if row.get("seed") and row.get("plan")]
@@ -525,9 +537,17 @@ def augment_baselines(report: dict[str, Any], *, test_limit: int = 100,
                     try:
                         randomized = _randomize_agent_seed(context, candidate, row["seed"], rng)
                         replay = replay_seed(project, candidate, randomized, session=session)
-                        corpus_file = write_corpus(project, candidate, randomized, context, seed_root)
+                        if replay["replay_status"] != "executable":
+                            random_rows.append({"property_id": row["property_id"],
+                                                "candidate_id": candidate["candidate_id"],
+                                                "status": "replay_failed", "replay": replay})
+                            continue
+                        seed_id = new_seed_id()
+                        corpus_file = write_corpus(project, candidate, randomized, context, seed_root,
+                                                   replay=replay, seed_id=seed_id)
                         random_rows.append({"property_id": row["property_id"],
                                             "candidate_id": candidate["candidate_id"],
+                                            "seed_id": seed_id,
                                             "matched_function_sequence": [tx["function"] for tx in randomized],
                                             "transactions": randomized, "replay": replay,
                                             "corpus_file": str(corpus_file.relative_to(ROOT)),
@@ -539,7 +559,7 @@ def augment_baselines(report: dict[str, Any], *, test_limit: int = 100,
                                             "error": f"{type(exc).__name__}: {str(exc)[:1000]}"})
         random_echidna = None
         campaign_root = ROOT / "deepseek/结果/分组闭环实验/语料/匹配随机种子Echidna" / baseline_batch / project / f"{method}-r{repetition}"
-        if random_rows:
+        if any(row.get("status") == "executable" for row in random_rows):
             campaign_coverage = campaign_root / "coverage"
             campaign_coverage.mkdir(parents=True, exist_ok=True)
             # 仅复制本轮 Agent 配对随机种子，排除同目录上一次 Echidna 变异生成的语料。

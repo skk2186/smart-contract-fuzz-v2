@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import time
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +16,7 @@ from AgentA import generate_candidates
 from AgentB import instantiate_candidate
 from deepseek接口 import DeepSeekCallError
 from 属性种子上下文 import PROJECTS, find_property, load_project_context, read_json
-from 种子验证 import AnvilSession, replay_seed, run_echidna, write_corpus
+from 种子验证 import AnvilSession, new_seed_id, replay_seed, run_echidna, write_corpus
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -91,7 +93,9 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int,
         tag=f"AgentA_{project}_{'_'.join(property_ids)}")
     candidates = plan.get("property_sequences", [])
     results = []
-    corpus_root = ROOT / f"deepseek/结果/Agent种子/{project}"
+    experiment_id = uuid.uuid4().hex
+    run_root = ROOT / f"deepseek/结果/Agent种子语料/{project}/{experiment_id}"
+    corpus_root = run_root / "种子包"
     corpus_root.mkdir(parents=True, exist_ok=True)
     (corpus_root / "coverage").mkdir(exist_ok=True)
 
@@ -102,15 +106,20 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int,
                 try:
                     concrete, agent_b_events = _attempt_agent_b(context, candidate, repairs)
                     replay = replay_seed(project, candidate, concrete["transactions"], session=session)
-                    corpus_file = write_corpus(project, candidate, concrete["transactions"],
-                                               context, corpus_root)
+                    corpus_file = None
+                    seed_id = None
+                    if replay["replay_status"] == "executable":
+                        seed_id = new_seed_id()
+                        corpus_file = write_corpus(project, candidate, concrete["transactions"],
+                                                   context, corpus_root, replay=replay,
+                                                   seed_id=seed_id)
                     results.append({"candidate_id": candidate["candidate_id"],
                                     "property_id": candidate["property_id"],
+                                    "seed_id": seed_id,
                                     "plan": candidate["steps"], "seed": concrete,
                                     "agent_b_calls": agent_b_events, "replay": replay,
-                                    "corpus_file": str(corpus_file.relative_to(ROOT)),
-                                    "status": "abi_encoded_and_replayed" if
-                                    replay["replay_status"] == "executable" else "replay_failed"})
+                                    "corpus_file": str(corpus_file.relative_to(ROOT)) if corpus_file else None,
+                                    "status": "abi_encoded_and_replayed" if corpus_file else "replay_failed"})
                 except Exception as exc:
                     results.append({"candidate_id": candidate.get("candidate_id"),
                                     "property_id": candidate.get("property_id"),
@@ -118,17 +127,25 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int,
                                     "status": "candidate_error",
                                     "error": f"{type(exc).__name__}: {str(exc)[:1000]}"})
     echidna = []
-    if run_fuzzer and results and any(item.get("corpus_file") for item in results):
+    if run_fuzzer and results:
         properties_by_id = {p["property_id"]: p["property"].rsplit(".", 1)[-1].split("(", 1)[0]
                             for p in context["properties"]}
         for property_id, property_name in properties_by_id.items():
-            echidna.append(run_echidna(project, corpus_root, property_name=property_name,
+            campaign_root = run_root / "Echidna" / property_id
+            coverage = campaign_root / "coverage"
+            coverage.mkdir(parents=True, exist_ok=True)
+            for row in results:
+                if row.get("property_id") == property_id and row.get("corpus_file"):
+                    source = ROOT / row["corpus_file"]
+                    shutil.copy2(source, coverage / source.name)
+            echidna.append(run_echidna(project, campaign_root, property_name=property_name,
                                        test_limit=echidna_limit,
                                        timeout=echidna_timeout, seed=20261113))
     return {"project": project, "property_ids": property_ids,
             "property_count": len(context["properties"]), "action_counts": actions,
             "agent_a": agent_a_event, "agent_a_output": plan,
             "candidates": results, "echidna": echidna,
+            "experiment_id": experiment_id,
             "elapsed_seconds": round(time.monotonic() - started, 3)}
 
 
