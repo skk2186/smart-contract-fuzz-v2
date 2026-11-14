@@ -251,6 +251,7 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
                         use_shared_prefixes: bool = True, tag: str | None = None,
                         shared_prefix_hint: dict[str, Any] | None = None,
                         task_constraints: list[str] | None = None,
+                        repair_feedback: str | None = None,
                         call_options: dict[str, Any] | None = None):
     """返回 (结构化候选, API 调用记录)。不补造静态分析未提供的入口。"""
     compact_started = time.perf_counter()
@@ -261,7 +262,7 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
         "rules": [
             "每条输出必须绑定自己的 property_id，不能把组内属性合并成一个谓词。",
             "只使用 candidate_actions 中 seed_compatible=true 的 abi_signature。",
-            "根据 property_predicate、候选函数源码、effect_evidence 与守卫推断顺序；不要把静态候选当成已证明可行。",
+            "结合 Slither 的 prerequisite_state_closure、read_states、property_write_states、matched_states、effect_evidence、函数源码与守卫推断顺序；状态生产操作应先于依赖它的消费操作，不要把静态候选当成已证明可行。",
             "每条属性至多给出指定数量的不同序列；避免仅重排同一交易的重复候选。",
             ("若多个属性确实需要同一准备前缀，请在 shared_prefixes 中显式给出，并确保对应候选序列以该前缀开头。"
              if use_shared_prefixes else "shared_prefixes 必须为空；不要为候选序列设计跨属性共享前缀。"),
@@ -276,6 +277,7 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
         "max_steps_per_sequence": max_steps,
         "shared_prefix_hint": shared_prefix_hint if use_shared_prefixes else None,
         "sample_constraints": list(task_constraints or []),
+        "previous_attempt_feedback": repair_feedback,
         "context": agent_context,
     }
     if any(prop.get("assertion_trigger") for prop in context.get("properties", [])):

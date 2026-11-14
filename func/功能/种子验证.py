@@ -53,6 +53,8 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
                 not worker_crashes)
     instruction_counts = [int(match.replace(",", "")) for match in
                           re.findall(r"unique instructions\s*:\s*([\d,]+)", output, re.IGNORECASE)]
+    coverage_snapshots = [int(match.replace(",", "")) for match in
+                          re.findall(r"\bcov:\s*([\d,]+)", output, re.IGNORECASE)]
     return {"loaded_seed_count": count,
             "loaded_seed_evidence": count > 0,
             "replayed_sequence_count": len(replayed),
@@ -61,8 +63,12 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
             "mutation_evidence": mutation,
             "fuzzing_transactions": max((txs for txs, _ in fuzzing_counts), default=0),
             "fuzzing_cases": max((cases for _, cases in fuzzing_counts), default=0),
+            "fuzzing_progress_count": max((txs for txs, _ in fuzzing_counts), default=0),
+            "fuzzing_progress_limit": max((cases for _, cases in fuzzing_counts), default=0),
             "worker_crashes": worker_crashes,
-            "unique_instructions": max(instruction_counts, default=None)}
+            "unique_instructions": max(instruction_counts or coverage_snapshots, default=None),
+            "coverage_source": ("final_unique_instructions" if instruction_counts else
+                                "last_status_cov_snapshot" if coverage_snapshots else None)}
 
 
 class AnvilSession:
@@ -466,6 +472,7 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
                 filter_functions: list[str] | None = None,
                 seq_len: int = 8,
                 shrink_limit: int = 1,
+                stop_on_fail: bool = False,
                 disable_slither: bool = True) -> dict[str, Any]:
     if not Path(ECHIDNA_BIN).is_file() and shutil.which(ECHIDNA_BIN) is None:
         raise FileNotFoundError(f"找不到 Echidna 2.3.2：{ECHIDNA_BIN}")
@@ -523,7 +530,7 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         f"balanceAddr: {INITIAL_BALANCE}", "balanceContract: 0",
         f"testMaxGas: {MAX_TX_GAS}", f"propMaxGas: {MAX_TX_GAS}",
         "maxGasprice: 0", "maxTimeDelay: 86400", "maxBlockDelay: 86400",
-        "coverage: true", "stopOnFail: false"]
+        "coverage: true", f"stopOnFail: {'true' if stop_on_fail else 'false'}"]
     if filter_functions is not None:
         config_lines.append("filterBlacklist: false")
         config_lines.append("filterFunctions: [" + ", ".join(
@@ -541,6 +548,8 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
     if disable_slither:
         command.append("--disable-slither")
     corpus_root.mkdir(parents=True, exist_ok=True)
+    initial_corpus_files = sorted(path.name for path in
+                                  (corpus_root / "coverage").glob("*.txt"))
     run_marker = corpus_root / ".echidna-run-started"
     if run_marker.exists():
         raise RuntimeError(f"语料目录已经执行过 Echidna，拒绝复用：{corpus_root}")
@@ -560,12 +569,20 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         build_root = corpus_root.parent / "foundry-build"
         environment["FOUNDRY_OUT"] = str(build_root / "out")
         environment["FOUNDRY_CACHE_PATH"] = str(build_root / "cache")
-    result = subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,
-                            timeout=min(timeout, remaining) if remaining is not None else timeout,
-                            env=environment)
+    try:
+        result = subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT,
+                                timeout=min(timeout, remaining) if remaining is not None else timeout,
+                                env=environment)
+        exit_code = result.returncode
+        full_output = result.stdout
+        timed_out = False
+    except subprocess.TimeoutExpired as exc:
+        exit_code = None
+        timed_out = True
+        partial = exc.stdout or ""
+        full_output = partial.decode("utf-8", errors="replace") if isinstance(partial, bytes) else partial
     elapsed = round(time.monotonic() - started, 3)
-    full_output = result.stdout
     output = full_output[-18000:]
     result_prefix = property_name if property_name.endswith("_") else property_name + ":"
     property_results = [line.strip() for line in full_output.splitlines()
@@ -581,13 +598,28 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
                              any(token in line.lower() for token in
                                  ("failed", "falsified", "💥"))]
     else:
-        property_failures = [line for line in property_results if ": failed" in line.lower()]
+        target_falsifications = [line.strip() for line in full_output.splitlines()
+                                 if re.search(r"\bTest\s+" + re.escape(property_name) +
+                                              r"\s+falsified\b", line, re.IGNORECASE)]
+        property_results = list(dict.fromkeys(target_falsifications + property_results))
+        property_failures = [line for line in property_results
+                             if any(token in line.lower() for token in
+                                    (": failed", "falsified", "💥"))]
     return {"project": project, "property_name": property_name,
             "test_mode": test_mode,
-            "command": command, "exit_code": result.returncode,
+            "command": command, "exit_code": exit_code,
+            "status": "timeout" if timed_out else "completed",
+            "timed_out": timed_out,
+            "seed": seed, "test_limit": test_limit,
+            "seq_len": seq_len, "shrink_limit": shrink_limit,
             "elapsed_seconds": elapsed, **echidna_corpus_evidence(full_output),
+            "initial_corpus_file_count": len(initial_corpus_files),
+            "initial_corpus_files": initial_corpus_files,
+            "stop_on_fail": stop_on_fail,
             "target_property_results": property_results,
             "property_failures": property_failures,
+            "first_property_failure_observed_seconds": elapsed if property_failures else None,
+            "property_failure_time_is_upper_bound": bool(property_failures and not stop_on_fail),
             "initial_state_failures": [line for line in property_failures
                                         if "no transactions made" in line.lower()],
             "output": output}

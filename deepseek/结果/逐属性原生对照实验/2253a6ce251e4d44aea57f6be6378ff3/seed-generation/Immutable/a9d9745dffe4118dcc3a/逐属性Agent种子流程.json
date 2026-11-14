@@ -1,0 +1,707 @@
+{
+  "schema_version": 2,
+  "experiment_id": "db24a1b4fa784084a21b21cc573841b1",
+  "project": "Immutable",
+  "property_ids": [
+    "a9d9745dffe4118dcc3a"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "a9d9745dffe4118dcc3a",
+      "property": "ERC721PsiV2Echidna.echidna_complex_transfer_sequence()",
+      "dependency_status": "incomplete",
+      "seed_compatible_action_count": 6,
+      "candidate_results": [
+        {
+          "candidate_id": "a9d9745dffe4-01-a9d9745dffe4118dcc3a-seq-1",
+          "plan": [
+            {
+              "function": "mintForTest(address,uint256)",
+              "rationale": "建立 totalMinted>0 与 tokenOwners 状态，使属性中 tokenId=currentTokenId%totalMinted 可解析且 ownerOf 有定义；mintForTest 同时写 totalMinted 与 tokenOwners。"
+            },
+            {
+              "function": "approve(address,uint256)",
+              "rationale": "为后续 transferFrom 建立 tokenApprovals 前置授权（属性内部 _approveForTest 的等价外部路径），满足 _isApprovedOrOwner 守卫。"
+            },
+            {
+              "function": "transferFrom(address,address,uint256)",
+              "rationale": "消费已建立的 owner/approval 状态执行转移，触发 _transfer 写 owners/tokenOwners 并清空 tokenApprovals，覆盖属性 A->B 段。"
+            },
+            {
+              "function": "safeTransferFrom(address,address,uint256)",
+              "rationale": "使用 seed_compatible 的三参 safeTransferFrom 继续链式转移，验证转移后 ownerOf 与 getApproved 归零路径。"
+            }
+          ],
+          "status": "replay_failed",
+          "seed_class": "echidna_only_diagnostic_candidate",
+          "seed_id": null,
+          "corpus_file": null,
+          "concrete_seed": {
+            "property_id": "a9d9745dffe4118dcc3a",
+            "candidate_id": "a9d9745dffe4-01-a9d9745dffe4118dcc3a-seq-1",
+            "transactions": [
+              {
+                "index": 0,
+                "function": "mintForTest(address,uint256)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  1
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              },
+              {
+                "index": 1,
+                "function": "approve(address,uint256)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000020000",
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              },
+              {
+                "index": 2,
+                "function": "transferFrom(address,address,uint256)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              },
+              {
+                "index": 3,
+                "function": "safeTransferFrom(address,address,uint256)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000020000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              }
+            ],
+            "assumptions": [
+              "mintForTest 由 sender_pool[0] 调用，to 设为同一地址 sender_pool[0]，quantity=1，使 totalMinted 从 0 变为 1，tokenId 0 存在且 ownerOf(0)=sender_pool[0]；此前回放失败是因为 approve 时 tokenId 0 不存在（owner query for nonexistent token），本次通过先 mint 修复。",
+              "approve 的 tokenId 复用 mint 产生的 tokenId 0；to 设为 sender_pool[1]（0x...020000），与 owner（sender_pool[0]）不同，满足 require(to != owner)；sender 为 owner sender_pool[0]，满足 approve 调用者守卫。",
+              "transferFrom 的 _from 复用 owner sender_pool[0]，_to 为 sender_pool[1]，_tokenId 复用 0；sender 为 sender_pool[0]（owner 且已授权），满足 _isApprovedOrOwner；转移后 tokenApprovals[0] 被清空，owner 变为 sender_pool[1]。",
+              "safeTransferFrom 的 from 复用前序转移后的 owner sender_pool[1]，to 为 sender_pool[2]（0x...030000），tokenId 复用 0；sender 为 sender_pool[1]（当前 owner），满足 _isApprovedOrOwner。",
+              "所有交易 payable=false，value_wei 均为 0；无源码证据要求延迟，delay_seconds 与 delay_blocks 均为 0。",
+              "未声称已验证可执行；实际回放由验证器执行。"
+            ],
+            "execution_feedback": "Anvil 逐交易回放失败。仅修正参数、发送者、金额或时间；保持 Agent A 的函数顺序，并检查相邻交易的身份、对象 ID 与提交/揭示数据一致性。不要声称已验证。证据：{\"replay_status\": \"replay_failed\", \"deployment_status\": \"success\", \"initial_property_violations\": [\"echidna_balance_consistency()\", \"echidna_balance_sum_property()\", \"echidna_boundary_minting_sequence()\", \"echidna_group_operations_sequence()\", \"echidna_total_supply_matches()\"], \"failed_transactions\": [{\"index\": 2, \"function\": \"approve(address,uint256)\", \"arguments\": [\"0x0000000000000000000000000000000000020000\", 0], \"sender\": \"0x0000000000000000000000000000000000010000\", \"value_wei\": \"0\", \"delay_seconds\": 0, \"delay_blocks\": 0, \"tx_hash\": \"b94f6fe5345dabfd543ec783335d11bab91507cd09dd6b13ac8c642b7f1e3230\", \"block_number\": 4370002, \"status\": \"reverted\", \"gas_used\": 29629, \"observed_view_state_changed\": false, \"observed_view_count\": 20, \"tracked_contract_count\": 3, \"tracked_contract_types\": [\"Harness\", \"MaliciousReceiver\", \"TestReceiver\"], \"observed_effect_status\": \"unknown\", \"expected_effect_states\": [\"ERC721PsiV2.tokenApprovals\"], \"observed_effect_states\": [], \"changed_effect_states\": [], \"unobserved_effect_states\": [\"ERC721PsiV2.tokenApprovals\"], \"execution_effect_error\": null, \"state_fingerprint_before\": \"fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8\", \"state_fingerprint_after\": \"fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8\", \"target_property\": null, \"property_error\": \"tx_revert: ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c4552433732315073693a206f776e657220717565727920666f72206e6f6e6578697374656e7420746f6b656e0000\", \"all_property_values\": {}, \"all_property_errors\": {}, \"other_property_violations_during_prevalidation\": []}], \"property_errors\": [\"tx_revert: ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c4552433732315073693a206f776e657220717565727920666f72206e6f6e6578697374656e7420746f6b656e0000\"]}"
+          },
+          "agent_b": {
+            "logical_calls": 2,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_Immutable_a9d9745dffe4-01-a9d9745dffe4118dcc3a-seq-1_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 10562,
+                  "prompt_cache_hit_tokens": 0,
+                  "prompt_cache_miss_tokens": 10562,
+                  "completion_tokens": 734,
+                  "total_tokens": 11296,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.0020247",
+                    "peak": "0.0040494"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 3.366,
+                "attempt": 1,
+                "prompt_utf8_bytes": 35320,
+                "invalid_record_count": null
+              },
+              {
+                "tag": "AgentB_Immutable_a9d9745dffe4-01-a9d9745dffe4118dcc3a-seq-1_try2",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 11366,
+                  "prompt_cache_hit_tokens": 10496,
+                  "prompt_cache_miss_tokens": 870,
+                  "completion_tokens": 748,
+                  "total_tokens": 12114,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000610788",
+                    "peak": "0.001221576"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 3.616,
+                "attempt": 1,
+                "prompt_utf8_bytes": 37779,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "Immutable",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "a9d9745dffe4-01-a9d9745dffe4118dcc3a-seq-1",
+              "replay_status": "replay_failed",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_approval_clearing()": true,
+                "echidna_approval_consistency()": true,
+                "echidna_balance_consistency()": false,
+                "echidna_balance_sum_property()": false,
+                "echidna_batch_operation_gas()": true,
+                "echidna_boundary_minting_sequence()": false,
+                "echidna_burn()": null,
+                "echidna_burn_unminted()": true,
+                "echidna_burned_tokens_have_no_owner()": true,
+                "echidna_complex_transfer_sequence()": true,
+                "echidna_concurrent_operations()": true,
+                "echidna_cross_group_operations()": null,
+                "echidna_group_boundary_sequence()": true,
+                "echidna_group_occupancy()": true,
+                "echidna_group_operations_sequence()": false,
+                "echidna_max_token_id_overflow()": true,
+                "echidna_mint_boundary_check()": null,
+                "echidna_mint_by_id()": true,
+                "echidna_mint_by_quantity()": true,
+                "echidna_mint_quantity_range()": true,
+                "echidna_mint_threshold_respected()": null,
+                "echidna_minted_tokens_have_owner()": true,
+                "echidna_nonexistent_ownership1()": true,
+                "echidna_nonexistent_ownership2()": true,
+                "echidna_reentrancy_protection()": true,
+                "echidna_safe_transfer_callback()": true,
+                "echidna_sequential_token_ids()": true,
+                "echidna_token_id_uniqueness()": true,
+                "echidna_total_supply_matches()": false,
+                "echidna_total_supply_sequence()": null,
+                "echidna_transfer_ownership_updates()": true,
+                "echidna_zero_address_protection()": true
+              },
+              "initial_property_errors": {
+                "echidna_burn()": "ContractPanicError: ('Panic error 0x12: Division by zero.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000012')",
+                "echidna_cross_group_operations()": "ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000",
+                "echidna_mint_boundary_check()": "ContractPanicError: ('Panic error 0x11: Arithmetic operation results in underflow or overflow.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000011')",
+                "echidna_mint_threshold_respected()": "Web3RPCError: {'code': -32003, 'message': 'EVM error OutOfGas'}",
+                "echidna_total_supply_sequence()": "ContractPanicError: ('Panic error 0x12: Division by zero.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000012')"
+              },
+              "initial_property_violations": [
+                "echidna_balance_consistency()",
+                "echidna_balance_sum_property()",
+                "echidna_boundary_minting_sequence()",
+                "echidna_group_operations_sequence()",
+                "echidna_total_supply_matches()"
+              ],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "mintForTest(address,uint256)",
+                  "arguments": [
+                    "0x0000000000000000000000000000000000010000",
+                    1
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "3743aa87e75c8f2abb4e31816d0783abb818311745d7631a4bdb06080d5e5eb5",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 170311,
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 20,
+                  "tracked_contract_count": 3,
+                  "tracked_contract_types": [
+                    "Harness",
+                    "MaliciousReceiver",
+                    "TestReceiver"
+                  ],
+                  "observed_effect_status": "changed",
+                  "expected_effect_states": [
+                    "ERC721PsiV2.tokenOwners",
+                    "ERC721PsiV2Echidna.totalMinted"
+                  ],
+                  "observed_effect_states": [
+                    "ERC721PsiV2Echidna.totalMinted"
+                  ],
+                  "changed_effect_states": [
+                    "ERC721PsiV2Echidna.totalMinted"
+                  ],
+                  "unobserved_effect_states": [
+                    "ERC721PsiV2.tokenOwners"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "eb8a507e8ed4de5e0c816af6fe40ae4f084a5c68281b552f901c0634ce470121",
+                  "state_fingerprint_after": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_approval_clearing()": true,
+                    "echidna_approval_consistency()": true,
+                    "echidna_balance_consistency()": false,
+                    "echidna_balance_sum_property()": false,
+                    "echidna_batch_operation_gas()": true,
+                    "echidna_boundary_minting_sequence()": false,
+                    "echidna_burn()": true,
+                    "echidna_burn_unminted()": true,
+                    "echidna_burned_tokens_have_no_owner()": true,
+                    "echidna_complex_transfer_sequence()": true,
+                    "echidna_concurrent_operations()": true,
+                    "echidna_cross_group_operations()": null,
+                    "echidna_group_boundary_sequence()": true,
+                    "echidna_group_occupancy()": true,
+                    "echidna_group_operations_sequence()": false,
+                    "echidna_max_token_id_overflow()": true,
+                    "echidna_mint_boundary_check()": true,
+                    "echidna_mint_by_id()": true,
+                    "echidna_mint_by_quantity()": true,
+                    "echidna_mint_quantity_range()": true,
+                    "echidna_mint_threshold_respected()": null,
+                    "echidna_minted_tokens_have_owner()": false,
+                    "echidna_nonexistent_ownership1()": true,
+                    "echidna_nonexistent_ownership2()": true,
+                    "echidna_reentrancy_protection()": true,
+                    "echidna_safe_transfer_callback()": true,
+                    "echidna_sequential_token_ids()": true,
+                    "echidna_token_id_uniqueness()": true,
+                    "echidna_total_supply_matches()": false,
+                    "echidna_total_supply_sequence()": null,
+                    "echidna_transfer_ownership_updates()": true,
+                    "echidna_zero_address_protection()": true
+                  },
+                  "all_property_errors": {
+                    "echidna_cross_group_operations()": "ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000",
+                    "echidna_mint_threshold_respected()": "Web3RPCError: {'code': -32003, 'message': 'EVM error OutOfGas'}",
+                    "echidna_total_supply_sequence()": "ContractPanicError: ('Panic error 0x11: Arithmetic operation results in underflow or overflow.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000011')"
+                  },
+                  "other_property_violations_during_prevalidation": [
+                    "echidna_balance_consistency()",
+                    "echidna_balance_sum_property()",
+                    "echidna_boundary_minting_sequence()",
+                    "echidna_group_operations_sequence()",
+                    "echidna_minted_tokens_have_owner()",
+                    "echidna_total_supply_matches()"
+                  ]
+                },
+                {
+                  "index": 2,
+                  "function": "approve(address,uint256)",
+                  "arguments": [
+                    "0x0000000000000000000000000000000000020000",
+                    0
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "b94f6fe5345dabfd543ec783335d11bab91507cd09dd6b13ac8c642b7f1e3230",
+                  "block_number": 4370002,
+                  "status": "reverted",
+                  "gas_used": 29629,
+                  "observed_view_state_changed": false,
+                  "observed_view_count": 20,
+                  "tracked_contract_count": 3,
+                  "tracked_contract_types": [
+                    "Harness",
+                    "MaliciousReceiver",
+                    "TestReceiver"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "ERC721PsiV2.tokenApprovals"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "ERC721PsiV2.tokenApprovals"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+                  "state_fingerprint_after": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+                  "target_property": null,
+                  "property_error": "tx_revert: ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c4552433732315073693a206f776e657220717565727920666f72206e6f6e6578697374656e7420746f6b656e0000",
+                  "all_property_values": {},
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 1.495,
+              "elapsed_from_run_start_seconds": 7.939
+            },
+            {
+              "project": "Immutable",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "a9d9745dffe4-01-a9d9745dffe4118dcc3a-seq-1",
+              "replay_status": "replay_failed",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_approval_clearing()": true,
+                "echidna_approval_consistency()": true,
+                "echidna_balance_consistency()": false,
+                "echidna_balance_sum_property()": false,
+                "echidna_batch_operation_gas()": true,
+                "echidna_boundary_minting_sequence()": false,
+                "echidna_burn()": null,
+                "echidna_burn_unminted()": true,
+                "echidna_burned_tokens_have_no_owner()": true,
+                "echidna_complex_transfer_sequence()": true,
+                "echidna_concurrent_operations()": true,
+                "echidna_cross_group_operations()": null,
+                "echidna_group_boundary_sequence()": true,
+                "echidna_group_occupancy()": true,
+                "echidna_group_operations_sequence()": false,
+                "echidna_max_token_id_overflow()": true,
+                "echidna_mint_boundary_check()": null,
+                "echidna_mint_by_id()": true,
+                "echidna_mint_by_quantity()": true,
+                "echidna_mint_quantity_range()": true,
+                "echidna_mint_threshold_respected()": null,
+                "echidna_minted_tokens_have_owner()": true,
+                "echidna_nonexistent_ownership1()": true,
+                "echidna_nonexistent_ownership2()": true,
+                "echidna_reentrancy_protection()": true,
+                "echidna_safe_transfer_callback()": true,
+                "echidna_sequential_token_ids()": true,
+                "echidna_token_id_uniqueness()": true,
+                "echidna_total_supply_matches()": false,
+                "echidna_total_supply_sequence()": null,
+                "echidna_transfer_ownership_updates()": true,
+                "echidna_zero_address_protection()": true
+              },
+              "initial_property_errors": {
+                "echidna_burn()": "ContractPanicError: ('Panic error 0x12: Division by zero.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000012')",
+                "echidna_cross_group_operations()": "ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000",
+                "echidna_mint_boundary_check()": "ContractPanicError: ('Panic error 0x11: Arithmetic operation results in underflow or overflow.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000011')",
+                "echidna_mint_threshold_respected()": "Web3RPCError: {'code': -32003, 'message': 'EVM error OutOfGas'}",
+                "echidna_total_supply_sequence()": "ContractPanicError: ('Panic error 0x12: Division by zero.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000012')"
+              },
+              "initial_property_violations": [
+                "echidna_balance_consistency()",
+                "echidna_balance_sum_property()",
+                "echidna_boundary_minting_sequence()",
+                "echidna_group_operations_sequence()",
+                "echidna_total_supply_matches()"
+              ],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "mintForTest(address,uint256)",
+                  "arguments": [
+                    "0x0000000000000000000000000000000000010000",
+                    1
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "3743aa87e75c8f2abb4e31816d0783abb818311745d7631a4bdb06080d5e5eb5",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 170311,
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 20,
+                  "tracked_contract_count": 3,
+                  "tracked_contract_types": [
+                    "Harness",
+                    "MaliciousReceiver",
+                    "TestReceiver"
+                  ],
+                  "observed_effect_status": "changed",
+                  "expected_effect_states": [
+                    "ERC721PsiV2.tokenOwners",
+                    "ERC721PsiV2Echidna.totalMinted"
+                  ],
+                  "observed_effect_states": [
+                    "ERC721PsiV2Echidna.totalMinted"
+                  ],
+                  "changed_effect_states": [
+                    "ERC721PsiV2Echidna.totalMinted"
+                  ],
+                  "unobserved_effect_states": [
+                    "ERC721PsiV2.tokenOwners"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "eb8a507e8ed4de5e0c816af6fe40ae4f084a5c68281b552f901c0634ce470121",
+                  "state_fingerprint_after": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_approval_clearing()": true,
+                    "echidna_approval_consistency()": true,
+                    "echidna_balance_consistency()": false,
+                    "echidna_balance_sum_property()": false,
+                    "echidna_batch_operation_gas()": true,
+                    "echidna_boundary_minting_sequence()": false,
+                    "echidna_burn()": true,
+                    "echidna_burn_unminted()": true,
+                    "echidna_burned_tokens_have_no_owner()": true,
+                    "echidna_complex_transfer_sequence()": true,
+                    "echidna_concurrent_operations()": true,
+                    "echidna_cross_group_operations()": null,
+                    "echidna_group_boundary_sequence()": true,
+                    "echidna_group_occupancy()": true,
+                    "echidna_group_operations_sequence()": false,
+                    "echidna_max_token_id_overflow()": true,
+                    "echidna_mint_boundary_check()": true,
+                    "echidna_mint_by_id()": true,
+                    "echidna_mint_by_quantity()": true,
+                    "echidna_mint_quantity_range()": true,
+                    "echidna_mint_threshold_respected()": null,
+                    "echidna_minted_tokens_have_owner()": false,
+                    "echidna_nonexistent_ownership1()": true,
+                    "echidna_nonexistent_ownership2()": true,
+                    "echidna_reentrancy_protection()": true,
+                    "echidna_safe_transfer_callback()": true,
+                    "echidna_sequential_token_ids()": true,
+                    "echidna_token_id_uniqueness()": true,
+                    "echidna_total_supply_matches()": false,
+                    "echidna_total_supply_sequence()": null,
+                    "echidna_transfer_ownership_updates()": true,
+                    "echidna_zero_address_protection()": true
+                  },
+                  "all_property_errors": {
+                    "echidna_cross_group_operations()": "ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000",
+                    "echidna_mint_threshold_respected()": "Web3RPCError: {'code': -32003, 'message': 'EVM error OutOfGas'}",
+                    "echidna_total_supply_sequence()": "ContractPanicError: ('Panic error 0x11: Arithmetic operation results in underflow or overflow.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000011')"
+                  },
+                  "other_property_violations_during_prevalidation": [
+                    "echidna_balance_consistency()",
+                    "echidna_balance_sum_property()",
+                    "echidna_boundary_minting_sequence()",
+                    "echidna_group_operations_sequence()",
+                    "echidna_minted_tokens_have_owner()",
+                    "echidna_total_supply_matches()"
+                  ]
+                },
+                {
+                  "index": 2,
+                  "function": "approve(address,uint256)",
+                  "arguments": [
+                    "0x0000000000000000000000000000000000020000",
+                    0
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "b94f6fe5345dabfd543ec783335d11bab91507cd09dd6b13ac8c642b7f1e3230",
+                  "block_number": 4370002,
+                  "status": "reverted",
+                  "gas_used": 29629,
+                  "observed_view_state_changed": false,
+                  "observed_view_count": 20,
+                  "tracked_contract_count": 3,
+                  "tracked_contract_types": [
+                    "Harness",
+                    "MaliciousReceiver",
+                    "TestReceiver"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "ERC721PsiV2.tokenApprovals"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "ERC721PsiV2.tokenApprovals"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+                  "state_fingerprint_after": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+                  "target_property": null,
+                  "property_error": "tx_revert: ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c4552433732315073693a206f776e657220717565727920666f72206e6f6e6578697374656e7420746f6b656e0000",
+                  "all_property_values": {},
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "attempt": 2,
+              "elapsed_seconds": 1.421,
+              "elapsed_from_run_start_seconds": 12.977
+            }
+          ],
+          "error": null,
+          "elapsed_seconds": 9.901
+        }
+      ],
+      "status": "no_valid_evm_seed",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Immutable_a9d9745dffe4118dcc3a_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 9826,
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 9826,
+              "completion_tokens": 415,
+              "total_tokens": 10241,
+              "estimated_cost_usd": {
+                "offpeak": "0.0017229",
+                "peak": "0.0034458"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.89,
+            "attempt": 1,
+            "prompt_utf8_bytes": 32656,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "a9d9745dffe4118dcc3a",
+                "candidate_id": "a9d9745dffe4118dcc3a-seq-1",
+                "steps": [
+                  {
+                    "function": "mintForTest(address,uint256)",
+                    "rationale": "建立 totalMinted>0 与 tokenOwners 状态，使属性中 tokenId=currentTokenId%totalMinted 可解析且 ownerOf 有定义；mintForTest 同时写 totalMinted 与 tokenOwners。"
+                  },
+                  {
+                    "function": "approve(address,uint256)",
+                    "rationale": "为后续 transferFrom 建立 tokenApprovals 前置授权（属性内部 _approveForTest 的等价外部路径），满足 _isApprovedOrOwner 守卫。"
+                  },
+                  {
+                    "function": "transferFrom(address,address,uint256)",
+                    "rationale": "消费已建立的 owner/approval 状态执行转移，触发 _transfer 写 owners/tokenOwners 并清空 tokenApprovals，覆盖属性 A->B 段。"
+                  },
+                  {
+                    "function": "safeTransferFrom(address,address,uint256)",
+                    "rationale": "使用 seed_compatible 的三参 safeTransferFrom 继续链式转移，验证转移后 ownerOf 与 getApproved 归零路径。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "属性内部调用 this.transferFrom 与 _approveForTest，外部序列只能近似其状态生产/消费顺序，不能保证参数与账户数组一致。",
+              "mintForTest 的 quantity 与 to 需由执行器具体化，使 totalMinted>0 且 tokenId 落在已铸造范围。",
+              "approve 需由 token 当前 owner 或 approved-for-all 调用，否则守卫回滚；序列假设执行器可满足该调用者约束。",
+              "safeTransferFrom(address,address,uint256,bytes) 因 seed_compatible=false 被排除，仅使用三参重载。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 0,
+      "elapsed_seconds": 12.794
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 60,
+    "token_budget": 80000,
+    "wall_budget_seconds": 60
+  },
+  "api_usage": {
+    "request_attempts": 3,
+    "failed_request_attempts": 0,
+    "unmetered_attempts": 0,
+    "prompt_tokens": 31754,
+    "completion_tokens": 1897,
+    "total_tokens": 33651,
+    "estimated_cost_usd_offpeak": "0.004358388",
+    "estimated_cost_usd_peak": "0.008716776",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/逐属性原生对照实验/181427b0618543959e36da14df761331/seed-generation/Immutable/a9d9745dffe4118dcc3a/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 33651,
+  "total_elapsed_seconds": 12.981,
+  "anvil_start_error": null
+}
