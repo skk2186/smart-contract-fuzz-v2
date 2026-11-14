@@ -1,0 +1,461 @@
+{
+  "schema_version": "1.0",
+  "random_seed": 20261114,
+  "projects": {
+    "Hokusai": {
+      "input_file": "/home/skk/smart-contract-fuzz-v2/deepseek/结果/自主种子质量实验/Hokusai-Slither属性.json",
+      "input_properties": 5,
+      "group_count": 5,
+      "grouped_properties": 0,
+      "groups": [
+        {
+          "members": [
+            {
+              "property_id": "04c6adfdc2682ffb6415",
+              "property": "EchidnaHokusaiToken.echidna_only_controller_can_mint()",
+              "analysis_contract": "EchidnaHokusaiToken",
+              "analysis_contract_source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#18-175"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "self:EchidnaHokusaiToken.unauthorizedMintSucceeded"
+            ],
+            "actions": [
+              "EchidnaHokusaiToken.attemptUnauthorizedMint(uint256)"
+            ],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "40b35ad5dc128d8aff62",
+              "property": "EchidnaHokusaiToken.echidna_supply_accounting()",
+              "analysis_contract": "EchidnaHokusaiToken",
+              "analysis_contract_source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#18-175"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "external:EchidnaHokusaiToken:EchidnaHokusaiToken.token@sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#27:ERC20._totalSupply",
+              "self:EchidnaHokusaiToken.expectedSupply"
+            ],
+            "actions": [
+              "EchidnaHokusaiToken.burnInvestorUserA(uint256)",
+              "EchidnaHokusaiToken.burnSelf(uint256)",
+              "EchidnaHokusaiToken.distributeSupplier(uint256)",
+              "EchidnaHokusaiToken.mintInvestorSelf(uint256)",
+              "EchidnaHokusaiToken.mintInvestorUserA(uint256)",
+              "EchidnaHokusaiToken.mintRewardSelf(uint256)"
+            ],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "a36be6874710a8a5a9a7",
+              "property": "EchidnaHokusaiToken.echidna_supplier_distributed_once()",
+              "analysis_contract": "EchidnaHokusaiToken",
+              "analysis_contract_source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#18-175"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "external:EchidnaHokusaiToken:EchidnaHokusaiToken.token@sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#27:HokusaiToken.modelSupplierDistributed",
+              "self:EchidnaHokusaiToken.supplierDistributedSeen"
+            ],
+            "actions": [
+              "EchidnaHokusaiToken.distributeSupplier(uint256)"
+            ],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "ad28f4492fa527ee713b",
+              "property": "EchidnaHokusaiToken.echidna_investor_cap()",
+              "analysis_contract": "EchidnaHokusaiToken",
+              "analysis_contract_source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#18-175"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "external:EchidnaHokusaiToken:EchidnaHokusaiToken.token@sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#27:HokusaiToken.investorMinted"
+            ],
+            "actions": [
+              "EchidnaHokusaiToken.burnInvestorUserA(uint256)",
+              "EchidnaHokusaiToken.mintInvestorSelf(uint256)",
+              "EchidnaHokusaiToken.mintInvestorUserA(uint256)"
+            ],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "c3672406d0e2093f69aa",
+              "property": "EchidnaHokusaiToken.echidna_reward_cap()",
+              "analysis_contract": "EchidnaHokusaiToken",
+              "analysis_contract_source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#18-175"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "external:EchidnaHokusaiToken:EchidnaHokusaiToken.token@sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#27:HokusaiToken.rewardMinted"
+            ],
+            "actions": [
+              "EchidnaHokusaiToken.mintRewardSelf(uint256)"
+            ],
+            "setup": []
+          },
+          "pair_evidence": []
+        }
+      ],
+      "graph": [],
+      "evaluation": {
+        "independent": {
+          "within_pairs": 0,
+          "supported_pairs": 0,
+          "pairs_with_shared_setup": 0,
+          "shared_setup_pair_total": 0,
+          "reused_state_features": 0,
+          "reused_candidate_features": 0
+        },
+        "grouped": {
+          "within_pairs": 0,
+          "supported_pairs": 0,
+          "pairs_with_shared_setup": 0,
+          "shared_setup_pair_total": 0,
+          "reused_state_features": 0,
+          "reused_candidate_features": 0
+        },
+        "matched_random": {
+          "trials": 200,
+          "mean": {
+            "within_pairs": 0.0,
+            "supported_pairs": 0.0,
+            "pairs_with_shared_setup": 0.0,
+            "shared_setup_pair_total": 0.0,
+            "reused_state_features": 0.0,
+            "reused_candidate_features": 0.0
+          },
+          "max": {
+            "within_pairs": 0,
+            "supported_pairs": 0,
+            "pairs_with_shared_setup": 0,
+            "shared_setup_pair_total": 0,
+            "reused_state_features": 0,
+            "reused_candidate_features": 0
+          }
+        }
+      },
+      "method": "同一分析合约内：共享可写状态和有写入证据的候选函数，或共享至少两个可写状态；完全连接合并，且全组至少共享一个状态；可能实例别名只保留在原报告，不作为分组证据。前置操作仅用于独立评价。"
+    },
+    "BeeStorage": {
+      "input_file": "/home/skk/smart-contract-fuzz-v2/deepseek/结果/自主种子质量实验/BeeStorage-Slither属性.json",
+      "input_properties": 4,
+      "group_count": 4,
+      "grouped_properties": 0,
+      "groups": [
+        {
+          "members": [
+            {
+              "property_id": "0226f9cc69ab30e7821a",
+              "property": "EchidnaSystemHarness.echidna_unauthorized_oracle_adjust_never_succeeds()",
+              "analysis_contract": "EchidnaSystemHarness",
+              "analysis_contract_source": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#84-366"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "self:EchidnaSystemHarness.unauthorizedOracleAdjustSucceeded"
+            ],
+            "actions": [
+              "EchidnaSystemHarness.act_rando_tryAdjustOraclePrice(uint8,uint16)"
+            ],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "2c68514fc72b1303d6e8",
+              "property": "EchidnaSystemHarness.echidna_stamp_internal_pot_not_above_contract_balance()",
+              "analysis_contract": "EchidnaSystemHarness",
+              "analysis_contract_source": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#84-366"
+            }
+          ],
+          "shared_core": {
+            "states": [],
+            "actions": [],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "571d80aea536af7fdcda",
+              "property": "EchidnaSystemHarness.echidna_oracle_price_matches_stamp_lastPrice_when_updated()",
+              "analysis_contract": "EchidnaSystemHarness",
+              "analysis_contract_source": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#84-366"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "external:EchidnaSystemHarness:EchidnaSystemHarness.oracle@sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#89:PriceOracle.currentPriceUpScaled"
+            ],
+            "actions": [
+              "EchidnaSystemHarness.act_admin_setOraclePrice(uint32)"
+            ],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "a11cc51249256da90a47",
+              "property": "EchidnaSystemHarness.echidna_tracked_redist_commit_reveal_consistent()",
+              "analysis_contract": "EchidnaSystemHarness",
+              "analysis_contract_source": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#84-366"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "self:EchidnaSystemHarness.trackedDepth",
+              "self:EchidnaSystemHarness.trackedHasCommit",
+              "self:EchidnaSystemHarness.trackedHasReveal",
+              "self:EchidnaSystemHarness.trackedHash",
+              "self:EchidnaSystemHarness.trackedObfuscated",
+              "self:EchidnaSystemHarness.trackedRound"
+            ],
+            "actions": [
+              "EchidnaSystemHarness.act_redist_happyCommit(uint8,bytes32,bytes32)",
+              "EchidnaSystemHarness.act_redist_happyReveal(uint8)"
+            ],
+            "setup": [
+              "EchidnaSystemHarness.act_redist_happyCommit(uint8,bytes32,bytes32)",
+              "EchidnaSystemHarness.act_redist_happyReveal(uint8)"
+            ]
+          },
+          "pair_evidence": []
+        }
+      ],
+      "graph": [],
+      "evaluation": {
+        "independent": {
+          "within_pairs": 0,
+          "supported_pairs": 0,
+          "pairs_with_shared_setup": 0,
+          "shared_setup_pair_total": 0,
+          "reused_state_features": 0,
+          "reused_candidate_features": 0
+        },
+        "grouped": {
+          "within_pairs": 0,
+          "supported_pairs": 0,
+          "pairs_with_shared_setup": 0,
+          "shared_setup_pair_total": 0,
+          "reused_state_features": 0,
+          "reused_candidate_features": 0
+        },
+        "matched_random": {
+          "trials": 200,
+          "mean": {
+            "within_pairs": 0.0,
+            "supported_pairs": 0.0,
+            "pairs_with_shared_setup": 0.0,
+            "shared_setup_pair_total": 0.0,
+            "reused_state_features": 0.0,
+            "reused_candidate_features": 0.0
+          },
+          "max": {
+            "within_pairs": 0,
+            "supported_pairs": 0,
+            "pairs_with_shared_setup": 0,
+            "shared_setup_pair_total": 0,
+            "reused_state_features": 0,
+            "reused_candidate_features": 0
+          }
+        }
+      },
+      "method": "同一分析合约内：共享可写状态和有写入证据的候选函数，或共享至少两个可写状态；完全连接合并，且全组至少共享一个状态；可能实例别名只保留在原报告，不作为分组证据。前置操作仅用于独立评价。"
+    },
+    "Drips": {
+      "input_file": "/home/skk/smart-contract-fuzz-v2/deepseek/结果/自主种子质量实验/Drips-Slither属性.json",
+      "input_properties": 1,
+      "group_count": 1,
+      "grouped_properties": 0,
+      "groups": [
+        {
+          "members": [
+            {
+              "property_id": "6e7899beaef22d4a3a87",
+              "property": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+              "analysis_contract": "Echidna",
+              "analysis_contract_source": "src/echidna/Echidna.sol#28-36"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "self:EchidnaConfig.ADDRESS_TO_DRIPS_ACCOUNT_ID",
+              "self:EchidnaStorage.userToStreamReceivers",
+              "self:EchidnaStorage.userToStreamsHistory",
+              "self:EchidnaStorage.userToStreamsHistoryHashes",
+              "self:EchidnaStreamsHelpers.maxEndHint1",
+              "self:EchidnaStreamsHelpers.maxEndHint2"
+            ],
+            "actions": [
+              "EchidnaBasicHelpers.give(uint8,uint8,uint128)",
+              "EchidnaBasicHelpers.giveClampedAmount(uint8,uint8,uint128)",
+              "EchidnaBasicHelpers.receiveStreams(uint8,uint32)",
+              "EchidnaBasicHelpers.receiveStreamsAllCycles(uint8)",
+              "EchidnaBasicHelpers.receiveStreamsSplitAndCollectToSelf(uint8)",
+              "EchidnaBasicHelpers.split(uint8)",
+              "EchidnaBasicHelpers.splitAndCollectToSelf(uint8)",
+              "EchidnaBasicTests.testCollect(uint8,uint8)",
+              "EchidnaBasicTests.testGiveShouldNotRevert(uint8,uint8,uint128)",
+              "EchidnaBasicTests.testReceiveStreams(uint8,uint32)",
+              "EchidnaBasicTests.testReceiveStreamsShouldNotRevert(uint8)",
+              "EchidnaBasicTests.testReceiveStreamsViewConsistency(uint8,uint32)",
+              "EchidnaBasicTests.testReceiveStreamsViewVsActual(uint8,uint32)",
+              "EchidnaInvariantTests.invariantAccountingVsTokenBalance()",
+              "EchidnaInvariantTests.invariantSumAmtDeltaIsZero(uint8)",
+              "EchidnaInvariantTests.invariantWithdrawAllTokens()",
+              "EchidnaSplitsHelpers.addSplitsReceiver(uint8,uint8,uint32)",
+              "EchidnaSplitsHelpers.addSplitsReceiverWithClamping(uint8,uint8,uint32)",
+              "EchidnaSplitsHelpers.setSplits(uint8,uint8,uint32)",
+              "EchidnaSplitsHelpers.setSplitsWithClamping(uint8,uint8,uint32)",
+              "EchidnaSplitsTests.testCollectableAfterSplit(uint8)",
+              "EchidnaSplitsTests.testReceiversReceivedSplit(uint8)",
+              "EchidnaSplitsTests.testSplitShouldNotRevert(uint8)",
+              "EchidnaSplitsTests.testSplitViewVsActual(uint8)",
+              "EchidnaSplitsTests.testSplittableAfterSplit(uint8)",
+              "EchidnaSqueezeHelpers.squeezeAllAndReceiveAndSplitAndCollectToSelf(uint8)",
+              "EchidnaSqueezeHelpers.squeezeAllSenders(uint8)",
+              "EchidnaSqueezeHelpers.squeezeToSelf(uint8)",
+              "EchidnaSqueezeHelpers.squeezeWithDefaultHistory(uint8,uint8)",
+              "EchidnaSqueezeHelpers.squeezeWithFuzzedHistory(uint8,uint8,uint256,bytes32)",
+              "EchidnaSqueezeTests.testSqueezableAmountCantBeWithdrawn(uint8,uint8)",
+              "EchidnaSqueezeTests.testSqueezableVsReceived(uint8)",
+              "EchidnaSqueezeTests.testSqueeze(uint8,uint8)",
+              "EchidnaSqueezeTests.testSqueezeTwice(uint8,uint8,uint256,bytes32)",
+              "EchidnaSqueezeTests.testSqueezeViewVsActual(uint8,uint8)",
+              "EchidnaSqueezeTests.testSqueezeWithFullyHashedHistory(uint8,uint8)",
+              "EchidnaStreamsHelpers.addStream(uint8,uint8,uint160,uint32,uint32,int128)",
+              "EchidnaStreamsHelpers.addStreamImmediatelySqueezable(uint8,uint8,uint160)",
+              "EchidnaStreamsHelpers.addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+              "EchidnaStreamsHelpers.removeStream(uint8,uint256)",
+              "EchidnaStreamsHelpers.setMaxEndHints(uint32,uint32)",
+              "EchidnaStreamsHelpers.setStreamBalance(uint8,int128)",
+              "EchidnaStreamsHelpers.setStreamBalanceWithClamping(uint8,int128)",
+              "EchidnaStreamsHelpers.setStreamBalanceWithdrawAll(uint8)",
+              "EchidnaStreamsHelpers.setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+              "EchidnaStreamsHelpers.setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+              "EchidnaStreamsTests.testBalanceAtInFuture(uint8,uint8,uint160)",
+              "EchidnaStreamsTests.testSetStreamBalance(uint8,int128)"
+            ],
+            "setup": [
+              "EchidnaBasicHelpers.give(uint8,uint8,uint128)",
+              "EchidnaBasicHelpers.giveClampedAmount(uint8,uint8,uint128)",
+              "EchidnaBasicHelpers.receiveStreams(uint8,uint32)",
+              "EchidnaBasicHelpers.receiveStreamsAllCycles(uint8)",
+              "EchidnaBasicHelpers.receiveStreamsSplitAndCollectToSelf(uint8)",
+              "EchidnaBasicHelpers.split(uint8)",
+              "EchidnaBasicHelpers.splitAndCollectToSelf(uint8)",
+              "EchidnaBasicTests.testCollect(uint8,uint8)",
+              "EchidnaBasicTests.testGiveShouldNotRevert(uint8,uint8,uint128)",
+              "EchidnaBasicTests.testReceiveStreams(uint8,uint32)",
+              "EchidnaBasicTests.testReceiveStreamsShouldNotRevert(uint8)",
+              "EchidnaBasicTests.testReceiveStreamsViewConsistency(uint8,uint32)",
+              "EchidnaBasicTests.testReceiveStreamsViewVsActual(uint8,uint32)",
+              "EchidnaInvariantTests.invariantAccountingVsTokenBalance()",
+              "EchidnaInvariantTests.invariantSumAmtDeltaIsZero(uint8)",
+              "EchidnaInvariantTests.invariantWithdrawAllTokens()",
+              "EchidnaSplitsHelpers.addSplitsReceiver(uint8,uint8,uint32)",
+              "EchidnaSplitsHelpers.addSplitsReceiverWithClamping(uint8,uint8,uint32)",
+              "EchidnaSplitsHelpers.setSplits(uint8,uint8,uint32)",
+              "EchidnaSplitsHelpers.setSplitsWithClamping(uint8,uint8,uint32)",
+              "EchidnaSplitsTests.testCollectableAfterSplit(uint8)",
+              "EchidnaSplitsTests.testReceiversReceivedSplit(uint8)",
+              "EchidnaSplitsTests.testSplitShouldNotRevert(uint8)",
+              "EchidnaSplitsTests.testSplitViewVsActual(uint8)",
+              "EchidnaSplitsTests.testSplittableAfterSplit(uint8)",
+              "EchidnaSqueezeHelpers.squeezeAllAndReceiveAndSplitAndCollectToSelf(uint8)",
+              "EchidnaSqueezeHelpers.squeezeAllSenders(uint8)",
+              "EchidnaSqueezeHelpers.squeezeToSelf(uint8)",
+              "EchidnaSqueezeHelpers.squeezeWithDefaultHistory(uint8,uint8)",
+              "EchidnaSqueezeHelpers.squeezeWithFuzzedHistory(uint8,uint8,uint256,bytes32)",
+              "EchidnaSqueezeTests.testSqueezableAmountCantBeWithdrawn(uint8,uint8)",
+              "EchidnaSqueezeTests.testSqueezableVsReceived(uint8)",
+              "EchidnaSqueezeTests.testSqueeze(uint8,uint8)",
+              "EchidnaSqueezeTests.testSqueezeTwice(uint8,uint8,uint256,bytes32)",
+              "EchidnaSqueezeTests.testSqueezeViewVsActual(uint8,uint8)",
+              "EchidnaSqueezeTests.testSqueezeWithFullyHashedHistory(uint8,uint8)",
+              "EchidnaStreamsHelpers.addStream(uint8,uint8,uint160,uint32,uint32,int128)",
+              "EchidnaStreamsHelpers.addStreamImmediatelySqueezable(uint8,uint8,uint160)",
+              "EchidnaStreamsHelpers.addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+              "EchidnaStreamsHelpers.removeStream(uint8,uint256)",
+              "EchidnaStreamsHelpers.setStreamBalance(uint8,int128)",
+              "EchidnaStreamsHelpers.setStreamBalanceWithClamping(uint8,int128)",
+              "EchidnaStreamsHelpers.setStreamBalanceWithdrawAll(uint8)",
+              "EchidnaStreamsHelpers.setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+              "EchidnaStreamsHelpers.setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+              "EchidnaStreamsTests.testBalanceAtInFuture(uint8,uint8,uint160)",
+              "EchidnaStreamsTests.testSetStreamBalance(uint8,int128)"
+            ]
+          },
+          "pair_evidence": []
+        }
+      ],
+      "graph": [],
+      "evaluation": {
+        "independent": {
+          "within_pairs": 0,
+          "supported_pairs": 0,
+          "pairs_with_shared_setup": 0,
+          "shared_setup_pair_total": 0,
+          "reused_state_features": 0,
+          "reused_candidate_features": 0
+        },
+        "grouped": {
+          "within_pairs": 0,
+          "supported_pairs": 0,
+          "pairs_with_shared_setup": 0,
+          "shared_setup_pair_total": 0,
+          "reused_state_features": 0,
+          "reused_candidate_features": 0
+        },
+        "matched_random": {
+          "trials": 200,
+          "mean": {
+            "within_pairs": 0.0,
+            "supported_pairs": 0.0,
+            "pairs_with_shared_setup": 0.0,
+            "shared_setup_pair_total": 0.0,
+            "reused_state_features": 0.0,
+            "reused_candidate_features": 0.0
+          },
+          "max": {
+            "within_pairs": 0,
+            "supported_pairs": 0,
+            "pairs_with_shared_setup": 0,
+            "shared_setup_pair_total": 0,
+            "reused_state_features": 0,
+            "reused_candidate_features": 0
+          }
+        }
+      },
+      "method": "同一分析合约内：共享可写状态和有写入证据的候选函数，或共享至少两个可写状态；完全连接合并，且全组至少共享一个状态；可能实例别名只保留在原报告，不作为分组证据。前置操作仅用于独立评价。"
+    }
+  }
+}

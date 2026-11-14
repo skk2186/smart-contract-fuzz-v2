@@ -24,13 +24,32 @@ PROJECTS = {
         "contract": "ERC721PsiV2Echidna",
     },
     "Hokusai": {
-        "report": ".tools/results/hokusai-full-final.json",
-        "artifact": ".tools/results/HokusaiToken-Harness编译.json",
+        "report": "deepseek/结果/自主种子质量实验/Hokusai-Slither属性.json",
+        "artifact": "deepseek/结果/自主种子质量实验/HokusaiToken-Harness编译.json",
         "source_root": "sol/真实项目/Hokusai",
         "contract": "EchidnaHokusaiToken",
     },
+    "BeeStorage": {
+        "report": "deepseek/结果/自主种子质量实验/BeeStorage-Slither属性.json",
+        "artifact": "deepseek/结果/自主种子质量实验/BeeStorage-Harness编译.json",
+        "source_root": "sol/真实项目/BeeStorage",
+        "contract": "EchidnaSystemHarness",
+    },
+    "Drips": {
+        "report": "deepseek/结果/自主种子质量实验/Drips-Slither属性.json",
+        "artifact": "deepseek/结果/自主种子质量实验/Drips-Harness编译.json",
+        "source_root": "sol/真实项目/DripsSCFuzzBench",
+        "contract": "Echidna",
+    },
+    "Kink": {
+        "report": "deepseek/结果/自主种子质量实验/Kink-Slither属性.json",
+        "artifact": "deepseek/结果/自主种子质量实验/Kink-Harness编译.json",
+        "source_root": "sol/真实项目/Kink",
+        "contract": "KinkPoolEchidna",
+    },
 }
 SEED_TYPES = re.compile(r"^(u?int)([0-9]*)$")
+FIXED_BYTES_TYPES = re.compile(r"^bytes([1-9]|[12][0-9]|3[0-2])$")
 ADDRESS_RE = re.compile(r"^0x[0-9a-fA-F]{40}$")
 
 
@@ -107,7 +126,8 @@ def _abi_signature(entry: dict[str, Any]) -> str:
 def _seed_abi_supported(entry: dict[str, Any]) -> tuple[bool, str | None]:
     for item in entry.get("inputs", []):
         kind = item["type"]
-        if kind == "address" or kind == "bool" or SEED_TYPES.fullmatch(kind):
+        if (kind == "address" or kind == "bool" or SEED_TYPES.fullmatch(kind) or
+                FIXED_BYTES_TYPES.fullmatch(kind)):
             continue
         return False, f"Echidna 原生序列化器暂未接入 ABI 类型 {kind}"
     return True, None
@@ -180,12 +200,35 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
     property_source = prop.get("source", "")
     property_signature = prop.get("property", "")
     property_name = property_signature.rsplit(".", 1)[-1].split("(", 1)[0]
-    property_abi = next((entry for entry in abi_functions.values()
-                         if entry.get("name") == property_name and not entry.get("inputs")), None)
+    property_abi = abi_functions.get(property_signature.rsplit(".", 1)[-1])
+    if property_abi is None:
+        property_abi = next((entry for entry in abi_functions.values()
+                             if entry.get("name") == property_name and
+                             len(entry.get("inputs", [])) == len(
+                                 prop.get("property_parameters", []))), None)
+    assertion_trigger = None
+    if prop.get("property_kind") == "assertion_test" and property_abi is not None:
+        trigger_supported, trigger_limitation = _seed_abi_supported(property_abi)
+        assertion_trigger = {
+            "function": property_signature,
+            "abi_signature": _abi_signature(property_abi),
+            "abi_inputs": [{"name": item.get("name", ""), "type": item["type"]}
+                           for item in property_abi.get("inputs", [])],
+            "payable": property_abi.get("stateMutability") == "payable",
+            "seed_compatible": trigger_supported,
+            "seed_limitation": trigger_limitation,
+            "source_excerpt": source_excerpt(project, property_source),
+        }
     return {
         "property_id": prop.get("property_id"),
         "property": property_signature,
         "property_abi": _abi_signature(property_abi) if property_abi else None,
+        "property_abi_inputs": ([{"name": item.get("name", ""), "type": item["type"]}
+                                  for item in property_abi.get("inputs", [])]
+                                 if property_abi else []),
+        "property_kind": prop.get("property_kind", "boolean_property"),
+        "assertion_sites": prop.get("assertion_sites", []),
+        "assertion_trigger": assertion_trigger,
         "property_source": property_source,
         "property_predicate": source_excerpt(project, property_source),
         "analysis_contract": prop.get("analysis_contract"),

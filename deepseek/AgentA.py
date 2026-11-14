@@ -44,6 +44,17 @@ def _normalize_response(data: dict[str, Any], issues: list[dict[str, Any]]) -> N
     data["property_sequences"] = flattened
 
 
+def _canonical_abi_signature(value: Any, available: set[str]) -> str | None:
+    """接受唯一可解析的 Contract.function(...) 展示形式，并归一为 ABI 签名。"""
+    if not isinstance(value, str):
+        return None
+    if value in available:
+        return value
+    suffix = value.rsplit(".", 1)[-1]
+    matches = [signature for signature in available if signature == suffix]
+    return matches[0] if len(matches) == 1 else None
+
+
 def normalize_agent_a_response(context: dict[str, Any], data: dict[str, Any], *,
                                max_candidates: int, max_steps: int,
                                min_steps: int = 1,
@@ -52,6 +63,7 @@ def normalize_agent_a_response(context: dict[str, Any], data: dict[str, Any], *,
     """逐条恢复候选记录；无效项进入 invalid_records，不丢弃同组有效项。"""
     properties = {item["property_id"]: item for item in context.get("properties", [])}
     issues: list[dict[str, Any]] = []
+    canonicalized: list[dict[str, Any]] = []
     _normalize_response(data, issues)
     raw_rows = data.get("property_sequences")
     if not isinstance(raw_rows, list):
@@ -82,8 +94,24 @@ def normalize_agent_a_response(context: dict[str, Any], data: dict[str, Any], *,
             continue
         available = {action["abi_signature"] for action in properties[property_id].get("candidate_actions", [])
                      if action.get("seed_compatible") and action.get("abi_signature")}
-        if any(not isinstance(step, dict) or not isinstance(step.get("function"), str) or
-               step.get("function") not in available for step in steps):
+        signatures_valid = True
+        for step_index, step in enumerate(steps):
+            if not isinstance(step, dict):
+                signatures_valid = False
+                break
+            raw_signature = step.get("function")
+            signature = _canonical_abi_signature(raw_signature, available)
+            if signature is None:
+                signatures_valid = False
+                break
+            if signature != raw_signature:
+                step["function"] = signature
+                canonicalized.append({"record_type": "property_sequence",
+                                      "record_index": row_index,
+                                      "step_index": step_index,
+                                      "from": raw_signature, "to": signature,
+                                      "reason": "唯一匹配 Slither 候选 ABI 签名"})
+        if not signatures_valid:
             issues.append({"record_type": "property_sequence", "record_index": row_index,
                            "property_id": property_id,
                            "reason": "存在非候选或不可序列化函数"})
@@ -136,9 +164,24 @@ def normalize_agent_a_response(context: dict[str, Any], data: dict[str, Any], *,
              if action.get("seed_compatible") and action.get("abi_signature")}
             for property_id in ids]
         common_signatures = set.intersection(*signatures_by_property) if signatures_by_property else set()
-        if any(not isinstance(step, dict) or not isinstance(step.get("function"), str) or
-               step.get("function") not in common_signatures
-               for step in steps):
+        signatures_valid = True
+        for step_index, step in enumerate(steps):
+            if not isinstance(step, dict):
+                signatures_valid = False
+                break
+            raw_signature = step.get("function")
+            signature = _canonical_abi_signature(raw_signature, common_signatures)
+            if signature is None:
+                signatures_valid = False
+                break
+            if signature != raw_signature:
+                step["function"] = signature
+                canonicalized.append({"record_type": "shared_prefix",
+                                      "record_index": prefix_index,
+                                      "step_index": step_index,
+                                      "from": raw_signature, "to": signature,
+                                      "reason": "唯一匹配关联属性共同候选 ABI 签名"})
+        if not signatures_valid:
             issues.append({"record_type": "shared_prefix", "record_index": prefix_index,
                            "reason": "前缀函数并非所有关联属性共同支持的可序列化入口"})
             continue
@@ -196,6 +239,7 @@ def normalize_agent_a_response(context: dict[str, Any], data: dict[str, Any], *,
     data["property_sequences"] = final_rows
     data["applied_shared_prefixes"] = applied
     data["invalid_records"] = issues
+    data["canonicalized_signatures"] = canonicalized
     data["recovery_summary"] = {"valid_candidate_count": len(final_rows),
                                 "invalid_record_count": len(issues),
                                 "applied_shared_prefix_count": len(applied)}
@@ -234,11 +278,17 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
         "sample_constraints": list(task_constraints or []),
         "context": agent_context,
     }
+    if any(prop.get("assertion_trigger") for prop in context.get("properties", [])):
+        prompt["rules"].append(
+            "对 assertion_test 目标，只规划触发检查前的状态准备交易；目标断言函数会由参数实例化器在序列末尾调用，不要把它重复放进 steps。")
 
+    encoding_started = time.perf_counter()
+    user_message = json.dumps(prompt, ensure_ascii=False, separators=(",", ":"))
+    prompt_encoding_seconds = time.perf_counter() - encoding_started
     call_kwargs = dict(call_options or {})
     data, event = call_json(
         system="你是智能合约测试序列规划器。只根据给定 Slither 证据和源码作答，必须输出合法 JSON。",
-        user=json.dumps(prompt, ensure_ascii=False, separators=(",", ":")),
+        user=user_message,
         tag=tag or f"AgentA_{context['project']}", max_tokens=4096,
         **call_kwargs)
     data = normalize_agent_a_response(context, data, max_candidates=max_candidates,
@@ -248,5 +298,7 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
     event["invalid_record_count"] = data["recovery_summary"]["invalid_record_count"]
     event["applied_shared_prefix_count"] = data["recovery_summary"]["applied_shared_prefix_count"]
     event["local_context_dedup_seconds"] = round(compact_seconds, 9)
+    event["prompt_json_encoding_seconds"] = round(prompt_encoding_seconds, 9)
+    event["prompt_utf8_bytes"] = len(user_message.encode("utf-8"))
     return data, event
 

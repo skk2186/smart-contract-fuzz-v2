@@ -36,6 +36,26 @@ def name(function: Any) -> str:
     return f"{owner}.{getattr(function, 'full_name', getattr(function, 'name', '?'))}"
 
 
+def function_matches_selector(function: Any, selector: str) -> bool:
+    """允许显式选中任意 Slither 函数，兼容完整签名和唯一函数名。"""
+    bare = getattr(function, "full_name", getattr(function, "name", ""))
+    return selector in {name(function), bare, getattr(function, "name", "")}
+
+
+def assertion_sites(function: Any) -> list[dict[str, str]]:
+    """从 SlithIR 保留函数体中直接可见的 Solidity assert 调用。"""
+    sites = []
+    for node in getattr(function, "nodes", []):
+        for ir in getattr(node, "irs", []):
+            if not isinstance(ir, SolidityCall):
+                continue
+            call_name = str(getattr(getattr(ir, "function", None), "name", ""))
+            rendered = str(ir)
+            if call_name == "assert" or "SOLIDITY_CALL assert(" in rendered:
+                sites.append({"call": rendered, "source": location(node)})
+    return sites
+
+
 def location(item: Any) -> str:
     source = getattr(item, "source_mapping", None)
     return str(source) if source is not None else "unknown"
@@ -158,6 +178,7 @@ class PropertyAdapter:
         solc: str | None,
         compile_options: list[str],
         prefix: str,
+        property_functions: list[str],
         max_call_depth: int,
         max_setup_depth: int,
         max_paths: int,
@@ -168,6 +189,7 @@ class PropertyAdapter:
         self.analysis_options = {
             "solc": solc, "solc_remaps": remaps,
             "compile_options": compile_options, "property_prefix": prefix,
+            "property_functions": property_functions,
             "max_call_depth": max_call_depth,
             "max_setup_depth": max_setup_depth, "max_paths": max_paths,
         }
@@ -179,19 +201,31 @@ class PropertyAdapter:
         self.entries = sorted(
             [f for f in self.contract.functions_entry_points if not f.is_constructor], key=name
         )
-        self.properties = [
+        prefixed_properties = [
             f for f in self.entries
             if f.name.startswith(prefix) and len(f.parameters) == 0
             and len(f.returns) == 1 and str(f.returns[0].type) == "bool"
         ]
         invalid_properties = [
-            f for f in self.entries if f.name.startswith(prefix) and f not in self.properties
+            f for f in self.entries if f.name.startswith(prefix) and f not in prefixed_properties
         ]
         for invalid in invalid_properties:
             self.unknowns.add(f"属性签名不符合零参数、返回 bool: {name(invalid)}")
+        selected_properties = []
+        for selector in property_functions:
+            matches = [f for f in self.entries if function_matches_selector(f, selector)]
+            if len(matches) == 1:
+                selected_properties.extend(matches)
+            elif len(matches) > 1:
+                self.unknowns.add(
+                    f"显式属性函数选择器匹配多个入口，需改用完整签名: {selector}")
+            else:
+                self.unknowns.add(f"显式属性函数未在目标合约入口中找到: {selector}")
+        self.properties = list(dict.fromkeys(prefixed_properties + selected_properties))
         self.actions = [
             f for f in self.entries
-            if not f.name.startswith(prefix) and not f.view and not f.pure
+            if not f.name.startswith(prefix) and f not in self.properties
+            and not f.view and not f.pure
         ]
         self.paths: dict[Any, list[list[tuple[Any, Any | None]]]] = {}
         self.path_truncated: set[str] = set()
@@ -885,6 +919,15 @@ class PropertyAdapter:
 
     def analyze_property(self, prop: Any) -> dict[str, Any]:
         prior_unknowns = set(self.unknowns)
+        direct_assertion_sites = assertion_sites(prop)
+        is_boolean_property = (len(prop.parameters) == 0 and len(prop.returns) == 1
+                               and str(prop.returns[0].type) == "bool")
+        property_kind = ("boolean_property" if is_boolean_property else
+                         "assertion_test" if direct_assertion_sites else
+                         "selected_function")
+        if property_kind == "selected_function":
+            self.unknowns.add(
+                f"{name(prop)}: 显式选中的目标函数不是零参数 bool 属性，也未发现直接 assert；需人工确认其检查语义")
         read_states = set(prop.all_state_variables_read())
         property_write_states = unique_states(prop.all_state_variables_written())
         cross_contract = self._cross_contract_context(prop)
@@ -997,6 +1040,11 @@ class PropertyAdapter:
                                  for effect_id in action["effect_ids"]})
         return {
             "property": name(prop), "source": location(prop),
+            "property_kind": property_kind,
+            "property_parameters": [{"name": parameter.name,
+                                      "type": str(parameter.type)}
+                                     for parameter in prop.parameters],
+            "assertion_sites": direct_assertion_sites,
             "property_id": property_context_id(self.contract, prop),
             "analysis_contract": self.contract.name,
             "analysis_contract_source": location(self.contract),
@@ -1045,7 +1093,8 @@ class PropertyAdapter:
 
     def run(self) -> dict[str, Any]:
         if not self.properties:
-            self.unknowns.add(f"没有找到零参数、以 {self.prefix!r} 开头的显式属性")
+            if not self.analysis_options["property_functions"]:
+                self.unknowns.add(f"没有找到零参数、以 {self.prefix!r} 开头的显式属性")
         properties = []
         global_unknowns = set(self.unknowns)
         for prop in self.properties:
@@ -1109,17 +1158,23 @@ def _framework_root(target: str) -> tuple[str | None, str | None]:
     return None, None
 
 
-def _foundry_property_sources(root: str, prefix: str) -> list[str]:
-    """使用 Foundry 的原生目录配置，仅以属性声明定位待编译源码。"""
+def _foundry_property_sources(root: str, prefix: str,
+                              property_functions: list[str] | None = None) -> list[str]:
+    """使用 Foundry 的原生目录配置，按属性前缀或显式入口定位待编译源码。"""
     config = Foundry.config(root)
-    pattern = re.compile(r"\bfunction\s+" + re.escape(prefix) + r"\w*\s*\(")
+    patterns = [re.compile(r"\bfunction\s+" + re.escape(prefix) + r"\w*\s*\(")]
+    for selector in property_functions or []:
+        function_name = selector.rsplit(".", 1)[-1].split("(", 1)[0]
+        if function_name:
+            patterns.append(re.compile(r"\bfunction\s+" + re.escape(function_name) + r"\s*\("))
     sources: set[Path] = set()
     for directory in (config.src_path, config.tests_path, config.scripts_path):
         if not directory:
             continue
         source_root = Path(root) / directory
         for source in source_root.rglob("*.sol") if source_root.is_dir() else ():
-            if pattern.search(source.read_text(encoding="utf-8", errors="replace")):
+            source_text = source.read_text(encoding="utf-8", errors="replace")
+            if any(pattern.search(source_text) for pattern in patterns):
                 sources.add(source.resolve())
     return [str(source) for source in sorted(sources)]
 
@@ -1154,6 +1209,8 @@ def main() -> int:
     parser.add_argument("--compile-option", action="append", default=[],
                         help="额外 crytic-compile 参数 NAME=VALUE，可重复")
     parser.add_argument("--property-prefix", default="echidna_", help="显式属性函数名前缀")
+    parser.add_argument("--property-function", action="append", default=[],
+                        help="显式分析一个 Slither 入口函数，可重复；支持完整签名或唯一函数名。用于 assertion/test 风格目标")
     parser.add_argument("--max-call-depth", type=int, default=12)
     parser.add_argument("--max-setup-depth", type=int, default=3)
     parser.add_argument("--max-paths", type=int, default=1000)
@@ -1179,7 +1236,8 @@ def main() -> int:
         kwargs = _build_compile_kwargs(args)
         foundry_directory = bool(project_root and Path(args.target).is_dir()
                                  and (Path(project_root) / "foundry.toml").is_file())
-        property_sources = (_foundry_property_sources(project_root, args.property_prefix)
+        property_sources = (_foundry_property_sources(
+                                project_root, args.property_prefix, args.property_function)
                             if foundry_directory and "foundry_compile_all" not in kwargs
                             else [])
         targets = property_sources or [args.target]
@@ -1217,7 +1275,9 @@ def main() -> int:
                                       or args.contract_source in location(c))]
                     if args.contract is None:
                         contracts = [c for c in contracts if any(
-                            f.name.startswith(args.property_prefix)
+                            f.name.startswith(args.property_prefix) or any(
+                                function_matches_selector(f, selector)
+                                for selector in args.property_function)
                             for f in c.functions_entry_points)]
                     for contract in contracts:
                         key = (contract.name, location(contract))
@@ -1230,6 +1290,7 @@ def main() -> int:
                             adapter = PropertyAdapter(
                                 slither, contract, args.target, args.solc_remaps, args.solc,
                                 args.compile_option, args.property_prefix,
+                                args.property_function,
                                 args.max_call_depth, args.max_setup_depth, args.max_paths)
                             part = adapter.run()
                             report["properties"].extend(part["properties"])
@@ -1244,7 +1305,9 @@ def main() -> int:
                                 partial_property(prop, exc,
                                                  analysis_contract=contract)
                                 for prop in contract.functions_entry_points
-                                if prop.name.startswith(args.property_prefix))
+                                if prop.name.startswith(args.property_prefix) or any(
+                                    function_matches_selector(prop, selector)
+                                    for selector in args.property_function))
             except Exception as exc:
                 report["source_issues"].append({
                     "target": target, "type": type(exc).__name__, "message": str(exc),

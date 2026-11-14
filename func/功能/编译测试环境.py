@@ -4,13 +4,14 @@
 import argparse
 import json
 import os
+import tempfile
 from pathlib import Path
 
 from crytic_compile import CryticCompile
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SOLC = "/home/skk/miniconda3/envs/contract-fuzz/bin/solc"
+SOLC = os.environ.get("SOLC_BIN", "solc")
 PROJECTS = {
     "Request": {
         "target": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
@@ -31,14 +32,60 @@ PROJECTS = {
         "remaps": "@openzeppelin/contracts/=sol/真实项目/依赖/OpenZeppelin4/contracts/",
         "solc_version": "0.8.20",
     },
+    "BeeStorage": {
+        "target": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol",
+        "contract": "EchidnaSystemHarness",
+        "remaps": "@openzeppelin/contracts/=sol/真实项目/依赖/OpenZeppelin482/contracts/",
+        "solc_version": "0.8.20",
+    },
+    "Drips": {
+        "target": "sol/真实项目/DripsSCFuzzBench",
+        "contract": "Echidna",
+        "remaps": None,
+        "solc_version": "0.8.20",
+        "foundry": True,
+    },
+    "Kink": {
+        "target": "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol",
+        "contract": "KinkPoolEchidna",
+        "remaps": "@openzeppelin/contracts/=sol/真实项目/依赖/OpenZeppelin550/contracts/",
+        "solc_version": "0.8.20",
+        "solc_args": "--optimize --via-ir",
+    },
 }
 
 
-def compile_project(name):
+def compile_project(name, solc=SOLC):
     config = PROJECTS[name]
     os.environ["SOLC_VERSION"] = config["solc_version"]
-    result = CryticCompile(config["target"], solc=SOLC,
-                           solc_remaps=config["remaps"], cwd=str(ROOT))
+    compile_options = {"cwd": str(ROOT)}
+    if solc:
+        compile_options["solc"] = solc
+    if config.get("remaps"):
+        compile_options["solc_remaps"] = config["remaps"]
+    if config.get("solc_args"):
+        compile_options["solc_args"] = config["solc_args"]
+    previous_path = os.environ.get("PATH", "")
+    if config.get("foundry"):
+        os.environ["PATH"] = str(ROOT / ".tools/foundry/bin") + os.pathsep + previous_path
+    temporary_build = tempfile.TemporaryDirectory(prefix=f"crytic-{name}-") \
+        if config.get("foundry") else None
+    environment_keys = ("FOUNDRY_OUT", "FOUNDRY_CACHE_PATH")
+    previous_environment = {key: os.environ.get(key) for key in environment_keys}
+    if temporary_build is not None:
+        os.environ["FOUNDRY_OUT"] = str(Path(temporary_build.name) / "out")
+        os.environ["FOUNDRY_CACHE_PATH"] = str(Path(temporary_build.name) / "cache")
+    try:
+        result = CryticCompile(config["target"], **compile_options)
+    finally:
+        os.environ["PATH"] = previous_path
+        for key, value in previous_environment.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+        if temporary_build is not None:
+            temporary_build.cleanup()
     found = []
     for unit in result.compilation_units.values():
         for filename, source_unit in unit.source_units.items():
@@ -71,11 +118,19 @@ def compile_project(name):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("project", choices=list(PROJECTS) + ["all"])
+    parser.add_argument("--solc", default=SOLC,
+                        help="Solidity 编译器可执行文件；可用 SOLC_BIN 设置默认值")
+    parser.add_argument("--output-dir", default=".tools/results",
+                        help="ABI 与字节码输出目录，默认使用本地结果目录")
     args = parser.parse_args()
     names = PROJECTS if args.project == "all" else [args.project]
+    output_dir = Path(args.output_dir)
+    if not output_dir.is_absolute():
+        output_dir = ROOT / output_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
     for name in names:
-        result = compile_project(name)
-        output = ROOT / f".tools/results/{name}-Harness编译.json"
+        result = compile_project(name, solc=args.solc)
+        output = output_dir / f"{name}-Harness编译.json"
         output.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
         print(name, "ABI", len(result["abi"]), "bytecode_bytes",
               (len(result["bytecode"]) - 2) // 2, flush=True)

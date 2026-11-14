@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from typing import Any
 
 from deepseek接口 import call_json
@@ -25,6 +26,13 @@ def normalize_argument(kind: str, value: Any) -> Any:
         if not isinstance(value, bool):
             raise ValueError(f"bool 参数必须是 JSON 布尔值：{value!r}")
         return value
+    bytes_match = re.fullmatch(r"bytes([1-9]|[12][0-9]|3[0-2])", kind)
+    if bytes_match:
+        size = int(bytes_match.group(1))
+        if (not isinstance(value, str) or
+                not re.fullmatch(r"0x[0-9a-fA-F]{" + str(size * 2) + r"}", value)):
+            raise ValueError(f"{kind} 参数必须是含 {size} 字节的 0x 十六进制字符串")
+        return value.lower()
     match = re.fullmatch(r"(u?int)([0-9]*)", kind)
     if not match:
         raise ValueError(f"暂不支持原生语料编码类型：{kind}")
@@ -49,6 +57,12 @@ def _abi_value(kind: str, value: Any) -> dict[str, Any]:
         return {"tag": "AbiAddress", "contents": str(int(normalized, 16))}
     if kind == "bool":
         return {"tag": "AbiBool", "contents": normalized}
+    if re.fullmatch(r"bytes([1-9]|[12][0-9]|3[0-2])", kind):
+        size = int(kind[5:])
+        byte_string = bytes.fromhex(normalized[2:])
+        escaped = '"' + "".join(f"\\{byte}" for byte in byte_string) + '"'
+        # Echidna 的 AbiBytes 长度单位是字节；原生 corpus 使用 [N, Haskell-string]。
+        return {"tag": "AbiBytes", "contents": [size, escaped]}
     match = re.fullmatch(r"(u?int)([0-9]*)", kind)
     bits = int(match.group(2) or "256")
     tag = "AbiUInt" if match.group(1) == "uint" else "AbiInt"
@@ -59,9 +73,16 @@ def _validator(context: dict[str, Any], candidate: dict[str, Any], feedback: str
                fixed_prefix_transactions: list[dict[str, Any]] | None = None):
     property_context = next(p for p in context["properties"]
                             if p["property_id"] == candidate["property_id"])
+    trigger = candidate.get("assertion_trigger") or property_context.get("assertion_trigger")
     action_index = {action["abi_signature"]: action for action in property_context["candidate_actions"]
                     if action.get("seed_compatible") and action.get("abi_signature")}
     expected_steps = candidate["steps"]
+    expected_transactions = [
+        {"function": step["function"], "action": action_index.get(step["function"])}
+        for step in expected_steps
+    ]
+    if trigger:
+        expected_transactions.append({"function": trigger["abi_signature"], "action": trigger})
 
     def validate(data: dict[str, Any]) -> None:
         if data.get("property_id") != candidate["property_id"]:
@@ -69,13 +90,15 @@ def _validator(context: dict[str, Any], candidate: dict[str, Any], feedback: str
         if data.get("candidate_id") != candidate["candidate_id"]:
             raise ValueError("Agent B 返回了错误的 candidate_id")
         transactions = data.get("transactions")
-        if not isinstance(transactions, list) or len(transactions) != len(expected_steps):
-            raise ValueError("交易数必须与 Agent A 规划完全一致")
-        for expected, tx in zip(expected_steps, transactions):
+        if not isinstance(transactions, list) or len(transactions) != len(expected_transactions):
+            raise ValueError("交易数必须与 Agent A 规划及目标断言调用完全一致")
+        for expected, tx in zip(expected_transactions, transactions):
             signature = expected["function"]
             if tx.get("function") != signature:
                 raise ValueError(f"Agent B 改变了规划函数：{signature}")
-            action = action_index[signature]
+            action = expected["action"]
+            if action is None:
+                raise ValueError(f"交易函数没有对应 ABI：{signature}")
             params = action["abi_inputs"]
             arguments = tx.get("arguments")
             if not isinstance(arguments, list) or len(arguments) != len(params):
@@ -117,6 +140,7 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
                           call_options: dict[str, Any] | None = None):
     property_context = next(p for p in context["properties"]
                             if p["property_id"] == candidate["property_id"])
+    trigger = candidate.get("assertion_trigger") or property_context.get("assertion_trigger")
     actions = {action["abi_signature"]: action for action in property_context["candidate_actions"]
                if action.get("seed_compatible") and action.get("abi_signature")}
     sequence = []
@@ -126,7 +150,16 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
                          "inputs": action["abi_inputs"],
                          "payable": action["payable"],
                          "matched_states": action["matched_states"],
-                         "effect_evidence": action["effect_evidence"]})
+                         "effect_evidence": action["effect_evidence"],
+                         "source_excerpt": action.get("source_excerpt")})
+    if trigger:
+        if not trigger.get("seed_compatible"):
+            raise ValueError(f"目标断言函数 ABI 暂不支持种子编码：{trigger.get('seed_limitation')}")
+        sequence.append({"function": trigger["abi_signature"],
+                         "rationale": "状态准备完成后调用目标断言检查",
+                         "inputs": trigger["abi_inputs"], "payable": trigger["payable"],
+                         "matched_states": [], "effect_evidence": [],
+                         "assertion_trigger": True})
     selected_actions = [actions[step["function"]] for step in candidate["steps"]]
     selected_full_names = {action["function"] for action in selected_actions}
     relevant_unresolved = [item for item in property_context.get("unresolved_effect_actions", [])
@@ -146,8 +179,9 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
         "task": "为指定交易序列生成可 ABI 编码并可回放的具体多交易种子。",
         "rules": [
             "必须逐笔遵循计划的 function 顺序，不能增删交易。",
-            "candidate.execution_constraints 中的样本级调用顺序与参数约束属于必需条件。",
+            "只根据 ABI、属性谓词、源码、守卫与 Slither 状态依赖推断参数；无法确认的语义写入 assumptions。",
             "arguments 必须按 inputs 顺序提供，uint/int 使用十进制字符串，address 使用 40 位十六进制地址，bool 使用 JSON 布尔值。",
+            "bytesN 使用恰好 N 字节的 0x 十六进制字符串。",
             "sender 只能从 sender_pool 选择；payable=false 时 value_wei 必须为 0。",
             "没有源码证据要求时，delay_seconds 与 delay_blocks 都设为 0。",
             "严格满足函数源码、guard、状态依赖和目标谓词；静态不确定项应写入 assumptions。",
@@ -159,7 +193,7 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
         "shared_property_contexts": shared_contexts,
         "fixed_shared_prefix_transactions": fixed_prefix_transactions or [],
         "shared_prefix_steps": candidate.get("shared_prefix_steps", []),
-        "candidate": candidate,
+        "candidate": {key: value for key, value in candidate.items() if key != "context"},
         "transactions_to_instantiate": sequence,
         "sender_pool": SENDERS,
         "environment": {"chain_id": 1, "initial_timestamp": 1524785992,
@@ -176,11 +210,17 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
     def validate(data: dict[str, Any]) -> None:
         _validator(context, candidate, feedback, fixed_prefix_transactions)(data)
 
-    return call_json(
+    encoding_started = time.perf_counter()
+    user_message = json.dumps(prompt, ensure_ascii=False, separators=(",", ":"))
+    prompt_encoding_seconds = time.perf_counter() - encoding_started
+    data, event = call_json(
         system="你是智能合约交易参数具体化器。只根据输入 ABI 与源码作答，必须输出合法 JSON。",
-        user=json.dumps(prompt, ensure_ascii=False, separators=(",", ":")),
+        user=user_message,
         tag=f"AgentB_{context['project']}_{candidate['candidate_id']}_try{attempt}",
         max_tokens=4096, validator=validate, **(call_options or {}))
+    event["prompt_json_encoding_seconds"] = round(prompt_encoding_seconds, 9)
+    event["prompt_utf8_bytes"] = len(user_message.encode("utf-8"))
+    return data, event
 
 
 def to_echidna_sequence(candidate: dict[str, Any], transactions: list[dict[str, Any]],
@@ -190,6 +230,9 @@ def to_echidna_sequence(candidate: dict[str, Any], transactions: list[dict[str, 
                             if p["property_id"] == candidate["property_id"])
     actions = {action["abi_signature"]: action for action in property_context["candidate_actions"]
                if action.get("seed_compatible") and action.get("abi_signature")}
+    trigger = candidate.get("assertion_trigger") or property_context.get("assertion_trigger")
+    if trigger and trigger.get("seed_compatible"):
+        actions[trigger["abi_signature"]] = trigger
     sequence = []
     for tx in transactions:
         action = actions[tx["function"]]

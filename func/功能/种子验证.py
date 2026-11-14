@@ -41,13 +41,28 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
     replayed = [line.strip() for line in output.splitlines()
                 if "Sequence replayed from corpus file" in line]
     count = max(loaded_counts, default=0)
-    mutation = "fuzzing:" in output.lower() and "unique instructions" in output.lower()
+    fuzzing_counts = [(int(txs), int(cases)) for txs, cases in
+                      re.findall(r"fuzzing\s*:\s*(\d+)\s*/\s*(\d+)",
+                                 output, re.IGNORECASE)]
+    worker_crashes = [line.strip() for line in output.splitlines()
+                      if re.search(r"\bCrashed:\s*", line, re.IGNORECASE)]
+    # 仅有统计区标题或 unique-instruction 汇总不能证明语料已进入后续变异。
+    # 需要明确看到正数 fuzzing 计数，并且 Echidna worker 没有崩溃。
+    mutation = (count > 0 and bool(replayed) and
+                any(txs > 0 and cases > 0 for txs, cases in fuzzing_counts) and
+                not worker_crashes)
+    instruction_counts = [int(match.replace(",", "")) for match in
+                          re.findall(r"unique instructions\s*:\s*([\d,]+)", output, re.IGNORECASE)]
     return {"loaded_seed_count": count,
             "loaded_seed_evidence": count > 0,
             "replayed_sequence_count": len(replayed),
             "replay_evidence": bool(replayed),
             "replayed_lines": replayed,
-            "mutation_evidence": mutation}
+            "mutation_evidence": mutation,
+            "fuzzing_transactions": max((txs for txs, _ in fuzzing_counts), default=0),
+            "fuzzing_cases": max((cases for _, cases in fuzzing_counts), default=0),
+            "worker_crashes": worker_crashes,
+            "unique_instructions": max(instruction_counts, default=None)}
 
 
 class AnvilSession:
@@ -445,7 +460,13 @@ def write_corpus(project: str, candidate: dict[str, Any], transactions: list[dic
 def run_echidna(project: str, corpus_root: Path, *, property_name: str,
                 test_limit: int = 80, timeout: int = 45,
                 seed: int = 20261113,
-                campaign_deadline: float | None = None) -> dict[str, Any]:
+                campaign_deadline: float | None = None,
+                test_mode: str = "property",
+                property_prefix: str | None = None,
+                filter_functions: list[str] | None = None,
+                seq_len: int = 8,
+                shrink_limit: int = 1,
+                disable_slither: bool = True) -> dict[str, Any]:
     if not Path(ECHIDNA_BIN).is_file() and shutil.which(ECHIDNA_BIN) is None:
         raise FileNotFoundError(f"找不到 Echidna 2.3.2：{ECHIDNA_BIN}")
     conf = PROJECTS[project]
@@ -461,16 +482,39 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         "Hokusai": {
         "target": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol",
         "contract": "EchidnaHokusaiToken",
-        "remaps": "@openzeppelin/contracts/=sol/真实项目/依赖/OpenZeppelin4/contracts/"}}
+        "remaps": "@openzeppelin/contracts/=sol/真实项目/依赖/OpenZeppelin4/contracts/"},
+        "BeeStorage": {
+        "target": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol",
+        "contract": "EchidnaSystemHarness",
+        "remaps": "@openzeppelin/contracts/=sol/真实项目/依赖/OpenZeppelin482/contracts/"},
+        "Kink": {
+        "target": "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol",
+        "contract": "KinkPoolEchidna",
+        "remaps": "@openzeppelin/contracts/=sol/真实项目/依赖/OpenZeppelin550/contracts/",
+        "solc_args": "--optimize --via-ir"},
+        "Drips": {
+        "target": "sol/真实项目/DripsSCFuzzBench",
+        "contract": "Echidna",
+        "remaps": None,
+        "foundry": True}}
     spec = project_data[project]
     compiler_config = corpus_root.parent / f"{project}-{corpus_root.name}-crytic-compile.json"
-    compiler_config.write_text(json.dumps({
-        "solc": "/home/skk/miniconda3/envs/contract-fuzz/bin/solc",
-        "solc_remaps": spec["remaps"],
-    }, ensure_ascii=False, indent=2), encoding="utf-8")
+    solc_candidates = [os.environ.get("SOLC_BIN"),
+                       str(Path.home() / ".solc-select/artifacts/solc-0.8.20/solc-0.8.20"),
+                       shutil.which("solc"), "solc"]
+    solc = next((item for item in solc_candidates
+                 if item and (item == "solc" or Path(item).is_file())), "solc")
+    compiler_config_data = {"solc": solc}
+    if spec.get("remaps"):
+        compiler_config_data["solc_remaps"] = spec["remaps"]
+    if spec.get("solc_args"):
+        compiler_config_data["solc_args"] = spec["solc_args"]
+    compiler_config.write_text(json.dumps(compiler_config_data, ensure_ascii=False, indent=2),
+                               encoding="utf-8")
     echidna_config = corpus_root.parent / f"{project}-{corpus_root.name}-echidna.yaml"
-    echidna_config.write_text("\n".join([
-        f'prefix: "{property_name}"', "workers: 1",
+    config_lines = [
+        f'prefix: "{property_prefix or property_name}"', "workers: 1",
+        f'testMode: "{test_mode}"',
         f'corpusDir: "{corpus_root}"',
         f'contractAddr: "{HARNESS_ADDRESS.lower()}"',
         f'deployer: "{DEPLOYER.lower()}"',
@@ -479,14 +523,23 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         f"balanceAddr: {INITIAL_BALANCE}", "balanceContract: 0",
         f"testMaxGas: {MAX_TX_GAS}", f"propMaxGas: {MAX_TX_GAS}",
         "maxGasprice: 0", "maxTimeDelay: 86400", "maxBlockDelay: 86400",
-        "coverage: true", "stopOnFail: false", "",]), encoding="utf-8")
+        "coverage: true", "stopOnFail: false"]
+    if filter_functions is not None:
+        config_lines.append("filterBlacklist: false")
+        config_lines.append("filterFunctions: [" + ", ".join(
+            json.dumps(item, ensure_ascii=False) for item in filter_functions) + "]")
+    config_lines.append("")
+    echidna_config.write_text("\n".join(config_lines), encoding="utf-8")
     command = [ECHIDNA_BIN, spec["target"], "--contract", spec["contract"],
-               "--crytic-args", f"--config-file {compiler_config.relative_to(ROOT)}",
-               "--config", str(echidna_config.relative_to(ROOT)),
-               "--test-limit", str(test_limit), "--seq-len", "8",
-               "--seed", str(seed), "--workers", "1", "--disable-slither", "--format", "text",
+               "--crytic-args", f"--config-file {compiler_config.resolve()}",
+               "--config", str(echidna_config.resolve()),
+               "--test-limit", str(test_limit), "--seq-len", str(seq_len),
+               "--shrink-limit", str(shrink_limit),
+               "--seed", str(seed), "--workers", "1", "--format", "text",
                "--deployer", DEPLOYER, "--contract-addr", HARNESS_ADDRESS,
                *sum((["--sender", item] for item in SENDERS), [])]
+    if disable_slither:
+        command.append("--disable-slither")
     corpus_root.mkdir(parents=True, exist_ok=True)
     run_marker = corpus_root / ".echidna-run-started"
     if run_marker.exists():
@@ -498,20 +551,41 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
     remaining = None if campaign_deadline is None else max(0, int(campaign_deadline - time.monotonic()))
     if remaining == 0:
         raise TimeoutError("本条件 Echidna 墙钟预算已耗尽")
+    environment = {**os.environ,
+                   "SOLC_VERSION": "0.8.20",
+                   "PATH": str(ROOT / ".tools/foundry/bin") + os.pathsep +
+                           "/home/skk/miniconda3/envs/contract-fuzz/bin:" +
+                           os.environ.get("PATH", "")}
+    if spec.get("foundry"):
+        build_root = corpus_root.parent / "foundry-build"
+        environment["FOUNDRY_OUT"] = str(build_root / "out")
+        environment["FOUNDRY_CACHE_PATH"] = str(build_root / "cache")
     result = subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT,
                             timeout=min(timeout, remaining) if remaining is not None else timeout,
-            env={**os.environ, "SOLC_VERSION": "0.8.20",
-                 "PATH": "/home/skk/miniconda3/envs/contract-fuzz/bin:" + os.environ.get("PATH", "")})
+                            env=environment)
     elapsed = round(time.monotonic() - started, 3)
-    output = result.stdout[-18000:]
+    full_output = result.stdout
+    output = full_output[-18000:]
     result_prefix = property_name if property_name.endswith("_") else property_name + ":"
-    property_results = [line.strip() for line in output.splitlines()
+    property_results = [line.strip() for line in full_output.splitlines()
                         if line.strip().startswith(result_prefix)]
-    property_failures = [line for line in property_results if ": failed" in line.lower()]
+    if test_mode == "assertion":
+        target_name = property_name.split("(", 1)[0].rsplit(".", 1)[-1]
+        property_results = [line.strip() for line in full_output.splitlines()
+                            if target_name in line and ":" in line and
+                            any(token in line.lower() for token in
+                                ("passing", "failed", "falsified", "💥"))]
+        property_failures = [line for line in property_results
+                             if "passing" not in line.lower() and
+                             any(token in line.lower() for token in
+                                 ("failed", "falsified", "💥"))]
+    else:
+        property_failures = [line for line in property_results if ": failed" in line.lower()]
     return {"project": project, "property_name": property_name,
+            "test_mode": test_mode,
             "command": command, "exit_code": result.returncode,
-            "elapsed_seconds": elapsed, **echidna_corpus_evidence(output),
+            "elapsed_seconds": elapsed, **echidna_corpus_evidence(full_output),
             "target_property_results": property_results,
             "property_failures": property_failures,
             "initial_state_failures": [line for line in property_failures

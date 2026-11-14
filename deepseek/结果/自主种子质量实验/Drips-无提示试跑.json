@@ -1,0 +1,353 @@
+{
+  "project": "Drips",
+  "property_id": "6e7899beaef22d4a3a87",
+  "property": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+  "manual_hints": false,
+  "seed_id": "seed-df95d2fc435d4db6adb78714707307bf",
+  "agent_a": {
+    "at_utc": "2026-11-14T07:25:34.749882+00:00",
+    "tag": "autonomous-drips-pilot",
+    "model_requested": "deepseek-flash",
+    "thinking": "disabled",
+    "request_sha256": "bd982e76b49a2cc6476cdbd6cf0e9a1c5d1e21fabd9e6cd1d6c60c19918d8bed",
+    "attempt": 1,
+    "max_tokens": 4096,
+    "budget_preflight_upper_bound": 309755,
+    "budget_remaining_before_call": 350000,
+    "http_status": 200,
+    "response_id": "124b0863-ceaf-4002-9e37-27e9bc651c31",
+    "model_returned": "deepseek-flash",
+    "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+    "usage": {
+      "prompt_tokens": 95257,
+      "prompt_cache_hit_tokens": 128,
+      "prompt_cache_miss_tokens": 95129,
+      "completion_tokens": 383,
+      "total_tokens": 95640,
+      "estimated_cost_usd": {
+        "offpeak": "0.014499534",
+        "peak": "0.028999068"
+      },
+      "pricing_date": "2026-11-13",
+      "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "cost_is_estimate": true
+    },
+    "finish_reason": "stop",
+    "response_json": {
+      "property_sequences": [
+        {
+          "property_id": "6e7899beaef22d4a3a87",
+          "candidate_id": "seq-1",
+          "steps": [
+            {
+              "function": "addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+              "rationale": "先为 sender 建立一条指向 receiver 的流并注入余额，使 getSqueezableAmount(sender,receiver) 在断言前可能非零，从而让 setStreams 前后 squeezable 不变性具备可检验的初始状态。"
+            },
+            {
+              "function": "setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+              "rationale": "在已有流历史基础上再调用带钳制的 setStreams，模拟属性函数内部对 receiver/sender 的流配置变更，为断言函数读取 squeezableBefore/After 提供前置历史。"
+            }
+          ]
+        }
+      ],
+      "shared_prefixes": [],
+      "assumptions": [
+        "属性函数 testSqueezableAmountCantBeUndone 自身会调用 setStreams 并读取 getSqueezableAmount，因此准备序列只负责建立 sender→receiver 的流与历史，断言函数由参数实例化器在末尾调用。",
+        "addStreamWithClamping 与 setStreamsWithClamping 均为 seed_compatible=true 且写入 userToStreamReceivers/userToStreamsHistory，可建立 getSqueezableAmount 依赖的流历史。",
+        "未证明该准备序列能使属性被违反；仅依据 effect_evidence 与守卫推断顺序，参数具体化由实例化器负责。",
+        "squeezeWithFuzzedHistory 等含 bytes32 的候选 seed_compatible=false，未纳入序列。"
+      ],
+      "shared_prefixes_ignored": false,
+      "applied_shared_prefixes": [],
+      "invalid_records": [],
+      "canonicalized_signatures": [
+        {
+          "record_type": "property_sequence",
+          "record_index": 0,
+          "step_index": 0,
+          "from": "EchidnaStreamsHelpers.addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+          "to": "addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+          "reason": "唯一匹配 Slither 候选 ABI 签名"
+        },
+        {
+          "record_type": "property_sequence",
+          "record_index": 0,
+          "step_index": 1,
+          "from": "EchidnaStreamsHelpers.setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+          "to": "setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+          "reason": "唯一匹配 Slither 候选 ABI 签名"
+        }
+      ],
+      "recovery_summary": {
+        "valid_candidate_count": 1,
+        "invalid_record_count": 0,
+        "applied_shared_prefix_count": 0
+      }
+    },
+    "ok": true,
+    "elapsed_seconds": 3.832,
+    "budget": {
+      "max_tokens": 350000,
+      "spent_tokens": 95640,
+      "charged_tokens": 95640,
+      "charge_source": "api_usage"
+    }
+  },
+  "agent_a_output": {
+    "property_sequences": [
+      {
+        "property_id": "6e7899beaef22d4a3a87",
+        "candidate_id": "seq-1",
+        "steps": [
+          {
+            "function": "addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+            "rationale": "先为 sender 建立一条指向 receiver 的流并注入余额，使 getSqueezableAmount(sender,receiver) 在断言前可能非零，从而让 setStreams 前后 squeezable 不变性具备可检验的初始状态。"
+          },
+          {
+            "function": "setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+            "rationale": "在已有流历史基础上再调用带钳制的 setStreams，模拟属性函数内部对 receiver/sender 的流配置变更，为断言函数读取 squeezableBefore/After 提供前置历史。"
+          }
+        ]
+      }
+    ],
+    "shared_prefixes": [],
+    "assumptions": [
+      "属性函数 testSqueezableAmountCantBeUndone 自身会调用 setStreams 并读取 getSqueezableAmount，因此准备序列只负责建立 sender→receiver 的流与历史，断言函数由参数实例化器在末尾调用。",
+      "addStreamWithClamping 与 setStreamsWithClamping 均为 seed_compatible=true 且写入 userToStreamReceivers/userToStreamsHistory，可建立 getSqueezableAmount 依赖的流历史。",
+      "未证明该准备序列能使属性被违反；仅依据 effect_evidence 与守卫推断顺序，参数具体化由实例化器负责。",
+      "squeezeWithFuzzedHistory 等含 bytes32 的候选 seed_compatible=false，未纳入序列。"
+    ],
+    "shared_prefixes_ignored": false,
+    "applied_shared_prefixes": [],
+    "invalid_records": [],
+    "canonicalized_signatures": [
+      {
+        "record_type": "property_sequence",
+        "record_index": 0,
+        "step_index": 0,
+        "from": "EchidnaStreamsHelpers.addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+        "to": "addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+        "reason": "唯一匹配 Slither 候选 ABI 签名"
+      },
+      {
+        "record_type": "property_sequence",
+        "record_index": 0,
+        "step_index": 1,
+        "from": "EchidnaStreamsHelpers.setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+        "to": "setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+        "reason": "唯一匹配 Slither 候选 ABI 签名"
+      }
+    ],
+    "recovery_summary": {
+      "valid_candidate_count": 1,
+      "invalid_record_count": 0,
+      "applied_shared_prefix_count": 0
+    }
+  },
+  "agent_b": {
+    "at_utc": "2026-11-14T07:29:01.589096+00:00",
+    "tag": "AgentB_Drips_autonomous-drips-pilot-0_try1",
+    "model_requested": "deepseek-flash",
+    "thinking": "disabled",
+    "request_sha256": "e6e3c1a10a0eb9696511ae2f51f9062eefc70a5bf200f60dbd6ce116475625ae",
+    "attempt": 1,
+    "max_tokens": 4096,
+    "budget_preflight_upper_bound": 38991,
+    "budget_remaining_before_call": 254360,
+    "http_status": 200,
+    "response_id": "cead8a92-c796-436c-922d-0a734934be0c",
+    "model_returned": "deepseek-flash",
+    "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+    "usage": {
+      "prompt_tokens": 11401,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 11401,
+      "completion_tokens": 542,
+      "total_tokens": 11943,
+      "estimated_cost_usd": {
+        "offpeak": "0.00203535",
+        "peak": "0.0040707"
+      },
+      "pricing_date": "2026-11-13",
+      "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "cost_is_estimate": true
+    },
+    "finish_reason": "stop",
+    "response_json": {
+      "property_id": "6e7899beaef22d4a3a87",
+      "candidate_id": "autonomous-drips-pilot-0",
+      "transactions": [
+        {
+          "function": "addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            0,
+            1,
+            1000,
+            1524785992,
+            3600,
+            1000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "function": "setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            0,
+            1,
+            1000,
+            1524785992,
+            3600,
+            1000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            1,
+            0,
+            1000,
+            1524785992,
+            3600,
+            1000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        }
+      ],
+      "assumptions": [
+        "账户 ID 0 与 1 分别映射到 sender_pool 中的有效地址；getAccount 对 0/1 返回非零地址。",
+        "amountPerSec=1000、startTime=1524785992、duration=3600、balanceDelta=1000000 均会被 clamp* 函数接受或钳制到合法范围，不导致 revert。",
+        "addStreamWithClamping 与 setStreamsWithClamping 的 fromAccId/toAccId 顺序按 ABI 输入 (from,to) 解释；属性函数中 receiverAccId/senderAccId 顺序为 (receiver,sender)，故目标调用使用 receiver=1、sender=0。",
+        "属性函数内部 setStreams 使用与前置交易相同的参数，使 squeezableBefore 与 squeezableAfter 在无外部时间推进时保持一致；delay 均为 0 以避免 block.timestamp 变化影响 squeezable 计算。",
+        "未提供 fixed_shared_prefix_transactions，故无前缀复用。",
+        "静态分析未证明候选链可执行；实际回放由验证器检查目标属性。"
+      ],
+      "execution_feedback": null
+    },
+    "ok": true,
+    "elapsed_seconds": 3.289,
+    "budget": {
+      "max_tokens": 350000,
+      "spent_tokens": 107583,
+      "charged_tokens": 11943,
+      "charge_source": "api_usage"
+    }
+  },
+  "transactions": [
+    {
+      "function": "addStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+      "arguments": [
+        0,
+        1,
+        1000,
+        1524785992,
+        3600,
+        1000000
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "setStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128)",
+      "arguments": [
+        0,
+        1,
+        1000,
+        1524785992,
+        3600,
+        1000000
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+      "arguments": [
+        1,
+        0,
+        1000,
+        1524785992,
+        3600,
+        1000000
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    }
+  ],
+  "echidna": {
+    "project": "Drips",
+    "property_name": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+    "test_mode": "assertion",
+    "command": [
+      "/usr/local/bin/echidna",
+      "sol/真实项目/DripsSCFuzzBench",
+      "--contract",
+      "Echidna",
+      "--crytic-args",
+      "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/自主种子质量实验/Drips-无提示试跑/Drips-campaign-1-crytic-compile.json",
+      "--config",
+      "/home/skk/smart-contract-fuzz-v2/deepseek/结果/自主种子质量实验/Drips-无提示试跑/Drips-campaign-1-echidna.yaml",
+      "--test-limit",
+      "1",
+      "--seq-len",
+      "8",
+      "--shrink-limit",
+      "1",
+      "--seed",
+      "20261114",
+      "--workers",
+      "1",
+      "--format",
+      "text",
+      "--deployer",
+      "0x0000000000000000000000000000000000030000",
+      "--contract-addr",
+      "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+      "--sender",
+      "0x0000000000000000000000000000000000010000",
+      "--sender",
+      "0x0000000000000000000000000000000000020000",
+      "--sender",
+      "0x0000000000000000000000000000000000030000",
+      "--sender",
+      "0x0000000000000000000000000000000000040000",
+      "--sender",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.554,
+    "loaded_seed_count": 1,
+    "loaded_seed_evidence": true,
+    "replayed_sequence_count": 1,
+    "replay_evidence": true,
+    "replayed_lines": [
+      "[2026-11-14 15:30:47.45] [Worker 0] Sequence replayed from corpus file seed-df95d2fc435d4db6adb78714707307bf.txt (1/1)"
+    ],
+    "mutation_evidence": true,
+    "unique_instructions": 18577,
+    "target_property_results": [],
+    "property_failures": [],
+    "initial_state_failures": [],
+    "output": "[2026-11-14 15:30:44.36] Compiling `sol/真实项目/DripsSCFuzzBench`... Done! (2.179131498s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/DripsSCFuzzBench/src/echidna/Echidna.sol:Echidna\n[2026-11-14 15:30:46.98] Running slither on `sol/真实项目/DripsSCFuzzBench`... WARNING: Running slither failed. Echidna will continue, however fuzzing will likely be less effective.\n\nDone! (0.351296188s)\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/自主种子质量实验/Drips-无提示试跑/campaign-1/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/自主种子质量实验/Drips-无提示试跑/campaign-1/coverage\n[2026-11-14 15:30:47.45] [Worker 0] New coverage: 18577 instr, 4 contracts, 1 seqs in corpus\n[2026-11-14 15:30:47.45] [Worker 0] Sequence replayed from corpus file seed-df95d2fc435d4db6adb78714707307bf.txt (1/1)\n[2026-11-14 15:30:47.45] [Worker 0] Test limit reached. Stopping.\n[2026-11-14 15:30:47.45] [status] tests: 0/67, fuzzing: 4/1, values: [], cov: 18577, corpus: 1, gas/s: 0\ntestBalanceAtInFuture(uint8,uint8,uint160): passing\naddSplitsReceiver(uint8,uint8,uint32): passing\ngiveClampedAmount(uint8,uint8,uint128): passing\ntestSqueeze(uint8,uint8): passing\nsqueezeAllAndReceiveAndSplitAndCollectToSelf(uint8): passing\ntestCollectShouldNotRevert(uint8,uint8): passing\naddStream(uint8,uint8,uint160,uint32,uint32,int128): passing\ntestSplittableAfterSplit(uint8): passing\nsetStreams(uint8,uint8,uint160,uint32,uint32,int128): passing\ntestReceiveStreamsViewConsistency(uint8,uint32): passing\ntestSqueezableVsReceived(uint8): passing\nsplit(uint8): passing\ninvariantSumAmtDeltaIsZero(uint8): passing\nclampSplitWeight(uint32,uint32): passing\ninvariantWithdrawAllTokensShouldNotRevert(): passing\nsetMaxEndHints(uint32,uint32): passing\naddSplitsReceiverWithClamping(uint8,uint8,uint32): passing\ntestSplitShouldNotRevert(uint8): passing\ntestSqueezeWithFullyHashedHistory(uint8,uint8): passing\nreceiveStreamsAllCycles(uint8): passing\nsetStreamsWithClamping(uint8,uint8,uint160,uint32,uint32,int128): passing\nsetStreamBalance(uint8,int128): passing\ntestSplitViewVsActual(uint8): passing\ntestCollectableAfterSplit(uint8): passing\nsetSplitsWithClamping(uint8,uint8,uint32): passing\ntestReceiveStreamsViewVsActual(uint8,uint32): passing\ntestRemoveStreamShouldNotRevert(uint8,uint256): passing\ntestAddSplitsShouldNotRevert(uint8,uint8,uint32): passing\ntestSqueezableAmountCantBeWithdrawn(uint8,uint8): passing\ncollect(uint8,uint8): passing\ncollectToSelf(uint8): passing\ninvariantAccountingVsTokenBalance(): passing\ninvariantAmtPerSecVsMinAmtPerSec(uint8,uint256): passing\ntestSqueezeWithDefaultHistoryShouldNotRevert(uint8,uint8): passing\ntestGiveShouldNotRevert(uint8,uint8,uint128): passing\nsetStreamBalanceWithdrawAll(uint8): passing\ntestSetStreamsShouldNotRevert(uint8,uint8,uint160,uint32,uint32,int128): passing\nsqueezeAllSenders(uint8): passing\ntestSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128): passing\ntestSqueezeTwice(uint8,uint8,uint256,bytes32): passing\ntestSqueezeViewVsActual(uint8,uint8): passing\ntestReceiveStreamsShouldNotRevert(uint8): passing\nreceiveStreamsSplitAndCollectToSelf(uint8): passing\nsetSplits(uint8,uint8,uint32): passing\ntestSetStreamBalanceShouldNotRevert(uint8,int128): passing\ntestSqueezeWithFuzzedHistoryShouldNotRevert(uint8,uint8,uint256,bytes32): passing\ninvariantWithdrawAllTokens(): passing\nsqueezeToSelf(uint8): passing\naddStreamWithClamping(uint8,uint8,uint160,uint32,uint32,int128): passing\naddStreamImmediatelySqueezable(uint8,uint8,uint160): passing\ngive(uint8,uint8,uint128): passing\nsqueezeWithDefaultHistory(uint8,uint8): passing\ntestSetSplitsShouldNotRevert(uint8,uint8,uint32): passing\nsplitAndCollectToSelf(uint8): passing\ntestCollect(uint8,uint8): passing\nremoveStream(uint8,uint256): passing\ntestAddStreamShouldNotRevert(uint8,uint8,uint160,uint32,uint32,int128): passing\ntestReceiveStreams(uint8,uint32): passing\nremoveAllSplits(uint8): passing\nsqueezeWithFuzzedHistory(uint8,uint8,uint256,bytes32): passing\ninvariantWithdrawShouldAlwaysFail(uint256): passing\nsetStreamBalanceWithClamping(uint8,int128): passing\ntestReceiversReceivedSplit(uint8): passing\ntestSetStreamBalance(uint8,int128): passing\ntestSetStreamBalanceWithdrawAllShouldNotRevert(uint8): passing\nreceiveStreams(uint8,uint32): passing\nAssertionFailed(..): passing\n\nUnique instructions: 18577\nUnique codehashes: 4\nCorpus size: 1\nSeed: 20261114\nTotal calls: 4\n\n[2026-11-14 15:30:47.45] Saving test reproducers... Done! (0.000001364s)\n[2026-11-14 15:30:47.45] Saving corpus... Done! (0.000049178s)\n[2026-11-14 15:30:47.45] Saving foundry reproducers... Done! (0.000251294s)\n[2026-11-14 15:30:47.45] Saving coverage... Done! (1.211864819s)\n"
+  },
+  "validation_limitations": {
+    "anvil_replay": "deployment failed in current Anvil path; Echidna native corpus replay used",
+    "echidna_seed_loaded": true,
+    "echidna_seed_replayed": true
+  }
+}

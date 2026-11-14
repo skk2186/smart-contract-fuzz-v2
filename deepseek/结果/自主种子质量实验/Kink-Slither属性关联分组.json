@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "random_seed": 20261114,
+  "projects": {
+    "Kink": {
+      "input_file": "/home/skk/smart-contract-fuzz-v2/deepseek/结果/自主种子质量实验/Kink-Slither属性.json",
+      "input_properties": 4,
+      "group_count": 3,
+      "grouped_properties": 2,
+      "groups": [
+        {
+          "members": [
+            {
+              "property_id": "28d4a5495cb06ab375a1",
+              "property": "KinkPoolEchidna.echidna_token1_conserved()",
+              "analysis_contract": "KinkPoolEchidna",
+              "analysis_contract_source": "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#10-127"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "external:KinkPoolEchidna:KinkPoolEchidna.token1@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#13:ERC20._balances"
+            ],
+            "actions": [],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "5dacaaaba0e37d49782b",
+              "property": "KinkPoolEchidna.echidna_token0_accounting()",
+              "analysis_contract": "KinkPoolEchidna",
+              "analysis_contract_source": "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#10-127"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "external:KinkPoolEchidna:KinkPoolEchidna.token0@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#12:ERC20._balances"
+            ],
+            "actions": [],
+            "setup": []
+          },
+          "pair_evidence": []
+        },
+        {
+          "members": [
+            {
+              "property_id": "5eac6f37a492eb4d843a",
+              "property": "KinkPoolEchidna.echidna_reserves_match_balances()",
+              "analysis_contract": "KinkPoolEchidna",
+              "analysis_contract_source": "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#10-127"
+            },
+            {
+              "property_id": "f79b3b000df5bc77ba4a",
+              "property": "KinkPoolEchidna.echidna_invariant_matches_supply()",
+              "analysis_contract": "KinkPoolEchidna",
+              "analysis_contract_source": "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#10-127"
+            }
+          ],
+          "shared_core": {
+            "states": [
+              "external:KinkPoolEchidna:KinkPoolEchidna.pool@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#11:KinkPool.adminFee0",
+              "external:KinkPoolEchidna:KinkPoolEchidna.pool@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#11:KinkPool.adminFee1",
+              "external:KinkPoolEchidna:KinkPoolEchidna.token0@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#12:ERC20._balances",
+              "external:KinkPoolEchidna:KinkPoolEchidna.token1@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#13:ERC20._balances"
+            ],
+            "actions": [
+              "KinkPoolEchidna.adversarialSwap(uint256,uint256)"
+            ],
+            "setup": []
+          },
+          "pair_evidence": [
+            {
+              "left": "5eac6f37a492eb4d843a",
+              "right": "f79b3b000df5bc77ba4a",
+              "states": [
+                "external:KinkPoolEchidna:KinkPoolEchidna.pool@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#11:KinkPool.adminFee0",
+                "external:KinkPoolEchidna:KinkPoolEchidna.pool@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#11:KinkPool.adminFee1",
+                "external:KinkPoolEchidna:KinkPoolEchidna.token0@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#12:ERC20._balances",
+                "external:KinkPoolEchidna:KinkPoolEchidna.token1@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#13:ERC20._balances"
+              ],
+              "actions": [
+                "KinkPoolEchidna.adversarialSwap(uint256,uint256)"
+              ],
+              "setup": [],
+              "supported": true,
+              "score": 9
+            }
+          ]
+        }
+      ],
+      "graph": [
+        {
+          "left": "5eac6f37a492eb4d843a",
+          "right": "f79b3b000df5bc77ba4a",
+          "states": [
+            "external:KinkPoolEchidna:KinkPoolEchidna.pool@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#11:KinkPool.adminFee0",
+            "external:KinkPoolEchidna:KinkPoolEchidna.pool@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#11:KinkPool.adminFee1",
+            "external:KinkPoolEchidna:KinkPoolEchidna.token0@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#12:ERC20._balances",
+            "external:KinkPoolEchidna:KinkPoolEchidna.token1@sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#13:ERC20._balances"
+          ],
+          "actions": [
+            "KinkPoolEchidna.adversarialSwap(uint256,uint256)"
+          ],
+          "setup": [],
+          "supported": true,
+          "score": 9
+        }
+      ],
+      "evaluation": {
+        "independent": {
+          "within_pairs": 0,
+          "supported_pairs": 0,
+          "pairs_with_shared_setup": 0,
+          "shared_setup_pair_total": 0,
+          "reused_state_features": 0,
+          "reused_candidate_features": 0
+        },
+        "grouped": {
+          "within_pairs": 1,
+          "supported_pairs": 1,
+          "pairs_with_shared_setup": 0,
+          "shared_setup_pair_total": 0,
+          "reused_state_features": 4,
+          "reused_candidate_features": 1
+        },
+        "matched_random": {
+          "trials": 300,
+          "mean": {
+            "within_pairs": 1.0,
+            "supported_pairs": 0.14666666666666667,
+            "pairs_with_shared_setup": 0.0,
+            "shared_setup_pair_total": 0.0,
+            "reused_state_features": 1.2533333333333334,
+            "reused_candidate_features": 0.14666666666666667
+          },
+          "max": {
+            "within_pairs": 1,
+            "supported_pairs": 1,
+            "pairs_with_shared_setup": 0,
+            "shared_setup_pair_total": 0,
+            "reused_state_features": 4,
+            "reused_candidate_features": 1
+          }
+        }
+      },
+      "method": "同一分析合约内：共享可写状态和有写入证据的候选函数，或共享至少两个可写状态；完全连接合并，且全组至少共享一个状态；可能实例别名只保留在原报告，不作为分组证据。前置操作仅用于独立评价。"
+    }
+  }
+}
