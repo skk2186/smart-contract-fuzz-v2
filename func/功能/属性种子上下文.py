@@ -197,6 +197,44 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
             "effect_evidence": evidence,
         })
 
+    slither_action_count = len(actions)
+    fallback_action_count = 0
+    action_inventory_source = "slither_dependency_candidates"
+    if not any(action.get("seed_compatible") for action in actions):
+        # Keep the property in the Agent pipeline when Slither cannot link a writer
+        # to the observed state. The fallback is generic: all serializable, mutating
+        # Harness ABI entries, with source excerpts for Agent A to inspect. It does
+        # not prescribe a path, order, sender, or argument value.
+        property_tail = prop.get("property", "").rsplit(".", 1)[-1]
+        fallback_actions = []
+        for signature, abi_entry in abi_functions.items():
+            if signature == property_tail or abi_entry.get("stateMutability") in {"view", "pure"}:
+                continue
+            supported, unsupported_reason = _seed_abi_supported(abi_entry)
+            if not supported:
+                continue
+            full_signature = f"{PROJECTS[project]['contract']}.{signature}"
+            fallback_actions.append({
+                "function": full_signature,
+                "abi_signature": signature,
+                "abi_inputs": [{"name": item.get("name", ""), "type": item["type"]}
+                               for item in abi_entry.get("inputs", [])],
+                "state_mutability": abi_entry.get("stateMutability"),
+                "payable": abi_entry.get("stateMutability") == "payable",
+                "matched_states": [],
+                "environment_reads": [],
+                "static_status": "abi_fallback_no_slither_writer_match",
+                "seed_compatible": True,
+                "seed_limitation": "No Slither write mapping; inspect source.",
+                "source_excerpt": _function_excerpt(project, full_signature, limit=500),
+                "effect_evidence": [],
+                "action_source": "generic_abi_fallback",
+            })
+        if fallback_actions:
+            actions = fallback_actions
+            fallback_action_count = len(fallback_actions)
+            action_inventory_source = "generic_abi_fallback_slither_relation_unresolved"
+
     property_source = prop.get("source", "")
     property_signature = prop.get("property", "")
     property_name = property_signature.rsplit(".", 1)[-1].split("(", 1)[0]
@@ -240,6 +278,9 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
         "environment_reads": prop.get("environment_reads", []),
         "read_sites": prop.get("read_sites", []),
         "candidate_actions": actions,
+        "action_inventory_source": action_inventory_source,
+        "slither_action_count": slither_action_count,
+        "abi_fallback_action_count": fallback_action_count,
         "prerequisite_state_closure": prop.get("prerequisite_state_closure", []),
         "unknowns": prop.get("unknowns", []),
         "unresolved_effect_actions": prop.get("unresolved_effect_actions", []),
@@ -272,14 +313,29 @@ def find_property(project: str, contains: str) -> str:
     return found[0]["property_id"]
 
 
+def compact_effect_evidence(effects: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    """保留每个效果和所有不同守卫，移除跨状态效果重复记录的相同守卫。"""
+    compact_effects = []
+    unique_guards: dict[str, dict[str, Any]] = {}
+    for effect in effects:
+        compact_effects.append({field: value for field, value in effect.items()
+                                if field != "guards"})
+        for guard in effect.get("guards", []):
+            guard_key = json.dumps(guard, ensure_ascii=False, sort_keys=True,
+                                   separators=(",", ":"))
+            unique_guards.setdefault(guard_key, guard)
+    return {"effect_evidence": compact_effects,
+            "action_guard_evidence": list(unique_guards.values())}
+
+
 def compact_for_agent(context: dict[str, Any]) -> dict[str, Any]:
-    """在属性组内只保留一份相同 ABI 与函数源码，按属性保留关系证据。"""
+    """在请求内对重复 ABI 与函数源码做上下文去重，不改变属性或交易序列。"""
     shared: dict[str, dict[str, Any]] = {}
     compact_properties = []
     common_fields = ("abi_inputs", "state_mutability", "payable", "seed_compatible",
                      "seed_limitation", "source_excerpt")
     property_fields = ("function", "abi_signature", "matched_states", "environment_reads",
-                       "static_status", "seed_compatible", "seed_limitation", "effect_evidence")
+                       "static_status", "seed_compatible", "effect_evidence")
     for prop in context["properties"]:
         actions = []
         for action in prop.get("candidate_actions", []):
@@ -289,6 +345,7 @@ def compact_for_agent(context: dict[str, Any]) -> dict[str, Any]:
                 shared[key]["function"] = action["function"]
             item = {field: action.get(field) for field in property_fields}
             item["source_context_id"] = key
+            item.update(compact_effect_evidence(action.get("effect_evidence", [])))
             actions.append(item)
         compact_properties.append({**{key: value for key, value in prop.items()
                                     if key != "candidate_actions"},

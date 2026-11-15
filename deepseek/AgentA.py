@@ -262,7 +262,8 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
         "rules": [
             "每条输出必须绑定自己的 property_id，不能把组内属性合并成一个谓词。",
             "只使用 candidate_actions 中 seed_compatible=true 的 abi_signature。",
-            "结合 Slither 的 prerequisite_state_closure、read_states、property_write_states、matched_states、effect_evidence、函数源码与守卫推断顺序；状态生产操作应先于依赖它的消费操作，不要把静态候选当成已证明可行。",
+            "结合 Slither 的 prerequisite_state_closure、read_states、property_write_states、matched_states、effect_evidence、action_guard_evidence、函数源码与守卫推断顺序；状态生产操作应先于依赖它的消费操作，不要把静态候选当成已证明可行。",
+            "若 action_inventory_source 标记为 generic_abi_fallback_slither_relation_unresolved，candidate_actions 只是 Harness ABI 的通用状态变更入口；必须结合 read_states 和函数源码自行判断相关性，不得声称 Slither 已证明该入口写入目标状态。",
             "每条属性至多给出指定数量的不同序列；避免仅重排同一交易的重复候选。",
             ("若多个属性确实需要同一准备前缀，请在 shared_prefixes 中显式给出，并确保对应候选序列以该前缀开头。"
              if use_shared_prefixes else "shared_prefixes 必须为空；不要为候选序列设计跨属性共享前缀。"),

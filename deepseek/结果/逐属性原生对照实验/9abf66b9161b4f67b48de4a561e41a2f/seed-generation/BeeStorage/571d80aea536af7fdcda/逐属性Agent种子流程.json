@@ -1,0 +1,280 @@
+{
+  "schema_version": 2,
+  "experiment_id": "30909a01318a434f9eebf8abfbb1b5b7",
+  "project": "BeeStorage",
+  "property_ids": [
+    "571d80aea536af7fdcda"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "571d80aea536af7fdcda",
+      "property": "EchidnaSystemHarness.echidna_oracle_price_matches_stamp_lastPrice_when_updated()",
+      "dependency_status": "incomplete",
+      "seed_compatible_action_count": 1,
+      "slither_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "candidate_results": [
+        {
+          "candidate_id": "571d80aea536-01-seq_1",
+          "plan": [
+            {
+              "function": "act_admin_setOraclePrice(uint32)",
+              "rationale": "唯一 seed_compatible 入口；源码显示其调用 oracle.setPrice(p)，Slither 证据表明 PriceOracle.setPrice 写入 currentPriceUpScaled，从而更新 oracle.currentPrice()；同时注释说明该调用应经 setPrice 联动更新 PostageStamp.lastPrice，使属性中 lp 非零后可与 oracle.currentPrice() 比较。该路径的跨合约联动与调用成功性未由 Slither 闭合，需在部署环境中验证。"
+            }
+          ],
+          "status": "executable",
+          "seed_class": "evm_valid",
+          "seed_id": "seed-ac23f8d95ca84314ab6f831bb79acfe4",
+          "corpus_file": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/BeeStorage/571d80aea536af7fdcda/种子包/BeeStorage/571d80aea536af7fdcda/coverage/seed-ac23f8d95ca84314ab6f831bb79acfe4.txt",
+          "concrete_seed": {
+            "property_id": "571d80aea536af7fdcda",
+            "candidate_id": "571d80aea536-01-seq_1",
+            "transactions": [
+              {
+                "function": "act_admin_setOraclePrice(uint32)",
+                "arguments": [
+                  1
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              }
+            ],
+            "assumptions": [
+              "选择 p=1 作为非零 uint32 价格，使 oracle.setPrice(1) 后 currentPrice() 非零，从而属性中 lp 非零时进入比较分支。",
+              "假设 harness 的 oracle 持有 PRICE_ORACLE_ROLE 且 PostageStamp 的 setPrice 调用成功，使 stamp.lastPrice 被更新为与 oracle.currentPrice() 一致的值；该跨合约联动未由 Slither 闭合，需回放验证。",
+              "sender 选用 sender_pool 中第一个地址，假设其具备调用 act_admin_setOraclePrice 的权限（源码无显式访问控制）。",
+              "payable=false，故 value_wei 设为 0；无源码证据要求延迟，delay_seconds 与 delay_blocks 均为 0。"
+            ],
+            "data_dependencies": [],
+            "execution_feedback": null
+          },
+          "agent_b": {
+            "logical_calls": 1,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_BeeStorage_571d80aea536-01-seq_1_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 1754,
+                  "prompt_cache_hit_tokens": 256,
+                  "prompt_cache_miss_tokens": 1498,
+                  "completion_tokens": 268,
+                  "total_tokens": 2022,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000386268",
+                    "peak": "0.000772536"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 2.146,
+                "attempt": 1,
+                "prompt_utf8_bytes": 6543,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "BeeStorage",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "571d80aea536-01-seq_1",
+              "replay_status": "executable",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_oracle_price_matches_stamp_lastPrice_when_updated()": true,
+                "echidna_stamp_internal_pot_not_above_contract_balance()": true,
+                "echidna_tracked_redist_commit_reveal_consistent()": true,
+                "echidna_unauthorized_oracle_adjust_never_succeeds()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "act_admin_setOraclePrice(uint32)",
+                  "arguments": [
+                    1
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "273ff851c37b03fba4b211454475bac5e5a5ccb1d3374db8231453c3c0b23e53",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 47330,
+                  "observed_view_state_changed": false,
+                  "observed_view_count": 4,
+                  "tracked_contract_count": 1,
+                  "tracked_contract_types": [
+                    "Harness"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "PriceOracle.currentPriceUpScaled"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "PriceOracle.currentPriceUpScaled"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "1faf8784530a4b7cea7b54a0941cfd87a4ba7f60dc36b925118b729b1e1494cf",
+                  "state_fingerprint_after": "1faf8784530a4b7cea7b54a0941cfd87a4ba7f60dc36b925118b729b1e1494cf",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_oracle_price_matches_stamp_lastPrice_when_updated()": true,
+                    "echidna_stamp_internal_pot_not_above_contract_balance()": true,
+                    "echidna_tracked_redist_commit_reveal_consistent()": true,
+                    "echidna_unauthorized_oracle_adjust_never_succeeds()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 0.205,
+              "elapsed_from_run_start_seconds": 5.061
+            }
+          ],
+          "error": null,
+          "elapsed_seconds": 2.382
+        }
+      ],
+      "status": "seed_generated",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_BeeStorage_571d80aea536af7fdcda_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 3163,
+              "prompt_cache_hit_tokens": 384,
+              "prompt_cache_miss_tokens": 2779,
+              "completion_tokens": 286,
+              "total_tokens": 3449,
+              "estimated_cost_usd": {
+                "offpeak": "0.000589602",
+                "peak": "0.001179204"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.617,
+            "attempt": 1,
+            "prompt_utf8_bytes": 11164,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "571d80aea536af7fdcda",
+                "candidate_id": "seq_1",
+                "steps": [
+                  {
+                    "function": "act_admin_setOraclePrice(uint32)",
+                    "rationale": "唯一 seed_compatible 入口；源码显示其调用 oracle.setPrice(p)，Slither 证据表明 PriceOracle.setPrice 写入 currentPriceUpScaled，从而更新 oracle.currentPrice()；同时注释说明该调用应经 setPrice 联动更新 PostageStamp.lastPrice，使属性中 lp 非零后可与 oracle.currentPrice() 比较。该路径的跨合约联动与调用成功性未由 Slither 闭合，需在部署环境中验证。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "act_admin_setOraclePrice 的外部调用 oracle.setPrice 成功执行，且 oracle 持有 PRICE_ORACLE_ROLE 使 PostageStamp.lastPrice 被同步更新（属性注释所述集成前提）。",
+              "Slither 未解析 PostageStamp.lastPrice 的写入入口；本序列依赖源码注释与跨合约调用语义，而非已证明的写入关系。",
+              "属性在 lp==0 时返回 true，因此该序列旨在先产生非零 lastPrice 以进入比较分支；若联动失败，属性可能因 lp 仍为 0 而平凡通过，不能据此证明一致性。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 1,
+      "elapsed_seconds": 5.0
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 60,
+    "token_budget": 30000,
+    "wall_budget_seconds": 60
+  },
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 0,
+    "unmetered_attempts": 0,
+    "prompt_tokens": 4917,
+    "completion_tokens": 554,
+    "total_tokens": 5471,
+    "estimated_cost_usd_offpeak": "0.000975870",
+    "estimated_cost_usd_peak": "0.001951740",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/BeeStorage/571d80aea536af7fdcda/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 5471,
+  "total_elapsed_seconds": 5.094,
+  "anvil_start_error": null
+}

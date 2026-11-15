@@ -202,6 +202,10 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                 "property_id": property_id, "property": prop.get("property"),
                 "dependency_status": prop.get("dependency_status"),
                 "seed_compatible_action_count": len(actions),
+                "slither_action_count": prop.get("slither_action_count", len(actions)),
+                "abi_fallback_action_count": prop.get("abi_fallback_action_count", 0),
+                "action_inventory_source": prop.get("action_inventory_source",
+                                                     "slither_dependency_candidates"),
                 "candidate_results": [], "status": "pending",
             }
             if not prop.get("property_predicate"):
@@ -209,12 +213,6 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                                      "error": "Slither 报告没有可定位的属性谓词源码"})
                 property_rows.append(property_row)
                 continue
-            if not actions:
-                property_row.update({"status": "no_seed_compatible_action",
-                                     "error": "Slither 没有匹配到可序列化的状态入口"})
-                property_rows.append(property_row)
-                continue
-
             candidates, a_events, planning = _agent_a_for_property(
                 context, property_id, max_candidates=max_candidates,
                 max_steps=max_steps, planning_repairs=planning_repairs,

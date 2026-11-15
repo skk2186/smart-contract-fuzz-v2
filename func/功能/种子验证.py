@@ -583,6 +583,8 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         partial = exc.stdout or ""
         full_output = partial.decode("utf-8", errors="replace") if isinstance(partial, bytes) else partial
     elapsed = round(time.monotonic() - started, 3)
+    full_log_path = (corpus_root / "echidna.log").resolve()
+    full_log_path.write_text(full_output, encoding="utf-8")
     output = full_output[-18000:]
     result_prefix = property_name if property_name.endswith("_") else property_name + ":"
     property_results = [line.strip() for line in full_output.splitlines()
@@ -615,6 +617,7 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
             "elapsed_seconds": elapsed, **echidna_corpus_evidence(full_output),
             "initial_corpus_file_count": len(initial_corpus_files),
             "initial_corpus_files": initial_corpus_files,
+             "full_log_path": str(full_log_path.relative_to(ROOT)),
             "stop_on_fail": stop_on_fail,
             "target_property_results": property_results,
             "property_failures": property_failures,

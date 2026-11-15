@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "experiment_id": "57a191c284744bf39f33d412f9d976fc",
+  "project": "BeeStorage",
+  "property_ids": [
+    "a11cc51249256da90a47"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "a11cc51249256da90a47",
+      "property": "EchidnaSystemHarness.echidna_tracked_redist_commit_reveal_consistent()",
+      "dependency_status": "incomplete",
+      "seed_compatible_action_count": 2,
+      "slither_action_count": 2,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "candidate_results": [
+        {
+          "candidate_id": "a11cc5124925-01-seq_commit_then_reveal",
+          "plan": [
+            {
+              "function": "act_redist_happyCommit(uint8,bytes32,bytes32)",
+              "rationale": "在 commit 阶段为某个 actor 建立 trackedHasCommit/trackedRound/trackedObfuscated/trackedDepth/trackedHash，并置 trackedHasReveal=false；这是属性中 commit 存在性与 reveal 匹配检查的状态生产前置。"
+            },
+            {
+              "function": "act_redist_happyReveal(uint8)",
+              "rationale": "在 reveal 阶段对同一 actor 消费已建立的 commit 状态，写入 trackedHasReveal=true；随后属性会校验 trackedObfuscated 对应 commit 存在且 trackedDepth/trackedHash 与 reveal 匹配。"
+            }
+          ],
+          "status": "agent_b_failed",
+          "seed_class": "none",
+          "seed_id": null,
+          "corpus_file": null,
+          "concrete_seed": null,
+          "agent_b": {
+            "logical_calls": 1,
+            "failed_logical_calls": 1,
+            "events": [
+              {
+                "tag": "AgentB_BeeStorage_a11cc5124925-01-seq_commit_then_reveal_try1",
+                "ok": false,
+                "error_kind": "token_budget_exceeded",
+                "error": "token_budget_exceeded: 本次请求最坏上界 25717 将超过剩余 Token 预算 22910",
+                "usage": null,
+                "elapsed_seconds": 0,
+                "attempt": 1,
+                "prompt_utf8_bytes": null,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [],
+          "error": "token_budget_exceeded: 本次请求最坏上界 25717 将超过剩余 Token 预算 22910",
+          "elapsed_seconds": 0.001
+        }
+      ],
+      "status": "no_valid_evm_seed",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_BeeStorage_a11cc51249256da90a47_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 6702,
+              "prompt_cache_hit_tokens": 384,
+              "prompt_cache_miss_tokens": 6318,
+              "completion_tokens": 388,
+              "total_tokens": 7090,
+              "estimated_cost_usd": {
+                "offpeak": "0.001181652",
+                "peak": "0.002363304"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.891,
+            "attempt": 1,
+            "prompt_utf8_bytes": 22582,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "a11cc51249256da90a47",
+                "candidate_id": "seq_commit_then_reveal",
+                "steps": [
+                  {
+                    "function": "act_redist_happyCommit(uint8,bytes32,bytes32)",
+                    "rationale": "在 commit 阶段为某个 actor 建立 trackedHasCommit/trackedRound/trackedObfuscated/trackedDepth/trackedHash，并置 trackedHasReveal=false；这是属性中 commit 存在性与 reveal 匹配检查的状态生产前置。"
+                  },
+                  {
+                    "function": "act_redist_happyReveal(uint8)",
+                    "rationale": "在 reveal 阶段对同一 actor 消费已建立的 commit 状态，写入 trackedHasReveal=true；随后属性会校验 trackedObfuscated 对应 commit 存在且 trackedDepth/trackedHash 与 reveal 匹配。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "act_redist_happyCommit 的守卫要求 redist 未暂停、处于 commit 阶段、block.number 不命中 152 取模限制，且 actor 的 lastUpdatedBlockNumberOfAddress 非零并早于 block.number-2*152；这些条件需由部署/种子环境满足，静态证据未证明可行。",
+              "act_redist_happyReveal 要求 redist 处于 reveal 阶段，且 currentRound 与 currentCommitRound 均等于该 actor 的 trackedRound；因此 commit 与 reveal 必须发生在同一轮次内，序列顺序为先 commit 后 reveal。",
+              "属性自身读取 redist.currentCommitRound() 与 currentCommits/currentReveals 外部状态；其返回值取决于实际部署与调用环境，静态证据未闭合。",
+              "未对 actorId、hash、revealNonce 做参数具体化；仅规划函数调用顺序。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 0,
+      "elapsed_seconds": 2.893
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 60,
+    "token_budget": 30000,
+    "wall_budget_seconds": 60
+  },
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 1,
+    "unmetered_attempts": 1,
+    "prompt_tokens": 6702,
+    "completion_tokens": 388,
+    "total_tokens": 7090,
+    "estimated_cost_usd_offpeak": "0.001181652",
+    "estimated_cost_usd_peak": "0.002363304",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/逐属性原生对照实验/b0a5a6fc96aa412baa1e57a105367283/seed-generation/BeeStorage/a11cc51249256da90a47/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 7090,
+  "total_elapsed_seconds": 2.973,
+  "anvil_start_error": null
+}

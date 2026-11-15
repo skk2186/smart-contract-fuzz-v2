@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "experiment_id": "595a0cec4c2940599338b814d2e3312c",
+  "started_at_utc": "2026-11-14T15:36:47.559875+00:00",
+  "sample_set_fixed_before_agent_calls": [
+    {
+      "project": "BeeStorage",
+      "property_id": "a11cc51249256da90a47"
+    }
+  ],
+  "experimental_conditions": {
+    "baseline": "Native Echidna 从空 coverage 目录启动，不注入外部语料",
+    "v2": "逐属性 Agent A/B；仅 Anvil 成功的 EVM 有效种子进入主比较语料",
+    "echidna_parameters": {
+      "workers": 1,
+      "seq_len": 8,
+      "shrink_limit": 1,
+      "disable_slither": true
+    },
+    "same_test_budget": {
+      "test_limit": 80,
+      "stop_on_fail": false
+    },
+    "same_end_to_end_time": {
+      "seconds_per_property": 60,
+      "test_limit": 10000000,
+      "stop_on_fail": true,
+      "v2_echidna_time_is_remaining_after_seed_preparation": true
+    },
+    "random_seed": 20261127,
+    "slither_reports_precomputed": true,
+    "excluded_from_end_to_end_time": [
+      "Slither 首次编译/静态分析，使用仓库既有报告"
+    ],
+    "diagnostic_corpus_excluded_from_v2_comparison": true
+  },
+  "properties": [
+    {
+      "project": "BeeStorage",
+      "property_id": "a11cc51249256da90a47",
+      "property": "EchidnaSystemHarness.echidna_tracked_redist_commit_reveal_consistent()",
+      "property_kind": "echidna_property",
+      "dependency_status": "incomplete",
+      "seed_generation": {
+        "property_id": "a11cc51249256da90a47",
+        "property": "EchidnaSystemHarness.echidna_tracked_redist_commit_reveal_consistent()",
+        "dependency_status": "incomplete",
+        "seed_compatible_action_count": 2,
+        "slither_action_count": 2,
+        "abi_fallback_action_count": 0,
+        "action_inventory_source": "slither_dependency_candidates",
+        "candidate_results": [
+          {
+            "candidate_id": "a11cc5124925-01-seq_commit_then_reveal",
+            "plan": [
+              {
+                "function": "act_redist_happyCommit(uint8,bytes32,bytes32)",
+                "rationale": "在 commit 阶段为某个 actor 建立 trackedHasCommit/trackedRound/trackedObfuscated/trackedDepth/trackedHash，并置 trackedHasReveal=false；这是属性中 commit 存在性与 reveal 匹配检查的状态生产前置。"
+              },
+              {
+                "function": "act_redist_happyReveal(uint8)",
+                "rationale": "在 reveal 阶段对同一 actor 消费已建立的 commit 状态，写入 trackedHasReveal=true；随后属性会校验 trackedObfuscated 对应 commit 存在且 trackedDepth/trackedHash 与 reveal 匹配。"
+              }
+            ],
+            "status": "agent_b_failed",
+            "seed_class": "none",
+            "seed_id": null,
+            "corpus_file": null,
+            "concrete_seed": null,
+            "agent_b": {
+              "logical_calls": 1,
+              "failed_logical_calls": 1,
+              "events": [
+                {
+                  "tag": "AgentB_BeeStorage_a11cc5124925-01-seq_commit_then_reveal_try1",
+                  "ok": false,
+                  "error_kind": "token_budget_exceeded",
+                  "error": "token_budget_exceeded: 本次请求最坏上界 25717 将超过剩余 Token 预算 22910",
+                  "usage": null,
+                  "elapsed_seconds": 0,
+                  "attempt": 1,
+                  "prompt_utf8_bytes": null,
+                  "invalid_record_count": null
+                }
+              ]
+            },
+            "replay_attempts": [],
+            "error": "token_budget_exceeded: 本次请求最坏上界 25717 将超过剩余 Token 预算 22910",
+            "elapsed_seconds": 0.001
+          }
+        ],
+        "status": "no_valid_evm_seed",
+        "agent_a": {
+          "logical_calls": 1,
+          "failed_logical_calls": 0,
+          "events": [
+            {
+              "tag": "AgentA_BeeStorage_a11cc51249256da90a47_plan1",
+              "ok": true,
+              "error_kind": null,
+              "error": null,
+              "usage": {
+                "prompt_tokens": 6702,
+                "prompt_cache_hit_tokens": 384,
+                "prompt_cache_miss_tokens": 6318,
+                "completion_tokens": 388,
+                "total_tokens": 7090,
+                "estimated_cost_usd": {
+                  "offpeak": "0.001181652",
+                  "peak": "0.002363304"
+                },
+                "pricing_date": "2026-11-13",
+                "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                "cost_is_estimate": true
+              },
+              "elapsed_seconds": 2.891,
+              "attempt": 1,
+              "prompt_utf8_bytes": 22582,
+              "invalid_record_count": 0
+            }
+          ]
+        },
+        "planning": {
+          "status": "planned",
+          "plans": [
+            {
+              "property_sequences": [
+                {
+                  "property_id": "a11cc51249256da90a47",
+                  "candidate_id": "seq_commit_then_reveal",
+                  "steps": [
+                    {
+                      "function": "act_redist_happyCommit(uint8,bytes32,bytes32)",
+                      "rationale": "在 commit 阶段为某个 actor 建立 trackedHasCommit/trackedRound/trackedObfuscated/trackedDepth/trackedHash，并置 trackedHasReveal=false；这是属性中 commit 存在性与 reveal 匹配检查的状态生产前置。"
+                    },
+                    {
+                      "function": "act_redist_happyReveal(uint8)",
+                      "rationale": "在 reveal 阶段对同一 actor 消费已建立的 commit 状态，写入 trackedHasReveal=true；随后属性会校验 trackedObfuscated 对应 commit 存在且 trackedDepth/trackedHash 与 reveal 匹配。"
+                    }
+                  ]
+                }
+              ],
+              "shared_prefixes": [],
+              "assumptions": [
+                "act_redist_happyCommit 的守卫要求 redist 未暂停、处于 commit 阶段、block.number 不命中 152 取模限制，且 actor 的 lastUpdatedBlockNumberOfAddress 非零并早于 block.number-2*152；这些条件需由部署/种子环境满足，静态证据未证明可行。",
+                "act_redist_happyReveal 要求 redist 处于 reveal 阶段，且 currentRound 与 currentCommitRound 均等于该 actor 的 trackedRound；因此 commit 与 reveal 必须发生在同一轮次内，序列顺序为先 commit 后 reveal。",
+                "属性自身读取 redist.currentCommitRound() 与 currentCommits/currentReveals 外部状态；其返回值取决于实际部署与调用环境，静态证据未闭合。",
+                "未对 actorId、hash、revealNonce 做参数具体化；仅规划函数调用顺序。"
+              ],
+              "shared_prefixes_ignored": true,
+              "applied_shared_prefixes": [],
+              "invalid_records": [],
+              "canonicalized_signatures": [],
+              "recovery_summary": {
+                "valid_candidate_count": 1,
+                "invalid_record_count": 0,
+                "applied_shared_prefix_count": 0
+              }
+            }
+          ]
+        },
+        "valid_evm_seed_count": 0,
+        "elapsed_seconds": 2.893
+      },
+      "seed_generation_success": false,
+      "candidate_plan_success": true,
+      "evm_executable": false,
+      "evm_valid_seed_id": null,
+      "candidate_seed_class": "none",
+      "agent_api_usage": {
+        "request_attempts": 2,
+        "failed_request_attempts": 1,
+        "unmetered_attempts": 1,
+        "prompt_tokens": 6702,
+        "completion_tokens": 388,
+        "total_tokens": 7090,
+        "estimated_cost_usd_offpeak": "0.001181652",
+        "estimated_cost_usd_peak": "0.002363304",
+        "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+        "log_path": "deepseek/结果/逐属性原生对照实验/b0a5a6fc96aa412baa1e57a105367283/seed-generation/BeeStorage/a11cc51249256da90a47/API调用.jsonl"
+      },
+      "seed_preparation_seconds": 2.973,
+      "comparisons": {
+        "same_test_budget": {
+          "paired_property_id": "a11cc51249256da90a47",
+          "same_random_seed": true,
+          "echidna_parameters_match_except_campaign_timeout_and_corpus_path": true,
+          "baseline": {
+            "elapsed_seconds": 2.784,
+            "end_to_end_elapsed_seconds": 2.784,
+            "status": "completed",
+            "exit_code": 0,
+            "timed_out": false,
+            "test_limit": 80,
+            "stop_on_fail": false,
+            "unique_instructions": 24641,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "loaded_seed_count": 0,
+            "replayed_seed_count": 0,
+            "fuzzing_transactions": 83,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 83,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "mutation_evidence": false,
+            "property_discovery": {
+              "property_violation_discovered": false,
+              "discovery_source": "none_observed",
+              "first_discovery_time_seconds": null,
+              "first_discovery_time_is_right_censored": true,
+              "echidna_initial_state_failures": [],
+              "echidna_noninitial_failures": []
+            },
+            "target_property_results": [
+              "echidna_tracked_redist_commit_reveal_consistent: passing"
+            ],
+            "property_failures": [],
+            "initial_state_failures": [],
+            "echidna_log_path": "deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/echidna.log",
+            "campaign_output_excerpt": "[2026-11-14 23:36:47.68] Compiling `sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (1.04378718s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol:EchidnaSystemHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/coverage\n[2026-11-14 23:36:49.35] [Worker 0] New coverage: 14247 instr, 7 contracts, 1 seqs in corpus\n[2026-11-14 23:36:49.35]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/611204738199435551.txt\n[2026-11-14 23:36:49.43] [Worker 0] New coverage: 19419 instr, 7 contracts, 2 seqs in corpus\n[2026-11-14 23:36:49.43]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/376708047906574815.txt\n[2026-11-14 23:36:49.44] [Worker 0] New coverage: 20160 instr, 7 contracts, 3 seqs in corpus\n[2026-11-14 23:36:49.44]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5257047465905216775.txt\n[2026-11-14 23:36:49.44] [Worker 0] New coverage: 23792 instr, 7 contracts, 4 seqs in corpus\n[2026-11-14 23:36:49.44]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/839942679441653088.txt\n[2026-11-14 23:36:49.49] [Worker 0] New coverage: 23955 instr, 7 contracts, 5 seqs in corpus\n[2026-11-14 23:36:49.49]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/502077191860717660.txt\n[2026-11-14 23:36:49.53] [Worker 0] New coverage: 24636 instr, 7 contracts, 6 seqs in corpus\n[2026-11-14 23:36:49.53]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5499894747368019542.txt\n[2026-11-14 23:36:49.70] [Worker 0] New coverage: 24641 instr, 7 contracts, 7 seqs in corpus\n[2026-11-14 23:36:49.70] [Worker 0] Test limit reached. Stopping.\n[2026-11-14 23:36:49.70] [status] tests: 0/1, fuzzing: 83/80, values: [], cov: 24641, corpus: 7, gas/s: 0\nechidna_tracked_redist_commit_reveal_consistent: passing\n\nUnique instructions: 24641\nUnique codehashes: 7\nCorpus size: 7\nSeed: 20261127\nTotal calls: 83\n\n[2026-11-14 23:36:49.70] Saving test reproducers... Done! (0.000000647s)\n[2026-11-14 23:36:49.70] Saving corpus... Done! (0.000288754s)\n[2026-11-14 23:36:49.70] Saving foundry reproducers... Done! (0.000259987s)\n[2026-11-14 23:36:49.70] Saving coverage... Done! (0.668722808s)\n",
+            "external_seed_loaded": false,
+            "native_empty_corpus_verified": true
+          },
+          "v2": {
+            "seed_preparation_seconds": 2.973,
+            "campaign_elapsed_seconds": 2.206,
+            "end_to_end_elapsed_seconds": 5.179,
+            "status": "completed",
+            "exit_code": 0,
+            "timed_out": false,
+            "test_limit": 80,
+            "stop_on_fail": false,
+            "unique_instructions": 24641,
+            "coverage_source": "final_unique_instructions",
+            "fuzzing_transactions": 83,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 83,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "initial_corpus_files": [],
+            "property_discovery": {
+              "property_violation_discovered": false,
+              "discovery_source": "none_observed",
+              "first_discovery_time_seconds": null,
+              "first_discovery_time_is_right_censored": true,
+              "echidna_initial_state_failures": [],
+              "echidna_noninitial_failures": []
+            },
+            "target_property_results": [
+              "echidna_tracked_redist_commit_reveal_consistent: passing"
+            ],
+            "property_failures": [],
+            "initial_state_failures": [],
+            "echidna_log_path": "deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/echidna.log",
+            "campaign_output_excerpt": "[2026-11-14 23:36:50.53] Compiling `sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (1.028615811s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol:EchidnaSystemHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage\n[2026-11-14 23:36:51.88] [Worker 0] New coverage: 14247 instr, 7 contracts, 1 seqs in corpus\n[2026-11-14 23:36:51.88]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/611204738199435551.txt\n[2026-11-14 23:36:51.95] [Worker 0] New coverage: 19419 instr, 7 contracts, 2 seqs in corpus\n[2026-11-14 23:36:51.96]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/376708047906574815.txt\n[2026-11-14 23:36:51.96] [Worker 0] New coverage: 20160 instr, 7 contracts, 3 seqs in corpus\n[2026-11-14 23:36:51.96]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5257047465905216775.txt\n[2026-11-14 23:36:51.97] [Worker 0] New coverage: 23792 instr, 7 contracts, 4 seqs in corpus\n[2026-11-14 23:36:51.97]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/839942679441653088.txt\n[2026-11-14 23:36:52.02] [Worker 0] New coverage: 23955 instr, 7 contracts, 5 seqs in corpus\n[2026-11-14 23:36:52.02]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/502077191860717660.txt\n[2026-11-14 23:36:52.05] [Worker 0] New coverage: 24636 instr, 7 contracts, 6 seqs in corpus\n[2026-11-14 23:36:52.05]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_test_budget/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5499894747368019542.txt\n[2026-11-14 23:36:52.14] [Worker 0] New coverage: 24641 instr, 7 contracts, 7 seqs in corpus\n[2026-11-14 23:36:52.14] [Worker 0] Test limit reached. Stopping.\n[2026-11-14 23:36:52.14] [status] tests: 0/1, fuzzing: 83/80, values: [], cov: 24641, corpus: 7, gas/s: 0\nechidna_tracked_redist_commit_reveal_consistent: passing\n\nUnique instructions: 24641\nUnique codehashes: 7\nCorpus size: 7\nSeed: 20261127\nTotal calls: 83\n\n[2026-11-14 23:36:52.14] Saving test reproducers... Done! (0.000000676s)\n[2026-11-14 23:36:52.14] Saving corpus... Done! (0.000378184s)\n[2026-11-14 23:36:52.14] Saving foundry reproducers... Done! (0.000245209s)\n[2026-11-14 23:36:52.14] Saving coverage... Done! (0.511731441s)\n",
+            "input_seed_id": null,
+            "input_seed_count": 0,
+            "loaded_seed_count": 0,
+            "replayed_seed_count": 0,
+            "specific_input_seed_replay_verified": false,
+            "seed_load_replay_verified": false,
+            "mutation_evidence": false,
+            "seed_generation_status": "no_valid_evm_seed"
+          },
+          "coverage_delta_unique_instructions": 0,
+          "violation_discovery_delta": 0
+        },
+        "same_end_to_end_time": {
+          "paired_property_id": "a11cc51249256da90a47",
+          "same_random_seed": true,
+          "echidna_parameters_match_except_campaign_timeout_and_corpus_path": true,
+          "baseline": {
+            "elapsed_seconds": 60.032,
+            "end_to_end_elapsed_seconds": 60.032,
+            "status": "timeout",
+            "exit_code": null,
+            "timed_out": true,
+            "test_limit": 10000000,
+            "stop_on_fail": true,
+            "unique_instructions": 28711,
+            "coverage_source": "last_status_cov_snapshot",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "loaded_seed_count": 0,
+            "replayed_seed_count": 0,
+            "fuzzing_transactions": 12790,
+            "fuzzing_cases": 10000000,
+            "fuzzing_progress_count": 12790,
+            "fuzzing_progress_limit": 10000000,
+            "worker_crashes": [],
+            "mutation_evidence": false,
+            "property_discovery": {
+              "property_violation_discovered": false,
+              "discovery_source": "none_observed",
+              "first_discovery_time_seconds": null,
+              "first_discovery_time_is_right_censored": true,
+              "echidna_initial_state_failures": [],
+              "echidna_noninitial_failures": []
+            },
+            "target_property_results": [],
+            "property_failures": [],
+            "initial_state_failures": [],
+            "echidna_log_path": "deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/echidna.log",
+            "campaign_output_excerpt": "[2026-11-14 23:36:52.82] Compiling `sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (1.005518301s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol:EchidnaSystemHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage\n[2026-11-14 23:36:54.15] [Worker 0] New coverage: 14247 instr, 7 contracts, 1 seqs in corpus\n[2026-11-14 23:36:54.15]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/611204738199435551.txt\n[2026-11-14 23:36:54.23] [Worker 0] New coverage: 19419 instr, 7 contracts, 2 seqs in corpus\n[2026-11-14 23:36:54.23]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/376708047906574815.txt\n[2026-11-14 23:36:54.23] [Worker 0] New coverage: 20160 instr, 7 contracts, 3 seqs in corpus\n[2026-11-14 23:36:54.24]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5257047465905216775.txt\n[2026-11-14 23:36:54.24] [Worker 0] New coverage: 23792 instr, 7 contracts, 4 seqs in corpus\n[2026-11-14 23:36:54.24]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/839942679441653088.txt\n[2026-11-14 23:36:54.29] [Worker 0] New coverage: 23955 instr, 7 contracts, 5 seqs in corpus\n[2026-11-14 23:36:54.29]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/502077191860717660.txt\n[2026-11-14 23:36:54.32] [Worker 0] New coverage: 24636 instr, 7 contracts, 6 seqs in corpus\n[2026-11-14 23:36:54.32]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5499894747368019542.txt\n[2026-11-14 23:36:54.41] [Worker 0] New coverage: 24641 instr, 7 contracts, 7 seqs in corpus\n[2026-11-14 23:36:54.41]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/6500762302414252321.txt\n[2026-11-14 23:36:54.42] [Worker 0] New coverage: 24711 instr, 7 contracts, 8 seqs in corpus\n[2026-11-14 23:36:54.42]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/3009296341796714098.txt\n[2026-11-14 23:36:54.52] [Worker 0] New coverage: 24999 instr, 7 contracts, 9 seqs in corpus\n[2026-11-14 23:36:54.52]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/6562975725859522028.txt\n[2026-11-14 23:36:54.54] [Worker 0] New coverage: 25005 instr, 7 contracts, 10 seqs in corpus\n[2026-11-14 23:36:54.54]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/2319697464387422779.txt\n[2026-11-14 23:36:54.66] [Worker 0] New coverage: 26267 instr, 7 contracts, 11 seqs in corpus\n[2026-11-14 23:36:54.66]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/3022052756643175965.txt\n[2026-11-14 23:36:54.67] [Worker 0] New coverage: 26297 instr, 7 contracts, 12 seqs in corpus\n[2026-11-14 23:36:54.67]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/7826891431010800018.txt\n[2026-11-14 23:36:54.80] [Worker 0] New coverage: 26478 instr, 7 contracts, 13 seqs in corpus\n[2026-11-14 23:36:54.80]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/728510629704731155.txt\n[2026-11-14 23:36:54.83] [Worker 0] New coverage: 26603 instr, 7 contracts, 14 seqs in corpus\n[2026-11-14 23:36:54.83]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/2060804553527453499.txt\n[2026-11-14 23:36:55.05] [Worker 0] New coverage: 27709 instr, 7 contracts, 15 seqs in corpus\n[2026-11-14 23:36:55.05]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5552961051383707573.txt\n[2026-11-14 23:36:55.36] [Worker 0] New coverage: 27723 instr, 7 contracts, 16 seqs in corpus\n[2026-11-14 23:36:55.36]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/6545804635997242538.txt\n[2026-11-14 23:36:55.41] [Worker 0] New coverage: 27798 instr, 7 contracts, 17 seqs in corpus\n[2026-11-14 23:36:55.41]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/8956362924875961693.txt\n[2026-11-14 23:36:56.31] [Worker 0] New coverage: 27948 instr, 7 contracts, 18 seqs in corpus\n[2026-11-14 23:36:56.31]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5538888463396471030.txt\n[2026-11-14 23:36:56.60] [Worker 0] New coverage: 27951 instr, 7 contracts, 19 seqs in corpus\n[2026-11-14 23:36:56.60]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/4555705249723401118.txt\n[2026-11-14 23:36:57.15] [status] tests: 0/1, fuzzing: 694/10000000, values: [], cov: 27951, corpus: 19, gas/s: 78500376\n[2026-11-14 23:36:57.59] [Worker 0] New coverage: 27954 instr, 7 contracts, 20 seqs in corpus\n[2026-11-14 23:36:57.59]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/7240867794058196708.txt\n[2026-11-14 23:36:58.09] [Worker 0] New coverage: 27959 instr, 7 contracts, 21 seqs in corpus\n[2026-11-14 23:36:58.09]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5017694553836484712.txt\n[2026-11-14 23:37:00.15] [status] tests: 0/1, fuzzing: 1370/10000000, values: [], cov: 27959, corpus: 21, gas/s: 84823004\n[2026-11-14 23:37:03.08] [Worker 0] New coverage: 28187 instr, 7 contracts, 22 seqs in corpus\n[2026-11-14 23:37:03.09]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/2424423965536614291.txt\n[2026-11-14 23:37:03.15] [status] tests: 0/1, fuzzing: 1895/10000000, values: [], cov: 28187, corpus: 22, gas/s: 75720454\n[2026-11-14 23:37:06.16] [status] tests: 0/1, fuzzing: 2549/10000000, values: [], cov: 28187, corpus: 22, gas/s: 89447219\n[2026-11-14 23:37:08.27] [Worker 0] New coverage: 28187 instr, 7 contracts, 23 seqs in corpus\n[2026-11-14 23:37:08.27]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5813880299341466949.txt\n[2026-11-14 23:37:09.16] [status] tests: 0/1, fuzzing: 3141/10000000, values: [], cov: 28187, corpus: 23, gas/s: 83762193\n[2026-11-14 23:37:11.80] [Worker 0] New coverage: 28190 instr, 7 contracts, 24 seqs in corpus\n[2026-11-14 23:37:11.80]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/8747842091180637805.txt\n[2026-11-14 23:37:12.16] [status] tests: 0/1, fuzzing: 3690/10000000, values: [], cov: 28190, corpus: 24, gas/s: 82142042\n[2026-11-14 23:37:15.17] [status] tests: 0/1, fuzzing: 4311/10000000, values: [], cov: 28190, corpus: 24, gas/s: 89653423\n[2026-11-14 23:37:18.17] [status] tests: 0/1, fuzzing: 4915/10000000, values: [], cov: 28190, corpus: 24, gas/s: 84195677\n[2026-11-14 23:37:18.84] [Worker 0] New coverage: 28345 instr, 7 contracts, 25 seqs in corpus\n[2026-11-14 23:37:18.85]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/2350206614584177916.txt\n[2026-11-14 23:37:21.17] [status] tests: 0/1, fuzzing: 5634/10000000, values: [], cov: 28345, corpus: 25, gas/s: 93012184\n[2026-11-14 23:37:24.18] [status] tests: 0/1, fuzzing: 6213/10000000, values: [], cov: 28345, corpus: 25, gas/s: 76161964\n[2026-11-14 23:37:24.54] [Worker 0] New coverage: 28470 instr, 7 contracts, 26 seqs in corpus\n[2026-11-14 23:37:24.54]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/2344863688852298465.txt\n[2026-11-14 23:37:27.18] [status] tests: 0/1, fuzzing: 6908/10000000, values: [], cov: 28470, corpus: 26, gas/s: 93026312\n[2026-11-14 23:37:30.19] [status] tests: 0/1, fuzzing: 7572/10000000, values: [], cov: 28470, corpus: 26, gas/s: 91004134\n[2026-11-14 23:37:33.19] [status] tests: 0/1, fuzzing: 8059/10000000, values: [], cov: 28470, corpus: 26, gas/s: 74672981\n[2026-11-14 23:37:36.19] [status] tests: 0/1, fuzzing: 8796/10000000, values: [], cov: 28470, corpus: 26, gas/s: 93168102\n[2026-11-14 23:37:38.20] [Worker 0] New coverage: 28703 instr, 7 contracts, 27 seqs in corpus\n[2026-11-14 23:37:38.20]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/1415013776578520425.txt\n[2026-11-14 23:37:39.20] [status] tests: 0/1, fuzzing: 9391/10000000, values: [], cov: 28703, corpus: 27, gas/s: 93426615\n[2026-11-14 23:37:42.20] [status] tests: 0/1, fuzzing: 10357/10000000, values: [], cov: 28703, corpus: 27, gas/s: 113855457\n[2026-11-14 23:37:42.47] [Worker 0] New coverage: 28706 instr, 7 contracts, 28 seqs in corpus\n[2026-11-14 23:37:42.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/5800128202514782843.txt\n[2026-11-14 23:37:44.08] [Worker 0] New coverage: 28711 instr, 7 contracts, 29 seqs in corpus\n[2026-11-14 23:37:44.08]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/native_echidna/BeeStorage/a11cc51249256da90a47/coverage/7419949952110184357.txt\n[2026-11-14 23:37:45.21] [status] tests: 0/1, fuzzing: 11114/10000000, values: [], cov: 28711, corpus: 29, gas/s: 85371977\n[2026-11-14 23:37:48.21] [status] tests: 0/1, fuzzing: 11976/10000000, values: [], cov: 28711, corpus: 29, gas/s: 92542011\n[2026-11-14 23:37:51.21] [status] tests: 0/1, fuzzing: 12790/10000000, values: [], cov: 28711, corpus: 29, gas/s: 86208982\n",
+            "external_seed_loaded": false,
+            "native_empty_corpus_verified": true
+          },
+          "v2": {
+            "seed_preparation_seconds": 2.973,
+            "campaign_elapsed_seconds": 57.03,
+            "end_to_end_elapsed_seconds": 60.003,
+            "status": "timeout",
+            "exit_code": null,
+            "timed_out": true,
+            "test_limit": 10000000,
+            "stop_on_fail": true,
+            "unique_instructions": 28711,
+            "coverage_source": "last_status_cov_snapshot",
+            "fuzzing_transactions": 12161,
+            "fuzzing_cases": 10000000,
+            "fuzzing_progress_count": 12161,
+            "fuzzing_progress_limit": 10000000,
+            "worker_crashes": [],
+            "initial_corpus_files": [],
+            "property_discovery": {
+              "property_violation_discovered": false,
+              "discovery_source": "none_observed",
+              "first_discovery_time_seconds": null,
+              "first_discovery_time_is_right_censored": true,
+              "echidna_initial_state_failures": [],
+              "echidna_noninitial_failures": []
+            },
+            "target_property_results": [],
+            "property_failures": [],
+            "initial_state_failures": [],
+            "echidna_log_path": "deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/echidna.log",
+            "campaign_output_excerpt": "[2026-11-14 23:37:52.93] Compiling `sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (1.018822726s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol:EchidnaSystemHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage\n[2026-11-14 23:37:54.35] [Worker 0] New coverage: 14247 instr, 7 contracts, 1 seqs in corpus\n[2026-11-14 23:37:54.35]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/611204738199435551.txt\n[2026-11-14 23:37:54.43] [Worker 0] New coverage: 19419 instr, 7 contracts, 2 seqs in corpus\n[2026-11-14 23:37:54.43]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/376708047906574815.txt\n[2026-11-14 23:37:54.44] [Worker 0] New coverage: 20160 instr, 7 contracts, 3 seqs in corpus\n[2026-11-14 23:37:54.44]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5257047465905216775.txt\n[2026-11-14 23:37:54.45] [Worker 0] New coverage: 23792 instr, 7 contracts, 4 seqs in corpus\n[2026-11-14 23:37:54.45]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/839942679441653088.txt\n[2026-11-14 23:37:54.50] [Worker 0] New coverage: 23955 instr, 7 contracts, 5 seqs in corpus\n[2026-11-14 23:37:54.50]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/502077191860717660.txt\n[2026-11-14 23:37:54.52] [Worker 0] New coverage: 24636 instr, 7 contracts, 6 seqs in corpus\n[2026-11-14 23:37:54.52]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5499894747368019542.txt\n[2026-11-14 23:37:54.63] [Worker 0] New coverage: 24641 instr, 7 contracts, 7 seqs in corpus\n[2026-11-14 23:37:54.63]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/6500762302414252321.txt\n[2026-11-14 23:37:54.65] [Worker 0] New coverage: 24711 instr, 7 contracts, 8 seqs in corpus\n[2026-11-14 23:37:54.65]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/3009296341796714098.txt\n[2026-11-14 23:37:54.78] [Worker 0] New coverage: 24999 instr, 7 contracts, 9 seqs in corpus\n[2026-11-14 23:37:54.78]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/6562975725859522028.txt\n[2026-11-14 23:37:54.80] [Worker 0] New coverage: 25005 instr, 7 contracts, 10 seqs in corpus\n[2026-11-14 23:37:54.80]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/2319697464387422779.txt\n[2026-11-14 23:37:54.92] [Worker 0] New coverage: 26267 instr, 7 contracts, 11 seqs in corpus\n[2026-11-14 23:37:54.93]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/3022052756643175965.txt\n[2026-11-14 23:37:54.93] [Worker 0] New coverage: 26297 instr, 7 contracts, 12 seqs in corpus\n[2026-11-14 23:37:54.93]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/7826891431010800018.txt\n[2026-11-14 23:37:55.09] [Worker 0] New coverage: 26478 instr, 7 contracts, 13 seqs in corpus\n[2026-11-14 23:37:55.09]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/728510629704731155.txt\n[2026-11-14 23:37:55.12] [Worker 0] New coverage: 26603 instr, 7 contracts, 14 seqs in corpus\n[2026-11-14 23:37:55.12]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/2060804553527453499.txt\n[2026-11-14 23:37:55.35] [Worker 0] New coverage: 27709 instr, 7 contracts, 15 seqs in corpus\n[2026-11-14 23:37:55.35]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5552961051383707573.txt\n[2026-11-14 23:37:55.66] [Worker 0] New coverage: 27723 instr, 7 contracts, 16 seqs in corpus\n[2026-11-14 23:37:55.66]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/6545804635997242538.txt\n[2026-11-14 23:37:55.72] [Worker 0] New coverage: 27798 instr, 7 contracts, 17 seqs in corpus\n[2026-11-14 23:37:55.72]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/8956362924875961693.txt\n[2026-11-14 23:37:56.61] [Worker 0] New coverage: 27948 instr, 7 contracts, 18 seqs in corpus\n[2026-11-14 23:37:56.61]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5538888463396471030.txt\n[2026-11-14 23:37:56.90] [Worker 0] New coverage: 27951 instr, 7 contracts, 19 seqs in corpus\n[2026-11-14 23:37:56.90]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/4555705249723401118.txt\n[2026-11-14 23:37:57.34] [status] tests: 0/1, fuzzing: 685/10000000, values: [], cov: 27951, corpus: 19, gas/s: 76318190\n[2026-11-14 23:37:57.85] [Worker 0] New coverage: 27954 instr, 7 contracts, 20 seqs in corpus\n[2026-11-14 23:37:57.85]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/7240867794058196708.txt\n[2026-11-14 23:37:58.35] [Worker 0] New coverage: 27959 instr, 7 contracts, 21 seqs in corpus\n[2026-11-14 23:37:58.35]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5017694553836484712.txt\n[2026-11-14 23:38:00.34] [status] tests: 0/1, fuzzing: 1370/10000000, values: [], cov: 27959, corpus: 21, gas/s: 87005190\n[2026-11-14 23:38:03.34] [Worker 0] New coverage: 28187 instr, 7 contracts, 22 seqs in corpus\n[2026-11-14 23:38:03.34]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/2424423965536614291.txt\n[2026-11-14 23:38:03.35] [status] tests: 0/1, fuzzing: 1886/10000000, values: [], cov: 28187, corpus: 22, gas/s: 74434686\n[2026-11-14 23:38:06.35] [status] tests: 0/1, fuzzing: 2549/10000000, values: [], cov: 28187, corpus: 22, gas/s: 90732988\n[2026-11-14 23:38:08.48] [Worker 0] New coverage: 28187 instr, 7 contracts, 23 seqs in corpus\n[2026-11-14 23:38:08.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5813880299341466949.txt\n[2026-11-14 23:38:09.36] [status] tests: 0/1, fuzzing: 3141/10000000, values: [], cov: 28187, corpus: 23, gas/s: 83762193\n[2026-11-14 23:38:12.01] [Worker 0] New coverage: 28190 instr, 7 contracts, 24 seqs in corpus\n[2026-11-14 23:38:12.01]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/8747842091180637805.txt\n[2026-11-14 23:38:12.36] [status] tests: 0/1, fuzzing: 3690/10000000, values: [], cov: 28190, corpus: 24, gas/s: 82142042\n[2026-11-14 23:38:15.36] [status] tests: 0/1, fuzzing: 4311/10000000, values: [], cov: 28190, corpus: 24, gas/s: 89653423\n[2026-11-14 23:38:18.37] [status] tests: 0/1, fuzzing: 4915/10000000, values: [], cov: 28190, corpus: 24, gas/s: 84195677\n[2026-11-14 23:38:19.01] [Worker 0] New coverage: 28345 instr, 7 contracts, 25 seqs in corpus\n[2026-11-14 23:38:19.01]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/2350206614584177916.txt\n[2026-11-14 23:38:21.37] [status] tests: 0/1, fuzzing: 5643/10000000, values: [], cov: 28345, corpus: 25, gas/s: 94574966\n[2026-11-14 23:38:24.26] [Worker 0] New coverage: 28470 instr, 7 contracts, 26 seqs in corpus\n[2026-11-14 23:38:24.26]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/2344863688852298465.txt\n[2026-11-14 23:38:24.37] [status] tests: 0/1, fuzzing: 6316/10000000, values: [], cov: 28470, corpus: 26, gas/s: 88883183\n[2026-11-14 23:38:27.38] [status] tests: 0/1, fuzzing: 6998/10000000, values: [], cov: 28470, corpus: 26, gas/s: 91631873\n[2026-11-14 23:38:30.38] [status] tests: 0/1, fuzzing: 7662/10000000, values: [], cov: 28470, corpus: 26, gas/s: 91595033\n[2026-11-14 23:38:33.38] [status] tests: 0/1, fuzzing: 8311/10000000, values: [], cov: 28470, corpus: 26, gas/s: 90944814\n[2026-11-14 23:38:36.39] [status] tests: 0/1, fuzzing: 8941/10000000, values: [], cov: 28470, corpus: 26, gas/s: 87387388\n[2026-11-14 23:38:37.66] [Worker 0] New coverage: 28703 instr, 7 contracts, 27 seqs in corpus\n[2026-11-14 23:38:37.66]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/1415013776578520425.txt\n[2026-11-14 23:38:39.39] [status] tests: 0/1, fuzzing: 9602/10000000, values: [], cov: 28703, corpus: 27, gas/s: 96497231\n[2026-11-14 23:38:41.94] [Worker 0] New coverage: 28706 instr, 7 contracts, 28 seqs in corpus\n[2026-11-14 23:38:41.95]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/5800128202514782843.txt\n[2026-11-14 23:38:42.39] [status] tests: 0/1, fuzzing: 10510/10000000, values: [], cov: 28706, corpus: 28, gas/s: 109140534\n[2026-11-14 23:38:43.54] [Worker 0] New coverage: 28711 instr, 7 contracts, 29 seqs in corpus\n[2026-11-14 23:38:43.54]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/逐属性原生对照实验/595a0cec4c2940599338b814d2e3312c/campaigns/same_end_to_end_time/v2_seeded/BeeStorage/a11cc51249256da90a47/coverage/7419949952110184357.txt\n[2026-11-14 23:38:45.40] [status] tests: 0/1, fuzzing: 11358/10000000, values: [], cov: 28711, corpus: 29, gas/s: 85927203\n[2026-11-14 23:38:48.40] [status] tests: 0/1, fuzzing: 12161/10000000, values: [], cov: 28711, corpus: 29, gas/s: 89612807\n",
+            "input_seed_id": null,
+            "input_seed_count": 0,
+            "loaded_seed_count": 0,
+            "replayed_seed_count": 0,
+            "specific_input_seed_replay_verified": false,
+            "seed_load_replay_verified": false,
+            "mutation_evidence": false,
+            "seed_generation_status": "no_valid_evm_seed"
+          },
+          "coverage_delta_unique_instructions": 0,
+          "violation_discovery_delta": 0
+        }
+      },
+      "echidna_only_diagnostic": null
+    }
+  ],
+  "seed_generation_reuse": {
+    "source_report": "deepseek/结果/逐属性原生对照实验/b0a5a6fc96aa412baa1e57a105367283/逐属性原生对照实验.json",
+    "reused_properties": [
+      {
+        "project": "BeeStorage",
+        "property_id": "a11cc51249256da90a47"
+      }
+    ],
+    "newly_generated_properties": [],
+    "reused_property_actual_api_usage_retained": true,
+    "additional_agent_api_calls_for_reused_properties": 0,
+    "seed_generation_time_accounting": "already_paid_once_in_initial_screening; zero additional preparation time charged",
+    "correction_reason": "按属性 ID 复用已有 Agent 响应和种子；新属性仍独立生成并保留其调用成本",
+    "historical_api_usage_retained_not_spent_again": {
+      "total_tokens": 7090,
+      "estimated_api_cost_usd_offpeak": "0.001181652",
+      "estimated_api_cost_usd_peak": "0.002363304",
+      "request_attempts_in_source_logs": 2
+    }
+  },
+  "aggregate": {
+    "property_count": 1,
+    "candidate_generation_success_count": 0,
+    "candidate_plan_success_count": 1,
+    "evm_executable_seed_count": 0,
+    "external_seed_load_replay_verified_count": 0,
+    "actual_api_tokens": 0,
+    "estimated_api_cost_usd_offpeak": "0",
+    "estimated_api_cost_usd_peak": "0",
+    "api_request_attempts": 0,
+    "failed_api_request_attempts": 0,
+    "unmetered_api_attempts": 0,
+    "seed_generation_success_rate": 0.0,
+    "evm_executable_rate": 0.0,
+    "same_test_budget_coverage_deltas": {
+      "BeeStorage/a11cc51249256da90a47": 0
+    },
+    "same_end_to_end_time_coverage_deltas": {
+      "BeeStorage/a11cc51249256da90a47": 0
+    },
+    "summed_per_property_elapsed_seconds": {
+      "same_test_budget": {
+        "native_echidna_campaigns": 2.784,
+        "v2_including_seed_preparation": 5.179
+      },
+      "same_end_to_end_time": {
+        "native_echidna_campaigns": 60.032,
+        "v2_including_seed_preparation": 60.003
+      }
+    },
+    "property_violation_discovery_counts": {
+      "same_test_budget": {
+        "native_echidna": 0,
+        "v2": 0
+      },
+      "same_end_to_end_time": {
+        "native_echidna": 0,
+        "v2": 0
+      }
+    },
+    "api_accounting_correction": {
+      "corrected_at_utc": "2026-11-14T15:57:53.547827+00:00",
+      "reason": "Per-property agent_api_usage is retained from the source seed report for audit, but reused generation is not new API spend in this Echidna-only rerun.",
+      "previous_aggregate_values_including_reused_usage": {
+        "actual_api_tokens": 7090,
+        "estimated_api_cost_usd_offpeak": "0.001181652",
+        "estimated_api_cost_usd_peak": "0.002363304",
+        "api_request_attempts": 2,
+        "failed_api_request_attempts": 1,
+        "unmetered_api_attempts": 1
+      },
+      "historical_source_usage": {
+        "total_tokens": 7090,
+        "estimated_api_cost_usd_offpeak": "0.001181652",
+        "estimated_api_cost_usd_peak": "0.002363304",
+        "request_attempts_in_source_logs": 2
+      },
+      "new_api_spend_in_this_run": 0
+    },
+    "actual_api_tokens_newly_spent_in_this_run": 0
+  },
+  "finished_at_utc": "2026-11-14T15:38:49.929637+00:00",
+  "total_experiment_elapsed_seconds": 122.37
+}

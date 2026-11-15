@@ -1,0 +1,169 @@
+{
+  "schema_version": 2,
+  "experiment_id": "c243248325d94d02afb8c031b484f33d",
+  "project": "Kink",
+  "property_ids": [
+    "5eac6f37a492eb4d843a"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "5eac6f37a492eb4d843a",
+      "property": "KinkPoolEchidna.echidna_reserves_match_balances()",
+      "dependency_status": "incomplete",
+      "seed_compatible_action_count": 3,
+      "slither_action_count": 3,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "candidate_results": [
+        {
+          "candidate_id": "5eac6f37a492-01-seq1_add_then_swap",
+          "plan": [
+            {
+              "function": "singleSidedAdd(uint256,uint256)",
+              "rationale": "先注入单侧流动性，使 pool.totalSupply()>0 且池内 token 余额非零，为后续 exchange 的 totalSupply 与 inputBalance 守卫提供前置状态；该入口经 add_liquidity 间接改变池内 token 余额与 LP 供应。"
+            },
+            {
+              "function": "adversarialSwap(uint256,uint256)",
+              "rationale": "在已有流动性基础上执行 exchange，触发池内 token 余额变动与 adminFee 累积；用于检验 getReserves 与 token 实际余额是否仍一致（属性核心断言）。"
+            }
+          ],
+          "status": "agent_b_failed",
+          "seed_class": "none",
+          "seed_id": null,
+          "corpus_file": null,
+          "concrete_seed": null,
+          "agent_b": {
+            "logical_calls": 1,
+            "failed_logical_calls": 1,
+            "events": [
+              {
+                "tag": "AgentB_Kink_5eac6f37a492-01-seq1_add_then_swap_try1",
+                "ok": false,
+                "error_kind": "token_budget_exceeded",
+                "error": "token_budget_exceeded: 本次请求最坏上界 35330 将超过剩余 Token 预算 22975",
+                "usage": null,
+                "elapsed_seconds": 0,
+                "attempt": 1,
+                "prompt_utf8_bytes": null,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [],
+          "error": "token_budget_exceeded: 本次请求最坏上界 35330 将超过剩余 Token 预算 22975",
+          "elapsed_seconds": 0.001
+        }
+      ],
+      "status": "no_valid_evm_seed",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Kink_5eac6f37a492eb4d843a_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 6613,
+              "prompt_cache_hit_tokens": 384,
+              "prompt_cache_miss_tokens": 6229,
+              "completion_tokens": 412,
+              "total_tokens": 7025,
+              "estimated_cost_usd": {
+                "offpeak": "0.001182702",
+                "peak": "0.002365404"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 3.286,
+            "attempt": 1,
+            "prompt_utf8_bytes": 22302,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "5eac6f37a492eb4d843a",
+                "candidate_id": "seq1_add_then_swap",
+                "steps": [
+                  {
+                    "function": "singleSidedAdd(uint256,uint256)",
+                    "rationale": "先注入单侧流动性，使 pool.totalSupply()>0 且池内 token 余额非零，为后续 exchange 的 totalSupply 与 inputBalance 守卫提供前置状态；该入口经 add_liquidity 间接改变池内 token 余额与 LP 供应。"
+                  },
+                  {
+                    "function": "adversarialSwap(uint256,uint256)",
+                    "rationale": "在已有流动性基础上执行 exchange，触发池内 token 余额变动与 adminFee 累积；用于检验 getReserves 与 token 实际余额是否仍一致（属性核心断言）。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "action_inventory_source 为 slither_dependency_candidates，但 effect_evidence 显示写入均发生在外部合约（KinkPool/ERC20）而非 KinkPoolEchidna 自身状态；候选入口对目标状态的影响为间接，未由 Slither 证明直接写入。",
+              "属性读取 pool.getReserves() 与 token0/token1.balanceOf(address(pool))，其一致性取决于 KinkPool 内部 reserve 更新逻辑；本序列仅按状态生产先于消费的顺序规划，不证明可违反属性。",
+              "singleSidedAdd 需 amounts 非零且首次添加时 lpAmount>MINIMUM_LIQUIDITY，参数具体化不在本规划职责内。",
+              "adversarialSwap 需 pool.totalSupply()>0 且 dx>0 且 inputBalanceAfter>inputBalanceBefore，故置于 singleSidedAdd 之后。",
+              "未使用 yankLiquidity，因其会减少 LP 与池内余额，可能削弱而非构造属性违反所需状态；如需覆盖移除路径可另加候选。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 0,
+      "elapsed_seconds": 3.289
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 60,
+    "token_budget": 30000,
+    "wall_budget_seconds": 60
+  },
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 1,
+    "unmetered_attempts": 1,
+    "prompt_tokens": 6613,
+    "completion_tokens": 412,
+    "total_tokens": 7025,
+    "estimated_cost_usd_offpeak": "0.001182702",
+    "estimated_cost_usd_peak": "0.002365404",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/Kink/5eac6f37a492eb4d843a/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 7025,
+  "total_elapsed_seconds": 3.409,
+  "anvil_start_error": null
+}

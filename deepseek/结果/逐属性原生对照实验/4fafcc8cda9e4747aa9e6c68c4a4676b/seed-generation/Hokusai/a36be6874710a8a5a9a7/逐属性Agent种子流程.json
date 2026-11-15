@@ -1,0 +1,288 @@
+{
+  "schema_version": 2,
+  "experiment_id": "d5e3d76b40d24e32a7fae23205532673",
+  "project": "Hokusai",
+  "property_ids": [
+    "a36be6874710a8a5a9a7"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "a36be6874710a8a5a9a7",
+      "property": "EchidnaHokusaiToken.echidna_supplier_distributed_once()",
+      "dependency_status": "statically_supported_with_limits",
+      "seed_compatible_action_count": 1,
+      "slither_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "candidate_results": [
+        {
+          "candidate_id": "a36be6874710-01-a36be6874710a8a5a9a7-c1",
+          "plan": [
+            {
+              "function": "distributeSupplier(uint256)",
+              "rationale": "唯一 seed_compatible 入口；源码显示当 token.modelSupplierDistributed() 为 false 时，成功调用 token.distributeModelSupplierAllocation 后会把 supplierDistributedSeen 置 true，从而触发属性中 !supplierDistributedSeen 分支为假、需依赖 token.modelSupplierDistributed() 为真；该序列用于检验分发后属性是否成立。"
+            }
+          ],
+          "status": "executable",
+          "seed_class": "evm_valid",
+          "seed_id": "seed-a3371c0983aa4291854b90a101b601ab",
+          "corpus_file": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/Hokusai/a36be6874710a8a5a9a7/种子包/Hokusai/a36be6874710a8a5a9a7/coverage/seed-a3371c0983aa4291854b90a101b601ab.txt",
+          "concrete_seed": {
+            "property_id": "a36be6874710a8a5a9a7",
+            "candidate_id": "a36be6874710-01-a36be6874710a8a5a9a7-c1",
+            "transactions": [
+              {
+                "function": "distributeSupplier(uint256)",
+                "arguments": [
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              }
+            ],
+            "assumptions": [
+              "vestedAmount 传入 0；源码中 _bound(vestedAmount, token.modelSupplierAllocation()) 会将其约束到 [0, modelSupplierAllocation()] 范围内，因此 0 是合法且确定可编码的取值。",
+              "sender 选择 property_sender 0x0000000000000000000000000000000000010000，distributeSupplier 无调用者权限守卫，任意地址均可调用。",
+              "属性成立依赖 token.modelSupplierDistributed() 在分发后返回 true；该外部调用结果取决于实际部署的 HokusaiToken 实现，静态无法确认，已列入 assumptions。",
+              "若 token.modelSupplierDistributed() 初始即为 true，则走 #114-116 分支直接置 supplierDistributedSeen=true；若为 false 且 try 成功，则走 #120-123 分支置 true；两种路径均使 supplierDistributedSeen 变为 true，属性需 token.modelSupplierDistributed() 为真才成立。",
+              "未提供 fixed_shared_prefix_transactions，无前缀需复用。",
+              "delay_seconds 与 delay_blocks 均设为 0，源码无时间或区块依赖要求。"
+            ],
+            "execution_feedback": null
+          },
+          "agent_b": {
+            "logical_calls": 1,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_Hokusai_a36be6874710-01-a36be6874710a8a5a9a7-c1_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 2310,
+                  "prompt_cache_hit_tokens": 256,
+                  "prompt_cache_miss_tokens": 2054,
+                  "completion_tokens": 359,
+                  "total_tokens": 2669,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000524268",
+                    "peak": "0.001048536"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 2.278,
+                "attempt": 1,
+                "prompt_utf8_bytes": 8273,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "Hokusai",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "a36be6874710-01-a36be6874710a8a5a9a7-c1",
+              "replay_status": "executable",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_investor_cap()": true,
+                "echidna_only_controller_can_mint()": true,
+                "echidna_reward_cap()": true,
+                "echidna_supplier_distributed_once()": true,
+                "echidna_supply_accounting()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "distributeSupplier(uint256)",
+                  "arguments": [
+                    0
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "72a935d00f8ec6d68677a38f6e095345fe2b4bfda3950c31b5dab9b932c6994b",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 157859,
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 52,
+                  "tracked_contract_count": 4,
+                  "tracked_contract_types": [
+                    "Harness",
+                    "HokusaiParams",
+                    "HokusaiToken",
+                    "IHokusaiParams"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "EchidnaHokusaiToken.supplierDistributedSeen"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "EchidnaHokusaiToken.supplierDistributedSeen"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "82fe17f77eef4c57fc2b08e96785dc9aeb233f6bf3d1f7a2315e74787753eec6",
+                  "state_fingerprint_after": "d11d7f59f56c9a2cf63515b6c9e7988764f2f9a9d90da62b82fd0aeecf19caeb",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_investor_cap()": true,
+                    "echidna_only_controller_can_mint()": true,
+                    "echidna_reward_cap()": true,
+                    "echidna_supplier_distributed_once()": true,
+                    "echidna_supply_accounting()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 1.252,
+              "elapsed_from_run_start_seconds": 6.249
+            }
+          ],
+          "error": null,
+          "elapsed_seconds": 3.562
+        }
+      ],
+      "status": "seed_generated",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Hokusai_a36be6874710a8a5a9a7_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 2502,
+              "prompt_cache_hit_tokens": 384,
+              "prompt_cache_miss_tokens": 2118,
+              "completion_tokens": 373,
+              "total_tokens": 2875,
+              "estimated_cost_usd": {
+                "offpeak": "0.000542652",
+                "peak": "0.001085304"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.638,
+            "attempt": 1,
+            "prompt_utf8_bytes": 9013,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "a36be6874710a8a5a9a7",
+                "candidate_id": "a36be6874710a8a5a9a7-c1",
+                "steps": [
+                  {
+                    "function": "distributeSupplier(uint256)",
+                    "rationale": "唯一 seed_compatible 入口；源码显示当 token.modelSupplierDistributed() 为 false 时，成功调用 token.distributeModelSupplierAllocation 后会把 supplierDistributedSeen 置 true，从而触发属性中 !supplierDistributedSeen 分支为假、需依赖 token.modelSupplierDistributed() 为真；该序列用于检验分发后属性是否成立。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "candidate_actions 仅含 distributeSupplier(uint256)，且其 seed_compatible=true；未使用其他未列出的入口。",
+              "属性谓词为 !supplierDistributedSeen || token.modelSupplierDistributed()；distributeSupplier 在 token.modelSupplierDistributed() 为 true 时直接置 supplierDistributedSeen=true 并返回，此时属性依赖 token.modelSupplierDistributed() 仍为 true。",
+              "distributeSupplier 在 token.modelSupplierDistributed() 为 false 时通过 try/catch 调用 token.distributeModelSupplierAllocation；静态证据未证明该外部调用一定成功，也未证明成功后 token.modelSupplierDistributed() 变为 true，因此该候选仅为待验证序列。",
+              "未对参数 vestedAmount 具体化；_bound 与 token.modelSupplierAllocation() 的实际取值由执行环境决定。",
+              "Slither 的 unknowns 指出属性自身含外部调用，其读取结果取决于实际部署与调用环境；本规划不声称路径可行或属性可被违反。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 1,
+      "elapsed_seconds": 6.203
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 60,
+    "token_budget": 30000,
+    "wall_budget_seconds": 60
+  },
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 0,
+    "unmetered_attempts": 0,
+    "prompt_tokens": 4812,
+    "completion_tokens": 732,
+    "total_tokens": 5544,
+    "estimated_cost_usd_offpeak": "0.001066920",
+    "estimated_cost_usd_peak": "0.002133840",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/Hokusai/a36be6874710a8a5a9a7/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 5544,
+  "total_elapsed_seconds": 6.282,
+  "anvil_start_error": null
+}

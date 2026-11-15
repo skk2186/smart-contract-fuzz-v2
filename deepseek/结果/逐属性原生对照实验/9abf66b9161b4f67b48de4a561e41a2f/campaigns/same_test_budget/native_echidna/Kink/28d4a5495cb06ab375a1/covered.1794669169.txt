@@ -1,0 +1,3572 @@
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/KinkFactory.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity ^0.8.20;
+   3 |     | 
+   4 |     | import "@openzeppelin/contracts/proxy/Clones.sol";
+   5 |     | import "@openzeppelin/contracts/access/Ownable.sol";
+   6 |     | import "./KinkPool.sol";
+   7 |     | import "./PoolRegistry.sol";
+   8 |     | 
+   9 |     | /**
+  10 |     |  * @title KinkFactory
+  11 |     |  * @notice Factory for creating KinkPool instances using minimal proxy pattern
+  12 |     |  */
+  13 | *   | contract KinkFactory is Ownable {
+  14 |     |     using Clones for address;
+  15 |     | 
+  16 |     |     /// @notice Implementation contract address
+  17 |     |     address public immutable implementation;
+  18 |     | 
+  19 |     |     /// @notice Array of all created pools
+  20 |     |     address[] public allPools;
+  21 |     | 
+  22 |     |     /// @notice Mapping from token pair to pool address
+  23 |     |     mapping(address => mapping(address => address[])) public getPools;
+  24 |     |     mapping(bytes32 => address) public getPool;
+  25 |     |     mapping(address => bool) public isPool;
+  26 |     | 
+  27 |     |     /// @notice Protocol fee configuration
+  28 |     |     address public feeReceiver;
+  29 | *   |     uint256 public baseFeeShare;
+  30 | *   |     uint256 public kinkingFeeShare;
+  31 |     |     uint256 public constant MAX_FEE_SHARE = 5000; // 50%
+  32 |     | 
+  33 |     |     PoolRegistry public immutable registry;
+  34 |     | 
+  35 |     |     event PoolCreated(
+  36 |     |         address indexed token0,
+  37 |     |         address indexed token1,
+  38 |     |         address indexed pool,
+  39 |     |         uint256 A0,
+  40 |     |         uint256 A1,
+  41 |     |         uint256 baseFee,
+  42 |     |         uint256 kinkingFee,
+  43 |     |         uint256 softPeg0,
+  44 |     |         uint256 softPeg1
+  45 |     |     );
+  46 |     | 
+  47 |     |     event ProtocolFeesUpdated(
+  48 |     |         address indexed feeReceiver,
+  49 |     |         uint256 baseFeeShare,
+  50 |     |         uint256 kinkingFeeShare
+  51 |     |     );
+  52 |     | 
+  53 | *   |     constructor(address _registry) Ownable(msg.sender) {
+  54 |     |         // Deploy standalone implementation that clones can initialize
+  55 | *   |         implementation = address(new KinkPool());
+  56 | *   |         registry = PoolRegistry(_registry);
+  57 |     |     }
+  58 |     | 
+  59 |     |     /**
+  60 |     |      * @notice Update protocol fee configuration
+  61 |     |      * @param _feeReceiver Address to receive protocol fees
+  62 |     |      * @param _baseFeeShare Admin share of base fee in bps
+  63 |     |      * @param _kinkingFeeShare Admin share of kinking fee in bps
+  64 |     |      */
+  65 |     |     function setProtocolFees(
+  66 |     |         address _feeReceiver,
+  67 |     |         uint256 _baseFeeShare,
+  68 |     |         uint256 _kinkingFeeShare
+  69 |     |     ) external onlyOwner {
+  70 |     |         require(_baseFeeShare <= MAX_FEE_SHARE, "KinkFactory: Fee share too high");
+  71 |     |         require(_kinkingFeeShare <= MAX_FEE_SHARE, "KinkFactory: Fee share too high");
+  72 |     |         require(_feeReceiver != address(0) || (_baseFeeShare == 0 && _kinkingFeeShare == 0), "KinkFactory: Zero address receiver");
+  73 |     | 
+  74 |     |         feeReceiver = _feeReceiver;
+  75 |     |         baseFeeShare = _baseFeeShare;
+  76 |     |         kinkingFeeShare = _kinkingFeeShare;
+  77 |     | 
+  78 |     |         emit ProtocolFeesUpdated(_feeReceiver, _baseFeeShare, _kinkingFeeShare);
+  79 |     |     }
+  80 |     | 
+  81 |     |     /**
+  82 |     |      * @notice Get the number of pools created
+  83 |     |      * @return Number of pools
+  84 |     |      */
+  85 |     |     function allPoolsLength() external view returns (uint256) {
+  86 |     |         return allPools.length;
+  87 |     |     }
+  88 |     | 
+  89 |     |     /**
+  90 |     |      * @notice Create a new pool
+  91 |     |      * @param tokenA Address of first token
+  92 |     |      * @param tokenB Address of second token
+  93 |     |      * @param _A0 Amplification when tokenA > tokenB
+  94 |     |      * @param _A1 Amplification when tokenB > tokenA
+  95 |     |      * @param _baseFee Base fee in basis points
+  96 |     |      * @param _kinkingFee Kinking fee in basis points
+  97 |     |      * @param _softPeg0 Soft peg price threshold for token0 (when selling token0)
+  98 |     |      * @param _softPeg1 Soft peg price threshold for token1 (when selling token1)
+  99 |     |      * @return pool Address of the created pool
+ 100 |     |      */
+ 101 |     |     function createPool(
+ 102 |     |         address tokenA,
+ 103 |     |         address tokenB,
+ 104 |     |         uint256 _A0,
+ 105 |     |         uint256 _A1,
+ 106 |     |         uint256 _baseFee,
+ 107 |     |         uint256 _kinkingFee,
+ 108 |     |         uint256 _softPeg0,
+ 109 |     |         uint256 _softPeg1
+ 110 |     |     )
+ 111 |     |         external
+ 112 |     |         returns (address pool)
+ 113 |     |     {
+ 114 | *   |         require(tokenA != tokenB, "KinkFactory: Identical tokens");
+ 115 | *   |         require(tokenA != address(0) && tokenB != address(0), "KinkFactory: Zero address");
+ 116 |     | 
+ 117 |     |         // Sort tokens and align amplification parameters to the deployed ordering
+ 118 |     |         // Note: _softPeg0 corresponds to tokenA, _softPeg1 corresponds to tokenB
+ 119 |     |         (address token0, address token1, uint256 A0Param, uint256 A1Param, uint256 peg0, uint256 peg1) =
+ 120 | *   |             tokenA < tokenB
+ 121 |     |                 ? (tokenA, tokenB, _A0, _A1, _softPeg0, _softPeg1)
+ 122 |     |                 : (tokenB, tokenA, _A1, _A0, _softPeg1, _softPeg0);
+ 123 |     | 
+ 124 |     |         // Hash must include new fee shares to ensure uniqueness if they differ
+ 125 | *   |         bytes32 paramsHash = keccak256(abi.encodePacked(token0, token1, A0Param, A1Param, _baseFee, _kinkingFee, peg0, peg1));
+ 126 | *   |         require(getPool[paramsHash] == address(0), "KinkFactory: Pool exists");
+ 127 |     | 
+ 128 |     |         // Clone implementation
+ 129 | *   |         pool = implementation.clone();
+ 130 |     | 
+ 131 |     |         // Update state variables BEFORE initializing
+ 132 |     |         getPool[paramsHash] = pool;
+ 133 | *   |         getPools[token0][token1].push(pool);
+ 134 | *   |         getPools[token1][token0].push(pool); // Reverse mapping
+ 135 |     |         allPools.push(pool);
+ 136 |     |         isPool[pool] = true;
+ 137 |     | 
+ 138 |     |         // Initialize pool
+ 139 |     |         // Pass msg.sender as admin (or factory could be admin if desired, but user usually wants control)
+ 140 |     |         // Here we set msg.sender (the deployer) as the admin.
+ 141 | *   |         KinkPool(pool).initialize(token0, token1, A0Param, A1Param, _baseFee, _kinkingFee, peg0, peg1, msg.sender);
+ 142 |     | 
+ 143 | *   |         registry.registerPool(token0, token1, pool);
+ 144 |     | 
+ 145 | *   |         emit PoolCreated(token0, token1, pool, A0Param, A1Param, _baseFee, _kinkingFee, peg0, peg1);
+ 146 |     |     }
+ 147 |     | 
+ 148 |     |     /**
+ 149 |     |      * @notice Get pool for specific parameters
+ 150 |     |      */
+ 151 |     |     function getPoolByParams(
+ 152 |     |         address tokenA,
+ 153 |     |         address tokenB,
+ 154 |     |         uint256 _A0,
+ 155 |     |         uint256 _A1,
+ 156 |     |         uint256 _baseFee,
+ 157 |     |         uint256 _kinkingFee,
+ 158 |     |         uint256 _softPeg0,
+ 159 |     |         uint256 _softPeg1
+ 160 |     |     ) external view returns (address) {
+ 161 |     |         (address token0, address token1, uint256 A0Param, uint256 A1Param, uint256 peg0, uint256 peg1) =
+ 162 |     |             tokenA < tokenB
+ 163 |     |                 ? (tokenA, tokenB, _A0, _A1, _softPeg0, _softPeg1)
+ 164 |     |                 : (tokenB, tokenA, _A1, _A0, _softPeg1, _softPeg0);
+ 165 |     | 
+ 166 | *   |         bytes32 paramsHash = keccak256(abi.encodePacked(token0, token1, A0Param, A1Param, _baseFee, _kinkingFee, peg0, peg1));
+ 167 |     |         return getPool[paramsHash];
+ 168 |     |     }
+ 169 |     | 
+ 170 |     |     /**
+ 171 |     |      * @notice Get all pools for a pair
+ 172 |     |      */
+ 173 |     |     function getPoolsForPair(address tokenA, address tokenB) external view returns (address[] memory) {
+ 174 |     |         return getPools[tokenA][tokenB];
+ 175 |     |     }
+ 176 |     | }
+ 177 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/KinkPool.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity ^0.8.20;
+   3 |     | 
+   4 |     | import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+   5 |     | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+   6 |     | import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+   7 |     | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+   8 |     | import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+   9 |     | import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+  10 |     | 
+  11 |     | import "./libraries/CurveMath.sol";
+  12 |     | 
+  13 |     | interface IKinkFactory {
+  14 |     |     function feeReceiver() external view returns (address);
+  15 |     |     function baseFeeShare() external view returns (uint256);
+  16 |     |     function kinkingFeeShare() external view returns (uint256);
+  17 |     | }
+  18 |     | 
+  19 |     | /**
+  20 |     |  * @title KinkPool
+  21 |     |  * @notice Two-asset stableswap pool with asymmetric amplification ("kink") behavior.
+  22 |     |  *         Deploy through `KinkFactory` which clones this implementation and calls `initialize`.
+  23 |     |  */
+  24 | *   | contract KinkPool is ERC20, ReentrancyGuard, Initializable {
+  25 |     |     using SafeERC20 for IERC20;
+  26 |     | 
+  27 | *   |     uint256 private constant N_COINS = 2;
+  28 | *   |     uint256 public constant FEE_DENOMINATOR = 10_000;
+  29 | *   |     uint256 public constant MINIMUM_LIQUIDITY = 1000;
+  30 |     | 
+  31 |     |     address public factory;
+  32 |     |     address public admin;
+  33 |     |     address public pendingAdmin; // Governance fix: Two-step transfer
+  34 |     |     address public token0;
+  35 |     |     address public token1;
+  36 |     |     uint8 public token0Decimals;
+  37 |     |     uint8 public token1Decimals;
+  38 |     |     uint256 public A0;
+  39 |     |     uint256 public A1;
+  40 |     |     uint256 public baseFee;
+  41 |     |     uint256 public kinkingFee;
+  42 |     |     uint256 public softPeg0;
+  43 |     |     uint256 public softPeg1;
+  44 |     |     uint256[N_COINS] private tokenMultipliers;
+  45 |     | 
+  46 |     |     event Exchange(
+  47 |     |         address indexed buyer,
+  48 |     |         address indexed receiver,
+  49 |     |         uint256 i,
+  50 |     |         uint256 j,
+  51 |     |         uint256 dx,
+  52 |     |         uint256 dy
+  53 |     |     );
+  54 |     | 
+  55 |     |     event AdminChanged(address indexed oldAdmin, address indexed newAdmin);
+  56 |     |     event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
+  57 |     |     event AdminFeesCollected(uint256 amount0, uint256 amount1);
+  58 |     | 
+  59 |     |     modifier onlyAdmin() {
+  60 |     |         require(msg.sender == admin, "KinkPool: Only admin");
+  61 |     |         _;
+  62 |     |     }
+  63 |     | 
+  64 |     |     event AddLiquidity(
+  65 |     |         address indexed provider,
+  66 |     |         uint256[N_COINS] amounts,
+  67 |     |         uint256 lpAmount
+  68 |     |     );
+  69 |     | 
+  70 |     |     event RemoveLiquidity(
+  71 |     |         address indexed provider,
+  72 |     |         uint256[N_COINS] amounts,
+  73 |     |         uint256 lpAmount
+  74 |     |     );
+  75 |     | 
+  76 |     |     constructor() ERC20("Kink Pool LP", "KINK-LP") {
+  77 |     |         // Disable initialization of implementation contract
+  78 |     |         _disableInitializers();
+  79 |     |     }
+  80 |     | 
+  81 |     |     /**
+  82 |     |      * @notice Initialize the pool
+  83 |     |      * @param _token0 Address of token0
+  84 |     |      * @param _token1 Address of token1
+  85 |     |      * @param _A0 Amplification parameter when token0 > token1
+  86 |     |      * @param _A1 Amplification parameter when token1 > token0
+  87 |     |      * @param _baseFee Base fee in basis points (for converging trades)
+  88 |     |      * @param _kinkingFee Kinking fee in basis points (for diverging trades)
+  89 |     |      */
+  90 |     |     function initialize(
+  91 |     |         address _token0,
+  92 |     |         address _token1,
+  93 |     |         uint256 _A0,
+  94 |     |         uint256 _A1,
+  95 |     |         uint256 _baseFee,
+  96 |     |         uint256 _kinkingFee,
+  97 |     |         uint256 _softPeg0,
+  98 |     |         uint256 _softPeg1,
+  99 |     |         address _admin
+ 100 |     |     ) external initializer {
+ 101 | *   |         require(_token0 != address(0) && _token1 != address(0), "KinkPool: Zero address");
+ 102 | *   |         require(_token0 < _token1, "KinkPool: Tokens not sorted");
+ 103 | *   |         require(_A0 >= 2 && _A0 <= 1000, "KinkPool: Invalid A0");
+ 104 | *   |         require(_A1 >= 2 && _A1 <= 1000, "KinkPool: Invalid A1");
+ 105 | *   |         require(_baseFee <= FEE_DENOMINATOR, "KinkPool: Invalid baseFee");
+ 106 | *   |         require(_kinkingFee <= FEE_DENOMINATOR, "KinkPool: Invalid kinkingFee");
+ 107 |     |         // _softPeg0 and _softPeg1 are typically around 1e18 (1.0).
+ 108 |     | 
+ 109 | *   |         uint8 decimals0 = IERC20Metadata(_token0).decimals();
+ 110 | *   |         uint8 decimals1 = IERC20Metadata(_token1).decimals();
+ 111 | *   |         require(decimals0 <= 18 && decimals1 <= 18, "KinkPool: Decimals too large");
+ 112 |     |         // decimals mismatch requirement removed
+ 113 |     | 
+ 114 | *   |         factory = msg.sender;
+ 115 | *   |         admin = _admin;
+ 116 | *   |         token0 = _token0;
+ 117 | *   |         token1 = _token1;
+ 118 |     |         token0Decimals = decimals0;
+ 119 |     |         token1Decimals = decimals1;
+ 120 | *   |         A0 = _A0;
+ 121 | *   |         A1 = _A1;
+ 122 | *   |         baseFee = _baseFee;
+ 123 | *   |         kinkingFee = _kinkingFee;
+ 124 | *   |         softPeg0 = _softPeg0;
+ 125 | *   |         softPeg1 = _softPeg1;
+ 126 |     | 
+ 127 | *   |         tokenMultipliers[0] = 10 ** (18 - decimals0);
+ 128 | *   |         tokenMultipliers[1] = 10 ** (18 - decimals1);
+ 129 |     |     }
+ 130 |     | 
+ 131 |     |     /**
+ 132 |     |      * @notice Start ownership transfer
+ 133 |     |      * @param newOwner New admin address
+ 134 |     |      */
+ 135 |     |     function transferOwnership(address newOwner) external onlyAdmin {
+ 136 |     |         require(newOwner != address(0), "KinkPool: Zero address");
+ 137 |     |         pendingAdmin = newOwner;
+ 138 |     |         emit OwnershipTransferStarted(admin, newOwner);
+ 139 |     |     }
+ 140 |     | 
+ 141 |     |     /**
+ 142 |     |      * @notice Collect accumulated admin fees
+ 143 |     |      */
+ 144 |     |     uint256 public adminFee0;
+ 145 |     |     uint256 public adminFee1;
+ 146 |     | 
+ 147 |     |     function collectFees() external nonReentrant {
+ 148 |     |         address feeReceiver = IKinkFactory(factory).feeReceiver();
+ 149 |     |         require(feeReceiver != address(0), "KinkPool: Fee receiver not set");
+ 150 |     | 
+ 151 |     |         uint256 amount0 = adminFee0;
+ 152 |     |         uint256 amount1 = adminFee1;
+ 153 |     | 
+ 154 |     |         if (amount0 > 0) {
+ 155 |     |             adminFee0 = 0;
+ 156 |     |             IERC20(token0).safeTransfer(feeReceiver, amount0);
+ 157 |     |         }
+ 158 |     |         if (amount1 > 0) {
+ 159 |     |             adminFee1 = 0;
+ 160 |     |             IERC20(token1).safeTransfer(feeReceiver, amount1);
+ 161 |     |         }
+ 162 |     | 
+ 163 |     |         emit AdminFeesCollected(amount0, amount1);
+ 164 |     |     }
+ 165 |     | 
+ 166 | *   |     function _balances() internal view returns (uint256[N_COINS] memory reserves) {
+ 167 | *   |         reserves[0] = IERC20(token0).balanceOf(address(this)) - adminFee0;
+ 168 | *   |         reserves[1] = IERC20(token1).balanceOf(address(this)) - adminFee1;
+ 169 |     |     }
+ 170 |     | 
+ 171 |     |     /**
+ 172 |     |      * @notice Normalize balances to 18 decimals using stored multipliers
+ 173 |     |      * @param balances Raw balance array
+ 174 |     |      * @return xp Normalized balances array
+ 175 |     |      */
+ 176 | *   |     function _xp(uint256[N_COINS] memory balances) internal view returns (uint256[N_COINS] memory xp) {
+ 177 | *   |         xp[0] = balances[0] * tokenMultipliers[0];
+ 178 | *   |         xp[1] = balances[1] * tokenMultipliers[1];
+ 179 |     |     }
+ 180 |     | 
+ 181 |     |     /**
+ 182 |     |      * @notice Get current amplification parameter based on balances
+ 183 |     |      */
+ 184 |     |     function _get_current_A() internal view returns (uint256) {
+ 185 | *   |         uint256[N_COINS] memory xp = _xp(_balances());
+ 186 | *   |         return _get_A(xp);
+ 187 |     |     }
+ 188 |     | 
+ 189 |     |     /**
+ 190 |     |      * @notice Get amplification parameter based on explicit balances
+ 191 |     |      */
+ 192 | *   |     function _get_A(uint256[N_COINS] memory xp) internal view returns (uint256) {
+ 193 | *   |         if (xp[0] > xp[1]) {
+ 194 | *   |             return A0;
+ 195 |     |         } else {
+ 196 |     |             return A1;
+ 197 |     |         }
+ 198 |     |     }
+ 199 |     | 
+ 200 |     |     /**
+ 201 |     |      * @notice Expose current amplification parameter for external observers
+ 202 |     |      */
+ 203 |     |     function currentAmplification() external view returns (uint256) {
+ 204 |     |         return _get_current_A();
+ 205 |     |     }
+ 206 |     | 
+ 207 |     |     /**
+ 208 |     |      * @notice Get current normalized balances (18 decimals)
+ 209 |     |      */
+ 210 |     |     function getNormalizedReserves() external view returns (uint256[N_COINS] memory xp) {
+ 211 |     |         return _xp(_balances());
+ 212 |     |     }
+ 213 |     | 
+ 214 |     |     /**
+ 215 |     |      * @notice Get current StableSwap invariant D
+ 216 |     |      */
+ 217 |     |     function currentInvariant() external view returns (uint256) {
+ 218 | *   |         uint256[N_COINS] memory xp = _xp(_balances());
+ 219 | *   |         return CurveMath.get_D(xp, _get_current_A());
+ 220 |     |     }
+ 221 |     | 
+ 222 |     |     /**
+ 223 |     |      * @notice Calculate virtual marginal price using small epsilon
+ 224 |     |      * @param i Index of input token
+ 225 |     |      * @param j Index of output token
+ 226 |     |      * @param x Input balance (normalized)
+ 227 |     |      * @param xp Current normalized balances
+ 228 |     |      * @param A Amplification parameter
+ 229 |     |      * @return Price in 18 decimals (output token per input token)
+ 230 |     |      */
+ 231 | *   |     function _get_marginal_price(
+ 232 |     |         uint256 i,
+ 233 |     |         uint256 j,
+ 234 |     |         uint256 x,
+ 235 |     |         uint256[N_COINS] memory xp,
+ 236 |     |         uint256 A
+ 237 |     |     ) internal pure returns (uint256) {
+ 238 |     |         // Simulate price by checking y at x and x+epsilon
+ 239 | *   |         uint256 epsilon = 1e15; // 0.001 unit (normalized 18 decimals)
+ 240 |     | 
+ 241 | *   |         uint256 y1 = CurveMath.get_y(i, j, x, xp, A);
+ 242 | *   |         uint256 y2 = CurveMath.get_y(i, j, x + epsilon, xp, A);
+ 243 |     | 
+ 244 | *   |         if (y1 <= y2) return 0; // Should not happen
+ 245 |     | 
+ 246 |     |         // dy = y1 - y2
+ 247 |     |         // dx = epsilon
+ 248 |     |         // price = dy/dx
+ 249 | *   |         return ((y1 - y2) * 1e18) / epsilon;
+ 250 |     |     }
+ 251 |     | 
+ 252 |     |     /**
+ 253 |     |      * @notice Binary search to find dx where price crosses peg
+ 254 |     |      */
+ 255 |     |     function _find_crossing_dx(
+ 256 |     |         uint256 i,
+ 257 |     |         uint256 j,
+ 258 |     |         uint256 startX,
+ 259 |     |         uint256[N_COINS] memory xp,
+ 260 |     |         uint256 A,
+ 261 |     |         uint256 peg,
+ 262 |     |         uint256 maxDx
+ 263 |     |     ) internal pure returns (uint256) {
+ 264 |     |         uint256 low = 0;
+ 265 |     |         uint256 high = maxDx;
+ 266 |     | 
+ 267 |     |         // 10 iterations provides decent precision for this purpose
+ 268 |     |         // Note: Minor precision loss on fee splitting is acceptable / expected behavior.
+ 269 |     |         for (uint256 k = 0; k < 10; k++) {
+ 270 |     |             uint256 mid = (low + high) / 2;
+ 271 |     |             if (mid == 0) {
+ 272 |     |                 low = 1;
+ 273 |     |                 continue;
+ 274 |     |             }
+ 275 |     |             uint256 price = _get_marginal_price(i, j, startX + mid, xp, A);
+ 276 |     | 
+ 277 |     |             if (price > peg) {
+ 278 |     |                 // Price too high, need more dx (price drops as x increases)
+ 279 |     |                 low = mid;
+ 280 |     |             } else {
+ 281 |     |                 // Price too low, need less dx
+ 282 |     |                 high = mid;
+ 283 |     |             }
+ 284 |     |         }
+ 285 |     |         return (low + high) / 2;
+ 286 |     |     }
+ 287 |     | 
+ 288 | *   |     function _calculate_exchange(
+ 289 |     |         uint256 i,
+ 290 |     |         uint256 j,
+ 291 |     |         uint256 actualDx,
+ 292 |     |         uint256[N_COINS] memory xpBefore
+ 293 |     |     ) internal view returns (uint256 dy, uint256 adminFeeAmount) {
+ 294 | *   |         uint256 baseFeeShare = IKinkFactory(factory).baseFeeShare();
+ 295 | *   |         uint256 kinkingFeeShare = IKinkFactory(factory).kinkingFeeShare();
+ 296 |     | 
+ 297 | *   |         uint256 currentA = xpBefore[0] > xpBefore[1] ? A0 : A1;
+ 298 |     |         // Determine if current A is correct. The logic in _get_A matches this.
+ 299 |     |         // A is based on the current state balances.
+ 300 |     | 
+ 301 | *   |         uint256 D = CurveMath.get_D(xpBefore, currentA);
+ 302 |     |         uint256 thresholdXP = D / N_COINS;
+ 303 |     | 
+ 304 |     |         // Check if swap crosses equilibrium (1:1 point)
+ 305 | *   |         bool crossesEquilibrium = false;
+ 306 | *   |         uint256 dx1 = 0;
+ 307 | *   |         uint256 dx2 = 0;
+ 308 |     | 
+ 309 | *   |         if (xpBefore[i] < xpBefore[j]) {
+ 310 |     |             // Currently converging (xp[i] < xp[j])
+ 311 |     |             // Check if we cross the threshold (D/2)
+ 312 | *   |             uint256 dxNormalized = actualDx * tokenMultipliers[i];
+ 313 | *   |             if (xpBefore[i] + dxNormalized > thresholdXP) {
+ 314 |     |                 // Check if we actually cross (avoid precision issues if very close)
+ 315 |     |                 // If xpBefore[i] + dxNormalized > thresholdXP, we MIGHT cross.
+ 316 |     |                 // The gap to reach D/2 is (thresholdXP - xpBefore[i]).
+ 317 | *   |                 uint256 gapNormalized = thresholdXP - xpBefore[i];
+ 318 |     | 
+ 319 |     |                 // dx1 is the input required to reach equilibrium
+ 320 |     |                 // Since input is added to pool, increasing x, we just fill the gap to D/2.
+ 321 |     |                 // Note: this is an approximation for the split point because D is invariant.
+ 322 |     | 
+ 323 | *   |                 uint256 gapDx = gapNormalized / tokenMultipliers[i];
+ 324 | *   |                 if (gapDx < actualDx) {
+ 325 | *   |                     crossesEquilibrium = true;
+ 326 | *   |                     dx1 = gapDx;
+ 327 | *   |                     dx2 = actualDx - gapDx;
+ 328 |     |                 }
+ 329 |     |             }
+ 330 |     |         }
+ 331 |     | 
+ 332 | *   |         if (crossesEquilibrium) {
+ 333 |     |             // Split swap: first part converges (baseFee), second part diverges (kinkingFee)
+ 334 |     |             // First part: swap dx1
+ 335 |     |             uint256[N_COINS] memory xp1 = xpBefore;
+ 336 | *   |             uint256 dx1Normalized = dx1 * tokenMultipliers[i];
+ 337 | *   |             uint256 x1 = xp1[i] + dx1Normalized;
+ 338 | *   |             uint256 y1 = CurveMath.get_y(i, j, x1, xp1, currentA);
+ 339 | *   |             require(y1 > 0, "KinkPool: Convergence failed"); // Fix #2
+ 340 | *   |             uint256 dy1Normalized = xp1[j] - y1;
+ 341 |     | 
+ 342 |     |             // Apply baseFee to the converging part
+ 343 | *   |             uint256 dy1FeeTotal = (dy1Normalized * baseFee) / FEE_DENOMINATOR;
+ 344 |     | 
+ 345 |     |             // Calculate admin share
+ 346 | *   |             uint256 adminShare1 = (dy1FeeTotal * baseFeeShare) / FEE_DENOMINATOR;
+ 347 |     |             // Denormalize admin share to token units
+ 348 | *   |             if (adminShare1 > 0) {
+ 349 |     |                 adminFeeAmount += adminShare1 / tokenMultipliers[j];
+ 350 |     |             }
+ 351 |     | 
+ 352 | *   |             dy1Normalized -= dy1FeeTotal;
+ 353 |     | 
+ 354 | *   |             uint256 dy1 = dy1Normalized / tokenMultipliers[j];
+ 355 |     | 
+ 356 |     |             // Update balances to reflect first swap outcome
+ 357 | *   |             xp1[i] = x1;
+ 358 | *   |             xp1[j] = xpBefore[j] - dy1Normalized - adminShare1;
+ 359 |     | 
+ 360 |     |             // Second swap with target A (opposite side)
+ 361 | *   |             uint256 targetA = i == 0 ? A0 : A1; // Fix #3: i=0 means token0 input, so we become token0 heavy -> A0
+ 362 |     |             uint256[N_COINS] memory xp2 = xp1;
+ 363 | *   |             uint256 dx2Normalized = dx2 * tokenMultipliers[i];
+ 364 | *   |             uint256 x2 = xp2[i] + dx2Normalized;
+ 365 | *   |             uint256 y2 = CurveMath.get_y(i, j, x2, xp2, targetA);
+ 366 | *   |             require(y2 > 0, "KinkPool: Convergence failed"); // Fix #2
+ 367 | *   |             uint256 dy2Normalized = xp2[j] - y2;
+ 368 |     | 
+ 369 |     |             // Apply fee to the diverging part based on soft peg logic
+ 370 |     |             // The diverging part starts at equilibrium (price ~ 1.0).
+ 371 |     |             // If softPeg < 1.0, we start in the "good" zone (price > softPeg).
+ 372 |     |             // We check if the swap pushes price below softPeg.
+ 373 |     | 
+ 374 | *   |             uint256 peg = i == 0 ? softPeg0 : softPeg1;
+ 375 |     |             uint256 fee = baseFee;
+ 376 |     | 
+ 377 | *   |             if (dx2Normalized > 0) {
+ 378 |     |                 // Check marginal price at the end of the swap
+ 379 |     |                 // x2 is the end state of input token balance
+ 380 | *   |                 uint256 endPrice = _get_marginal_price(i, j, x2, xp2, targetA);
+ 381 |     | 
+ 382 | *   |                 if (endPrice < peg) {
+ 383 |     |                     // We crossed the peg.
+ 384 |     |                     // We assume we started above peg (since we started at equilibrium ~1.0).
+ 385 |     |                     // Find the split point.
+ 386 | *   |                     uint256 startPrice = _get_marginal_price(i, j, xp2[i], xp2, targetA);
+ 387 |     | 
+ 388 | *   |                     if (startPrice > peg) {
+ 389 |     |                         // Fix #2: Use binary search instead of linear interpolation
+ 390 |     |                         uint256 dxSplitNormalized = _find_crossing_dx(i, j, xp2[i], xp2, targetA, peg, dx2Normalized);
+ 391 |     | 
+ 392 |     |                         // Safety check
+ 393 |     |                         if (dxSplitNormalized > dx2Normalized) dxSplitNormalized = dx2Normalized;
+ 394 |     | 
+ 395 |     |                         // Split calculations
+ 396 |     |                         // 1. Base fee part
+ 397 |     |                         uint256 xSplit = xp2[i] + dxSplitNormalized;
+ 398 | *   |                         uint256 ySplit = CurveMath.get_y(i, j, xSplit, xp2, targetA);
+ 399 | *   |                         uint256 dySplitNormalized = xp2[j] - ySplit;
+ 400 |     | 
+ 401 |     |                         // 2. Kinking fee part (remaining)
+ 402 |     |                         // Total dy (dy2Normalized) is already calculated as xp2[j] - y2.
+ 403 |     |                         // Remaining dy = dy2Normalized - dySplitNormalized
+ 404 |     |                         uint256 dyRestNormalized = dy2Normalized - dySplitNormalized;
+ 405 |     | 
+ 406 |     |                         // Apply fees
+ 407 |     |                         uint256 feeBasePart = (dySplitNormalized * baseFee) / FEE_DENOMINATOR;
+ 408 |     |                         uint256 feeKinkPart = (dyRestNormalized * kinkingFee) / FEE_DENOMINATOR;
+ 409 | *   |                         uint256 totalFee = feeBasePart + feeKinkPart;
+ 410 |     | 
+ 411 |     |                         // Admin share
+ 412 | *   |                         uint256 adminShareBase = (feeBasePart * baseFeeShare) / FEE_DENOMINATOR;
+ 413 |     |                         uint256 adminShareKink = (feeKinkPart * kinkingFeeShare) / FEE_DENOMINATOR;
+ 414 |     |                         uint256 totalAdminShare = adminShareBase + adminShareKink;
+ 415 |     | 
+ 416 |     |                         if (totalAdminShare > 0) {
+ 417 |     |                             adminFeeAmount += totalAdminShare / tokenMultipliers[j];
+ 418 |     |                         }
+ 419 |     | 
+ 420 |     |                         dy2Normalized -= totalFee;
+ 421 |     | 
+ 422 |     |                     } else {
+ 423 |     |                         // Started below peg? (Unlikely for diverging from equilibrium, but possible if peg > 1.0)
+ 424 | *   |                         fee = kinkingFee;
+ 425 | *   |                         uint256 dy2FeeTotal = (dy2Normalized * fee) / FEE_DENOMINATOR;
+ 426 | *   |                         uint256 adminShare2 = (dy2FeeTotal * kinkingFeeShare) / FEE_DENOMINATOR;
+ 427 | *   |                          if (adminShare2 > 0) {
+ 428 |     |                             adminFeeAmount += adminShare2 / tokenMultipliers[j];
+ 429 |     |                         }
+ 430 | *   |                         dy2Normalized -= dy2FeeTotal;
+ 431 |     |                     }
+ 432 |     |                 } else {
+ 433 |     |                     // End price >= peg. Whole swap is base fee.
+ 434 |     |                     uint256 dy2FeeTotal = (dy2Normalized * baseFee) / FEE_DENOMINATOR;
+ 435 |     |                     uint256 adminShare2 = (dy2FeeTotal * baseFeeShare) / FEE_DENOMINATOR;
+ 436 |     |                     if (adminShare2 > 0) {
+ 437 |     |                         adminFeeAmount += adminShare2 / tokenMultipliers[j];
+ 438 |     |                     }
+ 439 |     |                     dy2Normalized -= dy2FeeTotal;
+ 440 |     |                 }
+ 441 |     |             }
+ 442 |     | 
+ 443 | *   |             uint256 dy2 = dy2Normalized / tokenMultipliers[j];
+ 444 | *   |             dy = dy1 + dy2;
+ 445 |     |         } else {
+ 446 |     |             // Standard swap
+ 447 | *   |             bool converging = false;
+ 448 | *   |             if (xpBefore[i] < xpBefore[j]) {
+ 449 |     |                 converging = true;
+ 450 |     |             }
+ 451 |     | 
+ 452 | *   |             uint256 dxNormalized = actualDx * tokenMultipliers[i];
+ 453 | *   |             uint256 x = xpBefore[i] + dxNormalized;
+ 454 | *   |             uint256 y = CurveMath.get_y(i, j, x, xpBefore, currentA);
+ 455 | *   |             require(y > 0, "KinkPool: Convergence failed"); // Fix #2
+ 456 | *   |             uint256 dyNormalized = xpBefore[j] - y;
+ 457 |     | 
+ 458 | *   |             if (!converging) {
+ 459 | *   |                  uint256 peg = i == 0 ? softPeg0 : softPeg1;
+ 460 |     |                  uint256 fee = baseFee;
+ 461 |     | 
+ 462 | *   |                  if (dxNormalized > 0) {
+ 463 | *   |                     uint256 endPrice = _get_marginal_price(i, j, x, xpBefore, currentA);
+ 464 |     | 
+ 465 | *   |                     if (endPrice < peg) {
+ 466 |     |                         // Check start price
+ 467 | *   |                         uint256 startPrice = _get_marginal_price(i, j, xpBefore[i], xpBefore, currentA);
+ 468 |     | 
+ 469 | *   |                         if (startPrice > peg) {
+ 470 |     |                             // Fix #2: Use binary search instead of linear interpolation
+ 471 |     |                             uint256 dxSplitNormalized = _find_crossing_dx(i, j, xpBefore[i], xpBefore, currentA, peg, dxNormalized);
+ 472 |     | 
+ 473 |     |                             // Split
+ 474 |     |                             uint256 xSplit = xpBefore[i] + dxSplitNormalized;
+ 475 |     |                             uint256 ySplit = CurveMath.get_y(i, j, xSplit, xpBefore, currentA);
+ 476 |     |                             uint256 dySplitNormalized = xpBefore[j] - ySplit;
+ 477 |     |                             uint256 dyRestNormalized = dyNormalized - dySplitNormalized;
+ 478 |     | 
+ 479 |     |                             uint256 feeBasePart = (dySplitNormalized * baseFee) / FEE_DENOMINATOR;
+ 480 |     |                             uint256 feeKinkPart = (dyRestNormalized * kinkingFee) / FEE_DENOMINATOR;
+ 481 |     |                             uint256 totalFee = feeBasePart + feeKinkPart;
+ 482 |     | 
+ 483 |     |                             uint256 adminShareBase = (feeBasePart * baseFeeShare) / FEE_DENOMINATOR;
+ 484 |     |                             uint256 adminShareKink = (feeKinkPart * kinkingFeeShare) / FEE_DENOMINATOR;
+ 485 |     |                             uint256 totalAdminShare = adminShareBase + adminShareKink;
+ 486 |     | 
+ 487 |     |                             if (totalAdminShare > 0) {
+ 488 |     |                                 adminFeeAmount += totalAdminShare / tokenMultipliers[j];
+ 489 |     |                             }
+ 490 |     |                             dyNormalized -= totalFee;
+ 491 |     | 
+ 492 |     |                         } else {
+ 493 |     |                             // Started below peg
+ 494 | *   |                             fee = kinkingFee;
+ 495 | *   |                             uint256 dyFeeTotal = (dyNormalized * fee) / FEE_DENOMINATOR;
+ 496 | *   |                             uint256 adminShare = (dyFeeTotal * kinkingFeeShare) / FEE_DENOMINATOR;
+ 497 | *   |                             if (adminShare > 0) {
+ 498 |     |                                 adminFeeAmount += adminShare / tokenMultipliers[j];
+ 499 |     |                             }
+ 500 | *   |                             dyNormalized -= dyFeeTotal;
+ 501 |     |                         }
+ 502 |     |                     } else {
+ 503 |     |                         // End price >= peg. Base fee.
+ 504 |     |                         uint256 dyFeeTotal = (dyNormalized * baseFee) / FEE_DENOMINATOR;
+ 505 |     |                         uint256 adminShare = (dyFeeTotal * baseFeeShare) / FEE_DENOMINATOR;
+ 506 |     |                         if (adminShare > 0) {
+ 507 |     |                             adminFeeAmount += adminShare / tokenMultipliers[j];
+ 508 |     |                         }
+ 509 |     |                         dyNormalized -= dyFeeTotal;
+ 510 |     |                     }
+ 511 |     |                  }
+ 512 |     |             } else {
+ 513 |     |                 // Converging
+ 514 | *   |                 uint256 dyFeeTotal = (dyNormalized * baseFee) / FEE_DENOMINATOR;
+ 515 | *   |                 uint256 adminShare = (dyFeeTotal * baseFeeShare) / FEE_DENOMINATOR;
+ 516 | *   |                 if (adminShare > 0) {
+ 517 |     |                     adminFeeAmount += adminShare / tokenMultipliers[j];
+ 518 |     |                 }
+ 519 | *   |                 dyNormalized -= dyFeeTotal;
+ 520 |     |             }
+ 521 |     | 
+ 522 | *   |             dy = dyNormalized / tokenMultipliers[j];
+ 523 |     |         }
+ 524 |     |     }
+ 525 |     | 
+ 526 |     |     /**
+ 527 |     |      * @notice Calculate output amount for a given input (view only)
+ 528 |     |      * @param i Index of input token (0 or 1)
+ 529 |     |      * @param j Index of output token (0 or 1)
+ 530 |     |      * @param dx Input amount
+ 531 |     |      * @return dy Output amount
+ 532 |     |      */
+ 533 |     |     function get_dy(uint256 i, uint256 j, uint256 dx) external view returns (uint256 dy) {
+ 534 |     |         require(i != j && i < N_COINS && j < N_COINS, "KinkPool: Invalid indices");
+ 535 |     |         require(dx > 0, "KinkPool: Zero input");
+ 536 |     | 
+ 537 |     |         uint256[N_COINS] memory balances = _balances();
+ 538 |     |         uint256[N_COINS] memory xpBefore = _xp(balances);
+ 539 |     | 
+ 540 |     |         (dy, ) = _calculate_exchange(i, j, dx, xpBefore);
+ 541 |     |     }
+ 542 |     | 
+ 543 |     |     /**
+ 544 |     |      * @notice Execute a swap
+ 545 |     |      * @param i Index of input token (0 or 1)
+ 546 |     |      * @param j Index of output token (0 or 1)
+ 547 |     |      * @param dx Input amount
+ 548 |     |      * @param min_dy Minimum output amount (slippage protection)
+ 549 |     |      * @return dy Output amount
+ 550 |     |      */
+ 551 |     |     function exchange(
+ 552 |     |         uint256 i,
+ 553 |     |         uint256 j,
+ 554 |     |         uint256 dx,
+ 555 |     |         uint256 min_dy
+ 556 |     |     ) external nonReentrant returns (uint256 dy) {
+ 557 | *   |         require(i != j && i < N_COINS && j < N_COINS, "KinkPool: Invalid indices");
+ 558 | *   |         require(dx > 0, "KinkPool: Zero input");
+ 559 |     | 
+ 560 | *   |         IERC20 inputToken = i == 0 ? IERC20(token0) : IERC20(token1);
+ 561 | *   |         IERC20 outputToken = j == 0 ? IERC20(token0) : IERC20(token1);
+ 562 |     | 
+ 563 | *   |         uint256[N_COINS] memory reservesBefore = _balances();
+ 564 |     | 
+ 565 |     |         // Fix #1: Use raw balance for input calculation to prevent admin fee theft
+ 566 | *   |         uint256 inputBalanceBefore = IERC20(address(inputToken)).balanceOf(address(this));
+ 567 |     | 
+ 568 |     |         // Transfer input tokens
+ 569 | *   |         inputToken.safeTransferFrom(msg.sender, address(this), dx);
+ 570 |     | 
+ 571 | *   |         uint256 inputBalanceAfter = IERC20(address(inputToken)).balanceOf(address(this));
+ 572 | *   |         require(inputBalanceAfter > inputBalanceBefore, "KinkPool: Insufficient input");
+ 573 | *   |         uint256 actualDx = inputBalanceAfter - inputBalanceBefore;
+ 574 |     | 
+ 575 | *   |         uint256[N_COINS] memory xpBefore = _xp(reservesBefore);
+ 576 |     | 
+ 577 |     |         uint256 adminAmount;
+ 578 | *   |         (dy, adminAmount) = _calculate_exchange(i, j, actualDx, xpBefore);
+ 579 |     | 
+ 580 |     |         // Update admin fees
+ 581 | *   |         if (adminAmount > 0) {
+ 582 |     |             if (j == 0) adminFee0 += adminAmount;
+ 583 |     |             else adminFee1 += adminAmount;
+ 584 |     |         }
+ 585 |     | 
+ 586 | *   |         require(dy >= min_dy, "KinkPool: Slippage");
+ 587 | *   |         require(dy > 0, "KinkPool: Insufficient output");
+ 588 |     | 
+ 589 | *   |         uint256 outputBalanceBeforeTransfer = IERC20(address(outputToken)).balanceOf(address(this));
+ 590 | *   |         require(outputBalanceBeforeTransfer >= dy, "KinkPool: Insufficient liquidity");
+ 591 |     | 
+ 592 | *   |         outputToken.safeTransfer(msg.sender, dy);
+ 593 |     | 
+ 594 | *   |         uint256 outputBalanceAfterTransfer = IERC20(address(outputToken)).balanceOf(address(this));
+ 595 | *   |         uint256 actualDy = outputBalanceBeforeTransfer - outputBalanceAfterTransfer;
+ 596 | *   |         require(actualDy > 0, "KinkPool: Transfer failed");
+ 597 |     | 
+ 598 | *   |         if (actualDy != dy) {
+ 599 |     |             require(actualDy >= min_dy, "KinkPool: Actual output below minimum");
+ 600 |     |             dy = actualDy;
+ 601 |     |         }
+ 602 |     | 
+ 603 | *   |         emit Exchange(msg.sender, msg.sender, i, j, actualDx, dy);
+ 604 |     |     }
+ 605 |     | 
+ 606 |     |     /**
+ 607 |     |      * @notice Add liquidity to the pool
+ 608 |     |      * @dev Mitigates A-Switch valuation attacks by forcing the use of the higher A
+ 609 |     |      *      when crossing equilibrium.
+ 610 |     |      * @param amounts Array of amounts to add [token0, token1]
+ 611 |     |      * @param min_lp Minimum LP tokens to mint (slippage protection)
+ 612 |     |      * @return lpAmount Amount of LP tokens minted
+ 613 |     |      */
+ 614 |     |     function add_liquidity(
+ 615 |     |         uint256[N_COINS] memory amounts,
+ 616 |     |         uint256 min_lp
+ 617 |     |     ) external nonReentrant returns (uint256 lpAmount) {
+ 618 | *   |         require(amounts[0] > 0 || amounts[1] > 0, "KinkPool: Zero amounts");
+ 619 |     | 
+ 620 | *   |         uint256[N_COINS] memory balancesBefore = _balances();
+ 621 |     |         uint256 totalSupply = totalSupply();
+ 622 |     | 
+ 623 |     |         // Transfer tokens
+ 624 | *   |         if (amounts[0] > 0) {
+ 625 | *   |             IERC20(token0).safeTransferFrom(msg.sender, address(this), amounts[0]);
+ 626 |     |         }
+ 627 | *   |         if (amounts[1] > 0) {
+ 628 | *   |             IERC20(token1).safeTransferFrom(msg.sender, address(this), amounts[1]);
+ 629 |     |         }
+ 630 |     | 
+ 631 | *   |         uint256[N_COINS] memory balancesAfter = _balances();
+ 632 |     | 
+ 633 | *   |         uint256[N_COINS] memory xpAfter = _xp(balancesAfter);
+ 634 | *   |         uint256 A_new = _get_A(xpAfter);
+ 635 |     | 
+ 636 | *   |         if (totalSupply == 0) {
+ 637 | *   |             uint256 D1 = CurveMath.get_D(xpAfter, A_new);
+ 638 | *   |             require(D1 > 0, "KinkPool: Invalid D");
+ 639 |     |             lpAmount = D1;
+ 640 | *   |             require(lpAmount > MINIMUM_LIQUIDITY, "KinkPool: Insufficient liquidity minted");
+ 641 |     |             // Burn the minimum liquidity to lock the price
+ 642 |     |             _mint(address(0xdEaD), MINIMUM_LIQUIDITY);
+ 643 |     |             // Mint the rest to the sender
+ 644 |     |             lpAmount -= MINIMUM_LIQUIDITY;
+ 645 |     |         } else {
+ 646 | *   |             uint256[N_COINS] memory xpBefore = _xp(balancesBefore);
+ 647 | *   |             uint256 A_old = _get_A(xpBefore);
+ 648 |     | 
+ 649 |     |             // Use the MAX A for the calculation to prevent valuation arbitrage
+ 650 |     |             // If we move Low -> High, we use High (suppresses minting).
+ 651 |     |             // If we move High -> Low, we use High (suppresses minting).
+ 652 | *   |             uint256 A_calc = A_old > A_new ? A_old : A_new;
+ 653 |     | 
+ 654 | *   |             uint256 D0 = CurveMath.get_D(xpBefore, A_calc);
+ 655 | *   |             uint256 D1 = CurveMath.get_D(xpAfter, A_calc);
+ 656 | *   |             require(D1 > D0, "KinkPool: D must increase");
+ 657 |     | 
+ 658 |     |             // Calculate LP tokens to mint
+ 659 | *   |             lpAmount = (totalSupply * (D1 - D0)) / D0;
+ 660 |     |         }
+ 661 |     | 
+ 662 | *   |         require(lpAmount >= min_lp, "KinkPool: Slippage");
+ 663 | *   |         _mint(msg.sender, lpAmount);
+ 664 |     | 
+ 665 | *   |         emit AddLiquidity(msg.sender, amounts, lpAmount);
+ 666 |     |     }
+ 667 |     | 
+ 668 |     |     /**
+ 669 |     |      * @notice Remove liquidity from the pool
+ 670 |     |      * @param lpAmount Amount of LP tokens to burn
+ 671 |     |      * @param min_amounts Minimum amounts to receive [token0, token1]
+ 672 |     |      * @return amounts Array of amounts withdrawn [token0, token1]
+ 673 |     |      */
+ 674 |     |     function remove_liquidity(
+ 675 |     |         uint256 lpAmount,
+ 676 |     |         uint256[N_COINS] memory min_amounts
+ 677 |     |     ) external nonReentrant returns (uint256[N_COINS] memory amounts) {
+ 678 | *   |         require(lpAmount > 0, "KinkPool: Zero amount");
+ 679 |     | 
+ 680 |     |         uint256 totalSupply = totalSupply();
+ 681 | *   |         uint256[N_COINS] memory balances = _balances();
+ 682 |     | 
+ 683 |     |         // Calculate amounts to withdraw
+ 684 | *   |         for (uint256 i = 0; i < N_COINS; i++) {
+ 685 | *   |             amounts[i] = (balances[i] * lpAmount) / totalSupply;
+ 686 | *   |             require(amounts[i] >= min_amounts[i], "KinkPool: Slippage");
+ 687 |     |         }
+ 688 |     | 
+ 689 |     |         // Burn LP tokens
+ 690 | *   |         _burn(msg.sender, lpAmount);
+ 691 |     | 
+ 692 |     |         // Transfer tokens
+ 693 | *   |         if (amounts[0] > 0) {
+ 694 | *   |             IERC20(token0).safeTransfer(msg.sender, amounts[0]);
+ 695 |     |         }
+ 696 | *   |         if (amounts[1] > 0) {
+ 697 | *   |             IERC20(token1).safeTransfer(msg.sender, amounts[1]);
+ 698 |     |         }
+ 699 |     | 
+ 700 | *   |         emit RemoveLiquidity(msg.sender, amounts, lpAmount);
+ 701 |     |     }
+ 702 |     | 
+ 703 |     |     /**
+ 704 |     |      * @notice Calculate expected LP tokens for a given deposit
+ 705 |     |      * @param amounts Array of amounts to add [token0, token1]
+ 706 |     |      * @param is_deposit True if depositing, False if withdrawing (not used currently but standard signature)
+ 707 |     |      * @return Expected LP amount
+ 708 |     |      */
+ 709 |     |     function calc_token_amount(
+ 710 |     |         uint256[N_COINS] memory amounts,
+ 711 |     |         bool is_deposit
+ 712 |     |     ) external view returns (uint256) {
+ 713 |     |         uint256[N_COINS] memory balances = _balances();
+ 714 |     |         uint256 totalSupply = totalSupply();
+ 715 |     | 
+ 716 |     |         uint256[N_COINS] memory xpBefore = _xp(balances);
+ 717 |     |         uint256 A_old = _get_A(xpBefore);
+ 718 |     | 
+ 719 |     |         uint256[N_COINS] memory new_balances = balances;
+ 720 |     |         for (uint256 i = 0; i < N_COINS; i++) {
+ 721 |     |             if (is_deposit) {
+ 722 |     |                 new_balances[i] += amounts[i];
+ 723 |     |             } else {
+ 724 |     |                 // Logic for withdrawal would differ
+ 725 |     |                 if (amounts[i] > new_balances[i]) return 0;
+ 726 |     |                 new_balances[i] -= amounts[i];
+ 727 |     |             }
+ 728 |     |         }
+ 729 |     | 
+ 730 |     |         uint256[N_COINS] memory xpAfter = _xp(new_balances);
+ 731 |     |         uint256 A_new = _get_A(xpAfter);
+ 732 |     | 
+ 733 |     |         if (totalSupply == 0) {
+ 734 |     |             uint256 D1 = CurveMath.get_D(xpAfter, A_new);
+ 735 |     |             if (D1 <= MINIMUM_LIQUIDITY) return 0;
+ 736 |     |             return D1 - MINIMUM_LIQUIDITY;
+ 737 |     |         }
+ 738 |     | 
+ 739 |     |         // Use Max A logic
+ 740 |     |         uint256 A_calc = A_old > A_new ? A_old : A_new;
+ 741 |     |         uint256 D0 = CurveMath.get_D(xpBefore, A_calc);
+ 742 |     |         uint256 D1 = CurveMath.get_D(xpAfter, A_calc);
+ 743 |     | 
+ 744 |     |         if (D1 > D0) {
+ 745 |     |              return (totalSupply * (D1 - D0)) / D0;
+ 746 |     |         } else {
+ 747 |     |              return (totalSupply * (D0 - D1)) / D0;
+ 748 |     |         }
+ 749 |     |     }
+ 750 |     | 
+ 751 |     |     /**
+ 752 |     |      * @notice Get current reserves
+ 753 |     |      * @return reserve0 Reserve of token0
+ 754 |     |      * @return reserve1 Reserve of token1
+ 755 |     |      */
+ 756 |     |     function getReserves() external view returns (uint256 reserve0, uint256 reserve1) {
+ 757 | *   |         uint256[N_COINS] memory balances = _balances();
+ 758 |     |         reserve0 = balances[0];
+ 759 |     |         reserve1 = balances[1];
+ 760 |     |     }
+ 761 |     | 
+ 762 |     |     /**
+ 763 |     |      * @notice Square root function (Babylonian method)
+ 764 |     |      */
+ 765 |     |     function sqrt(uint256 x) internal pure returns (uint256) {
+ 766 |     |         if (x == 0) return 0;
+ 767 |     |         uint256 z = (x + 1) / 2;
+ 768 |     |         uint256 y = x;
+ 769 |     |         while (z < y) {
+ 770 |     |             y = z;
+ 771 |     |             z = (x / z + z) / 2;
+ 772 |     |         }
+ 773 |     |         return y;
+ 774 |     |     }
+ 775 |     | }
+ 776 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/PoolRegistry.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.20;
+  3 |     | 
+  4 |     | import "@openzeppelin/contracts/access/Ownable.sol";
+  5 |     | 
+  6 | *   | contract PoolRegistry is Ownable {
+  7 |     |     event PoolRegistered(address indexed token0, address indexed token1, address indexed pool);
+  8 |     |     event FactoryUpdated(address indexed oldFactory, address indexed newFactory);
+  9 |     | 
+ 10 |     |     address[] public allPools;
+ 11 |     |     mapping(address => bool) public isPool;
+ 12 |     |     mapping(bytes32 => address[]) private poolsByPair;
+ 13 |     |     address public canonicalFactory;
+ 14 |     | 
+ 15 |     |     constructor(address initialOwner, address initialFactory) Ownable(initialOwner) {
+ 16 | *   |         canonicalFactory = initialFactory;
+ 17 |     |     }
+ 18 |     | 
+ 19 |     |     function setFactory(address newFactory) external onlyOwner {
+ 20 | *   |         require(newFactory != address(0), "PoolRegistry: zero factory");
+ 21 | *   |         emit FactoryUpdated(canonicalFactory, newFactory);
+ 22 |     |         canonicalFactory = newFactory;
+ 23 |     |     }
+ 24 |     | 
+ 25 |     |     function registerPool(address token0, address token1, address pool) external {
+ 26 | *   |         require(msg.sender == canonicalFactory, "PoolRegistry: only factory");
+ 27 | *   |         require(!isPool[pool], "PoolRegistry: Pool already registered");
+ 28 | *   |         require(pool != address(0), "PoolRegistry: Zero pool");
+ 29 |     | 
+ 30 |     |         isPool[pool] = true;
+ 31 |     |         allPools.push(pool);
+ 32 |     | 
+ 33 | *   |         (address ordered0, address ordered1) = token0 < token1 ? (token0, token1) : (token1, token0);
+ 34 | *   |         poolsByPair[keccak256(abi.encodePacked(ordered0, ordered1))].push(pool);
+ 35 |     | 
+ 36 | *   |         emit PoolRegistered(ordered0, ordered1, pool);
+ 37 |     |     }
+ 38 |     | 
+ 39 |     |     function allPoolsLength() external view returns (uint256) {
+ 40 |     |         return allPools.length;
+ 41 |     |     }
+ 42 |     | 
+ 43 |     |     function getPoolsForPair(address tokenA, address tokenB) external view returns (address[] memory) {
+ 44 |     |         (address ordered0, address ordered1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+ 45 | *   |         return poolsByPair[keccak256(abi.encodePacked(ordered0, ordered1))];
+ 46 |     |     }
+ 47 |     | }
+ 48 |     | 
+ 49 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/echidna/KinkPoolEchidna.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity ^0.8.20;
+   3 |     | 
+   4 |     | import "../KinkPool.sol";
+   5 |     | import "../KinkFactory.sol";
+   6 |     | import "../PoolRegistry.sol";
+   7 |     | import "../mocks/MockERC20.sol";
+   8 |     | import "../mocks/FeeOnTransferToken.sol";
+   9 |     | 
+  10 | *   | contract KinkPoolEchidna {
+  11 |     |     KinkPool public pool;
+  12 |     |     FeeOnTransferToken public token0;
+  13 | *   |     MockERC20 public token1;
+  14 |     | 
+  15 | *   |     uint256 public immutable initialToken0;
+  16 | *   |     uint256 public immutable initialToken1;
+  17 |     | 
+  18 | *   |     uint256 private constant SEED_AMOUNT = 10_000e18;
+  19 | *   |     uint256 private constant MAX_SINGLE_SWAP = 100_000e18;
+  20 |     | 
+  21 |     |     constructor() {
+  22 | *   |         token0 = new FeeOnTransferToken("Fee Token", "FEE", 100); // 1% burn
+  23 | *   |         token1 = new MockERC20("Token1", "T1");
+  24 |     | 
+  25 | *   |         PoolRegistry registry = new PoolRegistry(address(this), address(0));
+  26 | *   |         KinkFactory factory = new KinkFactory(address(registry));
+  27 | *   |         registry.setFactory(address(factory));
+  28 | *   |         address poolAddress = factory.createPool(address(token0), address(token1), 100, 200, 4, 10, 2e18, 2e18);
+  29 |     |         pool = KinkPool(poolAddress);
+  30 |     | 
+  31 | *   |         token0.approve(poolAddress, type(uint256).max);
+  32 | *   |         token1.approve(poolAddress, type(uint256).max);
+  33 |     | 
+  34 | *   |         initialToken0 = token0.balanceOf(address(this));
+  35 | *   |         initialToken1 = token1.balanceOf(address(this));
+  36 |     | 
+  37 |     |         _provideSeedLiquidity();
+  38 |     |     }
+  39 |     | 
+  40 |     |     // ======== Fuzz entrypoints ========
+  41 |     | 
+  42 | *   |     function adversarialSwap(uint256 rawDx, uint256 direction) external {
+  43 | *   |         if (pool.totalSupply() == 0) return;
+  44 | *   |         uint256 side = direction % 2;
+  45 | *   |         if (side == 0) {
+  46 | *   |             uint256 dx = _bound(rawDx, _min(token0.balanceOf(address(this)), MAX_SINGLE_SWAP));
+  47 | *   |             if (dx == 0) return;
+  48 | *   |             pool.exchange(0, 1, dx, 0);
+  49 |     |         } else {
+  50 | *   |             uint256 dx = _bound(rawDx, _min(token1.balanceOf(address(this)), MAX_SINGLE_SWAP));
+  51 | *   |             if (dx == 0) return;
+  52 | *   |             pool.exchange(1, 0, dx, 0);
+  53 |     |         }
+  54 |     |     }
+  55 |     | 
+  56 | *   |     function singleSidedAdd(uint256 rawAmount, uint256 side) external {
+  57 |     |         uint256 index = side % 2;
+  58 |     |         uint256[2] memory amounts;
+  59 | *   |         if (index == 0) {
+  60 | *   |             uint256 amount = _bound(rawAmount, token0.balanceOf(address(this)));
+  61 | *   |             if (amount == 0) return;
+  62 |     |             amounts[0] = amount;
+  63 |     |         } else {
+  64 |     |             uint256 amount = _bound(rawAmount, token1.balanceOf(address(this)));
+  65 |     |             if (amount == 0) return;
+  66 |     |             amounts[1] = amount;
+  67 |     |         }
+  68 | *   |         pool.add_liquidity(amounts, 0);
+  69 |     |     }
+  70 |     | 
+  71 | *   |     function yankLiquidity(uint256 rawLp) external {
+  72 | *   |         uint256 lpBalance = pool.balanceOf(address(this));
+  73 | *   |         if (lpBalance == 0) return;
+  74 | *   |         uint256 amount = _bound(rawLp, lpBalance);
+  75 | *   |         if (amount == 0) return;
+  76 |     |         uint256[2] memory mins;
+  77 | *   |         pool.remove_liquidity(amount, mins);
+  78 |     |     }
+  79 |     | 
+  80 |     |     // ======== Properties ========
+  81 |     | 
+  82 |     |     function echidna_token0_accounting() external view returns (bool) {
+  83 | *   |         uint256 accounted = token0.balanceOf(address(this)) + token0.balanceOf(address(pool)) + token0.totalBurned();
+  84 | *   |         return accounted == initialToken0;
+  85 |     |     }
+  86 |     | 
+  87 |     |     function echidna_token1_conserved() external view returns (bool) {
+  88 | *   |         return token1.balanceOf(address(this)) + token1.balanceOf(address(pool)) == initialToken1;
+  89 |     |     }
+  90 |     | 
+  91 |     |     function echidna_reserves_match_balances() external view returns (bool) {
+  92 | *   |         (uint256 reserve0, uint256 reserve1) = pool.getReserves();
+  93 | *   |         return reserve0 == token0.balanceOf(address(pool)) && reserve1 == token1.balanceOf(address(pool));
+  94 |     |     }
+  95 |     | 
+  96 | *   |     function echidna_invariant_matches_supply() external view returns (bool) {
+  97 | *   |         uint256 supply = pool.totalSupply();
+  98 | *   |         uint256 invariantValue = pool.currentInvariant();
+  99 | *   |         if (supply == 0) {
+ 100 |     |             return invariantValue == 0
+ 101 |     |                 && token0.balanceOf(address(pool)) == 0
+ 102 |     |                 && token1.balanceOf(address(pool)) == 0;
+ 103 |     |         }
+ 104 | *   |         if (supply >= invariantValue) {
+ 105 | *   |             return supply - invariantValue <= 1;
+ 106 |     |         }
+ 107 | *   |         return invariantValue - supply <= 1;
+ 108 |     |     }
+ 109 |     | 
+ 110 |     |     // ======== Helpers ========
+ 111 |     | 
+ 112 |     |     function _provideSeedLiquidity() internal {
+ 113 |     |         uint256[2] memory seedAmounts;
+ 114 |     |         seedAmounts[0] = SEED_AMOUNT;
+ 115 |     |         seedAmounts[1] = SEED_AMOUNT;
+ 116 | *   |         pool.add_liquidity(seedAmounts, 0);
+ 117 |     |     }
+ 118 |     | 
+ 119 | *   |     function _bound(uint256 raw, uint256 max) internal pure returns (uint256) {
+ 120 | *   |         if (max == 0) return 0;
+ 121 | *   |         return raw % (max + 1);
+ 122 |     |     }
+ 123 |     | 
+ 124 |     |     function _min(uint256 a, uint256 b) internal pure returns (uint256) {
+ 125 | *   |         return a < b ? a : b;
+ 126 |     |     }
+ 127 |     | }
+ 128 |     | 
+ 129 |     | 
+ 130 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/libraries/CurveMath.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity ^0.8.20;
+   3 |     | 
+   4 |     | /**
+   5 |     |  * @title CurveMath
+   6 |     |  * @notice Stableswap math library ported from Curve Fi's StableSwap.vy
+   7 |     |  * @dev Implements the Stableswap invariant with dynamic amplification parameter A
+   8 |     |  */
+   9 |     | library CurveMath {
+  10 |     |     uint256 public constant A_PRECISION = 100;
+  11 |     |     uint256 public constant N_COINS = 2;
+  12 |     |     uint256 public constant PRECISION = 1e18;
+  13 |     | 
+  14 |     |     /**
+  15 |     |      * @notice Calculate D (invariant) using Newton-Raphson method
+  16 |     |      * @param xp Normalized balances array
+  17 |     |      * @param A Amplification parameter
+  18 |     |      * @return D The invariant value, or 0 if convergence fails
+  19 |     |      */
+  20 | *   |     function get_D(uint256[N_COINS] memory xp, uint256 A) internal pure returns (uint256) {
+  21 | *   |         uint256 S = 0;
+  22 | *   |         for (uint256 i = 0; i < N_COINS; i++) {
+  23 | *   |             S += xp[i];
+  24 |     |         }
+  25 | *   |         if (S == 0) {
+  26 |     |             return 0;
+  27 |     |         }
+  28 |     | 
+  29 | *   |         uint256 D = S;
+  30 |     |         uint256 Ann = A * N_COINS;
+  31 |     | 
+  32 | *   |         for (uint256 i = 0; i < 255; i++) {
+  33 | *   |             uint256 D_P = D;
+  34 | *   |             for (uint256 j = 0; j < N_COINS; j++) {
+  35 | *   |                 D_P = (D_P * D) / (xp[j] * N_COINS + 1); // +1 to prevent /0
+  36 |     |             }
+  37 | *   |             uint256 D_prev = D;
+  38 | *   |             D = ((Ann * S + D_P * N_COINS) * D) / ((Ann - 1) * D + (N_COINS + 1) * D_P);
+  39 |     | 
+  40 |     |             // Equality with the precision of 1
+  41 | *   |             if (D > D_prev) {
+  42 | *   |                 if (D - D_prev <= 1) {
+  43 | *   |                     return D;
+  44 |     |                 }
+  45 |     |             } else {
+  46 | *   |                 if (D_prev - D <= 1) {
+  47 |     |                     return D;
+  48 |     |                 }
+  49 |     |             }
+  50 |     |         }
+  51 |     | 
+  52 |     |         // Convergence failed, return 0
+  53 |     |         return 0;
+  54 |     |     }
+  55 |     | 
+  56 |     |     /**
+  57 |     |      * @notice Calculate y (output amount) when x (input amount) changes
+  58 |     |      * @param i Index of input token
+  59 |     |      * @param j Index of output token
+  60 |     |      * @param x New balance of input token
+  61 |     |      * @param xp Current normalized balances
+  62 |     |      * @param A Amplification parameter
+  63 |     |      * @return y Output amount
+  64 |     |      */
+  65 | *   |     function get_y(uint256 i, uint256 j, uint256 x, uint256[N_COINS] memory xp, uint256 A)
+  66 |     |         internal
+  67 |     |         pure
+  68 |     |         returns (uint256)
+  69 |     |     {
+  70 | *   |         require(i != j && i < N_COINS && j < N_COINS, "CurveMath: Invalid indices");
+  71 |     | 
+  72 | *   |         uint256 D = get_D(xp, A);
+  73 | *   |         uint256 c = D;
+  74 | *   |         uint256 S_ = 0;
+  75 |     |         uint256 Ann = A * N_COINS;
+  76 |     | 
+  77 | *   |         uint256 _x = 0;
+  78 | *   |         for (uint256 _i = 0; _i < N_COINS; _i++) {
+  79 | *   |             if (_i == i) {
+  80 | *   |                 _x = x;
+  81 | *   |             } else if (_i != j) {
+  82 |     |                 _x = xp[_i];
+  83 |     |             } else {
+  84 | *   |                 continue;
+  85 |     |             }
+  86 | *   |             S_ += _x;
+  87 | *   |             c = (c * D) / (_x * N_COINS);
+  88 |     |         }
+  89 | *   |         c = (c * D) / (Ann * N_COINS);
+  90 | *   |         uint256 b = S_ + D / Ann;
+  91 |     |         uint256 y_prev = 0;
+  92 | *   |         uint256 y = D;
+  93 |     | 
+  94 | *   |         for (uint256 _i = 0; _i < 255; _i++) {
+  95 | *   |             y_prev = y;
+  96 | *   |             y = (y * y + c) / (2 * y + b - D);
+  97 | *   |             if (y > y_prev) {
+  98 | *   |                 if (y - y_prev <= 1) {
+  99 | *   |                     return y;
+ 100 |     |                 }
+ 101 |     |             } else {
+ 102 | *   |                 if (y_prev - y <= 1) {
+ 103 |     |                     return y;
+ 104 |     |                 }
+ 105 |     |             }
+ 106 |     |         }
+ 107 |     | 
+ 108 |     |         // If convergence fails, return 0
+ 109 |     |         return 0;
+ 110 |     |     }
+ 111 |     | 
+ 112 |     |     /**
+ 113 |     |      * @notice Calculate y given D
+ 114 |     |      * @param A Amplification parameter
+ 115 |     |      * @param i Index of token to calculate
+ 116 |     |      * @param xp Current normalized balances
+ 117 |     |      * @param D The invariant D
+ 118 |     |      * @return y Output amount
+ 119 |     |      */
+ 120 |     |     function get_y_D(uint256 A, uint256 i, uint256[N_COINS] memory xp, uint256 D) internal pure returns (uint256) {
+ 121 |     |         require(i < N_COINS, "CurveMath: Invalid index");
+ 122 |     | 
+ 123 |     |         uint256 c = D;
+ 124 |     |         uint256 S_ = 0;
+ 125 |     |         uint256 Ann = A * N_COINS;
+ 126 |     | 
+ 127 |     |         uint256 _x = 0;
+ 128 |     |         for (uint256 _i = 0; _i < N_COINS; _i++) {
+ 129 |     |             if (_i != i) {
+ 130 |     |                 _x = xp[_i];
+ 131 |     |             } else {
+ 132 |     |                 continue;
+ 133 |     |             }
+ 134 |     |             S_ += _x;
+ 135 |     |             c = (c * D) / (_x * N_COINS);
+ 136 |     |         }
+ 137 |     |         c = (c * D) / (Ann * N_COINS);
+ 138 |     |         uint256 b = S_ + D / Ann;
+ 139 |     |         uint256 y_prev = 0;
+ 140 |     |         uint256 y = D;
+ 141 |     | 
+ 142 |     |         for (uint256 _i = 0; _i < 255; _i++) {
+ 143 |     |             y_prev = y;
+ 144 |     |             y = (y * y + c) / (2 * y + b - D);
+ 145 |     |             if (y > y_prev) {
+ 146 |     |                 if (y - y_prev <= 1) {
+ 147 |     |                     return y;
+ 148 |     |                 }
+ 149 |     |             } else {
+ 150 |     |                 if (y_prev - y <= 1) {
+ 151 |     |                     return y;
+ 152 |     |                 }
+ 153 |     |             }
+ 154 |     |         }
+ 155 |     | 
+ 156 |     |         return 0;
+ 157 |     |     }
+ 158 |     | }
+ 159 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/mocks/FeeOnTransferToken.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.20;
+  3 |     | 
+  4 |     | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @title FeeOnTransferToken
+  8 |     |  * @notice ERC20 that burns a configurable percentage on every transfer
+  9 |     |  */
+ 10 | *   | contract FeeOnTransferToken is ERC20 {
+ 11 |     |     uint256 public immutable feeBps;
+ 12 | *   |     uint256 public totalBurned;
+ 13 |     | 
+ 14 |     |     constructor(string memory name_, string memory symbol_, uint256 _feeBps) ERC20(name_, symbol_) {
+ 15 | *   |         require(_feeBps <= 500, "FeeTooHigh");
+ 16 | *   |         feeBps = _feeBps;
+ 17 | *   |         _mint(msg.sender, 1_000_000 * 1e18);
+ 18 |     |     }
+ 19 |     | 
+ 20 | *   |     function _update(address from, address to, uint256 value) internal override {
+ 21 | *   |         if (feeBps == 0 || from == address(0) || to == address(0) || value == 0) {
+ 22 |     |             super._update(from, to, value);
+ 23 |     |             return;
+ 24 |     |         }
+ 25 |     | 
+ 26 | *   |         uint256 fee = (value * feeBps) / 10_000;
+ 27 |     |         uint256 amountAfterFee = value - fee;
+ 28 |     | 
+ 29 | *   |         if (fee > 0) {
+ 30 |     |             super._update(from, address(0), fee);
+ 31 | *   |             totalBurned += fee;
+ 32 |     |         }
+ 33 |     | 
+ 34 | *   |         super._update(from, to, amountAfterFee);
+ 35 |     |     }
+ 36 |     | }
+ 37 |     | 
+ 38 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/mocks/MockERC20.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.20;
+  3 |     | 
+  4 |     | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @title MockERC20
+  8 |     |  * @notice Mock ERC20 token for testing and deployment
+  9 |     |  */
+ 10 | *   | contract MockERC20 is ERC20 {
+ 11 |     |     uint8 private _decimals;
+ 12 |     | 
+ 13 |     |     constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+ 14 | *   |         _decimals = 18;
+ 15 | *   |         _mint(msg.sender, 1_000_000 * 10 ** 18);
+ 16 |     |     }
+ 17 |     | 
+ 18 |     |     function decimals() public view virtual override returns (uint8) {
+ 19 | *   |         return _decimals;
+ 20 |     |     }
+ 21 |     | 
+ 22 |     |     function mint(address to, uint256 amount) external {
+ 23 |     |         _mint(to, amount);
+ 24 |     |     }
+ 25 |     | }
+ 26 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/access/Ownable.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.0.0) (access/Ownable.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.20;
+   5 |     | 
+   6 |     | import {Context} from "../utils/Context.sol";
+   7 |     | 
+   8 |     | /**
+   9 |     |  * @dev Contract module which provides a basic access control mechanism, where
+  10 |     |  * there is an account (an owner) that can be granted exclusive access to
+  11 |     |  * specific functions.
+  12 |     |  *
+  13 |     |  * The initial owner is set to the address provided by the deployer. This can
+  14 |     |  * later be changed with {transferOwnership}.
+  15 |     |  *
+  16 |     |  * This module is used through inheritance. It will make available the modifier
+  17 |     |  * `onlyOwner`, which can be applied to your functions to restrict their use to
+  18 |     |  * the owner.
+  19 |     |  */
+  20 |     | abstract contract Ownable is Context {
+  21 |     |     address private _owner;
+  22 |     | 
+  23 |     |     /**
+  24 |     |      * @dev The caller account is not authorized to perform an operation.
+  25 |     |      */
+  26 |     |     error OwnableUnauthorizedAccount(address account);
+  27 |     | 
+  28 |     |     /**
+  29 |     |      * @dev The owner is not a valid owner account. (eg. `address(0)`)
+  30 |     |      */
+  31 |     |     error OwnableInvalidOwner(address owner);
+  32 |     | 
+  33 |     |     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+  34 |     | 
+  35 |     |     /**
+  36 |     |      * @dev Initializes the contract setting the address provided by the deployer as the initial owner.
+  37 |     |      */
+  38 |     |     constructor(address initialOwner) {
+  39 | *   |         if (initialOwner == address(0)) {
+  40 |     |             revert OwnableInvalidOwner(address(0));
+  41 |     |         }
+  42 |     |         _transferOwnership(initialOwner);
+  43 |     |     }
+  44 |     | 
+  45 |     |     /**
+  46 |     |      * @dev Throws if called by any account other than the owner.
+  47 |     |      */
+  48 | *   |     modifier onlyOwner() {
+  49 |     |         _checkOwner();
+  50 |     |         _;
+  51 |     |     }
+  52 |     | 
+  53 |     |     /**
+  54 |     |      * @dev Returns the address of the current owner.
+  55 |     |      */
+  56 |     |     function owner() public view virtual returns (address) {
+  57 | *   |         return _owner;
+  58 |     |     }
+  59 |     | 
+  60 |     |     /**
+  61 |     |      * @dev Throws if the sender is not the owner.
+  62 |     |      */
+  63 | *   |     function _checkOwner() internal view virtual {
+  64 | *   |         if (owner() != _msgSender()) {
+  65 |     |             revert OwnableUnauthorizedAccount(_msgSender());
+  66 |     |         }
+  67 |     |     }
+  68 |     | 
+  69 |     |     /**
+  70 |     |      * @dev Leaves the contract without owner. It will not be possible to call
+  71 |     |      * `onlyOwner` functions. Can only be called by the current owner.
+  72 |     |      *
+  73 |     |      * NOTE: Renouncing ownership will leave the contract without an owner,
+  74 |     |      * thereby disabling any functionality that is only available to the owner.
+  75 |     |      */
+  76 |     |     function renounceOwnership() public virtual onlyOwner {
+  77 |     |         _transferOwnership(address(0));
+  78 |     |     }
+  79 |     | 
+  80 |     |     /**
+  81 |     |      * @dev Transfers ownership of the contract to a new account (`newOwner`).
+  82 |     |      * Can only be called by the current owner.
+  83 |     |      */
+  84 |     |     function transferOwnership(address newOwner) public virtual onlyOwner {
+  85 |     |         if (newOwner == address(0)) {
+  86 |     |             revert OwnableInvalidOwner(address(0));
+  87 |     |         }
+  88 |     |         _transferOwnership(newOwner);
+  89 |     |     }
+  90 |     | 
+  91 |     |     /**
+  92 |     |      * @dev Transfers ownership of the contract to a new account (`newOwner`).
+  93 |     |      * Internal function without access restriction.
+  94 |     |      */
+  95 |     |     function _transferOwnership(address newOwner) internal virtual {
+  96 |     |         address oldOwner = _owner;
+  97 |     |         _owner = newOwner;
+  98 | *   |         emit OwnershipTransferred(oldOwner, newOwner);
+  99 |     |     }
+ 100 |     | }
+ 101 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/interfaces/IERC1363.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v5.4.0) (interfaces/IERC1363.sol)
+  3 |     | 
+  4 |     | pragma solidity >=0.6.2;
+  5 |     | 
+  6 |     | import {IERC20} from "./IERC20.sol";
+  7 |     | import {IERC165} from "./IERC165.sol";
+  8 |     | 
+  9 |     | /**
+ 10 |     |  * @title IERC1363
+ 11 |     |  * @dev Interface of the ERC-1363 standard as defined in the https://eips.ethereum.org/EIPS/eip-1363[ERC-1363].
+ 12 |     |  *
+ 13 |     |  * Defines an extension interface for ERC-20 tokens that supports executing code on a recipient contract
+ 14 |     |  * after `transfer` or `transferFrom`, or code on a spender contract after `approve`, in a single transaction.
+ 15 |     |  */
+ 16 |     | interface IERC1363 is IERC20, IERC165 {
+ 17 |     |     /*
+ 18 |     |      * Note: the ERC-165 identifier for this interface is 0xb0202a11.
+ 19 |     |      * 0xb0202a11 ===
+ 20 |     |      *   bytes4(keccak256('transferAndCall(address,uint256)')) ^
+ 21 |     |      *   bytes4(keccak256('transferAndCall(address,uint256,bytes)')) ^
+ 22 |     |      *   bytes4(keccak256('transferFromAndCall(address,address,uint256)')) ^
+ 23 |     |      *   bytes4(keccak256('transferFromAndCall(address,address,uint256,bytes)')) ^
+ 24 |     |      *   bytes4(keccak256('approveAndCall(address,uint256)')) ^
+ 25 |     |      *   bytes4(keccak256('approveAndCall(address,uint256,bytes)'))
+ 26 |     |      */
+ 27 |     | 
+ 28 |     |     /**
+ 29 |     |      * @dev Moves a `value` amount of tokens from the caller's account to `to`
+ 30 |     |      * and then calls {IERC1363Receiver-onTransferReceived} on `to`.
+ 31 |     |      * @param to The address which you want to transfer to.
+ 32 |     |      * @param value The amount of tokens to be transferred.
+ 33 |     |      * @return A boolean value indicating whether the operation succeeded unless throwing.
+ 34 |     |      */
+ 35 |     |     function transferAndCall(address to, uint256 value) external returns (bool);
+ 36 |     | 
+ 37 |     |     /**
+ 38 |     |      * @dev Moves a `value` amount of tokens from the caller's account to `to`
+ 39 |     |      * and then calls {IERC1363Receiver-onTransferReceived} on `to`.
+ 40 |     |      * @param to The address which you want to transfer to.
+ 41 |     |      * @param value The amount of tokens to be transferred.
+ 42 |     |      * @param data Additional data with no specified format, sent in call to `to`.
+ 43 |     |      * @return A boolean value indicating whether the operation succeeded unless throwing.
+ 44 |     |      */
+ 45 |     |     function transferAndCall(address to, uint256 value, bytes calldata data) external returns (bool);
+ 46 |     | 
+ 47 |     |     /**
+ 48 |     |      * @dev Moves a `value` amount of tokens from `from` to `to` using the allowance mechanism
+ 49 |     |      * and then calls {IERC1363Receiver-onTransferReceived} on `to`.
+ 50 |     |      * @param from The address which you want to send tokens from.
+ 51 |     |      * @param to The address which you want to transfer to.
+ 52 |     |      * @param value The amount of tokens to be transferred.
+ 53 |     |      * @return A boolean value indicating whether the operation succeeded unless throwing.
+ 54 |     |      */
+ 55 |     |     function transferFromAndCall(address from, address to, uint256 value) external returns (bool);
+ 56 |     | 
+ 57 |     |     /**
+ 58 |     |      * @dev Moves a `value` amount of tokens from `from` to `to` using the allowance mechanism
+ 59 |     |      * and then calls {IERC1363Receiver-onTransferReceived} on `to`.
+ 60 |     |      * @param from The address which you want to send tokens from.
+ 61 |     |      * @param to The address which you want to transfer to.
+ 62 |     |      * @param value The amount of tokens to be transferred.
+ 63 |     |      * @param data Additional data with no specified format, sent in call to `to`.
+ 64 |     |      * @return A boolean value indicating whether the operation succeeded unless throwing.
+ 65 |     |      */
+ 66 |     |     function transferFromAndCall(address from, address to, uint256 value, bytes calldata data) external returns (bool);
+ 67 |     | 
+ 68 |     |     /**
+ 69 |     |      * @dev Sets a `value` amount of tokens as the allowance of `spender` over the
+ 70 |     |      * caller's tokens and then calls {IERC1363Spender-onApprovalReceived} on `spender`.
+ 71 |     |      * @param spender The address which will spend the funds.
+ 72 |     |      * @param value The amount of tokens to be spent.
+ 73 |     |      * @return A boolean value indicating whether the operation succeeded unless throwing.
+ 74 |     |      */
+ 75 |     |     function approveAndCall(address spender, uint256 value) external returns (bool);
+ 76 |     | 
+ 77 |     |     /**
+ 78 |     |      * @dev Sets a `value` amount of tokens as the allowance of `spender` over the
+ 79 |     |      * caller's tokens and then calls {IERC1363Spender-onApprovalReceived} on `spender`.
+ 80 |     |      * @param spender The address which will spend the funds.
+ 81 |     |      * @param value The amount of tokens to be spent.
+ 82 |     |      * @param data Additional data with no specified format, sent in call to `spender`.
+ 83 |     |      * @return A boolean value indicating whether the operation succeeded unless throwing.
+ 84 |     |      */
+ 85 |     |     function approveAndCall(address spender, uint256 value, bytes calldata data) external returns (bool);
+ 86 |     | }
+ 87 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/interfaces/IERC165.sol
+ 1 |     | // SPDX-License-Identifier: MIT
+ 2 |     | // OpenZeppelin Contracts (last updated v5.4.0) (interfaces/IERC165.sol)
+ 3 |     | 
+ 4 |     | pragma solidity >=0.4.16;
+ 5 |     | 
+ 6 |     | import {IERC165} from "../utils/introspection/IERC165.sol";
+ 7 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/interfaces/IERC20.sol
+ 1 |     | // SPDX-License-Identifier: MIT
+ 2 |     | // OpenZeppelin Contracts (last updated v5.4.0) (interfaces/IERC20.sol)
+ 3 |     | 
+ 4 |     | pragma solidity >=0.4.16;
+ 5 |     | 
+ 6 |     | import {IERC20} from "../token/ERC20/IERC20.sol";
+ 7 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/interfaces/draft-IERC6093.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.5.0) (interfaces/draft-IERC6093.sol)
+   3 |     | 
+   4 |     | pragma solidity >=0.8.4;
+   5 |     | 
+   6 |     | /**
+   7 |     |  * @dev Standard ERC-20 Errors
+   8 |     |  * Interface of the https://eips.ethereum.org/EIPS/eip-6093[ERC-6093] custom errors for ERC-20 tokens.
+   9 |     |  */
+  10 |     | interface IERC20Errors {
+  11 |     |     /**
+  12 |     |      * @dev Indicates an error related to the current `balance` of a `sender`. Used in transfers.
+  13 |     |      * @param sender Address whose tokens are being transferred.
+  14 |     |      * @param balance Current balance for the interacting account.
+  15 |     |      * @param needed Minimum amount required to perform a transfer.
+  16 |     |      */
+  17 |     |     error ERC20InsufficientBalance(address sender, uint256 balance, uint256 needed);
+  18 |     | 
+  19 |     |     /**
+  20 |     |      * @dev Indicates a failure with the token `sender`. Used in transfers.
+  21 |     |      * @param sender Address whose tokens are being transferred.
+  22 |     |      */
+  23 |     |     error ERC20InvalidSender(address sender);
+  24 |     | 
+  25 |     |     /**
+  26 |     |      * @dev Indicates a failure with the token `receiver`. Used in transfers.
+  27 |     |      * @param receiver Address to which tokens are being transferred.
+  28 |     |      */
+  29 |     |     error ERC20InvalidReceiver(address receiver);
+  30 |     | 
+  31 |     |     /**
+  32 |     |      * @dev Indicates a failure with the `spender`’s `allowance`. Used in transfers.
+  33 |     |      * @param spender Address that may be allowed to operate on tokens without being their owner.
+  34 |     |      * @param allowance Amount of tokens a `spender` is allowed to operate with.
+  35 |     |      * @param needed Minimum amount required to perform a transfer.
+  36 |     |      */
+  37 |     |     error ERC20InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
+  38 |     | 
+  39 |     |     /**
+  40 |     |      * @dev Indicates a failure with the `approver` of a token to be approved. Used in approvals.
+  41 |     |      * @param approver Address initiating an approval operation.
+  42 |     |      */
+  43 |     |     error ERC20InvalidApprover(address approver);
+  44 |     | 
+  45 |     |     /**
+  46 |     |      * @dev Indicates a failure with the `spender` to be approved. Used in approvals.
+  47 |     |      * @param spender Address that may be allowed to operate on tokens without being their owner.
+  48 |     |      */
+  49 |     |     error ERC20InvalidSpender(address spender);
+  50 |     | }
+  51 |     | 
+  52 |     | /**
+  53 |     |  * @dev Standard ERC-721 Errors
+  54 |     |  * Interface of the https://eips.ethereum.org/EIPS/eip-6093[ERC-6093] custom errors for ERC-721 tokens.
+  55 |     |  */
+  56 |     | interface IERC721Errors {
+  57 |     |     /**
+  58 |     |      * @dev Indicates that an address can't be an owner. For example, `address(0)` is a forbidden owner in ERC-721.
+  59 |     |      * Used in balance queries.
+  60 |     |      * @param owner Address of the current owner of a token.
+  61 |     |      */
+  62 |     |     error ERC721InvalidOwner(address owner);
+  63 |     | 
+  64 |     |     /**
+  65 |     |      * @dev Indicates a `tokenId` whose `owner` is the zero address.
+  66 |     |      * @param tokenId Identifier number of a token.
+  67 |     |      */
+  68 |     |     error ERC721NonexistentToken(uint256 tokenId);
+  69 |     | 
+  70 |     |     /**
+  71 |     |      * @dev Indicates an error related to the ownership over a particular token. Used in transfers.
+  72 |     |      * @param sender Address whose tokens are being transferred.
+  73 |     |      * @param tokenId Identifier number of a token.
+  74 |     |      * @param owner Address of the current owner of a token.
+  75 |     |      */
+  76 |     |     error ERC721IncorrectOwner(address sender, uint256 tokenId, address owner);
+  77 |     | 
+  78 |     |     /**
+  79 |     |      * @dev Indicates a failure with the token `sender`. Used in transfers.
+  80 |     |      * @param sender Address whose tokens are being transferred.
+  81 |     |      */
+  82 |     |     error ERC721InvalidSender(address sender);
+  83 |     | 
+  84 |     |     /**
+  85 |     |      * @dev Indicates a failure with the token `receiver`. Used in transfers.
+  86 |     |      * @param receiver Address to which tokens are being transferred.
+  87 |     |      */
+  88 |     |     error ERC721InvalidReceiver(address receiver);
+  89 |     | 
+  90 |     |     /**
+  91 |     |      * @dev Indicates a failure with the `operator`’s approval. Used in transfers.
+  92 |     |      * @param operator Address that may be allowed to operate on tokens without being their owner.
+  93 |     |      * @param tokenId Identifier number of a token.
+  94 |     |      */
+  95 |     |     error ERC721InsufficientApproval(address operator, uint256 tokenId);
+  96 |     | 
+  97 |     |     /**
+  98 |     |      * @dev Indicates a failure with the `approver` of a token to be approved. Used in approvals.
+  99 |     |      * @param approver Address initiating an approval operation.
+ 100 |     |      */
+ 101 |     |     error ERC721InvalidApprover(address approver);
+ 102 |     | 
+ 103 |     |     /**
+ 104 |     |      * @dev Indicates a failure with the `operator` to be approved. Used in approvals.
+ 105 |     |      * @param operator Address that may be allowed to operate on tokens without being their owner.
+ 106 |     |      */
+ 107 |     |     error ERC721InvalidOperator(address operator);
+ 108 |     | }
+ 109 |     | 
+ 110 |     | /**
+ 111 |     |  * @dev Standard ERC-1155 Errors
+ 112 |     |  * Interface of the https://eips.ethereum.org/EIPS/eip-6093[ERC-6093] custom errors for ERC-1155 tokens.
+ 113 |     |  */
+ 114 |     | interface IERC1155Errors {
+ 115 |     |     /**
+ 116 |     |      * @dev Indicates an error related to the current `balance` of a `sender`. Used in transfers.
+ 117 |     |      * @param sender Address whose tokens are being transferred.
+ 118 |     |      * @param balance Current balance for the interacting account.
+ 119 |     |      * @param needed Minimum amount required to perform a transfer.
+ 120 |     |      * @param tokenId Identifier number of a token.
+ 121 |     |      */
+ 122 |     |     error ERC1155InsufficientBalance(address sender, uint256 balance, uint256 needed, uint256 tokenId);
+ 123 |     | 
+ 124 |     |     /**
+ 125 |     |      * @dev Indicates a failure with the token `sender`. Used in transfers.
+ 126 |     |      * @param sender Address whose tokens are being transferred.
+ 127 |     |      */
+ 128 |     |     error ERC1155InvalidSender(address sender);
+ 129 |     | 
+ 130 |     |     /**
+ 131 |     |      * @dev Indicates a failure with the token `receiver`. Used in transfers.
+ 132 |     |      * @param receiver Address to which tokens are being transferred.
+ 133 |     |      */
+ 134 |     |     error ERC1155InvalidReceiver(address receiver);
+ 135 |     | 
+ 136 |     |     /**
+ 137 |     |      * @dev Indicates a failure with the `operator`’s approval. Used in transfers.
+ 138 |     |      * @param operator Address that may be allowed to operate on tokens without being their owner.
+ 139 |     |      * @param owner Address of the current owner of a token.
+ 140 |     |      */
+ 141 |     |     error ERC1155MissingApprovalForAll(address operator, address owner);
+ 142 |     | 
+ 143 |     |     /**
+ 144 |     |      * @dev Indicates a failure with the `approver` of a token to be approved. Used in approvals.
+ 145 |     |      * @param approver Address initiating an approval operation.
+ 146 |     |      */
+ 147 |     |     error ERC1155InvalidApprover(address approver);
+ 148 |     | 
+ 149 |     |     /**
+ 150 |     |      * @dev Indicates a failure with the `operator` to be approved. Used in approvals.
+ 151 |     |      * @param operator Address that may be allowed to operate on tokens without being their owner.
+ 152 |     |      */
+ 153 |     |     error ERC1155InvalidOperator(address operator);
+ 154 |     | 
+ 155 |     |     /**
+ 156 |     |      * @dev Indicates an array length mismatch between ids and values in a safeBatchTransferFrom operation.
+ 157 |     |      * Used in batch transfers.
+ 158 |     |      * @param idsLength Length of the array of token identifiers
+ 159 |     |      * @param valuesLength Length of the array of token amounts
+ 160 |     |      */
+ 161 |     |     error ERC1155InvalidArrayLength(uint256 idsLength, uint256 valuesLength);
+ 162 |     | }
+ 163 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/proxy/Clones.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.5.0) (proxy/Clones.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.20;
+   5 |     | 
+   6 |     | import {Create2} from "../utils/Create2.sol";
+   7 |     | import {Errors} from "../utils/Errors.sol";
+   8 |     | 
+   9 |     | /**
+  10 |     |  * @dev https://eips.ethereum.org/EIPS/eip-1167[ERC-1167] is a standard for
+  11 |     |  * deploying minimal proxy contracts, also known as "clones".
+  12 |     |  *
+  13 |     |  * > To simply and cheaply clone contract functionality in an immutable way, this standard specifies
+  14 |     |  * > a minimal bytecode implementation that delegates all calls to a known, fixed address.
+  15 |     |  *
+  16 |     |  * The library includes functions to deploy a proxy using either `create` (traditional deployment) or `create2`
+  17 |     |  * (salted deterministic deployment). It also includes functions to predict the addresses of clones deployed using the
+  18 |     |  * deterministic method.
+  19 |     |  */
+  20 |     | library Clones {
+  21 |     |     error CloneArgumentsTooLong();
+  22 |     | 
+  23 |     |     /**
+  24 |     |      * @dev Deploys and returns the address of a clone that mimics the behavior of `implementation`.
+  25 |     |      *
+  26 |     |      * This function uses the create opcode, which should never revert.
+  27 |     |      *
+  28 |     |      * WARNING: This function does not check if `implementation` has code. A clone that points to an address
+  29 |     |      * without code cannot be initialized. Initialization calls may appear to be successful when, in reality, they
+  30 |     |      * have no effect and leave the clone uninitialized, allowing a third party to initialize it later.
+  31 |     |      */
+  32 |     |     function clone(address implementation) internal returns (address instance) {
+  33 |     |         return clone(implementation, 0);
+  34 |     |     }
+  35 |     | 
+  36 |     |     /**
+  37 |     |      * @dev Same as {xref-Clones-clone-address-}[clone], but with a `value` parameter to send native currency
+  38 |     |      * to the new contract.
+  39 |     |      *
+  40 |     |      * WARNING: This function does not check if `implementation` has code. A clone that points to an address
+  41 |     |      * without code cannot be initialized. Initialization calls may appear to be successful when, in reality, they
+  42 |     |      * have no effect and leave the clone uninitialized, allowing a third party to initialize it later.
+  43 |     |      *
+  44 |     |      * NOTE: Using a non-zero value at creation will require the contract using this function (e.g. a factory)
+  45 |     |      * to always have enough balance for new deployments. Consider exposing this function under a payable method.
+  46 |     |      */
+  47 |     |     function clone(address implementation, uint256 value) internal returns (address instance) {
+  48 |     |         if (address(this).balance < value) {
+  49 |     |             revert Errors.InsufficientBalance(address(this).balance, value);
+  50 |     |         }
+  51 | *   |         assembly ("memory-safe") {
+  52 |     |             // Cleans the upper 96 bits of the `implementation` word, then packs the first 3 bytes
+  53 |     |             // of the `implementation` address with the bytecode before the address.
+  54 |     |             mstore(0x00, or(shr(232, shl(96, implementation)), 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000))
+  55 |     |             // Packs the remaining 17 bytes of `implementation` with the bytecode after the address.
+  56 |     |             mstore(0x20, or(shl(120, implementation), 0x5af43d82803e903d91602b57fd5bf3))
+  57 |     |             instance := create(value, 0x09, 0x37)
+  58 |     |         }
+  59 | *   |         if (instance == address(0)) {
+  60 |     |             revert Errors.FailedDeployment();
+  61 |     |         }
+  62 |     |     }
+  63 |     | 
+  64 |     |     /**
+  65 |     |      * @dev Deploys and returns the address of a clone that mimics the behavior of `implementation`.
+  66 |     |      *
+  67 |     |      * This function uses the create2 opcode and a `salt` to deterministically deploy
+  68 |     |      * the clone. Using the same `implementation` and `salt` multiple times will revert, since
+  69 |     |      * the clones cannot be deployed twice at the same address.
+  70 |     |      *
+  71 |     |      * WARNING: This function does not check if `implementation` has code. A clone that points to an address
+  72 |     |      * without code cannot be initialized. Initialization calls may appear to be successful when, in reality, they
+  73 |     |      * have no effect and leave the clone uninitialized, allowing a third party to initialize it later.
+  74 |     |      */
+  75 |     |     function cloneDeterministic(address implementation, bytes32 salt) internal returns (address instance) {
+  76 |     |         return cloneDeterministic(implementation, salt, 0);
+  77 |     |     }
+  78 |     | 
+  79 |     |     /**
+  80 |     |      * @dev Same as {xref-Clones-cloneDeterministic-address-bytes32-}[cloneDeterministic], but with
+  81 |     |      * a `value` parameter to send native currency to the new contract.
+  82 |     |      *
+  83 |     |      * WARNING: This function does not check if `implementation` has code. A clone that points to an address
+  84 |     |      * without code cannot be initialized. Initialization calls may appear to be successful when, in reality, they
+  85 |     |      * have no effect and leave the clone uninitialized, allowing a third party to initialize it later.
+  86 |     |      *
+  87 |     |      * NOTE: Using a non-zero value at creation will require the contract using this function (e.g. a factory)
+  88 |     |      * to always have enough balance for new deployments. Consider exposing this function under a payable method.
+  89 |     |      */
+  90 |     |     function cloneDeterministic(
+  91 |     |         address implementation,
+  92 |     |         bytes32 salt,
+  93 |     |         uint256 value
+  94 |     |     ) internal returns (address instance) {
+  95 |     |         if (address(this).balance < value) {
+  96 |     |             revert Errors.InsufficientBalance(address(this).balance, value);
+  97 |     |         }
+  98 |     |         assembly ("memory-safe") {
+  99 |     |             // Cleans the upper 96 bits of the `implementation` word, then packs the first 3 bytes
+ 100 |     |             // of the `implementation` address with the bytecode before the address.
+ 101 |     |             mstore(0x00, or(shr(232, shl(96, implementation)), 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000))
+ 102 |     |             // Packs the remaining 17 bytes of `implementation` with the bytecode after the address.
+ 103 |     |             mstore(0x20, or(shl(120, implementation), 0x5af43d82803e903d91602b57fd5bf3))
+ 104 |     |             instance := create2(value, 0x09, 0x37, salt)
+ 105 |     |         }
+ 106 |     |         if (instance == address(0)) {
+ 107 |     |             revert Errors.FailedDeployment();
+ 108 |     |         }
+ 109 |     |     }
+ 110 |     | 
+ 111 |     |     /**
+ 112 |     |      * @dev Computes the address of a clone deployed using {Clones-cloneDeterministic}.
+ 113 |     |      */
+ 114 |     |     function predictDeterministicAddress(
+ 115 |     |         address implementation,
+ 116 |     |         bytes32 salt,
+ 117 |     |         address deployer
+ 118 |     |     ) internal pure returns (address predicted) {
+ 119 |     |         assembly ("memory-safe") {
+ 120 |     |             let ptr := mload(0x40)
+ 121 |     |             mstore(add(ptr, 0x38), deployer)
+ 122 |     |             mstore(add(ptr, 0x24), 0x5af43d82803e903d91602b57fd5bf3ff)
+ 123 |     |             mstore(add(ptr, 0x14), implementation)
+ 124 |     |             mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73)
+ 125 |     |             mstore(add(ptr, 0x58), salt)
+ 126 |     |             mstore(add(ptr, 0x78), keccak256(add(ptr, 0x0c), 0x37))
+ 127 |     |             predicted := and(keccak256(add(ptr, 0x43), 0x55), 0xffffffffffffffffffffffffffffffffffffffff)
+ 128 |     |         }
+ 129 |     |     }
+ 130 |     | 
+ 131 |     |     /**
+ 132 |     |      * @dev Computes the address of a clone deployed using {Clones-cloneDeterministic}.
+ 133 |     |      */
+ 134 |     |     function predictDeterministicAddress(
+ 135 |     |         address implementation,
+ 136 |     |         bytes32 salt
+ 137 |     |     ) internal view returns (address predicted) {
+ 138 |     |         return predictDeterministicAddress(implementation, salt, address(this));
+ 139 |     |     }
+ 140 |     | 
+ 141 |     |     /**
+ 142 |     |      * @dev Deploys and returns the address of a clone that mimics the behavior of `implementation` with custom
+ 143 |     |      * immutable arguments. These are provided through `args` and cannot be changed after deployment. To
+ 144 |     |      * access the arguments within the implementation, use {fetchCloneArgs}.
+ 145 |     |      *
+ 146 |     |      * This function uses the create opcode, which should never revert.
+ 147 |     |      *
+ 148 |     |      * WARNING: This function does not check if `implementation` has code. A clone that points to an address
+ 149 |     |      * without code cannot be initialized. Initialization calls may appear to be successful when, in reality, they
+ 150 |     |      * have no effect and leave the clone uninitialized, allowing a third party to initialize it later.
+ 151 |     |      */
+ 152 |     |     function cloneWithImmutableArgs(address implementation, bytes memory args) internal returns (address instance) {
+ 153 |     |         return cloneWithImmutableArgs(implementation, args, 0);
+ 154 |     |     }
+ 155 |     | 
+ 156 |     |     /**
+ 157 |     |      * @dev Same as {xref-Clones-cloneWithImmutableArgs-address-bytes-}[cloneWithImmutableArgs], but with a `value`
+ 158 |     |      * parameter to send native currency to the new contract.
+ 159 |     |      *
+ 160 |     |      * WARNING: This function does not check if `implementation` has code. A clone that points to an address
+ 161 |     |      * without code cannot be initialized. Initialization calls may appear to be successful when, in reality, they
+ 162 |     |      * have no effect and leave the clone uninitialized, allowing a third party to initialize it later.
+ 163 |     |      *
+ 164 |     |      * NOTE: Using a non-zero value at creation will require the contract using this function (e.g. a factory)
+ 165 |     |      * to always have enough balance for new deployments. Consider exposing this function under a payable method.
+ 166 |     |      */
+ 167 |     |     function cloneWithImmutableArgs(
+ 168 |     |         address implementation,
+ 169 |     |         bytes memory args,
+ 170 |     |         uint256 value
+ 171 |     |     ) internal returns (address instance) {
+ 172 |     |         if (address(this).balance < value) {
+ 173 |     |             revert Errors.InsufficientBalance(address(this).balance, value);
+ 174 |     |         }
+ 175 |     |         bytes memory bytecode = _cloneCodeWithImmutableArgs(implementation, args);
+ 176 |     |         assembly ("memory-safe") {
+ 177 |     |             instance := create(value, add(bytecode, 0x20), mload(bytecode))
+ 178 |     |         }
+ 179 |     |         if (instance == address(0)) {
+ 180 |     |             revert Errors.FailedDeployment();
+ 181 |     |         }
+ 182 |     |     }
+ 183 |     | 
+ 184 |     |     /**
+ 185 |     |      * @dev Deploys and returns the address of a clone that mimics the behavior of `implementation` with custom
+ 186 |     |      * immutable arguments. These are provided through `args` and cannot be changed after deployment. To
+ 187 |     |      * access the arguments within the implementation, use {fetchCloneArgs}.
+ 188 |     |      *
+ 189 |     |      * This function uses the create2 opcode and a `salt` to deterministically deploy the clone. Using the same
+ 190 |     |      * `implementation`, `args` and `salt` multiple times will revert, since the clones cannot be deployed twice
+ 191 |     |      * at the same address.
+ 192 |     |      *
+ 193 |     |      * WARNING: This function does not check if `implementation` has code. A clone that points to an address
+ 194 |     |      * without code cannot be initialized. Initialization calls may appear to be successful when, in reality, they
+ 195 |     |      * have no effect and leave the clone uninitialized, allowing a third party to initialize it later.
+ 196 |     |      */
+ 197 |     |     function cloneDeterministicWithImmutableArgs(
+ 198 |     |         address implementation,
+ 199 |     |         bytes memory args,
+ 200 |     |         bytes32 salt
+ 201 |     |     ) internal returns (address instance) {
+ 202 |     |         return cloneDeterministicWithImmutableArgs(implementation, args, salt, 0);
+ 203 |     |     }
+ 204 |     | 
+ 205 |     |     /**
+ 206 |     |      * @dev Same as {xref-Clones-cloneDeterministicWithImmutableArgs-address-bytes-bytes32-}[cloneDeterministicWithImmutableArgs],
+ 207 |     |      * but with a `value` parameter to send native currency to the new contract.
+ 208 |     |      *
+ 209 |     |      * WARNING: This function does not check if `implementation` has code. A clone that points to an address
+ 210 |     |      * without code cannot be initialized. Initialization calls may appear to be successful when, in reality, they
+ 211 |     |      * have no effect and leave the clone uninitialized, allowing a third party to initialize it later.
+ 212 |     |      *
+ 213 |     |      * NOTE: Using a non-zero value at creation will require the contract using this function (e.g. a factory)
+ 214 |     |      * to always have enough balance for new deployments. Consider exposing this function under a payable method.
+ 215 |     |      */
+ 216 |     |     function cloneDeterministicWithImmutableArgs(
+ 217 |     |         address implementation,
+ 218 |     |         bytes memory args,
+ 219 |     |         bytes32 salt,
+ 220 |     |         uint256 value
+ 221 |     |     ) internal returns (address instance) {
+ 222 |     |         bytes memory bytecode = _cloneCodeWithImmutableArgs(implementation, args);
+ 223 |     |         return Create2.deploy(value, salt, bytecode);
+ 224 |     |     }
+ 225 |     | 
+ 226 |     |     /**
+ 227 |     |      * @dev Computes the address of a clone deployed using {Clones-cloneDeterministicWithImmutableArgs}.
+ 228 |     |      */
+ 229 |     |     function predictDeterministicAddressWithImmutableArgs(
+ 230 |     |         address implementation,
+ 231 |     |         bytes memory args,
+ 232 |     |         bytes32 salt,
+ 233 |     |         address deployer
+ 234 |     |     ) internal pure returns (address predicted) {
+ 235 |     |         bytes memory bytecode = _cloneCodeWithImmutableArgs(implementation, args);
+ 236 |     |         return Create2.computeAddress(salt, keccak256(bytecode), deployer);
+ 237 |     |     }
+ 238 |     | 
+ 239 |     |     /**
+ 240 |     |      * @dev Computes the address of a clone deployed using {Clones-cloneDeterministicWithImmutableArgs}.
+ 241 |     |      */
+ 242 |     |     function predictDeterministicAddressWithImmutableArgs(
+ 243 |     |         address implementation,
+ 244 |     |         bytes memory args,
+ 245 |     |         bytes32 salt
+ 246 |     |     ) internal view returns (address predicted) {
+ 247 |     |         return predictDeterministicAddressWithImmutableArgs(implementation, args, salt, address(this));
+ 248 |     |     }
+ 249 |     | 
+ 250 |     |     /**
+ 251 |     |      * @dev Get the immutable args attached to a clone.
+ 252 |     |      *
+ 253 |     |      * - If `instance` is a clone that was deployed using `clone` or `cloneDeterministic`, this
+ 254 |     |      *   function will return an empty array.
+ 255 |     |      * - If `instance` is a clone that was deployed using `cloneWithImmutableArgs` or
+ 256 |     |      *   `cloneDeterministicWithImmutableArgs`, this function will return the args array used at
+ 257 |     |      *   creation.
+ 258 |     |      * - If `instance` is NOT a clone deployed using this library, the behavior is undefined. This
+ 259 |     |      *   function should only be used to check addresses that are known to be clones.
+ 260 |     |      */
+ 261 |     |     function fetchCloneArgs(address instance) internal view returns (bytes memory) {
+ 262 |     |         bytes memory result = new bytes(instance.code.length - 0x2d); // revert if length is too short
+ 263 |     |         assembly ("memory-safe") {
+ 264 |     |             extcodecopy(instance, add(result, 0x20), 0x2d, mload(result))
+ 265 |     |         }
+ 266 |     |         return result;
+ 267 |     |     }
+ 268 |     | 
+ 269 |     |     /**
+ 270 |     |      * @dev Helper that prepares the initcode of the proxy with immutable args.
+ 271 |     |      *
+ 272 |     |      * An assembly variant of this function requires copying the `args` array, which can be efficiently done using
+ 273 |     |      * `mcopy`. Unfortunately, that opcode is not available before cancun. A pure solidity implementation using
+ 274 |     |      * abi.encodePacked is more expensive but also more portable and easier to review.
+ 275 |     |      *
+ 276 |     |      * NOTE: https://eips.ethereum.org/EIPS/eip-170[EIP-170] limits the length of the contract code to 24576 bytes.
+ 277 |     |      * With the proxy code taking 45 bytes, that limits the length of the immutable args to 24531 bytes.
+ 278 |     |      */
+ 279 |     |     function _cloneCodeWithImmutableArgs(
+ 280 |     |         address implementation,
+ 281 |     |         bytes memory args
+ 282 |     |     ) private pure returns (bytes memory) {
+ 283 |     |         if (args.length > 0x5fd3) revert CloneArgumentsTooLong();
+ 284 |     |         return
+ 285 |     |             abi.encodePacked(
+ 286 |     |                 hex"61",
+ 287 |     |                 uint16(args.length + 0x2d),
+ 288 |     |                 hex"3d81600a3d39f3363d3d373d3d3d363d73",
+ 289 |     |                 implementation,
+ 290 |     |                 hex"5af43d82803e903d91602b57fd5bf3",
+ 291 |     |                 args
+ 292 |     |             );
+ 293 |     |     }
+ 294 |     | }
+ 295 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/proxy/utils/Initializable.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.3.0) (proxy/utils/Initializable.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.20;
+   5 |     | 
+   6 |     | /**
+   7 |     |  * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
+   8 |     |  * behind a proxy. Since proxied contracts do not make use of a constructor, it's common to move constructor logic to an
+   9 |     |  * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer
+  10 |     |  * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.
+  11 |     |  *
+  12 |     |  * The initialization functions use a version number. Once a version number is used, it is consumed and cannot be
+  13 |     |  * reused. This mechanism prevents re-execution of each "step" but allows the creation of new initialization steps in
+  14 |     |  * case an upgrade adds a module that needs to be initialized.
+  15 |     |  *
+  16 |     |  * For example:
+  17 |     |  *
+  18 |     |  * [.hljs-theme-light.nopadding]
+  19 |     |  * ```solidity
+  20 |     |  * contract MyToken is ERC20Upgradeable {
+  21 |     |  *     function initialize() initializer public {
+  22 |     |  *         __ERC20_init("MyToken", "MTK");
+  23 |     |  *     }
+  24 |     |  * }
+  25 |     |  *
+  26 |     |  * contract MyTokenV2 is MyToken, ERC20PermitUpgradeable {
+  27 |     |  *     function initializeV2() reinitializer(2) public {
+  28 |     |  *         __ERC20Permit_init("MyToken");
+  29 |     |  *     }
+  30 |     |  * }
+  31 |     |  * ```
+  32 |     |  *
+  33 |     |  * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as
+  34 |     |  * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.
+  35 |     |  *
+  36 |     |  * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure
+  37 |     |  * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.
+  38 |     |  *
+  39 |     |  * [CAUTION]
+  40 |     |  * ====
+  41 |     |  * Avoid leaving a contract uninitialized.
+  42 |     |  *
+  43 |     |  * An uninitialized contract can be taken over by an attacker. This applies to both a proxy and its implementation
+  44 |     |  * contract, which may impact the proxy. To prevent the implementation contract from being used, you should invoke
+  45 |     |  * the {_disableInitializers} function in the constructor to automatically lock it when it is deployed:
+  46 |     |  *
+  47 |     |  * [.hljs-theme-light.nopadding]
+  48 |     |  * ```
+  49 |     |  * /// @custom:oz-upgrades-unsafe-allow constructor
+  50 |     |  * constructor() {
+  51 |     |  *     _disableInitializers();
+  52 |     |  * }
+  53 |     |  * ```
+  54 |     |  * ====
+  55 |     |  */
+  56 |     | abstract contract Initializable {
+  57 |     |     /**
+  58 |     |      * @dev Storage of the initializable contract.
+  59 |     |      *
+  60 |     |      * It's implemented on a custom ERC-7201 namespace to reduce the risk of storage collisions
+  61 |     |      * when using with upgradeable contracts.
+  62 |     |      *
+  63 |     |      * @custom:storage-location erc7201:openzeppelin.storage.Initializable
+  64 |     |      */
+  65 |     |     struct InitializableStorage {
+  66 |     |         /**
+  67 |     |          * @dev Indicates that the contract has been initialized.
+  68 |     |          */
+  69 |     |         uint64 _initialized;
+  70 |     |         /**
+  71 |     |          * @dev Indicates that the contract is in the process of being initialized.
+  72 |     |          */
+  73 |     |         bool _initializing;
+  74 |     |     }
+  75 |     | 
+  76 |     |     // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.Initializable")) - 1)) & ~bytes32(uint256(0xff))
+  77 | *   |     bytes32 private constant INITIALIZABLE_STORAGE = 0xf0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00;
+  78 |     | 
+  79 |     |     /**
+  80 |     |      * @dev The contract is already initialized.
+  81 |     |      */
+  82 |     |     error InvalidInitialization();
+  83 |     | 
+  84 |     |     /**
+  85 |     |      * @dev The contract is not initializing.
+  86 |     |      */
+  87 |     |     error NotInitializing();
+  88 |     | 
+  89 |     |     /**
+  90 |     |      * @dev Triggered when the contract has been initialized or reinitialized.
+  91 |     |      */
+  92 |     |     event Initialized(uint64 version);
+  93 |     | 
+  94 |     |     /**
+  95 |     |      * @dev A modifier that defines a protected initializer function that can be invoked at most once. In its scope,
+  96 |     |      * `onlyInitializing` functions can be used to initialize parent contracts.
+  97 |     |      *
+  98 |     |      * Similar to `reinitializer(1)`, except that in the context of a constructor an `initializer` may be invoked any
+  99 |     |      * number of times. This behavior in the constructor can be useful during testing and is not expected to be used in
+ 100 |     |      * production.
+ 101 |     |      *
+ 102 |     |      * Emits an {Initialized} event.
+ 103 |     |      */
+ 104 |     |     modifier initializer() {
+ 105 |     |         // solhint-disable-next-line var-name-mixedcase
+ 106 |     |         InitializableStorage storage $ = _getInitializableStorage();
+ 107 |     | 
+ 108 |     |         // Cache values to avoid duplicated sloads
+ 109 | *   |         bool isTopLevelCall = !$._initializing;
+ 110 |     |         uint64 initialized = $._initialized;
+ 111 |     | 
+ 112 |     |         // Allowed calls:
+ 113 |     |         // - initialSetup: the contract is not in the initializing state and no previous version was
+ 114 |     |         //                 initialized
+ 115 |     |         // - construction: the contract is initialized at version 1 (no reinitialization) and the
+ 116 |     |         //                 current contract is just being deployed
+ 117 | *   |         bool initialSetup = initialized == 0 && isTopLevelCall;
+ 118 | *   |         bool construction = initialized == 1 && address(this).code.length == 0;
+ 119 |     | 
+ 120 | *   |         if (!initialSetup && !construction) {
+ 121 |     |             revert InvalidInitialization();
+ 122 |     |         }
+ 123 |     |         $._initialized = 1;
+ 124 | *   |         if (isTopLevelCall) {
+ 125 |     |             $._initializing = true;
+ 126 |     |         }
+ 127 |     |         _;
+ 128 | *   |         if (isTopLevelCall) {
+ 129 |     |             $._initializing = false;
+ 130 | *   |             emit Initialized(1);
+ 131 |     |         }
+ 132 |     |     }
+ 133 |     | 
+ 134 |     |     /**
+ 135 |     |      * @dev A modifier that defines a protected reinitializer function that can be invoked at most once, and only if the
+ 136 |     |      * contract hasn't been initialized to a greater version before. In its scope, `onlyInitializing` functions can be
+ 137 |     |      * used to initialize parent contracts.
+ 138 |     |      *
+ 139 |     |      * A reinitializer may be used after the original initialization step. This is essential to configure modules that
+ 140 |     |      * are added through upgrades and that require initialization.
+ 141 |     |      *
+ 142 |     |      * When `version` is 1, this modifier is similar to `initializer`, except that functions marked with `reinitializer`
+ 143 |     |      * cannot be nested. If one is invoked in the context of another, execution will revert.
+ 144 |     |      *
+ 145 |     |      * Note that versions can jump in increments greater than 1; this implies that if multiple reinitializers coexist in
+ 146 |     |      * a contract, executing them in the right order is up to the developer or operator.
+ 147 |     |      *
+ 148 |     |      * WARNING: Setting the version to 2**64 - 1 will prevent any future reinitialization.
+ 149 |     |      *
+ 150 |     |      * Emits an {Initialized} event.
+ 151 |     |      */
+ 152 |     |     modifier reinitializer(uint64 version) {
+ 153 |     |         // solhint-disable-next-line var-name-mixedcase
+ 154 |     |         InitializableStorage storage $ = _getInitializableStorage();
+ 155 |     | 
+ 156 |     |         if ($._initializing || $._initialized >= version) {
+ 157 |     |             revert InvalidInitialization();
+ 158 |     |         }
+ 159 |     |         $._initialized = version;
+ 160 |     |         $._initializing = true;
+ 161 |     |         _;
+ 162 |     |         $._initializing = false;
+ 163 |     |         emit Initialized(version);
+ 164 |     |     }
+ 165 |     | 
+ 166 |     |     /**
+ 167 |     |      * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the
+ 168 |     |      * {initializer} and {reinitializer} modifiers, directly or indirectly.
+ 169 |     |      */
+ 170 |     |     modifier onlyInitializing() {
+ 171 |     |         _checkInitializing();
+ 172 |     |         _;
+ 173 |     |     }
+ 174 |     | 
+ 175 |     |     /**
+ 176 |     |      * @dev Reverts if the contract is not in an initializing state. See {onlyInitializing}.
+ 177 |     |      */
+ 178 |     |     function _checkInitializing() internal view virtual {
+ 179 |     |         if (!_isInitializing()) {
+ 180 |     |             revert NotInitializing();
+ 181 |     |         }
+ 182 |     |     }
+ 183 |     | 
+ 184 |     |     /**
+ 185 |     |      * @dev Locks the contract, preventing any future reinitialization. This cannot be part of an initializer call.
+ 186 |     |      * Calling this in the constructor of a contract will prevent that contract from being initialized or reinitialized
+ 187 |     |      * to any version. It is recommended to use this to lock implementation contracts that are designed to be called
+ 188 |     |      * through proxies.
+ 189 |     |      *
+ 190 |     |      * Emits an {Initialized} event the first time it is successfully executed.
+ 191 |     |      */
+ 192 |     |     function _disableInitializers() internal virtual {
+ 193 |     |         // solhint-disable-next-line var-name-mixedcase
+ 194 |     |         InitializableStorage storage $ = _getInitializableStorage();
+ 195 |     | 
+ 196 | *   |         if ($._initializing) {
+ 197 |     |             revert InvalidInitialization();
+ 198 |     |         }
+ 199 | *   |         if ($._initialized != type(uint64).max) {
+ 200 |     |             $._initialized = type(uint64).max;
+ 201 | *   |             emit Initialized(type(uint64).max);
+ 202 |     |         }
+ 203 |     |     }
+ 204 |     | 
+ 205 |     |     /**
+ 206 |     |      * @dev Returns the highest version that has been initialized. See {reinitializer}.
+ 207 |     |      */
+ 208 |     |     function _getInitializedVersion() internal view returns (uint64) {
+ 209 |     |         return _getInitializableStorage()._initialized;
+ 210 |     |     }
+ 211 |     | 
+ 212 |     |     /**
+ 213 |     |      * @dev Returns `true` if the contract is currently initializing. See {onlyInitializing}.
+ 214 |     |      */
+ 215 |     |     function _isInitializing() internal view returns (bool) {
+ 216 |     |         return _getInitializableStorage()._initializing;
+ 217 |     |     }
+ 218 |     | 
+ 219 |     |     /**
+ 220 |     |      * @dev Pointer to storage slot. Allows integrators to override it with a custom storage location.
+ 221 |     |      *
+ 222 |     |      * NOTE: Consider following the ERC-7201 formula to derive storage locations.
+ 223 |     |      */
+ 224 |     |     function _initializableStorageSlot() internal pure virtual returns (bytes32) {
+ 225 |     |         return INITIALIZABLE_STORAGE;
+ 226 |     |     }
+ 227 |     | 
+ 228 |     |     /**
+ 229 |     |      * @dev Returns a pointer to the storage namespace.
+ 230 |     |      */
+ 231 |     |     // solhint-disable-next-line var-name-mixedcase
+ 232 |     |     function _getInitializableStorage() private pure returns (InitializableStorage storage $) {
+ 233 |     |         bytes32 slot = _initializableStorageSlot();
+ 234 |     |         assembly {
+ 235 |     |             $.slot := slot
+ 236 |     |         }
+ 237 |     |     }
+ 238 |     | }
+ 239 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/token/ERC20/ERC20.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.5.0) (token/ERC20/ERC20.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.20;
+   5 |     | 
+   6 |     | import {IERC20} from "./IERC20.sol";
+   7 |     | import {IERC20Metadata} from "./extensions/IERC20Metadata.sol";
+   8 |     | import {Context} from "../../utils/Context.sol";
+   9 |     | import {IERC20Errors} from "../../interfaces/draft-IERC6093.sol";
+  10 |     | 
+  11 |     | /**
+  12 |     |  * @dev Implementation of the {IERC20} interface.
+  13 |     |  *
+  14 |     |  * This implementation is agnostic to the way tokens are created. This means
+  15 |     |  * that a supply mechanism has to be added in a derived contract using {_mint}.
+  16 |     |  *
+  17 |     |  * TIP: For a detailed writeup see our guide
+  18 |     |  * https://forum.openzeppelin.com/t/how-to-implement-erc20-supply-mechanisms/226[How
+  19 |     |  * to implement supply mechanisms].
+  20 |     |  *
+  21 |     |  * The default value of {decimals} is 18. To change this, you should override
+  22 |     |  * this function so it returns a different value.
+  23 |     |  *
+  24 |     |  * We have followed general OpenZeppelin Contracts guidelines: functions revert
+  25 |     |  * instead returning `false` on failure. This behavior is nonetheless
+  26 |     |  * conventional and does not conflict with the expectations of ERC-20
+  27 |     |  * applications.
+  28 |     |  */
+  29 |     | abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
+  30 |     |     mapping(address account => uint256) private _balances;
+  31 |     | 
+  32 |     |     mapping(address account => mapping(address spender => uint256)) private _allowances;
+  33 |     | 
+  34 |     |     uint256 private _totalSupply;
+  35 |     | 
+  36 |     |     string private _name;
+  37 |     |     string private _symbol;
+  38 |     | 
+  39 |     |     /**
+  40 |     |      * @dev Sets the values for {name} and {symbol}.
+  41 |     |      *
+  42 |     |      * Both values are immutable: they can only be set once during construction.
+  43 |     |      */
+  44 |     |     constructor(string memory name_, string memory symbol_) {
+  45 | *   |         _name = name_;
+  46 | *   |         _symbol = symbol_;
+  47 |     |     }
+  48 |     | 
+  49 |     |     /**
+  50 |     |      * @dev Returns the name of the token.
+  51 |     |      */
+  52 |     |     function name() public view virtual returns (string memory) {
+  53 |     |         return _name;
+  54 |     |     }
+  55 |     | 
+  56 |     |     /**
+  57 |     |      * @dev Returns the symbol of the token, usually a shorter version of the
+  58 |     |      * name.
+  59 |     |      */
+  60 |     |     function symbol() public view virtual returns (string memory) {
+  61 |     |         return _symbol;
+  62 |     |     }
+  63 |     | 
+  64 |     |     /**
+  65 |     |      * @dev Returns the number of decimals used to get its user representation.
+  66 |     |      * For example, if `decimals` equals `2`, a balance of `505` tokens should
+  67 |     |      * be displayed to a user as `5.05` (`505 / 10 ** 2`).
+  68 |     |      *
+  69 |     |      * Tokens usually opt for a value of 18, imitating the relationship between
+  70 |     |      * Ether and Wei. This is the default value returned by this function, unless
+  71 |     |      * it's overridden.
+  72 |     |      *
+  73 |     |      * NOTE: This information is only used for _display_ purposes: it in
+  74 |     |      * no way affects any of the arithmetic of the contract, including
+  75 |     |      * {IERC20-balanceOf} and {IERC20-transfer}.
+  76 |     |      */
+  77 |     |     function decimals() public view virtual returns (uint8) {
+  78 | *   |         return 18;
+  79 |     |     }
+  80 |     | 
+  81 |     |     /// @inheritdoc IERC20
+  82 |     |     function totalSupply() public view virtual returns (uint256) {
+  83 | *   |         return _totalSupply;
+  84 |     |     }
+  85 |     | 
+  86 |     |     /// @inheritdoc IERC20
+  87 |     |     function balanceOf(address account) public view virtual returns (uint256) {
+  88 |     |         return _balances[account];
+  89 |     |     }
+  90 |     | 
+  91 |     |     /**
+  92 |     |      * @dev See {IERC20-transfer}.
+  93 |     |      *
+  94 |     |      * Requirements:
+  95 |     |      *
+  96 |     |      * - `to` cannot be the zero address.
+  97 |     |      * - the caller must have a balance of at least `value`.
+  98 |     |      */
+  99 |     |     function transfer(address to, uint256 value) public virtual returns (bool) {
+ 100 |     |         address owner = _msgSender();
+ 101 | *   |         _transfer(owner, to, value);
+ 102 |     |         return true;
+ 103 |     |     }
+ 104 |     | 
+ 105 |     |     /// @inheritdoc IERC20
+ 106 |     |     function allowance(address owner, address spender) public view virtual returns (uint256) {
+ 107 |     |         return _allowances[owner][spender];
+ 108 |     |     }
+ 109 |     | 
+ 110 |     |     /**
+ 111 |     |      * @dev See {IERC20-approve}.
+ 112 |     |      *
+ 113 |     |      * NOTE: If `value` is the maximum `uint256`, the allowance is not updated on
+ 114 |     |      * `transferFrom`. This is semantically equivalent to an infinite approval.
+ 115 |     |      *
+ 116 |     |      * Requirements:
+ 117 |     |      *
+ 118 |     |      * - `spender` cannot be the zero address.
+ 119 |     |      */
+ 120 |     |     function approve(address spender, uint256 value) public virtual returns (bool) {
+ 121 |     |         address owner = _msgSender();
+ 122 |     |         _approve(owner, spender, value);
+ 123 |     |         return true;
+ 124 |     |     }
+ 125 |     | 
+ 126 |     |     /**
+ 127 |     |      * @dev See {IERC20-transferFrom}.
+ 128 |     |      *
+ 129 |     |      * Skips emitting an {Approval} event indicating an allowance update. This is not
+ 130 |     |      * required by the ERC. See {xref-ERC20-_approve-address-address-uint256-bool-}[_approve].
+ 131 |     |      *
+ 132 |     |      * NOTE: Does not update the allowance if the current allowance
+ 133 |     |      * is the maximum `uint256`.
+ 134 |     |      *
+ 135 |     |      * Requirements:
+ 136 |     |      *
+ 137 |     |      * - `from` and `to` cannot be the zero address.
+ 138 |     |      * - `from` must have a balance of at least `value`.
+ 139 |     |      * - the caller must have allowance for ``from``'s tokens of at least
+ 140 |     |      * `value`.
+ 141 |     |      */
+ 142 |     |     function transferFrom(address from, address to, uint256 value) public virtual returns (bool) {
+ 143 |     |         address spender = _msgSender();
+ 144 |     |         _spendAllowance(from, spender, value);
+ 145 | *   |         _transfer(from, to, value);
+ 146 |     |         return true;
+ 147 |     |     }
+ 148 |     | 
+ 149 |     |     /**
+ 150 |     |      * @dev Moves a `value` amount of tokens from `from` to `to`.
+ 151 |     |      *
+ 152 |     |      * This internal function is equivalent to {transfer}, and can be used to
+ 153 |     |      * e.g. implement automatic token fees, slashing mechanisms, etc.
+ 154 |     |      *
+ 155 |     |      * Emits a {Transfer} event.
+ 156 |     |      *
+ 157 |     |      * NOTE: This function is not virtual, {_update} should be overridden instead.
+ 158 |     |      */
+ 159 | *   |     function _transfer(address from, address to, uint256 value) internal {
+ 160 | *   |         if (from == address(0)) {
+ 161 |     |             revert ERC20InvalidSender(address(0));
+ 162 |     |         }
+ 163 | *   |         if (to == address(0)) {
+ 164 |     |             revert ERC20InvalidReceiver(address(0));
+ 165 |     |         }
+ 166 | *   |         _update(from, to, value);
+ 167 |     |     }
+ 168 |     | 
+ 169 |     |     /**
+ 170 |     |      * @dev Transfers a `value` amount of tokens from `from` to `to`, or alternatively mints (or burns) if `from`
+ 171 |     |      * (or `to`) is the zero address. All customizations to transfers, mints, and burns should be done by overriding
+ 172 |     |      * this function.
+ 173 |     |      *
+ 174 |     |      * Emits a {Transfer} event.
+ 175 |     |      */
+ 176 | *   |     function _update(address from, address to, uint256 value) internal virtual {
+ 177 | *   |         if (from == address(0)) {
+ 178 |     |             // Overflow check required: The rest of the code assumes that totalSupply never overflows
+ 179 | *   |             _totalSupply += value;
+ 180 |     |         } else {
+ 181 |     |             uint256 fromBalance = _balances[from];
+ 182 | *   |             if (fromBalance < value) {
+ 183 |     |                 revert ERC20InsufficientBalance(from, fromBalance, value);
+ 184 |     |             }
+ 185 |     |             unchecked {
+ 186 |     |                 // Overflow not possible: value <= fromBalance <= totalSupply.
+ 187 |     |                 _balances[from] = fromBalance - value;
+ 188 |     |             }
+ 189 |     |         }
+ 190 |     | 
+ 191 | *   |         if (to == address(0)) {
+ 192 |     |             unchecked {
+ 193 |     |                 // Overflow not possible: value <= totalSupply or value <= fromBalance <= totalSupply.
+ 194 | *   |                 _totalSupply -= value;
+ 195 |     |             }
+ 196 |     |         } else {
+ 197 |     |             unchecked {
+ 198 |     |                 // Overflow not possible: balance + value is at most totalSupply, which we know fits into a uint256.
+ 199 |     |                 _balances[to] += value;
+ 200 |     |             }
+ 201 |     |         }
+ 202 |     | 
+ 203 | *   |         emit Transfer(from, to, value);
+ 204 |     |     }
+ 205 |     | 
+ 206 |     |     /**
+ 207 |     |      * @dev Creates a `value` amount of tokens and assigns them to `account`, by transferring it from address(0).
+ 208 |     |      * Relies on the `_update` mechanism
+ 209 |     |      *
+ 210 |     |      * Emits a {Transfer} event with `from` set to the zero address.
+ 211 |     |      *
+ 212 |     |      * NOTE: This function is not virtual, {_update} should be overridden instead.
+ 213 |     |      */
+ 214 |     |     function _mint(address account, uint256 value) internal {
+ 215 | *   |         if (account == address(0)) {
+ 216 |     |             revert ERC20InvalidReceiver(address(0));
+ 217 |     |         }
+ 218 | *   |         _update(address(0), account, value);
+ 219 |     |     }
+ 220 |     | 
+ 221 |     |     /**
+ 222 |     |      * @dev Destroys a `value` amount of tokens from `account`, lowering the total supply.
+ 223 |     |      * Relies on the `_update` mechanism.
+ 224 |     |      *
+ 225 |     |      * Emits a {Transfer} event with `to` set to the zero address.
+ 226 |     |      *
+ 227 |     |      * NOTE: This function is not virtual, {_update} should be overridden instead
+ 228 |     |      */
+ 229 |     |     function _burn(address account, uint256 value) internal {
+ 230 | *   |         if (account == address(0)) {
+ 231 |     |             revert ERC20InvalidSender(address(0));
+ 232 |     |         }
+ 233 |     |         _update(account, address(0), value);
+ 234 |     |     }
+ 235 |     | 
+ 236 |     |     /**
+ 237 |     |      * @dev Sets `value` as the allowance of `spender` over the `owner`'s tokens.
+ 238 |     |      *
+ 239 |     |      * This internal function is equivalent to `approve`, and can be used to
+ 240 |     |      * e.g. set automatic allowances for certain subsystems, etc.
+ 241 |     |      *
+ 242 |     |      * Emits an {Approval} event.
+ 243 |     |      *
+ 244 |     |      * Requirements:
+ 245 |     |      *
+ 246 |     |      * - `owner` cannot be the zero address.
+ 247 |     |      * - `spender` cannot be the zero address.
+ 248 |     |      *
+ 249 |     |      * Overrides to this logic should be done to the variant with an additional `bool emitEvent` argument.
+ 250 |     |      */
+ 251 |     |     function _approve(address owner, address spender, uint256 value) internal {
+ 252 |     |         _approve(owner, spender, value, true);
+ 253 |     |     }
+ 254 |     | 
+ 255 |     |     /**
+ 256 |     |      * @dev Variant of {_approve} with an optional flag to enable or disable the {Approval} event.
+ 257 |     |      *
+ 258 |     |      * By default (when calling {_approve}) the flag is set to true. On the other hand, approval changes made by
+ 259 |     |      * `_spendAllowance` during the `transferFrom` operation sets the flag to false. This saves gas by not emitting any
+ 260 |     |      * `Approval` event during `transferFrom` operations.
+ 261 |     |      *
+ 262 |     |      * Anyone who wishes to continue emitting `Approval` events on the `transferFrom` operation can force the flag to
+ 263 |     |      * true using the following override:
+ 264 |     |      *
+ 265 |     |      * ```solidity
+ 266 |     |      * function _approve(address owner, address spender, uint256 value, bool) internal virtual override {
+ 267 |     |      *     super._approve(owner, spender, value, true);
+ 268 |     |      * }
+ 269 |     |      * ```
+ 270 |     |      *
+ 271 |     |      * Requirements are the same as {_approve}.
+ 272 |     |      */
+ 273 |     |     function _approve(address owner, address spender, uint256 value, bool emitEvent) internal virtual {
+ 274 | *   |         if (owner == address(0)) {
+ 275 |     |             revert ERC20InvalidApprover(address(0));
+ 276 |     |         }
+ 277 | *   |         if (spender == address(0)) {
+ 278 |     |             revert ERC20InvalidSpender(address(0));
+ 279 |     |         }
+ 280 |     |         _allowances[owner][spender] = value;
+ 281 |     |         if (emitEvent) {
+ 282 | *   |             emit Approval(owner, spender, value);
+ 283 |     |         }
+ 284 |     |     }
+ 285 |     | 
+ 286 |     |     /**
+ 287 |     |      * @dev Updates `owner`'s allowance for `spender` based on spent `value`.
+ 288 |     |      *
+ 289 |     |      * Does not update the allowance value in case of infinite allowance.
+ 290 |     |      * Revert if not enough allowance is available.
+ 291 |     |      *
+ 292 |     |      * Does not emit an {Approval} event.
+ 293 |     |      */
+ 294 |     |     function _spendAllowance(address owner, address spender, uint256 value) internal virtual {
+ 295 |     |         uint256 currentAllowance = allowance(owner, spender);
+ 296 | *   |         if (currentAllowance < type(uint256).max) {
+ 297 |     |             if (currentAllowance < value) {
+ 298 |     |                 revert ERC20InsufficientAllowance(spender, currentAllowance, value);
+ 299 |     |             }
+ 300 |     |             unchecked {
+ 301 |     |                 _approve(owner, spender, currentAllowance - value, false);
+ 302 |     |             }
+ 303 |     |         }
+ 304 |     |     }
+ 305 |     | }
+ 306 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/token/ERC20/IERC20.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v5.4.0) (token/ERC20/IERC20.sol)
+  3 |     | 
+  4 |     | pragma solidity >=0.4.16;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Interface of the ERC-20 standard as defined in the ERC.
+  8 |     |  */
+  9 |     | interface IERC20 {
+ 10 |     |     /**
+ 11 |     |      * @dev Emitted when `value` tokens are moved from one account (`from`) to
+ 12 |     |      * another (`to`).
+ 13 |     |      *
+ 14 |     |      * Note that `value` may be zero.
+ 15 |     |      */
+ 16 |     |     event Transfer(address indexed from, address indexed to, uint256 value);
+ 17 |     | 
+ 18 |     |     /**
+ 19 |     |      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+ 20 |     |      * a call to {approve}. `value` is the new allowance.
+ 21 |     |      */
+ 22 |     |     event Approval(address indexed owner, address indexed spender, uint256 value);
+ 23 |     | 
+ 24 |     |     /**
+ 25 |     |      * @dev Returns the value of tokens in existence.
+ 26 |     |      */
+ 27 |     |     function totalSupply() external view returns (uint256);
+ 28 |     | 
+ 29 |     |     /**
+ 30 |     |      * @dev Returns the value of tokens owned by `account`.
+ 31 |     |      */
+ 32 |     |     function balanceOf(address account) external view returns (uint256);
+ 33 |     | 
+ 34 |     |     /**
+ 35 |     |      * @dev Moves a `value` amount of tokens from the caller's account to `to`.
+ 36 |     |      *
+ 37 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 38 |     |      *
+ 39 |     |      * Emits a {Transfer} event.
+ 40 |     |      */
+ 41 |     |     function transfer(address to, uint256 value) external returns (bool);
+ 42 |     | 
+ 43 |     |     /**
+ 44 |     |      * @dev Returns the remaining number of tokens that `spender` will be
+ 45 |     |      * allowed to spend on behalf of `owner` through {transferFrom}. This is
+ 46 |     |      * zero by default.
+ 47 |     |      *
+ 48 |     |      * This value changes when {approve} or {transferFrom} are called.
+ 49 |     |      */
+ 50 |     |     function allowance(address owner, address spender) external view returns (uint256);
+ 51 |     | 
+ 52 |     |     /**
+ 53 |     |      * @dev Sets a `value` amount of tokens as the allowance of `spender` over the
+ 54 |     |      * caller's tokens.
+ 55 |     |      *
+ 56 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 57 |     |      *
+ 58 |     |      * IMPORTANT: Beware that changing an allowance with this method brings the risk
+ 59 |     |      * that someone may use both the old and the new allowance by unfortunate
+ 60 |     |      * transaction ordering. One possible solution to mitigate this race
+ 61 |     |      * condition is to first reduce the spender's allowance to 0 and set the
+ 62 |     |      * desired value afterwards:
+ 63 |     |      * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+ 64 |     |      *
+ 65 |     |      * Emits an {Approval} event.
+ 66 |     |      */
+ 67 |     |     function approve(address spender, uint256 value) external returns (bool);
+ 68 |     | 
+ 69 |     |     /**
+ 70 |     |      * @dev Moves a `value` amount of tokens from `from` to `to` using the
+ 71 |     |      * allowance mechanism. `value` is then deducted from the caller's
+ 72 |     |      * allowance.
+ 73 |     |      *
+ 74 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 75 |     |      *
+ 76 |     |      * Emits a {Transfer} event.
+ 77 |     |      */
+ 78 |     |     function transferFrom(address from, address to, uint256 value) external returns (bool);
+ 79 |     | }
+ 80 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/token/ERC20/extensions/IERC20Metadata.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v5.4.0) (token/ERC20/extensions/IERC20Metadata.sol)
+  3 |     | 
+  4 |     | pragma solidity >=0.6.2;
+  5 |     | 
+  6 |     | import {IERC20} from "../IERC20.sol";
+  7 |     | 
+  8 |     | /**
+  9 |     |  * @dev Interface for the optional metadata functions from the ERC-20 standard.
+ 10 |     |  */
+ 11 |     | interface IERC20Metadata is IERC20 {
+ 12 |     |     /**
+ 13 |     |      * @dev Returns the name of the token.
+ 14 |     |      */
+ 15 |     |     function name() external view returns (string memory);
+ 16 |     | 
+ 17 |     |     /**
+ 18 |     |      * @dev Returns the symbol of the token.
+ 19 |     |      */
+ 20 |     |     function symbol() external view returns (string memory);
+ 21 |     | 
+ 22 |     |     /**
+ 23 |     |      * @dev Returns the decimals places of the token.
+ 24 |     |      */
+ 25 |     |     function decimals() external view returns (uint8);
+ 26 |     | }
+ 27 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/token/ERC20/utils/SafeERC20.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.5.0) (token/ERC20/utils/SafeERC20.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.20;
+   5 |     | 
+   6 |     | import {IERC20} from "../IERC20.sol";
+   7 |     | import {IERC1363} from "../../../interfaces/IERC1363.sol";
+   8 |     | 
+   9 |     | /**
+  10 |     |  * @title SafeERC20
+  11 |     |  * @dev Wrappers around ERC-20 operations that throw on failure (when the token
+  12 |     |  * contract returns false). Tokens that return no value (and instead revert or
+  13 |     |  * throw on failure) are also supported, non-reverting calls are assumed to be
+  14 |     |  * successful.
+  15 |     |  * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,
+  16 |     |  * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
+  17 |     |  */
+  18 |     | library SafeERC20 {
+  19 |     |     /**
+  20 |     |      * @dev An operation with an ERC-20 token failed.
+  21 |     |      */
+  22 |     |     error SafeERC20FailedOperation(address token);
+  23 |     | 
+  24 |     |     /**
+  25 |     |      * @dev Indicates a failed `decreaseAllowance` request.
+  26 |     |      */
+  27 |     |     error SafeERC20FailedDecreaseAllowance(address spender, uint256 currentAllowance, uint256 requestedDecrease);
+  28 |     | 
+  29 |     |     /**
+  30 |     |      * @dev Transfer `value` amount of `token` from the calling contract to `to`. If `token` returns no value,
+  31 |     |      * non-reverting calls are assumed to be successful.
+  32 |     |      */
+  33 | *   |     function safeTransfer(IERC20 token, address to, uint256 value) internal {
+  34 | *   |         if (!_safeTransfer(token, to, value, true)) {
+  35 |     |             revert SafeERC20FailedOperation(address(token));
+  36 |     |         }
+  37 |     |     }
+  38 |     | 
+  39 |     |     /**
+  40 |     |      * @dev Transfer `value` amount of `token` from `from` to `to`, spending the approval given by `from` to the
+  41 |     |      * calling contract. If `token` returns no value, non-reverting calls are assumed to be successful.
+  42 |     |      */
+  43 | *   |     function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+  44 | *   |         if (!_safeTransferFrom(token, from, to, value, true)) {
+  45 |     |             revert SafeERC20FailedOperation(address(token));
+  46 |     |         }
+  47 |     |     }
+  48 |     | 
+  49 |     |     /**
+  50 |     |      * @dev Variant of {safeTransfer} that returns a bool instead of reverting if the operation is not successful.
+  51 |     |      */
+  52 |     |     function trySafeTransfer(IERC20 token, address to, uint256 value) internal returns (bool) {
+  53 |     |         return _safeTransfer(token, to, value, false);
+  54 |     |     }
+  55 |     | 
+  56 |     |     /**
+  57 |     |      * @dev Variant of {safeTransferFrom} that returns a bool instead of reverting if the operation is not successful.
+  58 |     |      */
+  59 |     |     function trySafeTransferFrom(IERC20 token, address from, address to, uint256 value) internal returns (bool) {
+  60 |     |         return _safeTransferFrom(token, from, to, value, false);
+  61 |     |     }
+  62 |     | 
+  63 |     |     /**
+  64 |     |      * @dev Increase the calling contract's allowance toward `spender` by `value`. If `token` returns no value,
+  65 |     |      * non-reverting calls are assumed to be successful.
+  66 |     |      *
+  67 |     |      * IMPORTANT: If the token implements ERC-7674 (ERC-20 with temporary allowance), and if the "client"
+  68 |     |      * smart contract uses ERC-7674 to set temporary allowances, then the "client" smart contract should avoid using
+  69 |     |      * this function. Performing a {safeIncreaseAllowance} or {safeDecreaseAllowance} operation on a token contract
+  70 |     |      * that has a non-zero temporary allowance (for that particular owner-spender) will result in unexpected behavior.
+  71 |     |      */
+  72 |     |     function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+  73 |     |         uint256 oldAllowance = token.allowance(address(this), spender);
+  74 |     |         forceApprove(token, spender, oldAllowance + value);
+  75 |     |     }
+  76 |     | 
+  77 |     |     /**
+  78 |     |      * @dev Decrease the calling contract's allowance toward `spender` by `requestedDecrease`. If `token` returns no
+  79 |     |      * value, non-reverting calls are assumed to be successful.
+  80 |     |      *
+  81 |     |      * IMPORTANT: If the token implements ERC-7674 (ERC-20 with temporary allowance), and if the "client"
+  82 |     |      * smart contract uses ERC-7674 to set temporary allowances, then the "client" smart contract should avoid using
+  83 |     |      * this function. Performing a {safeIncreaseAllowance} or {safeDecreaseAllowance} operation on a token contract
+  84 |     |      * that has a non-zero temporary allowance (for that particular owner-spender) will result in unexpected behavior.
+  85 |     |      */
+  86 |     |     function safeDecreaseAllowance(IERC20 token, address spender, uint256 requestedDecrease) internal {
+  87 |     |         unchecked {
+  88 |     |             uint256 currentAllowance = token.allowance(address(this), spender);
+  89 |     |             if (currentAllowance < requestedDecrease) {
+  90 |     |                 revert SafeERC20FailedDecreaseAllowance(spender, currentAllowance, requestedDecrease);
+  91 |     |             }
+  92 |     |             forceApprove(token, spender, currentAllowance - requestedDecrease);
+  93 |     |         }
+  94 |     |     }
+  95 |     | 
+  96 |     |     /**
+  97 |     |      * @dev Set the calling contract's allowance toward `spender` to `value`. If `token` returns no value,
+  98 |     |      * non-reverting calls are assumed to be successful. Meant to be used with tokens that require the approval
+  99 |     |      * to be set to zero before setting it to a non-zero value, such as USDT.
+ 100 |     |      *
+ 101 |     |      * NOTE: If the token implements ERC-7674, this function will not modify any temporary allowance. This function
+ 102 |     |      * only sets the "standard" allowance. Any temporary allowance will remain active, in addition to the value being
+ 103 |     |      * set here.
+ 104 |     |      */
+ 105 |     |     function forceApprove(IERC20 token, address spender, uint256 value) internal {
+ 106 |     |         if (!_safeApprove(token, spender, value, false)) {
+ 107 |     |             if (!_safeApprove(token, spender, 0, true)) revert SafeERC20FailedOperation(address(token));
+ 108 |     |             if (!_safeApprove(token, spender, value, true)) revert SafeERC20FailedOperation(address(token));
+ 109 |     |         }
+ 110 |     |     }
+ 111 |     | 
+ 112 |     |     /**
+ 113 |     |      * @dev Performs an {ERC1363} transferAndCall, with a fallback to the simple {ERC20} transfer if the target has no
+ 114 |     |      * code. This can be used to implement an {ERC721}-like safe transfer that relies on {ERC1363} checks when
+ 115 |     |      * targeting contracts.
+ 116 |     |      *
+ 117 |     |      * Reverts if the returned value is other than `true`.
+ 118 |     |      */
+ 119 |     |     function transferAndCallRelaxed(IERC1363 token, address to, uint256 value, bytes memory data) internal {
+ 120 |     |         if (to.code.length == 0) {
+ 121 |     |             safeTransfer(token, to, value);
+ 122 |     |         } else if (!token.transferAndCall(to, value, data)) {
+ 123 |     |             revert SafeERC20FailedOperation(address(token));
+ 124 |     |         }
+ 125 |     |     }
+ 126 |     | 
+ 127 |     |     /**
+ 128 |     |      * @dev Performs an {ERC1363} transferFromAndCall, with a fallback to the simple {ERC20} transferFrom if the target
+ 129 |     |      * has no code. This can be used to implement an {ERC721}-like safe transfer that relies on {ERC1363} checks when
+ 130 |     |      * targeting contracts.
+ 131 |     |      *
+ 132 |     |      * Reverts if the returned value is other than `true`.
+ 133 |     |      */
+ 134 |     |     function transferFromAndCallRelaxed(
+ 135 |     |         IERC1363 token,
+ 136 |     |         address from,
+ 137 |     |         address to,
+ 138 |     |         uint256 value,
+ 139 |     |         bytes memory data
+ 140 |     |     ) internal {
+ 141 |     |         if (to.code.length == 0) {
+ 142 |     |             safeTransferFrom(token, from, to, value);
+ 143 |     |         } else if (!token.transferFromAndCall(from, to, value, data)) {
+ 144 |     |             revert SafeERC20FailedOperation(address(token));
+ 145 |     |         }
+ 146 |     |     }
+ 147 |     | 
+ 148 |     |     /**
+ 149 |     |      * @dev Performs an {ERC1363} approveAndCall, with a fallback to the simple {ERC20} approve if the target has no
+ 150 |     |      * code. This can be used to implement an {ERC721}-like safe transfer that rely on {ERC1363} checks when
+ 151 |     |      * targeting contracts.
+ 152 |     |      *
+ 153 |     |      * NOTE: When the recipient address (`to`) has no code (i.e. is an EOA), this function behaves as {forceApprove}.
+ 154 |     |      * Oppositely, when the recipient address (`to`) has code, this function only attempts to call {ERC1363-approveAndCall}
+ 155 |     |      * once without retrying, and relies on the returned value to be true.
+ 156 |     |      *
+ 157 |     |      * Reverts if the returned value is other than `true`.
+ 158 |     |      */
+ 159 |     |     function approveAndCallRelaxed(IERC1363 token, address to, uint256 value, bytes memory data) internal {
+ 160 |     |         if (to.code.length == 0) {
+ 161 |     |             forceApprove(token, to, value);
+ 162 |     |         } else if (!token.approveAndCall(to, value, data)) {
+ 163 |     |             revert SafeERC20FailedOperation(address(token));
+ 164 |     |         }
+ 165 |     |     }
+ 166 |     | 
+ 167 |     |     /**
+ 168 |     |      * @dev Imitates a Solidity `token.transfer(to, value)` call, relaxing the requirement on the return value: the
+ 169 |     |      * return value is optional (but if data is returned, it must not be false).
+ 170 |     |      *
+ 171 |     |      * @param token The token targeted by the call.
+ 172 |     |      * @param to The recipient of the tokens
+ 173 |     |      * @param value The amount of token to transfer
+ 174 |     |      * @param bubble Behavior switch if the transfer call reverts: bubble the revert reason or return a false boolean.
+ 175 |     |      */
+ 176 |     |     function _safeTransfer(IERC20 token, address to, uint256 value, bool bubble) private returns (bool success) {
+ 177 |     |         bytes4 selector = IERC20.transfer.selector;
+ 178 |     | 
+ 179 | *   |         assembly ("memory-safe") {
+ 180 |     |             let fmp := mload(0x40)
+ 181 |     |             mstore(0x00, selector)
+ 182 |     |             mstore(0x04, and(to, shr(96, not(0))))
+ 183 |     |             mstore(0x24, value)
+ 184 |     |             success := call(gas(), token, 0, 0x00, 0x44, 0x00, 0x20)
+ 185 |     |             // if call success and return is true, all is good.
+ 186 |     |             // otherwise (not success or return is not true), we need to perform further checks
+ 187 |     |             if iszero(and(success, eq(mload(0x00), 1))) {
+ 188 |     |                 // if the call was a failure and bubble is enabled, bubble the error
+ 189 |     |                 if and(iszero(success), bubble) {
+ 190 |     |                     returndatacopy(fmp, 0x00, returndatasize())
+ 191 |     |                     revert(fmp, returndatasize())
+ 192 |     |                 }
+ 193 |     |                 // if the return value is not true, then the call is only successful if:
+ 194 |     |                 // - the token address has code
+ 195 |     |                 // - the returndata is empty
+ 196 |     |                 success := and(success, and(iszero(returndatasize()), gt(extcodesize(token), 0)))
+ 197 |     |             }
+ 198 |     |             mstore(0x40, fmp)
+ 199 |     |         }
+ 200 |     |     }
+ 201 |     | 
+ 202 |     |     /**
+ 203 |     |      * @dev Imitates a Solidity `token.transferFrom(from, to, value)` call, relaxing the requirement on the return
+ 204 |     |      * value: the return value is optional (but if data is returned, it must not be false).
+ 205 |     |      *
+ 206 |     |      * @param token The token targeted by the call.
+ 207 |     |      * @param from The sender of the tokens
+ 208 |     |      * @param to The recipient of the tokens
+ 209 |     |      * @param value The amount of token to transfer
+ 210 |     |      * @param bubble Behavior switch if the transfer call reverts: bubble the revert reason or return a false boolean.
+ 211 |     |      */
+ 212 |     |     function _safeTransferFrom(
+ 213 |     |         IERC20 token,
+ 214 |     |         address from,
+ 215 |     |         address to,
+ 216 |     |         uint256 value,
+ 217 |     |         bool bubble
+ 218 |     |     ) private returns (bool success) {
+ 219 |     |         bytes4 selector = IERC20.transferFrom.selector;
+ 220 |     | 
+ 221 | *   |         assembly ("memory-safe") {
+ 222 |     |             let fmp := mload(0x40)
+ 223 |     |             mstore(0x00, selector)
+ 224 |     |             mstore(0x04, and(from, shr(96, not(0))))
+ 225 |     |             mstore(0x24, and(to, shr(96, not(0))))
+ 226 |     |             mstore(0x44, value)
+ 227 |     |             success := call(gas(), token, 0, 0x00, 0x64, 0x00, 0x20)
+ 228 |     |             // if call success and return is true, all is good.
+ 229 |     |             // otherwise (not success or return is not true), we need to perform further checks
+ 230 |     |             if iszero(and(success, eq(mload(0x00), 1))) {
+ 231 |     |                 // if the call was a failure and bubble is enabled, bubble the error
+ 232 |     |                 if and(iszero(success), bubble) {
+ 233 |     |                     returndatacopy(fmp, 0x00, returndatasize())
+ 234 |     |                     revert(fmp, returndatasize())
+ 235 |     |                 }
+ 236 |     |                 // if the return value is not true, then the call is only successful if:
+ 237 |     |                 // - the token address has code
+ 238 |     |                 // - the returndata is empty
+ 239 |     |                 success := and(success, and(iszero(returndatasize()), gt(extcodesize(token), 0)))
+ 240 |     |             }
+ 241 |     |             mstore(0x40, fmp)
+ 242 |     |             mstore(0x60, 0)
+ 243 |     |         }
+ 244 |     |     }
+ 245 |     | 
+ 246 |     |     /**
+ 247 |     |      * @dev Imitates a Solidity `token.approve(spender, value)` call, relaxing the requirement on the return value:
+ 248 |     |      * the return value is optional (but if data is returned, it must not be false).
+ 249 |     |      *
+ 250 |     |      * @param token The token targeted by the call.
+ 251 |     |      * @param spender The spender of the tokens
+ 252 |     |      * @param value The amount of token to transfer
+ 253 |     |      * @param bubble Behavior switch if the transfer call reverts: bubble the revert reason or return a false boolean.
+ 254 |     |      */
+ 255 |     |     function _safeApprove(IERC20 token, address spender, uint256 value, bool bubble) private returns (bool success) {
+ 256 |     |         bytes4 selector = IERC20.approve.selector;
+ 257 |     | 
+ 258 |     |         assembly ("memory-safe") {
+ 259 |     |             let fmp := mload(0x40)
+ 260 |     |             mstore(0x00, selector)
+ 261 |     |             mstore(0x04, and(spender, shr(96, not(0))))
+ 262 |     |             mstore(0x24, value)
+ 263 |     |             success := call(gas(), token, 0, 0x00, 0x44, 0x00, 0x20)
+ 264 |     |             // if call success and return is true, all is good.
+ 265 |     |             // otherwise (not success or return is not true), we need to perform further checks
+ 266 |     |             if iszero(and(success, eq(mload(0x00), 1))) {
+ 267 |     |                 // if the call was a failure and bubble is enabled, bubble the error
+ 268 |     |                 if and(iszero(success), bubble) {
+ 269 |     |                     returndatacopy(fmp, 0x00, returndatasize())
+ 270 |     |                     revert(fmp, returndatasize())
+ 271 |     |                 }
+ 272 |     |                 // if the return value is not true, then the call is only successful if:
+ 273 |     |                 // - the token address has code
+ 274 |     |                 // - the returndata is empty
+ 275 |     |                 success := and(success, and(iszero(returndatasize()), gt(extcodesize(token), 0)))
+ 276 |     |             }
+ 277 |     |             mstore(0x40, fmp)
+ 278 |     |         }
+ 279 |     |     }
+ 280 |     | }
+ 281 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/utils/Context.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v5.0.1) (utils/Context.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.20;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Provides information about the current execution context, including the
+  8 |     |  * sender of the transaction and its data. While these are generally available
+  9 |     |  * via msg.sender and msg.data, they should not be accessed in such a direct
+ 10 |     |  * manner, since when dealing with meta-transactions the account sending and
+ 11 |     |  * paying for execution may not be the actual sender (as far as an application
+ 12 |     |  * is concerned).
+ 13 |     |  *
+ 14 |     |  * This contract is only required for intermediate, library-like contracts.
+ 15 |     |  */
+ 16 |     | abstract contract Context {
+ 17 |     |     function _msgSender() internal view virtual returns (address) {
+ 18 | *   |         return msg.sender;
+ 19 |     |     }
+ 20 |     | 
+ 21 |     |     function _msgData() internal view virtual returns (bytes calldata) {
+ 22 |     |         return msg.data;
+ 23 |     |     }
+ 24 |     | 
+ 25 |     |     function _contextSuffixLength() internal view virtual returns (uint256) {
+ 26 |     |         return 0;
+ 27 |     |     }
+ 28 |     | }
+ 29 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/utils/Create2.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v5.5.0) (utils/Create2.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.20;
+  5 |     | 
+  6 |     | import {Errors} from "./Errors.sol";
+  7 |     | import {LowLevelCall} from "./LowLevelCall.sol";
+  8 |     | 
+  9 |     | /**
+ 10 |     |  * @dev Helper to make usage of the `CREATE2` EVM opcode easier and safer.
+ 11 |     |  * `CREATE2` can be used to compute in advance the address where a smart
+ 12 |     |  * contract will be deployed, which allows for interesting new mechanisms known
+ 13 |     |  * as 'counterfactual interactions'.
+ 14 |     |  *
+ 15 |     |  * See the https://eips.ethereum.org/EIPS/eip-1014#motivation[EIP] for more
+ 16 |     |  * information.
+ 17 |     |  */
+ 18 |     | library Create2 {
+ 19 |     |     /**
+ 20 |     |      * @dev There's no code to deploy.
+ 21 |     |      */
+ 22 |     |     error Create2EmptyBytecode();
+ 23 |     | 
+ 24 |     |     /**
+ 25 |     |      * @dev Deploys a contract using `CREATE2`. The address where the contract
+ 26 |     |      * will be deployed can be known in advance via {computeAddress}.
+ 27 |     |      *
+ 28 |     |      * The bytecode for a contract can be obtained from Solidity with
+ 29 |     |      * `type(contractName).creationCode`.
+ 30 |     |      *
+ 31 |     |      * Requirements:
+ 32 |     |      *
+ 33 |     |      * - `bytecode` must not be empty.
+ 34 |     |      * - `salt` must have not been used for `bytecode` already.
+ 35 |     |      * - the factory must have a balance of at least `amount`.
+ 36 |     |      * - if `amount` is non-zero, `bytecode` must have a `payable` constructor.
+ 37 |     |      */
+ 38 |     |     function deploy(uint256 amount, bytes32 salt, bytes memory bytecode) internal returns (address addr) {
+ 39 |     |         if (address(this).balance < amount) {
+ 40 |     |             revert Errors.InsufficientBalance(address(this).balance, amount);
+ 41 |     |         }
+ 42 |     |         if (bytecode.length == 0) {
+ 43 |     |             revert Create2EmptyBytecode();
+ 44 |     |         }
+ 45 |     |         assembly ("memory-safe") {
+ 46 |     |             addr := create2(amount, add(bytecode, 0x20), mload(bytecode), salt)
+ 47 |     |         }
+ 48 |     |         if (addr == address(0)) {
+ 49 |     |             if (LowLevelCall.returnDataSize() == 0) {
+ 50 |     |                 revert Errors.FailedDeployment();
+ 51 |     |             } else {
+ 52 |     |                 LowLevelCall.bubbleRevert();
+ 53 |     |             }
+ 54 |     |         }
+ 55 |     |     }
+ 56 |     | 
+ 57 |     |     /**
+ 58 |     |      * @dev Returns the address where a contract will be stored if deployed via {deploy}. Any change in the
+ 59 |     |      * `bytecodeHash` or `salt` will result in a new destination address.
+ 60 |     |      */
+ 61 |     |     function computeAddress(bytes32 salt, bytes32 bytecodeHash) internal view returns (address) {
+ 62 |     |         return computeAddress(salt, bytecodeHash, address(this));
+ 63 |     |     }
+ 64 |     | 
+ 65 |     |     /**
+ 66 |     |      * @dev Returns the address where a contract will be stored if deployed via {deploy} from a contract located at
+ 67 |     |      * `deployer`. If `deployer` is this contract's address, returns the same value as {computeAddress}.
+ 68 |     |      */
+ 69 |     |     function computeAddress(bytes32 salt, bytes32 bytecodeHash, address deployer) internal pure returns (address addr) {
+ 70 |     |         assembly ("memory-safe") {
+ 71 |     |             let ptr := mload(0x40) // Get free memory pointer
+ 72 |     | 
+ 73 |     |             // |                     | ↓ ptr ...  ↓ ptr + 0x0B (start) ...  ↓ ptr + 0x20 ...  ↓ ptr + 0x40 ...   |
+ 74 |     |             // |---------------------|---------------------------------------------------------------------------|
+ 75 |     |             // | bytecodeHash        |                                                        CCCCCCCCCCCCC...CC |
+ 76 |     |             // | salt                |                                      BBBBBBBBBBBBB...BB                   |
+ 77 |     |             // | deployer            | 000000...0000AAAAAAAAAAAAAAAAAAA...AA                                     |
+ 78 |     |             // | 0xFF                |            FF                                                             |
+ 79 |     |             // |---------------------|---------------------------------------------------------------------------|
+ 80 |     |             // | memory              | 000000...00FFAAAAAAAAAAAAAAAAAAA...AABBBBBBBBBBBBB...BBCCCCCCCCCCCCC...CC |
+ 81 |     |             // | keccak(start, 0x55) |            ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ |
+ 82 |     | 
+ 83 |     |             mstore(add(ptr, 0x40), bytecodeHash)
+ 84 |     |             mstore(add(ptr, 0x20), salt)
+ 85 |     |             mstore(ptr, deployer) // Right-aligned with 12 preceding garbage bytes
+ 86 |     |             let start := add(ptr, 0x0b) // The hashed data starts at the final garbage byte which we will set to 0xff
+ 87 |     |             mstore8(start, 0xff)
+ 88 |     |             addr := and(keccak256(start, 0x55), 0xffffffffffffffffffffffffffffffffffffffff)
+ 89 |     |         }
+ 90 |     |     }
+ 91 |     | }
+ 92 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/utils/Errors.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v5.1.0) (utils/Errors.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.20;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Collection of common custom errors used in multiple contracts
+  8 |     |  *
+  9 |     |  * IMPORTANT: Backwards compatibility is not guaranteed in future versions of the library.
+ 10 |     |  * It is recommended to avoid relying on the error API for critical functionality.
+ 11 |     |  *
+ 12 |     |  * _Available since v5.1._
+ 13 |     |  */
+ 14 |     | library Errors {
+ 15 |     |     /**
+ 16 |     |      * @dev The ETH balance of the account is not enough to perform the operation.
+ 17 |     |      */
+ 18 |     |     error InsufficientBalance(uint256 balance, uint256 needed);
+ 19 |     | 
+ 20 |     |     /**
+ 21 |     |      * @dev A call to an address target failed. The target may have reverted.
+ 22 |     |      */
+ 23 |     |     error FailedCall();
+ 24 |     | 
+ 25 |     |     /**
+ 26 |     |      * @dev The deployment failed.
+ 27 |     |      */
+ 28 |     |     error FailedDeployment();
+ 29 |     | 
+ 30 |     |     /**
+ 31 |     |      * @dev A necessary precompile is missing.
+ 32 |     |      */
+ 33 |     |     error MissingPrecompile(address);
+ 34 |     | }
+ 35 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/utils/LowLevelCall.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.5.0) (utils/LowLevelCall.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.20;
+   5 |     | 
+   6 |     | /**
+   7 |     |  * @dev Library of low level call functions that implement different calling strategies to deal with the return data.
+   8 |     |  *
+   9 |     |  * WARNING: Using this library requires an advanced understanding of Solidity and how the EVM works. It is recommended
+  10 |     |  * to use the {Address} library instead.
+  11 |     |  */
+  12 |     | library LowLevelCall {
+  13 |     |     /// @dev Performs a Solidity function call using a low level `call` and ignoring the return data.
+  14 |     |     function callNoReturn(address target, bytes memory data) internal returns (bool success) {
+  15 |     |         return callNoReturn(target, 0, data);
+  16 |     |     }
+  17 |     | 
+  18 |     |     /// @dev Same as {callNoReturn}, but allows to specify the value to be sent in the call.
+  19 |     |     function callNoReturn(address target, uint256 value, bytes memory data) internal returns (bool success) {
+  20 |     |         assembly ("memory-safe") {
+  21 |     |             success := call(gas(), target, value, add(data, 0x20), mload(data), 0x00, 0x00)
+  22 |     |         }
+  23 |     |     }
+  24 |     | 
+  25 |     |     /// @dev Performs a Solidity function call using a low level `call` and returns the first 64 bytes of the result
+  26 |     |     /// in the scratch space of memory. Useful for functions that return a tuple of single-word values.
+  27 |     |     ///
+  28 |     |     /// WARNING: Do not assume that the results are zero if `success` is false. Memory can be already allocated
+  29 |     |     /// and this function doesn't zero it out.
+  30 |     |     function callReturn64Bytes(
+  31 |     |         address target,
+  32 |     |         bytes memory data
+  33 |     |     ) internal returns (bool success, bytes32 result1, bytes32 result2) {
+  34 |     |         return callReturn64Bytes(target, 0, data);
+  35 |     |     }
+  36 |     | 
+  37 |     |     /// @dev Same as {callReturnBytes32Pair}, but allows to specify the value to be sent in the call.
+  38 |     |     function callReturn64Bytes(
+  39 |     |         address target,
+  40 |     |         uint256 value,
+  41 |     |         bytes memory data
+  42 |     |     ) internal returns (bool success, bytes32 result1, bytes32 result2) {
+  43 |     |         assembly ("memory-safe") {
+  44 |     |             success := call(gas(), target, value, add(data, 0x20), mload(data), 0x00, 0x40)
+  45 |     |             result1 := mload(0x00)
+  46 |     |             result2 := mload(0x20)
+  47 |     |         }
+  48 |     |     }
+  49 |     | 
+  50 |     |     /// @dev Performs a Solidity function call using a low level `staticcall` and ignoring the return data.
+  51 |     |     function staticcallNoReturn(address target, bytes memory data) internal view returns (bool success) {
+  52 |     |         assembly ("memory-safe") {
+  53 |     |             success := staticcall(gas(), target, add(data, 0x20), mload(data), 0x00, 0x00)
+  54 |     |         }
+  55 |     |     }
+  56 |     | 
+  57 |     |     /// @dev Performs a Solidity function call using a low level `staticcall` and returns the first 64 bytes of the result
+  58 |     |     /// in the scratch space of memory. Useful for functions that return a tuple of single-word values.
+  59 |     |     ///
+  60 |     |     /// WARNING: Do not assume that the results are zero if `success` is false. Memory can be already allocated
+  61 |     |     /// and this function doesn't zero it out.
+  62 |     |     function staticcallReturn64Bytes(
+  63 |     |         address target,
+  64 |     |         bytes memory data
+  65 |     |     ) internal view returns (bool success, bytes32 result1, bytes32 result2) {
+  66 |     |         assembly ("memory-safe") {
+  67 |     |             success := staticcall(gas(), target, add(data, 0x20), mload(data), 0x00, 0x40)
+  68 |     |             result1 := mload(0x00)
+  69 |     |             result2 := mload(0x20)
+  70 |     |         }
+  71 |     |     }
+  72 |     | 
+  73 |     |     /// @dev Performs a Solidity function call using a low level `delegatecall` and ignoring the return data.
+  74 |     |     function delegatecallNoReturn(address target, bytes memory data) internal returns (bool success) {
+  75 |     |         assembly ("memory-safe") {
+  76 |     |             success := delegatecall(gas(), target, add(data, 0x20), mload(data), 0x00, 0x00)
+  77 |     |         }
+  78 |     |     }
+  79 |     | 
+  80 |     |     /// @dev Performs a Solidity function call using a low level `delegatecall` and returns the first 64 bytes of the result
+  81 |     |     /// in the scratch space of memory. Useful for functions that return a tuple of single-word values.
+  82 |     |     ///
+  83 |     |     /// WARNING: Do not assume that the results are zero if `success` is false. Memory can be already allocated
+  84 |     |     /// and this function doesn't zero it out.
+  85 |     |     function delegatecallReturn64Bytes(
+  86 |     |         address target,
+  87 |     |         bytes memory data
+  88 |     |     ) internal returns (bool success, bytes32 result1, bytes32 result2) {
+  89 |     |         assembly ("memory-safe") {
+  90 |     |             success := delegatecall(gas(), target, add(data, 0x20), mload(data), 0x00, 0x40)
+  91 |     |             result1 := mload(0x00)
+  92 |     |             result2 := mload(0x20)
+  93 |     |         }
+  94 |     |     }
+  95 |     | 
+  96 |     |     /// @dev Returns the size of the return data buffer.
+  97 |     |     function returnDataSize() internal pure returns (uint256 size) {
+  98 |     |         assembly ("memory-safe") {
+  99 |     |             size := returndatasize()
+ 100 |     |         }
+ 101 |     |     }
+ 102 |     | 
+ 103 |     |     /// @dev Returns a buffer containing the return data from the last call.
+ 104 |     |     function returnData() internal pure returns (bytes memory result) {
+ 105 |     |         assembly ("memory-safe") {
+ 106 |     |             result := mload(0x40)
+ 107 |     |             mstore(result, returndatasize())
+ 108 |     |             returndatacopy(add(result, 0x20), 0x00, returndatasize())
+ 109 |     |             mstore(0x40, add(result, add(0x20, returndatasize())))
+ 110 |     |         }
+ 111 |     |     }
+ 112 |     | 
+ 113 |     |     /// @dev Revert with the return data from the last call.
+ 114 |     |     function bubbleRevert() internal pure {
+ 115 |     |         assembly ("memory-safe") {
+ 116 |     |             let fmp := mload(0x40)
+ 117 |     |             returndatacopy(fmp, 0x00, returndatasize())
+ 118 |     |             revert(fmp, returndatasize())
+ 119 |     |         }
+ 120 |     |     }
+ 121 |     | 
+ 122 |     |     function bubbleRevert(bytes memory returndata) internal pure {
+ 123 |     |         assembly ("memory-safe") {
+ 124 |     |             revert(add(returndata, 0x20), mload(returndata))
+ 125 |     |         }
+ 126 |     |     }
+ 127 |     | }
+ 128 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/utils/ReentrancyGuard.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.5.0) (utils/ReentrancyGuard.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.20;
+   5 |     | 
+   6 |     | import {StorageSlot} from "./StorageSlot.sol";
+   7 |     | 
+   8 |     | /**
+   9 |     |  * @dev Contract module that helps prevent reentrant calls to a function.
+  10 |     |  *
+  11 |     |  * Inheriting from `ReentrancyGuard` will make the {nonReentrant} modifier
+  12 |     |  * available, which can be applied to functions to make sure there are no nested
+  13 |     |  * (reentrant) calls to them.
+  14 |     |  *
+  15 |     |  * Note that because there is a single `nonReentrant` guard, functions marked as
+  16 |     |  * `nonReentrant` may not call one another. This can be worked around by making
+  17 |     |  * those functions `private`, and then adding `external` `nonReentrant` entry
+  18 |     |  * points to them.
+  19 |     |  *
+  20 |     |  * TIP: If EIP-1153 (transient storage) is available on the chain you're deploying at,
+  21 |     |  * consider using {ReentrancyGuardTransient} instead.
+  22 |     |  *
+  23 |     |  * TIP: If you would like to learn more about reentrancy and alternative ways
+  24 |     |  * to protect against it, check out our blog post
+  25 |     |  * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
+  26 |     |  *
+  27 |     |  * IMPORTANT: Deprecated. This storage-based reentrancy guard will be removed and replaced
+  28 |     |  * by the {ReentrancyGuardTransient} variant in v6.0.
+  29 |     |  *
+  30 |     |  * @custom:stateless
+  31 |     |  */
+  32 |     | abstract contract ReentrancyGuard {
+  33 |     |     using StorageSlot for bytes32;
+  34 |     | 
+  35 |     |     // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.ReentrancyGuard")) - 1)) & ~bytes32(uint256(0xff))
+  36 |     |     bytes32 private constant REENTRANCY_GUARD_STORAGE =
+  37 | *   |         0x9b779b17422d0df92223018b32b4d1fa46e071723d6817e2486d003becc55f00;
+  38 |     | 
+  39 |     |     // Booleans are more expensive than uint256 or any type that takes up a full
+  40 |     |     // word because each write operation emits an extra SLOAD to first read the
+  41 |     |     // slot's contents, replace the bits taken up by the boolean, and then write
+  42 |     |     // back. This is the compiler's defense against contract upgrades and
+  43 |     |     // pointer aliasing, and it cannot be disabled.
+  44 |     | 
+  45 |     |     // The values being non-zero value makes deployment a bit more expensive,
+  46 |     |     // but in exchange the refund on every call to nonReentrant will be lower in
+  47 |     |     // amount. Since refunds are capped to a percentage of the total
+  48 |     |     // transaction's gas, it is best to keep them low in cases like this one, to
+  49 |     |     // increase the likelihood of the full refund coming into effect.
+  50 | *   |     uint256 private constant NOT_ENTERED = 1;
+  51 |     |     uint256 private constant ENTERED = 2;
+  52 |     | 
+  53 |     |     /**
+  54 |     |      * @dev Unauthorized reentrant call.
+  55 |     |      */
+  56 |     |     error ReentrancyGuardReentrantCall();
+  57 |     | 
+  58 |     |     constructor() {
+  59 |     |         _reentrancyGuardStorageSlot().getUint256Slot().value = NOT_ENTERED;
+  60 |     |     }
+  61 |     | 
+  62 |     |     /**
+  63 |     |      * @dev Prevents a contract from calling itself, directly or indirectly.
+  64 |     |      * Calling a `nonReentrant` function from another `nonReentrant`
+  65 |     |      * function is not supported. It is possible to prevent this from happening
+  66 |     |      * by making the `nonReentrant` function external, and making it call a
+  67 |     |      * `private` function that does the actual work.
+  68 |     |      */
+  69 | *   |     modifier nonReentrant() {
+  70 |     |         _nonReentrantBefore();
+  71 |     |         _;
+  72 |     |         _nonReentrantAfter();
+  73 |     |     }
+  74 |     | 
+  75 |     |     /**
+  76 |     |      * @dev A `view` only version of {nonReentrant}. Use to block view functions
+  77 |     |      * from being called, preventing reading from inconsistent contract state.
+  78 |     |      *
+  79 |     |      * CAUTION: This is a "view" modifier and does not change the reentrancy
+  80 |     |      * status. Use it only on view functions. For payable or non-payable functions,
+  81 |     |      * use the standard {nonReentrant} modifier instead.
+  82 |     |      */
+  83 |     |     modifier nonReentrantView() {
+  84 |     |         _nonReentrantBeforeView();
+  85 |     |         _;
+  86 |     |     }
+  87 |     | 
+  88 |     |     function _nonReentrantBeforeView() private view {
+  89 | *   |         if (_reentrancyGuardEntered()) {
+  90 |     |             revert ReentrancyGuardReentrantCall();
+  91 |     |         }
+  92 |     |     }
+  93 |     | 
+  94 | *   |     function _nonReentrantBefore() private {
+  95 |     |         // On the first call to nonReentrant, _status will be NOT_ENTERED
+  96 |     |         _nonReentrantBeforeView();
+  97 |     | 
+  98 |     |         // Any calls to nonReentrant after this point will fail
+  99 |     |         _reentrancyGuardStorageSlot().getUint256Slot().value = ENTERED;
+ 100 |     |     }
+ 101 |     | 
+ 102 |     |     function _nonReentrantAfter() private {
+ 103 |     |         // By storing the original value once again, a refund is triggered (see
+ 104 |     |         // https://eips.ethereum.org/EIPS/eip-2200)
+ 105 |     |         _reentrancyGuardStorageSlot().getUint256Slot().value = NOT_ENTERED;
+ 106 |     |     }
+ 107 |     | 
+ 108 |     |     /**
+ 109 |     |      * @dev Returns true if the reentrancy guard is currently set to "entered", which indicates there is a
+ 110 |     |      * `nonReentrant` function in the call stack.
+ 111 |     |      */
+ 112 |     |     function _reentrancyGuardEntered() internal view returns (bool) {
+ 113 | *   |         return _reentrancyGuardStorageSlot().getUint256Slot().value == ENTERED;
+ 114 |     |     }
+ 115 |     | 
+ 116 |     |     function _reentrancyGuardStorageSlot() internal pure virtual returns (bytes32) {
+ 117 |     |         return REENTRANCY_GUARD_STORAGE;
+ 118 |     |     }
+ 119 |     | }
+ 120 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/utils/StorageSlot.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v5.1.0) (utils/StorageSlot.sol)
+   3 |     | // This file was procedurally generated from scripts/generate/templates/StorageSlot.js.
+   4 |     | 
+   5 |     | pragma solidity ^0.8.20;
+   6 |     | 
+   7 |     | /**
+   8 |     |  * @dev Library for reading and writing primitive types to specific storage slots.
+   9 |     |  *
+  10 |     |  * Storage slots are often used to avoid storage conflict when dealing with upgradeable contracts.
+  11 |     |  * This library helps with reading and writing to such slots without the need for inline assembly.
+  12 |     |  *
+  13 |     |  * The functions in this library return Slot structs that contain a `value` member that can be used to read or write.
+  14 |     |  *
+  15 |     |  * Example usage to set ERC-1967 implementation slot:
+  16 |     |  * ```solidity
+  17 |     |  * contract ERC1967 {
+  18 |     |  *     // Define the slot. Alternatively, use the SlotDerivation library to derive the slot.
+  19 |     |  *     bytes32 internal constant _IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+  20 |     |  *
+  21 |     |  *     function _getImplementation() internal view returns (address) {
+  22 |     |  *         return StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value;
+  23 |     |  *     }
+  24 |     |  *
+  25 |     |  *     function _setImplementation(address newImplementation) internal {
+  26 |     |  *         require(newImplementation.code.length > 0);
+  27 |     |  *         StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value = newImplementation;
+  28 |     |  *     }
+  29 |     |  * }
+  30 |     |  * ```
+  31 |     |  *
+  32 |     |  * TIP: Consider using this library along with {SlotDerivation}.
+  33 |     |  */
+  34 |     | library StorageSlot {
+  35 |     |     struct AddressSlot {
+  36 |     |         address value;
+  37 |     |     }
+  38 |     | 
+  39 |     |     struct BooleanSlot {
+  40 |     |         bool value;
+  41 |     |     }
+  42 |     | 
+  43 |     |     struct Bytes32Slot {
+  44 |     |         bytes32 value;
+  45 |     |     }
+  46 |     | 
+  47 |     |     struct Uint256Slot {
+  48 |     |         uint256 value;
+  49 |     |     }
+  50 |     | 
+  51 |     |     struct Int256Slot {
+  52 |     |         int256 value;
+  53 |     |     }
+  54 |     | 
+  55 |     |     struct StringSlot {
+  56 |     |         string value;
+  57 |     |     }
+  58 |     | 
+  59 |     |     struct BytesSlot {
+  60 |     |         bytes value;
+  61 |     |     }
+  62 |     | 
+  63 |     |     /**
+  64 |     |      * @dev Returns an `AddressSlot` with member `value` located at `slot`.
+  65 |     |      */
+  66 |     |     function getAddressSlot(bytes32 slot) internal pure returns (AddressSlot storage r) {
+  67 |     |         assembly ("memory-safe") {
+  68 |     |             r.slot := slot
+  69 |     |         }
+  70 |     |     }
+  71 |     | 
+  72 |     |     /**
+  73 |     |      * @dev Returns a `BooleanSlot` with member `value` located at `slot`.
+  74 |     |      */
+  75 |     |     function getBooleanSlot(bytes32 slot) internal pure returns (BooleanSlot storage r) {
+  76 |     |         assembly ("memory-safe") {
+  77 |     |             r.slot := slot
+  78 |     |         }
+  79 |     |     }
+  80 |     | 
+  81 |     |     /**
+  82 |     |      * @dev Returns a `Bytes32Slot` with member `value` located at `slot`.
+  83 |     |      */
+  84 |     |     function getBytes32Slot(bytes32 slot) internal pure returns (Bytes32Slot storage r) {
+  85 |     |         assembly ("memory-safe") {
+  86 |     |             r.slot := slot
+  87 |     |         }
+  88 |     |     }
+  89 |     | 
+  90 |     |     /**
+  91 |     |      * @dev Returns a `Uint256Slot` with member `value` located at `slot`.
+  92 |     |      */
+  93 |     |     function getUint256Slot(bytes32 slot) internal pure returns (Uint256Slot storage r) {
+  94 |     |         assembly ("memory-safe") {
+  95 |     |             r.slot := slot
+  96 |     |         }
+  97 |     |     }
+  98 |     | 
+  99 |     |     /**
+ 100 |     |      * @dev Returns a `Int256Slot` with member `value` located at `slot`.
+ 101 |     |      */
+ 102 |     |     function getInt256Slot(bytes32 slot) internal pure returns (Int256Slot storage r) {
+ 103 |     |         assembly ("memory-safe") {
+ 104 |     |             r.slot := slot
+ 105 |     |         }
+ 106 |     |     }
+ 107 |     | 
+ 108 |     |     /**
+ 109 |     |      * @dev Returns a `StringSlot` with member `value` located at `slot`.
+ 110 |     |      */
+ 111 |     |     function getStringSlot(bytes32 slot) internal pure returns (StringSlot storage r) {
+ 112 |     |         assembly ("memory-safe") {
+ 113 |     |             r.slot := slot
+ 114 |     |         }
+ 115 |     |     }
+ 116 |     | 
+ 117 |     |     /**
+ 118 |     |      * @dev Returns an `StringSlot` representation of the string storage pointer `store`.
+ 119 |     |      */
+ 120 |     |     function getStringSlot(string storage store) internal pure returns (StringSlot storage r) {
+ 121 |     |         assembly ("memory-safe") {
+ 122 |     |             r.slot := store.slot
+ 123 |     |         }
+ 124 |     |     }
+ 125 |     | 
+ 126 |     |     /**
+ 127 |     |      * @dev Returns a `BytesSlot` with member `value` located at `slot`.
+ 128 |     |      */
+ 129 |     |     function getBytesSlot(bytes32 slot) internal pure returns (BytesSlot storage r) {
+ 130 |     |         assembly ("memory-safe") {
+ 131 |     |             r.slot := slot
+ 132 |     |         }
+ 133 |     |     }
+ 134 |     | 
+ 135 |     |     /**
+ 136 |     |      * @dev Returns an `BytesSlot` representation of the bytes storage pointer `store`.
+ 137 |     |      */
+ 138 |     |     function getBytesSlot(bytes storage store) internal pure returns (BytesSlot storage r) {
+ 139 |     |         assembly ("memory-safe") {
+ 140 |     |             r.slot := store.slot
+ 141 |     |         }
+ 142 |     |     }
+ 143 |     | }
+ 144 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/依赖/OpenZeppelin550/contracts/utils/introspection/IERC165.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v5.4.0) (utils/introspection/IERC165.sol)
+  3 |     | 
+  4 |     | pragma solidity >=0.4.16;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Interface of the ERC-165 standard, as defined in the
+  8 |     |  * https://eips.ethereum.org/EIPS/eip-165[ERC].
+  9 |     |  *
+ 10 |     |  * Implementers can declare support of contract interfaces, which can then be
+ 11 |     |  * queried by others ({ERC165Checker}).
+ 12 |     |  *
+ 13 |     |  * For an implementation, see {ERC165}.
+ 14 |     |  */
+ 15 |     | interface IERC165 {
+ 16 |     |     /**
+ 17 |     |      * @dev Returns true if this contract implements the interface defined by
+ 18 |     |      * `interfaceId`. See the corresponding
+ 19 |     |      * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[ERC section]
+ 20 |     |      * to learn more about how these ids are created.
+ 21 |     |      *
+ 22 |     |      * This function call must use less than 30 000 gas.
+ 23 |     |      */
+ 24 |     |     function supportsInterface(bytes4 interfaceId) external view returns (bool);
+ 25 |     | }
+ 26 |     | 
+

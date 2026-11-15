@@ -9,6 +9,7 @@ import time
 from typing import Any
 
 from deepseek接口 import call_json
+from 属性种子上下文 import compact_effect_evidence
 
 
 SENDERS = [f"0x{i:040x}" for i in (0x10000, 0x20000, 0x30000, 0x40000, 0x50000)]
@@ -146,11 +147,12 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
     sequence = []
     for step in candidate["steps"]:
         action = actions[step["function"]]
+        evidence = compact_effect_evidence(action.get("effect_evidence", []))
         sequence.append({"function": step["function"], "rationale": step.get("rationale"),
                          "inputs": action["abi_inputs"],
                          "payable": action["payable"],
                          "matched_states": action["matched_states"],
-                         "effect_evidence": action["effect_evidence"],
+                         **evidence,
                          "source_excerpt": action.get("source_excerpt")})
     if trigger:
         if not trigger.get("seed_compatible"):
@@ -168,7 +170,13 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
                        ("property_id", "property", "property_predicate", "read_states",
                         "property_write_states", "analysis_status", "context_status",
                         "dependency_status", "prerequisite_state_closure", "unknowns")}
-    property_prompt["planned_actions"] = selected_actions
+    property_prompt["planned_actions"] = []
+    for action in selected_actions:
+        planned = {key: action.get(key) for key in
+                   ("function", "abi_signature", "abi_inputs", "payable",
+                    "matched_states", "source_excerpt")}
+        planned.update(compact_effect_evidence(action.get("effect_evidence", [])))
+        property_prompt["planned_actions"].append(planned)
     property_prompt["unresolved_effect_actions_for_planned_actions"] = relevant_unresolved
     shared_ids = list(dict.fromkeys(candidate.get("shared_prefix_property_ids", [])))
     shared_contexts = [{key: item.get(key) for key in

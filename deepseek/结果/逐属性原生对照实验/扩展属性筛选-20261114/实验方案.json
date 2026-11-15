@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "protocol_id": "expanded-attribute-screen-20261114",
+  "registered_at_utc": "2026-11-14T14:46:05.930997+00:00",
+  "status": "preregistered_before_agent_calls",
+  "question": "逐属性 Agent A/B 生成、EVM 回放通过的种子，是否提升原生 Echidna 的覆盖或反例发现效率；计入种子生成时间后是否仍有优势。",
+  "eligible_pool_source": "deepseek/结果/自主种子质量实验/*-Slither属性.json 与对应 *-Harness编译.json；仅用已缓存 Slither 报告，不重跑分析。",
+  "inclusion_rules": [
+    "真实项目 Harness 中存在可由当前 Echidna 运行的零参数 property/assertion 函数。",
+    "该属性存在于状态完整的缓存 Slither 报告，且对应 Harness 有现存编译 ABI/bytecode。",
+    "固定样本在首次 Agent API 调用前确定；不按 Agent 产物、EVM 成败或 Echidna 结果替换属性。"
+  ],
+  "type_rules": [
+    "权限控制：函数或状态明确检查授权主体、角色或未授权调用结果。",
+    "状态依赖：断言依赖先前交易写入/更新的状态或多个合约间的一致状态。",
+    "数值边界/会计：cap、守恒、余额/储备一致或 supply accounting 数值关系。",
+    "多交易序列：属性机制需要先建立状态，再经历至少两个有序动作；Drips assertion 属此类。可多标签。"
+  ],
+  "screening_selection_rule": "从现存且当前 Echidna 可运行的真实 Harness 中固定 10 条，覆盖 4 类属性、3 个真实项目。重复样本在任何筛选结果产生前指定为每类一个具体代表，全部进入重复集，不因种子失败或覆盖表现替换属性。Drips 参数化 assertion 因 Echidna 明确拒绝带参 test 函数，在模型调用前排除并记录；用新的零参数 commit/reveal 属性替代。",
+  "properties": [
+    {
+      "project": "BeeStorage",
+      "property_id": "0226f9cc69ab30e7821a",
+      "property": "EchidnaSystemHarness.echidna_unauthorized_oracle_adjust_never_succeeds()",
+      "types": [
+        "权限控制"
+      ],
+      "source": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#276-278",
+      "slither_candidate_actions": 1,
+      "slither_linked_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 1,
+      "action_inventory_source": "slither_dependency_candidates"
+    },
+    {
+      "project": "Hokusai",
+      "property_id": "04c6adfdc2682ffb6415",
+      "property": "EchidnaHokusaiToken.echidna_only_controller_can_mint()",
+      "types": [
+        "权限控制"
+      ],
+      "source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#153-155",
+      "slither_candidate_actions": 1,
+      "slither_linked_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 1,
+      "action_inventory_source": "slither_dependency_candidates"
+    },
+    {
+      "project": "BeeStorage",
+      "property_id": "571d80aea536af7fdcda",
+      "property": "EchidnaSystemHarness.echidna_oracle_price_matches_stamp_lastPrice_when_updated()",
+      "types": [
+        "状态依赖"
+      ],
+      "source": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#280-287",
+      "slither_candidate_actions": 0,
+      "slither_linked_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 1,
+      "action_inventory_source": "slither_dependency_candidates"
+    },
+    {
+      "project": "Hokusai",
+      "property_id": "a36be6874710a8a5a9a7",
+      "property": "EchidnaHokusaiToken.echidna_supplier_distributed_once()",
+      "types": [
+        "状态依赖"
+      ],
+      "source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#145-147",
+      "slither_candidate_actions": 1,
+      "slither_linked_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 1,
+      "action_inventory_source": "slither_dependency_candidates"
+    },
+    {
+      "project": "BeeStorage",
+      "property_id": "2c68514fc72b1303d6e8",
+      "property": "EchidnaSystemHarness.echidna_stamp_internal_pot_not_above_contract_balance()",
+      "types": [
+        "数值边界/资产守恒"
+      ],
+      "source": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#289-293",
+      "slither_candidate_actions": 0,
+      "slither_linked_action_count": 0,
+      "abi_fallback_action_count": 12,
+      "agent_available_action_count": 12,
+      "action_inventory_source": "generic_abi_fallback_slither_relation_unresolved"
+    },
+    {
+      "project": "Hokusai",
+      "property_id": "ad28f4492fa527ee713b",
+      "property": "EchidnaHokusaiToken.echidna_investor_cap()",
+      "types": [
+        "数值边界"
+      ],
+      "source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#137-139",
+      "slither_candidate_actions": 0,
+      "slither_linked_action_count": 4,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 4,
+      "action_inventory_source": "slither_dependency_candidates"
+    },
+    {
+      "project": "Hokusai",
+      "property_id": "40b35ad5dc128d8aff62",
+      "property": "EchidnaHokusaiToken.echidna_supply_accounting()",
+      "types": [
+        "数值会计不变量"
+      ],
+      "source": "sol/真实项目/Hokusai/contracts/echidna/EchidnaHokusaiToken.sol#149-151",
+      "slither_candidate_actions": 6,
+      "slither_linked_action_count": 7,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 7,
+      "action_inventory_source": "slither_dependency_candidates"
+    },
+    {
+      "project": "Kink",
+      "property_id": "28d4a5495cb06ab375a1",
+      "property": "KinkPoolEchidna.echidna_token1_conserved()",
+      "types": [
+        "数值边界/资产守恒"
+      ],
+      "source": "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#87-89",
+      "slither_candidate_actions": 0,
+      "slither_linked_action_count": 2,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 2,
+      "action_inventory_source": "slither_dependency_candidates"
+    },
+    {
+      "project": "Kink",
+      "property_id": "5eac6f37a492eb4d843a",
+      "property": "KinkPoolEchidna.echidna_reserves_match_balances()",
+      "types": [
+        "状态依赖",
+        "数值会计不变量"
+      ],
+      "source": "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol#91-94",
+      "slither_candidate_actions": 0,
+      "slither_linked_action_count": 3,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 3,
+      "action_inventory_source": "slither_dependency_candidates"
+    },
+    {
+      "project": "BeeStorage",
+      "property_id": "a11cc51249256da90a47",
+      "property": "EchidnaSystemHarness.echidna_tracked_redist_commit_reveal_consistent()",
+      "types": [
+        "多交易序列",
+        "状态依赖"
+      ],
+      "source": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol#295-312",
+      "slither_candidate_actions": 2,
+      "fresh_generation": true,
+      "selection_reason": "零参数多阶段 commit/reveal 属性；按属性类型选择，本轮重新生成以统一生成过程。",
+      "slither_linked_action_count": 2,
+      "abi_fallback_action_count": 0,
+      "agent_available_action_count": 2,
+      "action_inventory_source": "slither_dependency_candidates"
+    }
+  ],
+  "repetition_selection": [
+    {
+      "project": "BeeStorage",
+      "property_id": "0226f9cc69ab30e7821a",
+      "category": "权限控制",
+      "reason": "预先指定的权限绕过代表属性"
+    },
+    {
+      "project": "Hokusai",
+      "property_id": "a36be6874710a8a5a9a7",
+      "category": "状态依赖",
+      "reason": "预先指定的跨操作状态属性"
+    },
+    {
+      "project": "Hokusai",
+      "property_id": "ad28f4492fa527ee713b",
+      "category": "数值边界",
+      "reason": "预先指定的额度上限属性"
+    },
+    {
+      "project": "BeeStorage",
+      "property_id": "a11cc51249256da90a47",
+      "category": "多交易序列",
+      "reason": "预先指定的两阶段 commit/reveal 代表属性；本轮重新生成，不复用已知种子。"
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "project": "Hokusai",
+      "property_id": "c3672406d0e2093f69aa",
+      "reason": "与已纳入的 investor cap 同属数值 mint cap，按预设去冗余规则只留一个。"
+    },
+    {
+      "project": "Kink",
+      "property_id": "5dacaaaba0e37d49782b",
+      "reason": "与 token1 conserved 同为代币守恒/会计关系，按预设去冗余规则不重复采样。"
+    },
+    {
+      "project": "Kink",
+      "property_id": "f79b3b000df5bc77ba4a",
+      "reason": "与 reserves match balances 均检查池状态关系，按预设去冗余规则不重复采样。"
+    },
+    {
+      "project": "Drips",
+      "property_id": "6e7899beaef22d4a3a87",
+      "reason": "Echidna 2.3.2 预检在 Agent 调用前拒绝带六个参数的 assertion test 函数；不改上游 Harness，因此不具备当前原生属性运行条件。完整日志保留在 preflight-final/Drips/.../echidna.log。"
+    }
+  ],
+  "conditions": {
+    "baseline": "原生 Echidna，隔离的空 coverage 目录，不注入外部种子。",
+    "v2": "逐属性 Agent A 规划、Agent B 具体化、最多一次 planning repair 与一次 EVM feedback repair；只有 EVM 有效种子进入 V2 主语料；失败属性仍运行对照并计入分母。",
+    "candidate_seeds_per_property": 1,
+    "max_steps": 8,
+    "test_budget": {
+      "test_limit": 80,
+      "seq_len": 8,
+      "shrink_limit": 1,
+      "workers": 1,
+      "stop_on_fail": false
+    },
+    "end_to_end_budget": {
+      "seconds_per_property_treatment": 60,
+      "test_limit": 10000000,
+      "workers": 1,
+      "stop_on_fail": true,
+      "v2_echidna_time_is_remaining_after_seed_preparation": true
+    },
+    "exact_target_property_prefix": true,
+    "seed_schedule": {
+      "screening_base": 20261114,
+      "screening_index_offset": "0..9 in the frozen property order",
+      "repeat_round_2_base": 20261124,
+      "repeat_round_3_base": 20261134,
+      "runner_adds_property_index_within_invocation": true
+    },
+    "repeated_validation": {
+      "paired_random_seeds_per_selected_property": 3,
+      "includes_initial_screening_pair": true,
+      "additional_rounds": 2,
+      "seed_generation_paid_once_per_property_across_three_pairs": true,
+      "reuse_existing_generated_seed_for_rounds_2_and_3": true,
+      "seed_generation_time_basis": "screening pair includes measured generation/replay time once; subsequent pairs reuse the same seed without recharging already-paid preparation time"
+    },
+    "api_budget": {
+      "per_property_token_budget": 30000,
+      "property_count": 10,
+      "upper_bound_tokens": 300000,
+      "model_calls_for_repeats": 0,
+      "max_candidates": 1,
+      "planning_repairs": 1,
+      "evm_repairs": 1,
+      "new_agent_generated_property_count": 10
+    },
+    "coverage_metric": "Echidna unique instructions; report absolute per-property delta and relative percentage delta.",
+    "violation_metric": "Target-property counterexample indicator and first observed wall-clock time; EVM seed prevalidation violations counted separately and disclosed.",
+    "seed_metrics": "Plan/candidate success and EVM-executable seed rate, with failed or timed-out attributes retained in the denominator.",
+    "known_scope": "Fresh Slither compile/analysis is excluded from wall-clock budget because cached property analyses are reused."
+  },
+  "no_outcome_based_selection": true,
+  "pre_screening": {
+    "agent_api_calls": 0,
+    "harness_runs": 5,
+    "passed": 4,
+    "failed": 1,
+    "drips_failure": "Echidna 2.3.2 aborted because the assertion test function has arguments",
+    "failure_log": "deepseek/结果/逐属性原生对照实验/扩展属性筛选-20261114/preflight-final/Drips/6e7899beaef22d4a3a87/echidna.log"
+  },
+  "amendments_before_agent_calls": [
+    {
+      "recorded_at_utc": "2026-11-14T14:53:14.156498+00:00",
+      "change": "Remove the Drips parameterized assertion from the screening sample and replace it with BeeStorage tracked commit/reveal; update the multi-transaction repeat representative.",
+      "reason": "A zero-API Echidna 2.3.2 preflight rejected the Drips assertion because it has function arguments. The replacement follows the pre-registered property type and runtime compatibility, not Agent/EVM/fuzzing results. It will be freshly generated to avoid conditioning inclusion on an earlier seed.",
+      "screening_agent_calls_before_amendment": 0
+    },
+    {
+      "recorded_at_utc": "2026-11-14T14:57:40.648587+00:00",
+      "change": "Record each frozen property's Slither-linked versus generic ABI-fallback action inventory.",
+      "reason": "A pre-call context audit found that some properties have no direct Slither action but do have cross-contract actions; the single remaining empty Slither relation receives a generic serializable mutator inventory. All ten attributes remain fixed and each has at least one callable action. No model output was observed.",
+      "screening_agent_calls_before_amendment": 0
+    },
+    {
+      "recorded_at_utc": "2026-11-14T15:25:51.645744+00:00",
+      "change": "After the first screening run, preserve two local preflight budget rejections and rerun those same frozen properties under the already-registered 30,000-token cap using compact, deduplicated dependency evidence.",
+      "reason": "The initial Agent A requests had conservative UTF-8 upper bounds above the registered cap, so no API request was sent and no candidate was attempted for BeeStorage 2c68514fc72b1303d6e8 and a11cc51249256da90a47. A source-preserving prompt compaction was made; refreshed bounds are 26,783 and 26,794 tokens. No property, random seed, Echidna budget, or selection rule changes.",
+      "original_zero_charge_preflight_failures_retained": true,
+      "supplemental_properties": [
+        "BeeStorage/2c68514fc72b1303d6e8",
+        "BeeStorage/a11cc51249256da90a47"
+      ],
+      "screening_random_seeds": [
+        20261118,
+        20261123
+      ],
+      "api_call_attempts_before_this_amendment": 8,
+      "model_output_used_for_selection": false
+    }
+  ]
+}

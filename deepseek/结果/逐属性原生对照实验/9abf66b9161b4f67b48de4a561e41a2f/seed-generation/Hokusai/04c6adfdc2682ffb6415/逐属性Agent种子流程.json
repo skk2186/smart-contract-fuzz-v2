@@ -1,0 +1,286 @@
+{
+  "schema_version": 2,
+  "experiment_id": "091771d0564e443c949d15ca274ddc8c",
+  "project": "Hokusai",
+  "property_ids": [
+    "04c6adfdc2682ffb6415"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "04c6adfdc2682ffb6415",
+      "property": "EchidnaHokusaiToken.echidna_only_controller_can_mint()",
+      "dependency_status": "statically_supported_with_limits",
+      "seed_compatible_action_count": 1,
+      "slither_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "candidate_results": [
+        {
+          "candidate_id": "04c6adfdc268-01-04c6adfdc2682ffb6415-c1",
+          "plan": [
+            {
+              "function": "attemptUnauthorizedMint(uint256)",
+              "rationale": "唯一 seed_compatible 入口；源码显示当 bounded!=0 且 unauthorizedCaller.tryMintInvestor 返回 true 时写入 unauthorizedMintSucceeded=true，该状态正是属性读取的谓词变量，因此先执行该状态生产操作以尝试触发属性违反。"
+            }
+          ],
+          "status": "executable",
+          "seed_class": "evm_valid",
+          "seed_id": "seed-91ee42b963c748a19e9b482c23a32dc7",
+          "corpus_file": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/Hokusai/04c6adfdc2682ffb6415/种子包/Hokusai/04c6adfdc2682ffb6415/coverage/seed-91ee42b963c748a19e9b482c23a32dc7.txt",
+          "concrete_seed": {
+            "property_id": "04c6adfdc2682ffb6415",
+            "candidate_id": "04c6adfdc268-01-04c6adfdc2682ffb6415-c1",
+            "transactions": [
+              {
+                "function": "attemptUnauthorizedMint(uint256)",
+                "arguments": [
+                  1
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              }
+            ],
+            "assumptions": [
+              "amount 取非零值 1，以满足源码中 bounded != 0 的分支条件（_bound(amount, MAX_FUZZ_MINT) 结果非零），从而进入 unauthorizedCaller.tryMintInvestor 调用分支。",
+              "属性违反依赖 unauthorizedCaller.tryMintInvestor(token, USER_A, bounded) 返回 true；该外部调用的返回值无法从静态 ABI/源码片段确认，属于 unknowns 中所述外部调用未闭合项。",
+              "sender 选择 sender_pool 中第一个地址，与 property_sender 一致；源码未对调用者身份设限，attemptUnauthorizedMint 为 external 且无访问控制守卫。",
+              "payable=false，故 value_wei 设为 0；无源码证据要求延迟，delay_seconds 与 delay_blocks 均为 0。",
+              "未提供 fixed_shared_prefix_transactions，无需复用前缀交易。"
+            ],
+            "data_dependencies": [],
+            "execution_feedback": null
+          },
+          "agent_b": {
+            "logical_calls": 1,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_Hokusai_04c6adfdc268-01-04c6adfdc2682ffb6415-c1_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 1896,
+                  "prompt_cache_hit_tokens": 256,
+                  "prompt_cache_miss_tokens": 1640,
+                  "completion_tokens": 310,
+                  "total_tokens": 2206,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000432768",
+                    "peak": "0.000865536"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 2.624,
+                "attempt": 1,
+                "prompt_utf8_bytes": 6602,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "Hokusai",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "04c6adfdc268-01-04c6adfdc2682ffb6415-c1",
+              "replay_status": "executable",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_investor_cap()": true,
+                "echidna_only_controller_can_mint()": true,
+                "echidna_reward_cap()": true,
+                "echidna_supplier_distributed_once()": true,
+                "echidna_supply_accounting()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "attemptUnauthorizedMint(uint256)",
+                  "arguments": [
+                    1
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "e35fe2d416f16f3a659c04623bef9b020dd6aff5cbbb7b1e1974848ba96851c2",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 37375,
+                  "observed_view_state_changed": false,
+                  "observed_view_count": 52,
+                  "tracked_contract_count": 4,
+                  "tracked_contract_types": [
+                    "Harness",
+                    "HokusaiParams",
+                    "HokusaiToken",
+                    "IHokusaiParams"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "EchidnaHokusaiToken.unauthorizedMintSucceeded"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "EchidnaHokusaiToken.unauthorizedMintSucceeded"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "82fe17f77eef4c57fc2b08e96785dc9aeb233f6bf3d1f7a2315e74787753eec6",
+                  "state_fingerprint_after": "82fe17f77eef4c57fc2b08e96785dc9aeb233f6bf3d1f7a2315e74787753eec6",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_investor_cap()": true,
+                    "echidna_only_controller_can_mint()": true,
+                    "echidna_reward_cap()": true,
+                    "echidna_supplier_distributed_once()": true,
+                    "echidna_supply_accounting()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 1.733,
+              "elapsed_from_run_start_seconds": 6.768
+            }
+          ],
+          "error": null,
+          "elapsed_seconds": 4.383
+        }
+      ],
+      "status": "seed_generated",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Hokusai_04c6adfdc2682ffb6415_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 2371,
+              "prompt_cache_hit_tokens": 256,
+              "prompt_cache_miss_tokens": 2115,
+              "completion_tokens": 234,
+              "total_tokens": 2605,
+              "estimated_cost_usd": {
+                "offpeak": "0.000458418",
+                "peak": "0.000916836"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.318,
+            "attempt": 1,
+            "prompt_utf8_bytes": 8416,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "04c6adfdc2682ffb6415",
+                "candidate_id": "04c6adfdc2682ffb6415-c1",
+                "steps": [
+                  {
+                    "function": "attemptUnauthorizedMint(uint256)",
+                    "rationale": "唯一 seed_compatible 入口；源码显示当 bounded!=0 且 unauthorizedCaller.tryMintInvestor 返回 true 时写入 unauthorizedMintSucceeded=true，该状态正是属性读取的谓词变量，因此先执行该状态生产操作以尝试触发属性违反。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "属性为 view 布尔谓词 !unauthorizedMintSucceeded，仅依赖 EchidnaHokusaiToken.unauthorizedMintSucceeded 状态。",
+              "候选入口含外部调用 unauthorizedCaller.tryMintInvestor，静态证据未证明其返回值或副作用；序列可行性依赖该外部调用在运行时返回 true。",
+              "amount 参数需满足 _bound(amount, MAX_FUZZ_MINT) 后非零，具体参数化不在本规划范围内。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 1,
+      "elapsed_seconds": 6.703
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 60,
+    "token_budget": 30000,
+    "wall_budget_seconds": 60
+  },
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 0,
+    "unmetered_attempts": 0,
+    "prompt_tokens": 4267,
+    "completion_tokens": 544,
+    "total_tokens": 4811,
+    "estimated_cost_usd_offpeak": "0.000891186",
+    "estimated_cost_usd_peak": "0.001782372",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/Hokusai/04c6adfdc2682ffb6415/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 4811,
+  "total_elapsed_seconds": 6.796,
+  "anvil_start_error": null
+}

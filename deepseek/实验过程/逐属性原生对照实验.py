@@ -262,6 +262,7 @@ def _run_property(project: str, property_id: str, *, experiment_root: Path,
                          "target_property_results": baseline.get("target_property_results", []),
                          "property_failures": baseline.get("property_failures", []),
                          "initial_state_failures": baseline.get("initial_state_failures", []),
+                          "echidna_log_path": baseline.get("full_log_path"),
                          "campaign_output_excerpt": baseline.get("output", ""),
                          "external_seed_loaded": baseline.get("loaded_seed_count", 0) > 0,
                          "native_empty_corpus_verified": baseline.get("native_empty_corpus_verified", False),
@@ -287,6 +288,7 @@ def _run_property(project: str, property_id: str, *, experiment_root: Path,
                    "target_property_results": treatment.get("target_property_results", []),
                    "property_failures": treatment.get("property_failures", []),
                    "initial_state_failures": treatment.get("initial_state_failures", []),
+                    "echidna_log_path": treatment.get("full_log_path"),
                    "campaign_output_excerpt": treatment.get("output", ""),
                    "input_seed_id": valid_seed.get("seed_id") if valid_seed else None,
                    "input_seed_count": treatment.get("initial_corpus_file_count", 0),
@@ -342,11 +344,16 @@ def main() -> None:
     parser.add_argument("--token-budget-per-property", type=int, default=120_000)
     parser.add_argument("--reuse-generated-seeds-from", type=Path,
                         help="重跑 Echidna 配对条件时复用既有报告中的逐属性 Agent/EVM 种子，不再调用 API")
+    parser.add_argument("--seed-generation-paid-once", action="store_true",
+                        help="重复验证复用已生成种子时不重复计入已支付的种子准备时间；适用于将初筛与重复运行合并核算")
     parser.add_argument("--skip-echidna-only-diagnostic", action="store_true")
     args = parser.parse_args()
     if args.test_limit < 1 or args.time_budget_seconds < 1 or args.token_budget_per_property < 1:
         parser.error("预算参数必须为正数")
     deduplicated = list(dict.fromkeys(args.properties))
+    reuse_source = args.reuse_generated_seeds_from
+    if args.seed_generation_paid_once and reuse_source is None:
+        parser.error("--seed-generation-paid-once 只能与种子复用参数一起使用")
     experiment_started = time.monotonic()
     started_at_utc = datetime.now(timezone.utc).isoformat()
     experiment_id = uuid.uuid4().hex
@@ -355,8 +362,8 @@ def main() -> None:
     previous_report = None
     previous_root = None
     previous_properties: dict[tuple[str, str], dict[str, Any]] = {}
-    if args.reuse_generated_seeds_from:
-        previous_path = args.reuse_generated_seeds_from.resolve()
+    if reuse_source:
+        previous_path = reuse_source.resolve()
         previous_report = json.loads(previous_path.read_text(encoding="utf-8"))
         previous_root = previous_path.parent
         previous_properties = {(row["project"], row["property_id"]): row
@@ -390,23 +397,39 @@ def main() -> None:
         "properties": [],
     }
     if previous_report:
+        matched_properties = [
+            {"project": project, "property_id": property_id}
+            for project, property_id in deduplicated
+            if (project, property_id) in previous_properties]
+        fresh_properties = [
+            {"project": project, "property_id": property_id}
+            for project, property_id in deduplicated
+            if (project, property_id) not in previous_properties]
         report["seed_generation_reuse"] = {
-            "source_report": str(args.reuse_generated_seeds_from.resolve().relative_to(ROOT)),
-            "additional_agent_api_calls": 0,
-            "original_actual_token_usage_and_cost_retained": True,
-            "correction_reason": "仅重新运行 Echidna 条件，不改变已有 Agent 响应、种子或成本记录",
+            "source_report": str(reuse_source.resolve().relative_to(ROOT)),
+            "reused_properties": matched_properties,
+            "newly_generated_properties": fresh_properties,
+            "reused_property_actual_api_usage_retained": True,
+            "additional_agent_api_calls_for_reused_properties": 0,
+            "seed_generation_time_accounting": (
+                "already_paid_once_in_initial_screening; zero additional preparation time charged"
+                if args.seed_generation_paid_once else
+                "original preparation time charged to this independent rerun"),
+            "correction_reason": "按属性 ID 复用已有 Agent 响应和种子；新属性仍独立生成并保留其调用成本",
         }
     print(f"实验 {experiment_id}：固定属性 {len(sample_set)} 条", flush=True)
     for index, (project, property_id) in enumerate(deduplicated, start=1):
         print(f"[{index}/{len(deduplicated)}] {project}/{property_id}: 生成单属性种子并配对回放", flush=True)
         generation_override = None
         preparation_override = None
+        property_key = (project, property_id)
         if previous_root is not None:
-            prior = previous_properties[(project, property_id)]
+            prior = previous_properties[property_key]
             generation_path = (previous_root / "seed-generation" / project /
                                property_id / "逐属性Agent种子流程.json")
             generation_override = json.loads(generation_path.read_text(encoding="utf-8"))
-            preparation_override = prior.get("seed_preparation_seconds")
+            preparation_override = (0.0 if args.seed_generation_paid_once else
+                                    prior.get("seed_preparation_seconds"))
         result = _run_property(
             project, property_id, experiment_root=experiment_root,
             test_limit=args.test_limit, time_budget=args.time_budget_seconds,
@@ -426,7 +449,28 @@ def main() -> None:
                               "coverage_delta_unique_instructions"],
                           "api_tokens": (result.get("agent_api_usage") or {}).get("total_tokens")},
                          ensure_ascii=False), flush=True)
-    api_totals = [row.get("agent_api_usage") or {} for row in report["properties"]]
+    reused_keys = {
+        (item["project"], item["property_id"])
+        for item in report.get("seed_generation_reuse", {}).get("reused_properties", [])
+    }
+    api_by_property = {
+        (row["project"], row["property_id"]): row.get("agent_api_usage") or {}
+        for row in report["properties"]
+    }
+    api_totals = [usage for key, usage in api_by_property.items() if key not in reused_keys]
+    reused_api_totals = [usage for key, usage in api_by_property.items() if key in reused_keys]
+    if reused_keys:
+        report["seed_generation_reuse"]["historical_api_usage_retained_not_spent_again"] = {
+            "total_tokens": sum(row.get("total_tokens", 0) for row in reused_api_totals),
+            "estimated_api_cost_usd_offpeak": str(sum(
+                (Decimal(str(row.get("estimated_cost_usd_offpeak", 0)))
+                 for row in reused_api_totals), Decimal("0"))),
+            "estimated_api_cost_usd_peak": str(sum(
+                (Decimal(str(row.get("estimated_cost_usd_peak", 0)))
+                 for row in reused_api_totals), Decimal("0"))),
+            "request_attempts_in_source_logs": sum(
+                row.get("request_attempts", 0) for row in reused_api_totals),
+        }
     report["aggregate"] = {
         "property_count": len(report["properties"]),
         "candidate_generation_success_count": sum(row.get("seed_generation_success", False)
@@ -439,10 +483,14 @@ def main() -> None:
             row["comparisons"]["same_test_budget"]["v2"]["seed_load_replay_verified"]
             for row in report["properties"]),
         "actual_api_tokens": sum(row.get("total_tokens", 0) for row in api_totals),
+        "actual_api_tokens_newly_spent_in_this_run": sum(
+            row.get("total_tokens", 0) for row in api_totals),
         "estimated_api_cost_usd_offpeak": str(sum(
-            (float(row.get("estimated_cost_usd_offpeak", 0)) for row in api_totals), 0.0)),
+            (Decimal(str(row.get("estimated_cost_usd_offpeak", 0)))
+             for row in api_totals), Decimal("0"))),
         "estimated_api_cost_usd_peak": str(sum(
-            (float(row.get("estimated_cost_usd_peak", 0)) for row in api_totals), 0.0)),
+            (Decimal(str(row.get("estimated_cost_usd_peak", 0)))
+             for row in api_totals), Decimal("0"))),
         "api_request_attempts": sum(row.get("request_attempts", 0) for row in api_totals),
         "failed_api_request_attempts": sum(row.get("failed_request_attempts", 0) for row in api_totals),
         "unmetered_api_attempts": sum(row.get("unmetered_attempts", 0) for row in api_totals),

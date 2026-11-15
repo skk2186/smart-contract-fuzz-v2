@@ -1,0 +1,363 @@
+{
+  "schema_version": 2,
+  "experiment_id": "7165e912ae654f8bafe919d9ec7ad85d",
+  "project": "Hokusai",
+  "property_ids": [
+    "40b35ad5dc128d8aff62"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "40b35ad5dc128d8aff62",
+      "property": "EchidnaHokusaiToken.echidna_supply_accounting()",
+      "dependency_status": "statically_supported_with_limits",
+      "seed_compatible_action_count": 7,
+      "slither_action_count": 7,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "candidate_results": [
+        {
+          "candidate_id": "40b35ad5dc12-01-supply_accounting_mint_then_burn",
+          "plan": [
+            {
+              "function": "mintInvestorUserA(uint256)",
+              "rationale": "通过 _mintInvestor 增加 token.totalSupply 并同步 expectedSupply，先建立非零供应与记账基线，满足后续 burn 的 available 非零前提。"
+            },
+            {
+              "function": "burnInvestorUserA(uint256)",
+              "rationale": "在 USER_A 已有余额后调用 burnInvestor，成功时 expectedSupply -= bounded，检验供应与记账在增发后销毁路径上的一致性。"
+            }
+          ],
+          "status": "executable",
+          "seed_class": "evm_valid",
+          "seed_id": "seed-53975bbeb90b4ec1ae8858a6e081aa97",
+          "corpus_file": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/Hokusai/40b35ad5dc128d8aff62/种子包/Hokusai/40b35ad5dc128d8aff62/coverage/seed-53975bbeb90b4ec1ae8858a6e081aa97.txt",
+          "concrete_seed": {
+            "property_id": "40b35ad5dc128d8aff62",
+            "candidate_id": "40b35ad5dc12-01-supply_accounting_mint_then_burn",
+            "transactions": [
+              {
+                "index": 0,
+                "function": "mintInvestorUserA(uint256)",
+                "abi_signature": "mintInvestorUserA(uint256)",
+                "sender": "0x0000000000000000000000000000000000010000",
+                "arguments": [
+                  1000000000000000000
+                ],
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              },
+              {
+                "index": 1,
+                "function": "burnInvestorUserA(uint256)",
+                "abi_signature": "burnInvestorUserA(uint256)",
+                "sender": "0x0000000000000000000000000000000000010000",
+                "arguments": [
+                  500000000000000000
+                ],
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0
+              }
+            ],
+            "assumptions": [
+              "mintInvestorUserA 的 amount 取 1e18，经 _mintInvestor 内部 _bound 后应非零，从而触发 token.mintInvestor 成功并执行 expectedSupply += bounded。",
+              "burnInvestorUserA 的 amount 取 5e17，小于前序 mint 的 1e18，使 available 非零且 _bound 结果非零，从而进入 token.burnInvestor 调用分支。",
+              "两笔交易使用同一 sender（sender_pool 第一项），确保 USER_A 的余额与 investorMinted 在前序 mint 后对后续 burn 可见；具体 USER_A 地址由合约常量决定，静态不可见。",
+              "burn 的 bounded 依赖 token.balanceOf(USER_A) 与 token.investorMinted() 的运行时值；若 _bound 结果与 5e17 不同，expectedSupply 的扣减量以实际 bounded 为准，属性仍检验 totalSupply 与 expectedSupply 的一致性。",
+              "未提供源码证据要求延迟，故 delay_seconds 与 delay_blocks 均为 0。",
+              "外部调用 token.mintInvestor/token.burnInvestor 的返回值与副作用未静态闭合，实际回放结果可能影响属性判定。"
+            ],
+            "data_dependencies": [
+              {
+                "transaction_index": 1,
+                "depends_on_transaction_index": 0,
+                "field_relation": "burnInvestorUserA.amount 应不大于前序 mintInvestorUserA.amount 以保持 available 非零",
+                "reused_value": "sender=0x0000000000000000000000000000000000010000"
+              }
+            ],
+            "execution_feedback": null
+          },
+          "agent_b": {
+            "logical_calls": 1,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_Hokusai_40b35ad5dc12-01-supply_accounting_mint_then_burn_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 2677,
+                  "prompt_cache_hit_tokens": 256,
+                  "prompt_cache_miss_tokens": 2421,
+                  "completion_tokens": 551,
+                  "total_tokens": 3228,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000694518",
+                    "peak": "0.001389036"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 3.103,
+                "attempt": 1,
+                "prompt_utf8_bytes": 9337,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "Hokusai",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "40b35ad5dc12-01-supply_accounting_mint_then_burn",
+              "replay_status": "executable",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_investor_cap()": true,
+                "echidna_only_controller_can_mint()": true,
+                "echidna_reward_cap()": true,
+                "echidna_supplier_distributed_once()": true,
+                "echidna_supply_accounting()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "mintInvestorUserA(uint256)",
+                  "arguments": [
+                    1000000000000000000
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "eede241bdbf1fe29b35683115884da2d7a774b092fe06e03ae96e9be0de46f38",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 125972,
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 52,
+                  "tracked_contract_count": 4,
+                  "tracked_contract_types": [
+                    "Harness",
+                    "HokusaiParams",
+                    "HokusaiToken",
+                    "IHokusaiParams"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "EchidnaHokusaiToken.expectedSupply"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "EchidnaHokusaiToken.expectedSupply"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "82fe17f77eef4c57fc2b08e96785dc9aeb233f6bf3d1f7a2315e74787753eec6",
+                  "state_fingerprint_after": "0c7b44af2d28314948acb36f0456af09dba354902bc65d16d96025fd1cc3a725",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_investor_cap()": true,
+                    "echidna_only_controller_can_mint()": true,
+                    "echidna_reward_cap()": true,
+                    "echidna_supplier_distributed_once()": true,
+                    "echidna_supply_accounting()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                },
+                {
+                  "index": 2,
+                  "function": "burnInvestorUserA(uint256)",
+                  "arguments": [
+                    500000000000000000
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "1e586d61c0610d3ff372deab20a40a812d2e142136b5a1b6745fa4336e1822da",
+                  "block_number": 4370002,
+                  "status": "success",
+                  "gas_used": 57785,
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 52,
+                  "tracked_contract_count": 4,
+                  "tracked_contract_types": [
+                    "Harness",
+                    "HokusaiParams",
+                    "HokusaiToken",
+                    "IHokusaiParams"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "EchidnaHokusaiToken.expectedSupply"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "EchidnaHokusaiToken.expectedSupply"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "0c7b44af2d28314948acb36f0456af09dba354902bc65d16d96025fd1cc3a725",
+                  "state_fingerprint_after": "e2cabe4ed3080ec0a612defed29c3a485eaf90f1d8e8c112134d5fc94612e4a2",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_investor_cap()": true,
+                    "echidna_only_controller_can_mint()": true,
+                    "echidna_reward_cap()": true,
+                    "echidna_supplier_distributed_once()": true,
+                    "echidna_supply_accounting()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 1.947,
+              "elapsed_from_run_start_seconds": 7.083
+            }
+          ],
+          "error": null,
+          "elapsed_seconds": 5.08
+        }
+      ],
+      "status": "seed_generated",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Hokusai_40b35ad5dc128d8aff62_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 4586,
+              "prompt_cache_hit_tokens": 384,
+              "prompt_cache_miss_tokens": 4202,
+              "completion_tokens": 238,
+              "total_tokens": 4824,
+              "estimated_cost_usd": {
+                "offpeak": "0.000774252",
+                "peak": "0.001548504"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 1.944,
+            "attempt": 1,
+            "prompt_utf8_bytes": 15909,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "40b35ad5dc128d8aff62",
+                "candidate_id": "supply_accounting_mint_then_burn",
+                "steps": [
+                  {
+                    "function": "mintInvestorUserA(uint256)",
+                    "rationale": "通过 _mintInvestor 增加 token.totalSupply 并同步 expectedSupply，先建立非零供应与记账基线，满足后续 burn 的 available 非零前提。"
+                  },
+                  {
+                    "function": "burnInvestorUserA(uint256)",
+                    "rationale": "在 USER_A 已有余额后调用 burnInvestor，成功时 expectedSupply -= bounded，检验供应与记账在增发后销毁路径上的一致性。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "mintInvestorUserA 与 burnInvestorUserA 的外部调用 token.mintInvestor/token.burnInvestor 在部署环境中可成功执行；静态证据未证明其返回值或副作用。",
+              "参数由 fuzz 提供，序列只规划调用顺序，不保证 bounded 非零或余额足够。",
+              "attemptUnauthorizedMint 依赖 controller 权限，未纳入候选序列。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 1,
+      "elapsed_seconds": 7.026
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 60,
+    "token_budget": 30000,
+    "wall_budget_seconds": 60
+  },
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 0,
+    "unmetered_attempts": 0,
+    "prompt_tokens": 7263,
+    "completion_tokens": 789,
+    "total_tokens": 8052,
+    "estimated_cost_usd_offpeak": "0.001468770",
+    "estimated_cost_usd_peak": "0.002937540",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/seed-generation/Hokusai/40b35ad5dc128d8aff62/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 8052,
+  "total_elapsed_seconds": 7.116,
+  "anvil_start_error": null
+}
