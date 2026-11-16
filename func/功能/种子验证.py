@@ -307,6 +307,281 @@ def _state_view_snapshot(web3: Web3, contract, contract_abis: dict[str, Any]) ->
             "view_values": observations}
 
 
+def _split_solidity_arguments(arguments: str) -> list[str]:
+    parts, start, depth = [], 0, 0
+    for index, char in enumerate(arguments):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth = max(0, depth - 1)
+        elif char == "," and depth == 0:
+            parts.append(arguments[start:index].strip())
+            start = index + 1
+    tail = arguments[start:].strip()
+    if tail or parts:
+        parts.append(tail)
+    return parts
+
+
+def _property_calls(expression: str) -> list[tuple[str | None, str, list[str]]]:
+    calls = []
+    pattern = r"(?:(?P<receiver>[A-Za-z_][A-Za-z0-9_]*)\s*\.\s*)?(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*\("
+    for match in re.finditer(pattern, expression):
+        opening = expression.find("(", match.start())
+        depth = 0
+        for index in range(opening, len(expression)):
+            if expression[index] == "(":
+                depth += 1
+            elif expression[index] == ")":
+                depth -= 1
+                if depth == 0:
+                    args = _split_solidity_arguments(expression[opening + 1:index])
+                    calls.append((match.group("receiver"), match.group("name"), args))
+                    break
+    return calls
+
+
+def _resolve_property_argument(expression: str, abi_type: str, declarations: str,
+                                property_sender: str, contract=None,
+                                seen: set[str] | None = None) -> Any:
+    expression = expression.strip()
+    seen = set(seen or ())
+    if expression == "this" and contract is not None:
+        value: Any = contract.address
+    elif expression == "msg.sender":
+        value: Any = property_sender
+    elif expression in {"true", "false"}:
+        value = expression == "true"
+    else:
+        cast = re.fullmatch(r"(?:address|bool|u?int[0-9]*|bytes[0-9]*)\s*\((.*)\)", expression)
+        if cast:
+            value = _resolve_property_argument(cast.group(1), abi_type, declarations,
+                                               property_sender, contract, seen)
+        elif re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", expression):
+            if expression in seen:
+                raise ValueError("循环常量引用")
+            seen.add(expression)
+            getter_signature = expression + "()"
+            getter_abi = next((item for item in (contract.abi if contract else [])
+                               if item.get("type") == "function" and
+                               item.get("name") == expression and not item.get("inputs") and
+                               item.get("stateMutability") in {"view", "pure"}), None)
+            if getter_abi is not None:
+                value = contract.get_function_by_signature(getter_signature)().call(
+                    {"from": _checksum(property_sender)})
+            else:
+                initializers = re.findall(r"\b" + re.escape(expression) +
+                                          r"\s*=\s*([^;]+);", declarations)
+                if not initializers:
+                    raise ValueError("属性参数不是可解析的字面量/局部常量")
+                value = _resolve_property_argument(initializers[0], abi_type,
+                                                   declarations, property_sender,
+                                                   contract, seen)
+        elif re.fullmatch(r"0x[0-9a-fA-F]+|[0-9][0-9_]*", expression):
+            value = int(expression.replace("_", ""), 0 if expression.startswith("0x") else 10)
+        elif len(expression) >= 2 and expression[0] == expression[-1] == '"':
+            value = bytes(expression[1:-1], "utf-8").decode("unicode_escape")
+        else:
+            raise ValueError("暂不支持该属性参数表达式")
+
+    if abi_type == "address":
+        if isinstance(value, str) and Web3.is_address(value):
+            return Web3.to_checksum_address(value)
+        if isinstance(value, int) and 0 <= value < 2 ** 160:
+            return Web3.to_checksum_address("0x" + value.to_bytes(20, "big").hex())
+        raise ValueError("address 参数无法解析")
+    if abi_type == "bool":
+        if isinstance(value, bool):
+            return value
+        raise ValueError("bool 参数无法解析")
+    if abi_type.startswith(("uint", "int")):
+        if isinstance(value, int) and not isinstance(value, bool):
+            return value
+        raise ValueError("数值参数无法解析")
+    if abi_type == "string" and isinstance(value, str):
+        return value
+    if abi_type.startswith("bytes") and isinstance(value, str) and value.startswith("0x"):
+        return bytes.fromhex(value[2:])
+    raise ValueError("ABI 参数类型不在轻量观察器支持范围")
+
+
+def _property_getter_specs(property_context: dict[str, Any], contract,
+                           contract_abis: dict[str, Any]) -> list[dict[str, Any]]:
+    """从属性源码中的直接 view 调用抽取可解析的 getter 观察点。"""
+    reference = property_context.get("property_source", "")
+    source_path = ROOT / str(reference).split("#", 1)[0]
+    if not source_path.is_file():
+        return []
+    source = source_path.read_text(encoding="utf-8", errors="replace")
+    line_match = re.search(r"#(\d+)", str(reference))
+    if line_match:
+        declarations = "\n".join(source.splitlines()[:max(0, int(line_match.group(1)) - 1)])
+    else:
+        declarations = source
+    predicate = "\n".join(re.sub(r"^\s*\d+:\s?", "", line)
+                             for line in (property_context.get("property_predicate") or "").splitlines())
+    abi = [item for item in contract.abi
+           if item.get("type") == "function" and
+           item.get("stateMutability") in {"view", "pure"}]
+    target_name = property_context.get("property_abi", "").split("(", 1)[0].rsplit(".", 1)[-1]
+    specs = []
+    for receiver, name, arguments in _property_calls(predicate):
+        if name == target_name:
+            continue
+        target_type = None
+        if receiver:
+            receiver_getter = next((item for item in abi
+                                    if item.get("name") == receiver and not item.get("inputs")
+                                    and item.get("stateMutability") in {"view", "pure"}
+                                    and any(output.get("type") == "address"
+                                            for output in item.get("outputs", []))), None)
+            if receiver_getter is None:
+                continue
+            internal_type = next((output.get("internalType", "")
+                                  for output in receiver_getter.get("outputs", [])
+                                  if output.get("type") == "address"), "")
+            target_type = internal_type.replace("contract ", "").strip() or None
+            target_abi = contract_abis.get(target_type) if target_type else None
+            if not isinstance(target_abi, list):
+                continue
+        else:
+            target_abi = abi
+        matches = [entry for entry in target_abi if entry.get("type") == "function" and
+                   entry.get("name") == name and
+                   entry.get("stateMutability") in {"view", "pure"} and
+                   len(entry.get("inputs", [])) == len(arguments)]
+        if not matches:
+            continue
+        resolved = None
+        errors = []
+        for entry in matches:
+            try:
+                values = [_resolve_property_argument(expression, parameter["type"],
+                                                     declarations, PROPERTY_SENDER,
+                                                     contract)
+                          for expression, parameter in zip(arguments, entry.get("inputs", []))]
+                resolved = {"signature": entry["name"] + "(" +
+                            ",".join(item["type"] for item in entry.get("inputs", [])) + ")",
+                            "expressions": arguments, "arguments": values,
+                            "receiver": receiver,
+                            "receiver_getter": receiver + "()" if receiver else None,
+                            "receiver_type": target_type}
+                break
+            except (ValueError, TypeError) as exc:
+                errors.append(str(exc))
+        if resolved:
+            specs.append(resolved)
+        else:
+            specs.append({"function": name, "expressions": arguments,
+                          "status": "unresolved", "reason": errors[0] if errors else "ABI 未匹配"})
+    observed_signatures = {item.get("signature") for item in specs}
+    for identifier in re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*\b", predicate):
+        entry = next((item for item in abi if item.get("name") == identifier and
+                      not item.get("inputs") and
+                      item.get("stateMutability") in {"view", "pure"}), None)
+        signature = identifier + "()"
+        if (entry and identifier != target_name and signature not in observed_signatures):
+            specs.append({"signature": signature, "expressions": [identifier],
+                          "arguments": [], "receiver": None,
+                          "receiver_getter": None, "receiver_type": None})
+            observed_signatures.add(signature)
+    return specs
+
+
+def _observe_property_getters(web3: Web3, contract, contract_abis: dict[str, Any],
+                              specs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    observations = []
+    for spec in specs:
+        if spec.get("status") == "unresolved":
+            observations.append(spec)
+            continue
+        try:
+            target = contract
+            receiver_address = None
+            if spec.get("receiver_getter"):
+                receiver_address = contract.get_function_by_signature(
+                    spec["receiver_getter"])().call({"from": _checksum(PROPERTY_SENDER)})
+                target_abi = contract_abis.get(spec.get("receiver_type"))
+                if not isinstance(target_abi, list):
+                    raise ValueError("缺少属性 getter 接收合约 ABI")
+                target = web3.eth.contract(address=Web3.to_checksum_address(receiver_address),
+                                           abi=target_abi)
+            value = target.get_function_by_signature(spec["signature"])(
+                *spec["arguments"]).call({"from": _checksum(PROPERTY_SENDER)})
+            observations.append({**spec, "status": "observed",
+                                 "receiver_address": (_to_rpc_value(receiver_address)
+                                                      if receiver_address else None),
+                                 "value": _to_rpc_value(value)})
+        except Exception as exc:
+            observations.append({**spec, "status": "call_error",
+                                 "error": f"{type(exc).__name__}: {str(exc)[:200]}"})
+    return observations
+
+
+def _target_property_state(property_signature: str,
+                           initial_values: dict[str, Any],
+                           initial_getters: list[dict[str, Any]],
+                           records: list[dict[str, Any]]) -> dict[str, Any]:
+    initial = initial_values.get(property_signature)
+    trajectory = [{"transaction_index": 0, "value": initial,
+                   "predicate_getters": initial_getters}]
+    trajectory.extend({"transaction_index": row.get("index"),
+                       "value": row.get("target_property"),
+                       "predicate_getters": row.get("predicate_getter_values", [])}
+                      for row in records)
+
+    def getter_key(item: dict[str, Any]) -> tuple[str, str, str, str]:
+        return (str(item.get("signature")), str(item.get("receiver")),
+                json.dumps(item.get("receiver_address"), sort_keys=True),
+                json.dumps(item.get("arguments", []), sort_keys=True))
+
+    prior_values: dict[tuple[str, str, str, str], Any] = {}
+    first_change = None
+    for row in trajectory:
+        changed = []
+        for getter in row.get("predicate_getters", []):
+            if getter.get("status") != "observed" or "value" not in getter:
+                continue
+            key = getter_key(getter)
+            value = getter["value"]
+            if key in prior_values and prior_values[key] != value:
+                changed.append({"signature": getter.get("signature"),
+                                "receiver": getter.get("receiver"),
+                                "receiver_address": getter.get("receiver_address"),
+                                "arguments": getter.get("arguments", []),
+                                "before": prior_values[key], "after": value})
+            prior_values[key] = value
+        row["changed_predicate_getters"] = changed
+        if changed and first_change is None:
+            first_change = row
+
+    first_false = next((item for item in trajectory if item.get("value") is False), None)
+    observed_values = [item.get("value") for item in trajectory
+                       if isinstance(item.get("value"), bool)]
+    if first_false:
+        status = "counterexample_state_established"
+    elif first_change:
+        status = "property_related_state_changed_property_holds"
+    elif observed_values and len(observed_values) == len(trajectory):
+        status = "no_observed_property_related_state_change"
+    else:
+        status = "property_state_unobservable"
+    return {"property": property_signature,
+            "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+            "status": status,
+            "target_property_state_established": bool(first_false or first_change),
+            "counterexample_state_established": first_false is not None,
+            "property_related_state_changed": first_change is not None,
+            "first_established_transaction_index": (
+                first_false.get("transaction_index") if first_false else
+                first_change.get("transaction_index") if first_change else None),
+            "first_property_related_change_transaction_index": (
+                first_change.get("transaction_index") if first_change else None),
+            "first_counterexample_transaction_index": (
+                first_false.get("transaction_index") if first_false else None),
+            "trajectory": trajectory}
+
+
 def _observed_effect_status(context: dict[str, Any], property_id: str,
                             signature: str, before: dict[str, Any],
                             after: dict[str, Any]) -> dict[str, Any]:
@@ -469,6 +744,12 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                                     if p["property_id"] == candidate["property_id"])
             property_name = property_context["property_abi"]
         property_signature = property_name.rsplit(".", 1)[-1]
+        if not property_signature.endswith("()"):
+            property_signature += "()"
+        property_context = next((item for item in candidate.get("context", {}).get("properties", [])
+                                 if item.get("property_id") == candidate.get("property_id")), {})
+        predicate_getter_specs = _property_getter_specs(property_context, contract,
+                                                        contract_abis)
         property_signatures = [entry["name"] + "()" for entry in contract.abi
                                if entry.get("type") == "function" and not entry.get("inputs")
                                and entry["name"].startswith("echidna_")
@@ -483,11 +764,11 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             except Exception as exc:
                 initial_property_values[tested_property] = None
                 initial_property_errors[tested_property] = f"{type(exc).__name__}: {str(exc)[:200]}"
+        initial_predicate_getters = _observe_property_getters(
+            session.web3, contract, contract_abis, predicate_getter_specs)
         records = []
         resolved_transactions: list[dict[str, Any]] = []
         prior_events: list[list[dict[str, Any]]] = []
-        property_context = next((item for item in candidate.get("context", {}).get("properties", [])
-                                 if item.get("property_id") == candidate.get("property_id")), {})
         actions = {item["abi_signature"]: item for item in property_context.get("candidate_actions", [])
                    if item.get("abi_signature")}
         valid = bool(transactions)
@@ -565,6 +846,10 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                         property_errors[tested_property] = f"{type(exc).__name__}: {str(exc)[:200]}"
                 prop_result = property_values.get(property_signature)
                 prop_error = property_errors.get(property_signature)
+                predicate_getter_values = _observe_property_getters(
+                    session.web3, contract, contract_abis, predicate_getter_specs)
+            else:
+                predicate_getter_values = []
             if receipt.status != 1:
                 valid = False
                 try:
@@ -631,6 +916,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "state_fingerprint_after": state_after["fingerprint"],
                 "target_property": prop_result,
                 "property_error": prop_error,
+                "predicate_getter_values": predicate_getter_values,
                 "all_property_values": property_values,
                 "all_property_errors": property_errors,
                 "other_property_violations_during_prevalidation": other_violations,
@@ -648,6 +934,10 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "initial_property_values": initial_property_values,
                 "initial_property_errors": initial_property_errors,
                 "initial_property_violations": initial_violations,
+                "initial_predicate_getters": initial_predicate_getters,
+                "target_property_state": _target_property_state(
+                    property_signature, initial_property_values,
+                    initial_predicate_getters, records),
                 "environment": {"chain_id": CHAIN_ID,
                                 "initial_timestamp": INITIAL_TIMESTAMP,
                                 "initial_block_number": INITIAL_BLOCK_NUMBER,

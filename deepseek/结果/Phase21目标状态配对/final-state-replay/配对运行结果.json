@@ -1,0 +1,2995 @@
+{
+  "phase": "Phase 21",
+  "manifest": "deepseek/结果/Phase21目标状态配对/实验方案.json",
+  "configuration": {
+    "difference_between_arms": "native 语料为空；V2 语料只含对应既有有效种子。其它配置相同。",
+    "test_mode": "property",
+    "test_limit": 80,
+    "timeout_seconds": 45,
+    "seq_len": 8,
+    "shrink_limit": 1,
+    "workers": 1,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": "从 Phase 20 属性结果逐条读取，并在 native/V2 两臂共用",
+    "repeat_echidna_seeds": [
+      20261130,
+      20261131
+    ]
+  },
+  "samples": [
+    {
+      "project": "OpenNFTs",
+      "property_id": "f0a4ef464239609050c2",
+      "property": "echidna_owner",
+      "seed_id": "seed-db746b34bd044209bb39902d22d7a7bd",
+      "seed_file": "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/种子包/OpenNFTs/f0a4ef464239609050c2/coverage/seed-db746b34bd044209bb39902d22d7a7bd.txt",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0x000000000000000000000000000000000000002a"
+      ],
+      "anvil_recheck": {
+        "project": "OpenNFTs",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "f0a4ef464239-01-f0a4ef464239609050c2-c1",
+        "replay_status": "executable",
+        "target_property_violation": {
+          "transaction_index": 1,
+          "property": "echidna_owner()"
+        },
+        "initial_property_values": {
+          "echidna_balance()": true,
+          "echidna_owner()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [
+          {
+            "signature": "owner()",
+            "expressions": [],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x000000000000000000000000000000000000002A"
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_owner()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "counterexample_state_established",
+          "target_property_state_established": true,
+          "counterexample_state_established": true,
+          "property_related_state_changed": true,
+          "first_established_transaction_index": 1,
+          "first_property_related_change_transaction_index": 1,
+          "first_counterexample_transaction_index": 1,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "owner()",
+                  "expressions": [],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x000000000000000000000000000000000000002A"
+                }
+              ],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": false,
+              "predicate_getters": [
+                {
+                  "signature": "owner()",
+                  "expressions": [],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000010000"
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "owner()",
+                  "receiver": null,
+                  "receiver_address": null,
+                  "arguments": [],
+                  "before": "0x000000000000000000000000000000000000002A",
+                  "after": "0x0000000000000000000000000000000000010000"
+                }
+              ]
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "transferOwnership(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "argument_bindings": [],
+            "sender": "0x000000000000000000000000000000000000002A",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x46a24be621eb9a83979c304bca1cd4e6f91e1bb87854a3f18cb56fa1c01c6b20",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 28850,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 1,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "OwnershipTransferred",
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "fields": {
+                  "previousOwner": "0x000000000000000000000000000000000000002A",
+                  "newOwner": "0x0000000000000000000000000000000000010000"
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 7,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "OpenERC173._owner"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "OpenERC173._owner"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0xea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+            "state_fingerprint_after": "0x3929c77423f9b835ae760f2392480f34de8d87b5aef79ffb0eb4816d1fe88e2e",
+            "target_property": false,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "owner()",
+                "expressions": [],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000010000"
+              }
+            ],
+            "all_property_values": {
+              "echidna_balance()": true,
+              "echidna_owner()": false
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "transferOwnership(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "sender": "0x000000000000000000000000000000000000002a",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          }
+        ]
+      },
+      "pairs": []
+    },
+    {
+      "project": "OpenNFTs",
+      "property_id": "50cc31144be4bad9bc9d",
+      "property": "echidna_balance",
+      "seed_id": "seed-ea7f25cd2d96465487449ca5907c4b50",
+      "seed_file": "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/种子包/OpenNFTs/50cc31144be4bad9bc9d/coverage/seed-ea7f25cd2d96465487449ca5907c4b50.txt",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0x000000000000000000000000000000000000002a"
+      ],
+      "anvil_recheck": {
+        "project": "OpenNFTs",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "50cc31144be4-01-seq-50cc31144be4bad9bc9d-1",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_balance()": true,
+          "echidna_owner()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "_other"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000000001"
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_balance()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "no_observed_property_related_state_change",
+          "target_property_state_established": false,
+          "counterexample_state_established": false,
+          "property_related_state_changed": false,
+          "first_established_transaction_index": null,
+          "first_property_related_change_transaction_index": null,
+          "first_counterexample_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "_other"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000000001"
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "_other"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000000001"
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": []
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "mint(string)",
+            "arguments": [
+              "ipfs://seed/50cc31144be4bad9bc9d/1.json"
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x6cd981e8698e7ef4516b0001f90547b9a617ffb8fee3894c0e4fad98a7607a7c",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 120315,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 3,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "SetTokenRoyalty",
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "fields": {
+                  "tokenID": 1,
+                  "receiver": "0x0000000000000000000000000000000000000000",
+                  "fee": 0
+                }
+              },
+              {
+                "name": "Pay",
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "fields": {
+                  "tokenID": 1,
+                  "price": 0,
+                  "seller": "0x000000000000000000000000000000000000002A",
+                  "paid": 0,
+                  "receiver": "0x0000000000000000000000000000000000000000",
+                  "royalties": 0,
+                  "fee": 0,
+                  "buyer": "0x0000000000000000000000000000000000010000",
+                  "unspent": 0
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "fields": {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0x0000000000000000000000000000000000010000",
+                  "tokenId": 1
+                }
+              }
+            ],
+            "observed_view_state_changed": false,
+            "observed_view_count": 7,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "OpenERC721._balances"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "OpenERC721._balances"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0xea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+            "state_fingerprint_after": "0xea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "_other"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000000001"
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              }
+            ],
+            "all_property_values": {
+              "echidna_balance()": true,
+              "echidna_owner()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "mint(string)",
+            "arguments": [
+              "ipfs://seed/50cc31144be4bad9bc9d/1.json"
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          }
+        ]
+      },
+      "pairs": []
+    },
+    {
+      "project": "Request",
+      "property_id": "c451c42790194538cf50",
+      "property": "echidna_token_conservation",
+      "seed_id": "seed-031bae72d18e4af3b0dffb3c20c534fb",
+      "seed_file": "deepseek/结果/Agent种子语料/Request/58e77e98bfd646b9844f6819b3f00947/种子包/Request/c451c42790194538cf50/coverage/seed-031bae72d18e4af3b0dffb3c20c534fb.txt",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0x0000000000000000000000000000000000003000"
+      ],
+      "anvil_recheck": {
+        "project": "Request",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "c451c4279019-01-token_conservation_charge_then_refund",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_captured_never_exceeds_authorized()": true,
+          "echidna_escrow_not_token_sink()": true,
+          "echidna_escrow_state_consistent()": true,
+          "echidna_fee_bps_validation_enforced()": true,
+          "echidna_fee_calc_no_overflow()": true,
+          "echidna_fee_never_exceeds_capture()": true,
+          "echidna_fee_receiver_only_gets_fees()": true,
+          "echidna_invalid_fee_bps_reverts()": true,
+          "echidna_merchant_receives_nonnegative()": true,
+          "echidna_no_underflow_in_merchant_payment()": true,
+          "echidna_operator_authorization_enforced()": true,
+          "echidna_payment_ref_counter_monotonic()": true,
+          "echidna_token_conservation()": true,
+          "echidna_token_supply_never_decreases()": true,
+          "echidna_uint96_sufficient_range()": true,
+          "echidna_wrapper_not_token_sink()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "expressions": [],
+            "arguments": [],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000000000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(this)"
+            ],
+            "arguments": [
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000000000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000001000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000002000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000003000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000004000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(wrapper)"
+            ],
+            "arguments": [
+              "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(mockEscrow)"
+            ],
+            "arguments": [
+              "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "token()",
+            "expressions": [
+              "token"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+          },
+          {
+            "signature": "PAYER()",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000001000"
+          },
+          {
+            "signature": "MERCHANT()",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000002000"
+          },
+          {
+            "signature": "OPERATOR()",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000003000"
+          },
+          {
+            "signature": "FEE_RECEIVER()",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000004000"
+          },
+          {
+            "signature": "wrapper()",
+            "expressions": [
+              "wrapper"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+          },
+          {
+            "signature": "mockEscrow()",
+            "expressions": [
+              "mockEscrow"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_token_conservation()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "property_related_state_changed_property_holds",
+          "target_property_state_established": true,
+          "counterexample_state_established": false,
+          "property_related_state_changed": true,
+          "first_established_transaction_index": 1,
+          "first_property_related_change_transaction_index": 1,
+          "first_counterexample_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "totalSupply()",
+                  "expressions": [],
+                  "arguments": [],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 10000000000000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(this)"
+                  ],
+                  "arguments": [
+                    "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 10000000000000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "PAYER"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000001000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "MERCHANT"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000002000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "OPERATOR"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000003000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "FEE_RECEIVER"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000004000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(wrapper)"
+                  ],
+                  "arguments": [
+                    "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(mockEscrow)"
+                  ],
+                  "arguments": [
+                    "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "token()",
+                  "expressions": [
+                    "token"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+                },
+                {
+                  "signature": "PAYER()",
+                  "expressions": [
+                    "PAYER"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000001000"
+                },
+                {
+                  "signature": "MERCHANT()",
+                  "expressions": [
+                    "MERCHANT"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000002000"
+                },
+                {
+                  "signature": "OPERATOR()",
+                  "expressions": [
+                    "OPERATOR"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000003000"
+                },
+                {
+                  "signature": "FEE_RECEIVER()",
+                  "expressions": [
+                    "FEE_RECEIVER"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000004000"
+                },
+                {
+                  "signature": "wrapper()",
+                  "expressions": [
+                    "wrapper"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+                },
+                {
+                  "signature": "mockEscrow()",
+                  "expressions": [
+                    "mockEscrow"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                }
+              ],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "totalSupply()",
+                  "expressions": [],
+                  "arguments": [],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 10000001000000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(this)"
+                  ],
+                  "arguments": [
+                    "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 10000000000000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "PAYER"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000001000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "MERCHANT"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000002000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 990000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "OPERATOR"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000003000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "FEE_RECEIVER"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000004000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 10000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(wrapper)"
+                  ],
+                  "arguments": [
+                    "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(mockEscrow)"
+                  ],
+                  "arguments": [
+                    "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "token()",
+                  "expressions": [
+                    "token"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+                },
+                {
+                  "signature": "PAYER()",
+                  "expressions": [
+                    "PAYER"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000001000"
+                },
+                {
+                  "signature": "MERCHANT()",
+                  "expressions": [
+                    "MERCHANT"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000002000"
+                },
+                {
+                  "signature": "OPERATOR()",
+                  "expressions": [
+                    "OPERATOR"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000003000"
+                },
+                {
+                  "signature": "FEE_RECEIVER()",
+                  "expressions": [
+                    "FEE_RECEIVER"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000004000"
+                },
+                {
+                  "signature": "wrapper()",
+                  "expressions": [
+                    "wrapper"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+                },
+                {
+                  "signature": "mockEscrow()",
+                  "expressions": [
+                    "mockEscrow"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "totalSupply()",
+                  "receiver": "token",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "arguments": [],
+                  "before": 10000000000000000000000000,
+                  "after": 10000001000000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "receiver": "token",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "arguments": [
+                    "0x0000000000000000000000000000000000002000"
+                  ],
+                  "before": 0,
+                  "after": 990000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "receiver": "token",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "arguments": [
+                    "0x0000000000000000000000000000000000004000"
+                  ],
+                  "before": 0,
+                  "after": 10000000000000000
+                }
+              ]
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "totalSupply()",
+                  "expressions": [],
+                  "arguments": [],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 10000001500000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(this)"
+                  ],
+                  "arguments": [
+                    "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 10000000500000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "PAYER"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000001000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "MERCHANT"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000002000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 990000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "OPERATOR"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000003000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "FEE_RECEIVER"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000004000"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 10000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(wrapper)"
+                  ],
+                  "arguments": [
+                    "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(mockEscrow)"
+                  ],
+                  "arguments": [
+                    "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                  ],
+                  "receiver": "token",
+                  "receiver_getter": "token()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "value": 0
+                },
+                {
+                  "signature": "token()",
+                  "expressions": [
+                    "token"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+                },
+                {
+                  "signature": "PAYER()",
+                  "expressions": [
+                    "PAYER"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000001000"
+                },
+                {
+                  "signature": "MERCHANT()",
+                  "expressions": [
+                    "MERCHANT"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000002000"
+                },
+                {
+                  "signature": "OPERATOR()",
+                  "expressions": [
+                    "OPERATOR"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000003000"
+                },
+                {
+                  "signature": "FEE_RECEIVER()",
+                  "expressions": [
+                    "FEE_RECEIVER"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x0000000000000000000000000000000000004000"
+                },
+                {
+                  "signature": "wrapper()",
+                  "expressions": [
+                    "wrapper"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+                },
+                {
+                  "signature": "mockEscrow()",
+                  "expressions": [
+                    "mockEscrow"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "totalSupply()",
+                  "receiver": "token",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "arguments": [],
+                  "before": 10000001000000000000000000,
+                  "after": 10000001500000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "receiver": "token",
+                  "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "arguments": [
+                    "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                  ],
+                  "before": 10000000000000000000000000,
+                  "after": 10000000500000000000000000
+                }
+              ]
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "driver_chargePayment(uint256,uint16)",
+            "arguments": [
+              1000000000000000000,
+              100
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x70ab70586933f3aa5933f95afd18752add4936f2c6a497040529e47fb8cff41f",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 456925,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 16,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                  "value": 0
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "to": "0x0000000000000000000000000000000000002000",
+                  "value": 990000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "to": "0x0000000000000000000000000000000000004000",
+                  "value": 10000000000000000
+                }
+              },
+              {
+                "name": "TransferWithReferenceAndFee",
+                "address": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                "fields": {
+                  "paymentReference": "0x6c31fc15422ebad28aaf9089c306702f67540b53c7eea8b7d2941044b027100f",
+                  "tokenAddress": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "to": "0x0000000000000000000000000000000000002000",
+                  "amount": 990000000000000000,
+                  "feeAmount": 10000000000000000,
+                  "feeAddress": "0x0000000000000000000000000000000000004000"
+                }
+              },
+              {
+                "name": "PaymentCharged",
+                "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "fields": {
+                  "paymentReference": "0x0000000000000001",
+                  "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "merchant": "0x0000000000000000000000000000000000002000",
+                  "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "amount": 1000000000000000000,
+                  "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96"
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 17,
+            "tracked_contract_count": 8,
+            "tracked_contract_types": [
+              "ERC20CommerceEscrowWrapper",
+              "Harness",
+              "IAuthCaptureEscrow",
+              "IERC20",
+              "IERC20FeeProxy",
+              "MockAuthCaptureEscrow",
+              "MockERC20",
+              "MockERC20FeeProxy"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "MockERC20._balances",
+              "MockERC20._totalSupply"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "MockERC20._balances",
+              "MockERC20._totalSupply"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0x54f58d9aac6740a3e45f196d3a462619c915cd70890139ad504703085495e38f",
+            "state_fingerprint_after": "0x23e8621a6a2561627c0531314161e22c3ae4f3fc97748f647c8ddb456883e2fe",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "totalSupply()",
+                "expressions": [],
+                "arguments": [],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 10000001000000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(this)"
+                ],
+                "arguments": [
+                  "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 10000000000000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "PAYER"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000001000"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 0
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "MERCHANT"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000002000"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 990000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "OPERATOR"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000003000"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 0
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "FEE_RECEIVER"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000004000"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 10000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(wrapper)"
+                ],
+                "arguments": [
+                  "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 0
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(mockEscrow)"
+                ],
+                "arguments": [
+                  "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 0
+              },
+              {
+                "signature": "token()",
+                "expressions": [
+                  "token"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+              },
+              {
+                "signature": "PAYER()",
+                "expressions": [
+                  "PAYER"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000001000"
+              },
+              {
+                "signature": "MERCHANT()",
+                "expressions": [
+                  "MERCHANT"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000002000"
+              },
+              {
+                "signature": "OPERATOR()",
+                "expressions": [
+                  "OPERATOR"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000003000"
+              },
+              {
+                "signature": "FEE_RECEIVER()",
+                "expressions": [
+                  "FEE_RECEIVER"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000004000"
+              },
+              {
+                "signature": "wrapper()",
+                "expressions": [
+                  "wrapper"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+              },
+              {
+                "signature": "mockEscrow()",
+                "expressions": [
+                  "mockEscrow"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+              }
+            ],
+            "all_property_values": {
+              "echidna_captured_never_exceeds_authorized()": true,
+              "echidna_escrow_not_token_sink()": true,
+              "echidna_escrow_state_consistent()": true,
+              "echidna_fee_bps_validation_enforced()": true,
+              "echidna_fee_calc_no_overflow()": true,
+              "echidna_fee_never_exceeds_capture()": true,
+              "echidna_fee_receiver_only_gets_fees()": true,
+              "echidna_invalid_fee_bps_reverts()": true,
+              "echidna_merchant_receives_nonnegative()": true,
+              "echidna_no_underflow_in_merchant_payment()": true,
+              "echidna_operator_authorization_enforced()": true,
+              "echidna_payment_ref_counter_monotonic()": true,
+              "echidna_token_conservation()": true,
+              "echidna_token_supply_never_decreases()": true,
+              "echidna_uint96_sufficient_range()": true,
+              "echidna_wrapper_not_token_sink()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          },
+          {
+            "index": 2,
+            "function": "driver_refundPayment(uint256,uint256)",
+            "arguments": [
+              0,
+              500000000000000000
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x44dffaf39cc85d7e0931bb2a56b4f8d1af1a932ea03130c284df934cbdb36278",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 198580,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 7,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "spender": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0x0000000000000000000000000000000000000000",
+                  "value": 0
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0x0000000000000000000000000000000000000000",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                  "value": 0
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "TransferWithReferenceAndFee",
+                "address": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                "fields": {
+                  "paymentReference": "0x6c31fc15422ebad28aaf9089c306702f67540b53c7eea8b7d2941044b027100f",
+                  "tokenAddress": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "amount": 500000000000000000,
+                  "feeAmount": 0,
+                  "feeAddress": "0x0000000000000000000000000000000000000000"
+                }
+              },
+              {
+                "name": "PaymentRefunded",
+                "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "fields": {
+                  "paymentReference": "0x0000000000000001",
+                  "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96",
+                  "refundedAmount": 500000000000000000,
+                  "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 17,
+            "tracked_contract_count": 8,
+            "tracked_contract_types": [
+              "ERC20CommerceEscrowWrapper",
+              "Harness",
+              "IAuthCaptureEscrow",
+              "IERC20",
+              "IERC20FeeProxy",
+              "MockAuthCaptureEscrow",
+              "MockERC20",
+              "MockERC20FeeProxy"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "MockERC20._totalSupply",
+              "MockERC20._balances"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "MockERC20._totalSupply",
+              "MockERC20._balances"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0x23e8621a6a2561627c0531314161e22c3ae4f3fc97748f647c8ddb456883e2fe",
+            "state_fingerprint_after": "0x54fc0ac2f29a14c765d3b5dd246ee14a46bba46ef552f172eb4d48ec35c735b9",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "totalSupply()",
+                "expressions": [],
+                "arguments": [],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 10000001500000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(this)"
+                ],
+                "arguments": [
+                  "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 10000000500000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "PAYER"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000001000"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 0
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "MERCHANT"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000002000"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 990000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "OPERATOR"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000003000"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 0
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "FEE_RECEIVER"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000004000"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 10000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(wrapper)"
+                ],
+                "arguments": [
+                  "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 0
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(mockEscrow)"
+                ],
+                "arguments": [
+                  "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                ],
+                "receiver": "token",
+                "receiver_getter": "token()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                "value": 0
+              },
+              {
+                "signature": "token()",
+                "expressions": [
+                  "token"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+              },
+              {
+                "signature": "PAYER()",
+                "expressions": [
+                  "PAYER"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000001000"
+              },
+              {
+                "signature": "MERCHANT()",
+                "expressions": [
+                  "MERCHANT"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000002000"
+              },
+              {
+                "signature": "OPERATOR()",
+                "expressions": [
+                  "OPERATOR"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000003000"
+              },
+              {
+                "signature": "FEE_RECEIVER()",
+                "expressions": [
+                  "FEE_RECEIVER"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x0000000000000000000000000000000000004000"
+              },
+              {
+                "signature": "wrapper()",
+                "expressions": [
+                  "wrapper"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+              },
+              {
+                "signature": "mockEscrow()",
+                "expressions": [
+                  "mockEscrow"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+              }
+            ],
+            "all_property_values": {
+              "echidna_captured_never_exceeds_authorized()": true,
+              "echidna_escrow_not_token_sink()": true,
+              "echidna_escrow_state_consistent()": true,
+              "echidna_fee_bps_validation_enforced()": true,
+              "echidna_fee_calc_no_overflow()": true,
+              "echidna_fee_never_exceeds_capture()": true,
+              "echidna_fee_receiver_only_gets_fees()": true,
+              "echidna_invalid_fee_bps_reverts()": true,
+              "echidna_merchant_receives_nonnegative()": true,
+              "echidna_no_underflow_in_merchant_payment()": true,
+              "echidna_operator_authorization_enforced()": true,
+              "echidna_payment_ref_counter_monotonic()": true,
+              "echidna_token_conservation()": true,
+              "echidna_token_supply_never_decreases()": true,
+              "echidna_uint96_sufficient_range()": true,
+              "echidna_wrapper_not_token_sink()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "driver_chargePayment(uint256,uint16)",
+            "abi_signature": "driver_chargePayment(uint256,uint16)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "arguments": [
+              1000000000000000000,
+              100
+            ],
+            "expected_outcome": "state_change",
+            "rationale": "先执行 charge 流程：mint 增加 totalSupply 与 address(this) 余额，approve 后 wrapper.chargePayment 将资金分配到 merchant/feeReceiver/escrow，同时递增 paymentRefCounter，为后续 refund 提供已存在的 paymentRef。"
+          },
+          {
+            "function": "driver_refundPayment(uint256,uint256)",
+            "abi_signature": "driver_refundPayment(uint256,uint256)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "arguments": [
+              0,
+              500000000000000000
+            ],
+            "expected_outcome": "state_change",
+            "rationale": "paymentRefCounter 已非零，满足 refund 守卫；refund 流程再次 mint 并 approve wrapper，触发 wrapper.refundPayment 在 payer/operator/merchant/escrow 间转移代币，检验 supply 与各账户余额之和是否仍守恒。",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "event": "PaymentCharged",
+                "field": "paymentReference",
+                "note": "refund 的 paymentIndex=0 会映射到 paymentRefCounter 为 1 时生成的第一个 paymentRef；若事件字段不可用，则依赖 paymentRefCounter 单调递增语义"
+              }
+            ]
+          }
+        ]
+      },
+      "pairs": []
+    },
+    {
+      "project": "Kink",
+      "property_id": "28d4a5495cb06ab375a1",
+      "property": "echidna_token1_conserved",
+      "seed_id": "seed-e0fd08afaf7f456b88dec368f6e54a73",
+      "seed_file": "deepseek/结果/Agent种子语料/Kink/34c99f73bc2f485786c2166a02fb85aa/种子包/Kink/28d4a5495cb06ab375a1/coverage/seed-e0fd08afaf7f456b88dec368f6e54a73.txt",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+      ],
+      "anvil_recheck": {
+        "project": "Kink",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "28d4a5495cb0-01-28d4a5495cb06ab375a1-c1",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_invariant_matches_supply()": true,
+          "echidna_reserves_match_balances()": false,
+          "echidna_token0_accounting()": true,
+          "echidna_token1_conserved()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [
+          "echidna_reserves_match_balances()"
+        ],
+        "initial_predicate_getters": [
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(this)"
+            ],
+            "arguments": [
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+            ],
+            "receiver": "token1",
+            "receiver_getter": "token1()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+            "value": 990000000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(pool)"
+            ],
+            "arguments": [
+              "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+            ],
+            "receiver": "token1",
+            "receiver_getter": "token1()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+            "value": 10000000000000000000000
+          },
+          {
+            "signature": "token1()",
+            "expressions": [
+              "token1"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          },
+          {
+            "signature": "pool()",
+            "expressions": [
+              "pool"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+          },
+          {
+            "signature": "initialToken1()",
+            "expressions": [
+              "initialToken1"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 1000000000000000000000000
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_token1_conserved()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "property_related_state_changed_property_holds",
+          "target_property_state_established": true,
+          "counterexample_state_established": false,
+          "property_related_state_changed": true,
+          "first_established_transaction_index": 2,
+          "first_property_related_change_transaction_index": 2,
+          "first_counterexample_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(this)"
+                  ],
+                  "arguments": [
+                    "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                  ],
+                  "receiver": "token1",
+                  "receiver_getter": "token1()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "value": 990000000000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(pool)"
+                  ],
+                  "arguments": [
+                    "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                  ],
+                  "receiver": "token1",
+                  "receiver_getter": "token1()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "value": 10000000000000000000000
+                },
+                {
+                  "signature": "token1()",
+                  "expressions": [
+                    "token1"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                },
+                {
+                  "signature": "pool()",
+                  "expressions": [
+                    "pool"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                },
+                {
+                  "signature": "initialToken1()",
+                  "expressions": [
+                    "initialToken1"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000000000
+                }
+              ],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(this)"
+                  ],
+                  "arguments": [
+                    "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                  ],
+                  "receiver": "token1",
+                  "receiver_getter": "token1()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "value": 990000000000000000000000
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(pool)"
+                  ],
+                  "arguments": [
+                    "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                  ],
+                  "receiver": "token1",
+                  "receiver_getter": "token1()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "value": 10000000000000000000000
+                },
+                {
+                  "signature": "token1()",
+                  "expressions": [
+                    "token1"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                },
+                {
+                  "signature": "pool()",
+                  "expressions": [
+                    "pool"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                },
+                {
+                  "signature": "initialToken1()",
+                  "expressions": [
+                    "initialToken1"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000000000
+                }
+              ],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(this)"
+                  ],
+                  "arguments": [
+                    "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                  ],
+                  "receiver": "token1",
+                  "receiver_getter": "token1()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "value": 990000502487595628879628
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "address(pool)"
+                  ],
+                  "arguments": [
+                    "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                  ],
+                  "receiver": "token1",
+                  "receiver_getter": "token1()",
+                  "receiver_type": "MockERC20",
+                  "status": "observed",
+                  "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "value": 9999497512404371120372
+                },
+                {
+                  "signature": "token1()",
+                  "expressions": [
+                    "token1"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+                },
+                {
+                  "signature": "pool()",
+                  "expressions": [
+                    "pool"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                },
+                {
+                  "signature": "initialToken1()",
+                  "expressions": [
+                    "initialToken1"
+                  ],
+                  "arguments": [],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000000000
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "balanceOf(address)",
+                  "receiver": "token1",
+                  "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "arguments": [
+                    "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                  ],
+                  "before": 990000000000000000000000,
+                  "after": 990000502487595628879628
+                },
+                {
+                  "signature": "balanceOf(address)",
+                  "receiver": "token1",
+                  "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "arguments": [
+                    "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                  ],
+                  "before": 10000000000000000000000,
+                  "after": 9999497512404371120372
+                }
+              ]
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "singleSidedAdd(uint256,uint256)",
+            "arguments": [
+              1000000000000000000,
+              1
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x4d9a1e9f480abd8f8853d07fd90239f436acd8be5b8f00ba19926c40d496170b",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 119906,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 6,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0x0000000000000000000000000000000000000000",
+                  "value": 10000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                  "value": 990000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                "fields": {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 990024690289367387
+                }
+              },
+              {
+                "name": "AddLiquidity",
+                "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                "fields": {
+                  "provider": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "amounts": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "lpAmount": 990024690289367387
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 44,
+            "tracked_contract_count": 4,
+            "tracked_contract_types": [
+              "FeeOnTransferToken",
+              "Harness",
+              "KinkPool",
+              "MockERC20"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "ERC20._balances"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "ERC20._balances"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0x1706b697767b729cc909411d760b47ae17be21b3837fb80751b1d5ee0ab7f3ee",
+            "state_fingerprint_after": "0x01d598f4c138840d754dc314613483e4c892f1f5e2becd54a06ea9e88e332c95",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(this)"
+                ],
+                "arguments": [
+                  "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                ],
+                "receiver": "token1",
+                "receiver_getter": "token1()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                "value": 990000000000000000000000
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(pool)"
+                ],
+                "arguments": [
+                  "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                ],
+                "receiver": "token1",
+                "receiver_getter": "token1()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                "value": 10000000000000000000000
+              },
+              {
+                "signature": "token1()",
+                "expressions": [
+                  "token1"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+              },
+              {
+                "signature": "pool()",
+                "expressions": [
+                  "pool"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+              },
+              {
+                "signature": "initialToken1()",
+                "expressions": [
+                  "initialToken1"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000000000000
+              }
+            ],
+            "all_property_values": {
+              "echidna_invariant_matches_supply()": true,
+              "echidna_reserves_match_balances()": false,
+              "echidna_token0_accounting()": true,
+              "echidna_token1_conserved()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": [
+              "echidna_reserves_match_balances()"
+            ]
+          },
+          {
+            "index": 2,
+            "function": "yankLiquidity(uint256)",
+            "arguments": [
+              1000000000000000000
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x96cee3118b25776276ceef74356e38e090c63de724c834fa9aaa0e0babb03db7",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 104933,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 8,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "Transfer",
+                "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0x0000000000000000000000000000000000000000",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                "fields": {
+                  "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 502487595628879628
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                  "to": "0x0000000000000000000000000000000000000000",
+                  "value": 4975124659445580
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 492537341285112511
+                }
+              },
+              {
+                "name": "RemoveLiquidity",
+                "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                "fields": {
+                  "provider": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "amounts": [
+                    502487595628879628,
+                    497512465944558091
+                  ],
+                  "lpAmount": 1000000000000000000
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 44,
+            "tracked_contract_count": 4,
+            "tracked_contract_types": [
+              "FeeOnTransferToken",
+              "Harness",
+              "KinkPool",
+              "MockERC20"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "ERC20._balances"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "ERC20._balances"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0x01d598f4c138840d754dc314613483e4c892f1f5e2becd54a06ea9e88e332c95",
+            "state_fingerprint_after": "0x6be2c5b418cedc0af074da2bc433737f7a7221419f95e3b9466dec7bcc4f7bc2",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(this)"
+                ],
+                "arguments": [
+                  "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                ],
+                "receiver": "token1",
+                "receiver_getter": "token1()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                "value": 990000502487595628879628
+              },
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "address(pool)"
+                ],
+                "arguments": [
+                  "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+                ],
+                "receiver": "token1",
+                "receiver_getter": "token1()",
+                "receiver_type": "MockERC20",
+                "status": "observed",
+                "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                "value": 9999497512404371120372
+              },
+              {
+                "signature": "token1()",
+                "expressions": [
+                  "token1"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+              },
+              {
+                "signature": "pool()",
+                "expressions": [
+                  "pool"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f"
+              },
+              {
+                "signature": "initialToken1()",
+                "expressions": [
+                  "initialToken1"
+                ],
+                "arguments": [],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000000000000
+              }
+            ],
+            "all_property_values": {
+              "echidna_invariant_matches_supply()": true,
+              "echidna_reserves_match_balances()": false,
+              "echidna_token0_accounting()": true,
+              "echidna_token1_conserved()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": [
+              "echidna_reserves_match_balances()"
+            ]
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "singleSidedAdd(uint256,uint256)",
+            "arguments": [
+              1000000000000000000,
+              1
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "yankLiquidity(uint256)",
+            "arguments": [
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "relation": "yankLiquidity 的 rawLp 需不超过前序 singleSidedAdd 后 Harness 持有的 LP 余额；此处取 1e18 作为保守值，依赖前序注入产生的 LP"
+              }
+            ]
+          }
+        ]
+      },
+      "pairs": []
+    }
+  ]
+}

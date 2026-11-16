@@ -1,0 +1,937 @@
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC165.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | //
+  3 |     | // EIP-165: Standard Interface Detection
+  4 |     | // https://eips.ethereum.org/EIPS/eip-165
+  5 |     | //
+  6 |     | // Derived from OpenZeppelin Contracts (utils/introspection/ERC165.sol)
+  7 |     | // https://github.com/OpenZeppelin/openzeppelin-contracts/tree/master/contracts/utils/introspection/ERC165.sol
+  8 |     | //
+  9 |     | //  OpenERC165 —— IERC165
+ 10 |     | //
+ 11 |     | pragma solidity ^0.8.19;
+ 12 |     | 
+ 13 |     | import "OpenNFTs/contracts/interfaces/IERC165.sol";
+ 14 |     | 
+ 15 |     | abstract contract OpenERC165 is IERC165 {
+ 16 | *   |   function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
+ 17 | *   |     return interfaceId == 0x01ffc9a7; //  type(IERC165).interfaceId
+ 18 |     |   }
+ 19 |     | }
+ 20 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC173.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | //
+  3 |     | // EIP-173: Contract Ownership Standard
+  4 |     | // https://eips.ethereum.org/EIPS/eip-173
+  5 |     | //
+  6 |     | // Derived from OpenZeppelin Contracts (access/Ownable.sol)
+  7 |     | // https://github.com/OpenZeppelin/openzeppelin-contracts/tree/master/contracts/access/Ownable.sol
+  8 |     | //
+  9 |     | //  OpenERC165
+ 10 |     | //       |
+ 11 |     | //  OpenERC173 —— IERC173
+ 12 |     | //
+ 13 |     | pragma solidity ^0.8.19;
+ 14 |     | 
+ 15 |     | import "OpenNFTs/contracts/OpenERC/OpenERC165.sol";
+ 16 |     | import "OpenNFTs/contracts/interfaces/IERC173.sol";
+ 17 |     | 
+ 18 |     | abstract contract OpenERC173 is IERC173, OpenERC165 {
+ 19 |     |   bool private _openERC173Initialized;
+ 20 |     |   address private _owner;
+ 21 |     | 
+ 22 |     |   modifier onlyOwner() {
+ 23 | *r  |     require(_owner == msg.sender, "Not owner");
+ 24 |     |     _;
+ 25 |     |   }
+ 26 |     | 
+ 27 | *   |   function transferOwnership(address newOwner) external override(IERC173) onlyOwner {
+ 28 |     |     _transferOwnership(newOwner);
+ 29 |     |   }
+ 30 |     | 
+ 31 | *   |   function owner() public view override(IERC173) returns (address) {
+ 32 | *   |     return _owner;
+ 33 |     |   }
+ 34 |     | 
+ 35 | *   |   function supportsInterface(bytes4 interfaceId)
+ 36 |     |     public
+ 37 |     |     view
+ 38 |     |     virtual
+ 39 |     |     override(OpenERC165)
+ 40 | *   |     returns (bool)
+ 41 |     |   {
+ 42 | *   |     return interfaceId == 0x7f5828d0 || super.supportsInterface(interfaceId);
+ 43 |     |   }
+ 44 |     | 
+ 45 | *   |   function _initialize(address owner_) internal {
+ 46 | *r  |     require(_openERC173Initialized == false, "Already initialized");
+ 47 | *   |     _openERC173Initialized = true;
+ 48 |     | 
+ 49 | *   |     _transferOwnership(owner_);
+ 50 |     |   }
+ 51 |     | 
+ 52 | *   |   function _transferOwnership(address newOwner) internal {
+ 53 | *   |     address oldOwner = _owner;
+ 54 | *   |     _owner = newOwner;
+ 55 | *   |     emit OwnershipTransferred(oldOwner, newOwner);
+ 56 |     |   }
+ 57 |     | }
+ 58 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC2981.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | //
+  3 |     | // EIP-2981: NFT Royalty Standard
+  4 |     | // https://eips.ethereum.org/EIPS/eip-2981
+  5 |     | //
+  6 |     | // Derived from OpenZeppelin Contracts (token/common/ERC2981.sol)
+  7 |     | // https://github.com/OpenZeppelin/openzeppelin-contracts/tree/master/contracts/token/common/ERC2981.sol
+  8 |     | //
+  9 |     | //  OpenERC165
+ 10 |     | //       |
+ 11 |     | //  OpenERC2981 —— IERC2981 —— IOpenReceiverInfos
+ 12 |     | //
+ 13 |     | pragma solidity ^0.8.19;
+ 14 |     | 
+ 15 |     | import "OpenNFTs/contracts/OpenERC/OpenERC721.sol";
+ 16 |     | import "OpenNFTs/contracts/interfaces/IERC2981.sol";
+ 17 |     | import "OpenNFTs/contracts/interfaces/IOpenReceiverInfos.sol";
+ 18 |     | 
+ 19 |     | abstract contract OpenERC2981 is IERC2981, IOpenReceiverInfos, OpenERC165 {
+ 20 |     |   uint256 internal _mintPrice;
+ 21 |     |   ReceiverInfos internal _defaultRoyalty;
+ 22 |     |   mapping(uint256 => ReceiverInfos) internal _tokenRoyalty;
+ 23 |     | 
+ 24 | *   |   uint96 internal constant _MAX_FEE = 10_000;
+ 25 |     | 
+ 26 |     |   modifier notTooExpensive(uint256 price) {
+ 27 |     |     /// otherwise may overflow
+ 28 | *   |     require(price < 2 ** 128, "Too expensive");
+ 29 |     |     _;
+ 30 |     |   }
+ 31 |     | 
+ 32 | *   |   modifier lessThanMaxFee(uint256 fee) {
+ 33 | *   |     require(fee <= _MAX_FEE, "Royalty fee exceed price");
+ 34 |     |     _;
+ 35 |     |   }
+ 36 |     | 
+ 37 | *   |   function royaltyInfo(uint256 tokenID, uint256 price)
+ 38 |     |     public
+ 39 |     |     view
+ 40 |     |     override(IERC2981)
+ 41 | *   |     notTooExpensive(price)
+ 42 | *   |     returns (address receiver, uint256 royaltyAmount)
+ 43 |     |   {
+ 44 | *   |     ReceiverInfos memory royalty = _tokenRoyalty[tokenID];
+ 45 |     | 
+ 46 | *   |     if (royalty.account == address(0)) {
+ 47 | *   |       royalty = _defaultRoyalty;
+ 48 |     |     }
+ 49 |     | 
+ 50 | *   |     royaltyAmount = _calculateAmount(price, royalty.fee);
+ 51 |     | 
+ 52 |     |     /// MINIMAL royaltyAmount
+ 53 | *   |     if (royalty.minimum > 0) {
+ 54 |     |       /// With zero price, token owner can bypass royalties...
+ 55 |     |       /// SO a defaultRoyaltyAmount is calculated with _mintPrice as a base
+ 56 |     |       /// (can only be modified by collection owner)
+ 57 |     |       /// BUT collection owner can higher too much mintPrice making fees too high
+ 58 |     |       /// SO a royalty.minimum if calculated for each token on minting (and on setTokenRoyalty)
+ 59 |     | 
+ 60 |     |       /// MIN(royalty.minimum, defaultRoyaltyAmount)
+ 61 |     |       uint256 defaultRoyaltyAmount = _calculateAmount(_mintPrice, royalty.fee);
+ 62 |     |       uint256 minimumRoyaltyAmount =
+ 63 |     |         royalty.minimum < defaultRoyaltyAmount ? royalty.minimum : defaultRoyaltyAmount;
+ 64 |     | 
+ 65 |     |       /// MAX(normalRoyaltyAmount, minimumRoyaltyAmount)
+ 66 |     |       royaltyAmount = royaltyAmount < minimumRoyaltyAmount ? minimumRoyaltyAmount : royaltyAmount;
+ 67 |     |     }
+ 68 |     | 
+ 69 | *   |     return (royalty.account, royaltyAmount);
+ 70 |     |   }
+ 71 |     | 
+ 72 | *   |   function supportsInterface(bytes4 interfaceId)
+ 73 |     |     public
+ 74 |     |     view
+ 75 |     |     virtual
+ 76 |     |     override(OpenERC165)
+ 77 | *   |     returns (bool)
+ 78 |     |   {
+ 79 | *   |     return interfaceId == 0x2a55205a || super.supportsInterface(interfaceId);
+ 80 |     |   }
+ 81 |     | 
+ 82 | *   |   function _calculateAmount(uint256 price, uint96 fee) internal pure returns (uint256) {
+ 83 | *   |     return (price * fee) / _MAX_FEE;
+ 84 |     |   }
+ 85 |     | }
+ 86 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | //
+   3 |     | // EIP-721: Non-Fungible Token Standard
+   4 |     | // https://eips.ethereum.org/EIPS/eip-721
+   5 |     | //
+   6 |     | // Derived from OpenZeppelin Contracts (token/ERC721/ERC721.sol)
+   7 |     | // https://github.com/OpenZeppelin/openzeppelin-contracts/tree/master/contracts/token/ERC721/ERC721.sol
+   8 |     | //
+   9 |     | //  OpenERC165
+  10 |     | //       |
+  11 |     | //  OpenERC721 —— IERC721
+  12 |     | //
+  13 |     | pragma solidity ^0.8.19;
+  14 |     | 
+  15 |     | import "OpenNFTs/contracts/OpenERC/OpenERC165.sol";
+  16 |     | import "OpenNFTs/contracts/interfaces/IERC721.sol";
+  17 |     | import "OpenNFTs/contracts/interfaces/IERC721TokenReceiver.sol";
+  18 |     | 
+  19 |     | abstract contract OpenERC721 is IERC721, OpenERC165 {
+  20 |     |   // Mapping from token ID to owner address
+  21 |     |   mapping(uint256 => address) private _owners;
+  22 |     | 
+  23 |     |   // Mapping owner address to token count
+  24 |     |   mapping(address => uint256) private _balances;
+  25 |     | 
+  26 |     |   // Mapping from token ID to approved address
+  27 |     |   mapping(uint256 => address) private _tokenApprovals;
+  28 |     | 
+  29 |     |   // Mapping from owner to operator approvals
+  30 |     |   mapping(address => mapping(address => bool)) private _operatorApprovals;
+  31 |     | 
+  32 |     |   modifier onlyTokenOwnerOrApproved(uint256 tokenID) {
+  33 | *   |     require(_isOwnerOrApproved(msg.sender, tokenID), "Not token owner nor approved");
+  34 |     |     _;
+  35 |     |   }
+  36 |     | 
+  37 |     |   modifier existsToken(uint256 tokenID) {
+  38 | *r  |     require(_owners[tokenID] != address(0), "Invalid token ID");
+  39 |     |     _;
+  40 |     |   }
+  41 |     | 
+  42 | *   |   function transferFrom(address from, address to, uint256 tokenID)
+  43 |     |     external
+  44 |     |     payable
+  45 |     |     override(IERC721)
+  46 |     |   {
+  47 | *   |     _transferFrom(from, to, tokenID);
+  48 |     |   }
+  49 |     | 
+  50 |     |   function safeTransferFrom(address from, address to, uint256 tokenID, bytes memory data)
+  51 |     |     external
+  52 |     |     payable
+  53 |     |     override(IERC721)
+  54 |     |   {
+  55 |     |     _safeTransferFrom(from, to, tokenID, data);
+  56 |     |   }
+  57 |     | 
+  58 | *   |   function approve(address spender, uint256 tokenID) public override(IERC721) {
+  59 | *   |     require(_isOwnerOrOperator(msg.sender, tokenID), "Not token owner nor operator");
+  60 |     | 
+  61 |     |     _tokenApprovals[tokenID] = spender;
+  62 |     |     emit Approval(ownerOf(tokenID), spender, tokenID);
+  63 |     |   }
+  64 |     | 
+  65 | *   |   function setApprovalForAll(address operator, bool approved) public override(IERC721) {
+  66 | *   |     _operatorApprovals[msg.sender][operator] = approved;
+  67 | *   |     emit ApprovalForAll(msg.sender, operator, approved);
+  68 |     |   }
+  69 |     | 
+  70 |     |   function safeTransferFrom(address from, address to, uint256 tokenID)
+  71 |     |     public
+  72 |     |     payable
+  73 |     |     override(IERC721)
+  74 |     |   {
+  75 |     |     _safeTransferFrom(from, to, tokenID, "");
+  76 |     |   }
+  77 |     | 
+  78 | *   |   function supportsInterface(bytes4 interfaceId)
+  79 |     |     public
+  80 |     |     view
+  81 |     |     virtual
+  82 |     |     override(OpenERC165)
+  83 | *   |     returns (bool)
+  84 |     |   {
+  85 | *   |     return interfaceId == 0x80ac58cd // = type(IERC721).interfaceId
+  86 | *   |       || super.supportsInterface(interfaceId);
+  87 |     |   }
+  88 |     | 
+  89 | *   |   function balanceOf(address owner) public view override(IERC721) returns (uint256) {
+  90 | *   |     require(owner != address(0), "Invalid zero address");
+  91 | *   |     return _balances[owner];
+  92 |     |   }
+  93 |     | 
+  94 | *   |   function ownerOf(uint256 tokenID)
+  95 |     |     public
+  96 |     |     view
+  97 |     |     override(IERC721)
+  98 | *   |     existsToken(tokenID)
+  99 | *   |     returns (address)
+ 100 |     |   {
+ 101 |     |     return _owners[tokenID];
+ 102 |     |   }
+ 103 |     | 
+ 104 | *   |   function getApproved(uint256 tokenID)
+ 105 |     |     public
+ 106 |     |     view
+ 107 |     |     override(IERC721)
+ 108 | *   |     existsToken(tokenID)
+ 109 | *   |     returns (address)
+ 110 |     |   {
+ 111 |     |     return _tokenApprovals[tokenID];
+ 112 |     |   }
+ 113 |     | 
+ 114 |     |   function isApprovedForAll(address owner, address operator)
+ 115 |     |     public
+ 116 |     |     view
+ 117 |     |     override(IERC721)
+ 118 |     |     returns (bool)
+ 119 |     |   {
+ 120 |     |     return _operatorApprovals[owner][operator];
+ 121 |     |   }
+ 122 |     | 
+ 123 | *   |   function _mint(address to, string memory, uint256 tokenID) internal virtual {
+ 124 | *   |     require(to != address(0), "Mint to zero address");
+ 125 | *   |     require(_owners[tokenID] == address(0), "Token already minted");
+ 126 | *   |     require(_isERC721Receiver(address(0), to, tokenID, ""), "Not ERC721Received");
+ 127 |     | 
+ 128 | *   |     _balances[to] += 1;
+ 129 | *   |     _owners[tokenID] = to;
+ 130 |     | 
+ 131 | *   |     emit Transfer(address(0), to, tokenID);
+ 132 |     |   }
+ 133 |     | 
+ 134 | *   |   function _burn(uint256 tokenID) internal virtual {
+ 135 | *   |     address owner = ownerOf(tokenID);
+ 136 |     |     require(owner != address(0), "Invalid token ID");
+ 137 |     | 
+ 138 |     |     assert(_balances[owner] > 0);
+ 139 |     | 
+ 140 |     |     _balances[owner] -= 1;
+ 141 |     |     delete _tokenApprovals[tokenID];
+ 142 |     |     delete _owners[tokenID];
+ 143 |     | 
+ 144 |     |     emit Transfer(owner, address(0), tokenID);
+ 145 |     |   }
+ 146 |     | 
+ 147 |     |   function _transferFromBefore(address from, address to, uint256 tokenID) internal virtual {}
+ 148 |     | 
+ 149 | *   |   function _isOwnerOrOperator(address spender, uint256 tokenID)
+ 150 |     |     internal
+ 151 |     |     view
+ 152 |     |     virtual
+ 153 | *   |     returns (bool ownerOrOperator)
+ 154 |     |   {
+ 155 | *   |     address tokenOwner = ownerOf(tokenID);
+ 156 |     |     ownerOrOperator = (tokenOwner == spender || isApprovedForAll(tokenOwner, spender));
+ 157 |     |   }
+ 158 |     | 
+ 159 |     |   function _safeTransferFrom(address from, address to, uint256 tokenID, bytes memory data) private {
+ 160 |     |     require(_isERC721Receiver(from, to, tokenID, data), "Not ERC721Receiver");
+ 161 |     | 
+ 162 |     |     _transferFrom(from, to, tokenID);
+ 163 |     |   }
+ 164 |     | 
+ 165 | *   |   function _transferFrom(address from, address to, uint256 tokenID)
+ 166 |     |     private
+ 167 | *   |     onlyTokenOwnerOrApproved(tokenID)
+ 168 |     |   {
+ 169 |     |     require(from != address(0), "Transfer from zero address");
+ 170 |     |     require(to != address(0), "Transfer to zero address");
+ 171 |     |     require(from == ownerOf(tokenID), "From not owner");
+ 172 |     | 
+ 173 |     |     _transferFromBefore(from, to, tokenID);
+ 174 |     | 
+ 175 |     |     delete _tokenApprovals[tokenID];
+ 176 |     | 
+ 177 |     |     if (from != to) {
+ 178 |     |       _balances[from] -= 1;
+ 179 |     |       _balances[to] += 1;
+ 180 |     |       _owners[tokenID] = to;
+ 181 |     |     }
+ 182 |     | 
+ 183 |     |     emit Transfer(from, to, tokenID);
+ 184 |     |   }
+ 185 |     | 
+ 186 | *   |   function _isERC721Receiver(address from, address to, uint256 tokenID, bytes memory data)
+ 187 |     |     private
+ 188 | *   |     returns (bool)
+ 189 |     |   {
+ 190 | *   |     return to.code.length == 0
+ 191 |     |       || IERC721TokenReceiver(to).onERC721Received(msg.sender, from, tokenID, data)
+ 192 |     |         == IERC721TokenReceiver.onERC721Received.selector;
+ 193 |     |   }
+ 194 |     | 
+ 195 | *   |   function _isOwnerOrApproved(address spender, uint256 tokenID)
+ 196 |     |     private
+ 197 |     |     view
+ 198 | *   |     returns (bool ownerOrApproved)
+ 199 |     |   {
+ 200 | *   |     ownerOrApproved = (_isOwnerOrOperator(spender, tokenID) || (getApproved(tokenID) == spender));
+ 201 |     |   }
+ 202 |     | }
+ 203 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/OpenNFTs/OpenGuard.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | //   OpenGuard
+  3 |     | //
+  4 |     | pragma solidity ^0.8.19;
+  5 |     | 
+  6 |     | abstract contract OpenGuard {
+  7 |     |   bool private _locked;
+  8 |     | 
+  9 |     |   modifier reEntryGuard() {
+ 10 | *   |     require(!_locked, "No re-entry!");
+ 11 |     | 
+ 12 | *   |     _locked = true;
+ 13 |     | 
+ 14 |     |     _;
+ 15 |     | 
+ 16 | *   |     _locked = false;
+ 17 |     |   }
+ 18 |     | }
+ 19 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/OpenNFTs/OpenMarketable.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | //
+   3 |     | // Derived from Kredeum NFTs
+   4 |     | // https://github.com/Kredeum/kredeum
+   5 |     | //
+   6 |     | //   OpenERC165
+   7 |     | //   (supports)
+   8 |     | //        |
+   9 |     | //        ————————————————————————————
+  10 |     | //        |            |             |
+  11 |     | //   OpenERC721    OpenERC173   OpenERC2981
+  12 |     | //      (NFT)      (Ownable)   (RoyaltyInfo)
+  13 |     | //        |            |             |
+  14 |     | //        ————————————————————————————
+  15 |     | //        |
+  16 |     | //  OpenMarketable —— IOpenMarketable - OpenGuard
+  17 |     | //
+  18 |     | pragma solidity ^0.8.19;
+  19 |     | 
+  20 |     | import "OpenNFTs/contracts/OpenERC/OpenERC721.sol";
+  21 |     | import "OpenNFTs/contracts/OpenERC/OpenERC173.sol";
+  22 |     | import "OpenNFTs/contracts/OpenERC/OpenERC2981.sol";
+  23 |     | import "OpenNFTs/contracts/OpenNFTs/OpenGuard.sol";
+  24 |     | import "OpenNFTs/contracts/interfaces/IOpenMarketable.sol";
+  25 |     | 
+  26 |     | abstract contract OpenMarketable is
+  27 |     |   IOpenMarketable,
+  28 |     |   OpenERC721,
+  29 |     |   OpenERC173,
+  30 |     |   OpenERC2981,
+  31 |     |   OpenGuard
+  32 |     | {
+  33 |     |   mapping(uint256 => uint256) internal _tokenPrice;
+  34 |     | 
+  35 | *   |   bool public minimal;
+  36 |     | 
+  37 | *   |   ReceiverInfos public treasury;
+  38 |     | 
+  39 |     |   /// @notice withdraw eth
+  40 |     |   function withdraw() external override(IOpenMarketable) onlyOwner returns (uint256) {
+  41 |     |     return _withdraw();
+  42 |     |   }
+  43 |     | 
+  44 |     |   /// @notice SET default mint price
+  45 |     |   /// @param price : default price in wei
+  46 |     |   function setMintPrice(uint256 price) public override(IOpenMarketable) onlyOwner {
+  47 |     |     _setMintPrice(price);
+  48 |     |   }
+  49 |     | 
+  50 |     |   /// @notice SET default royalty info
+  51 |     |   /// @param receiver : address of the royalty receiver, or address(0) to reset
+  52 |     |   /// @param fee : fee Numerator, less than 10000
+  53 |     |   function setDefaultRoyalty(address receiver, uint96 fee)
+  54 |     |     public
+  55 |     |     override(IOpenMarketable)
+  56 |     |     onlyOwner
+  57 |     |   {
+  58 |     |     _setDefaultRoyalty(receiver, fee);
+  59 |     |   }
+  60 |     | 
+  61 |     |   /// @notice SET token price
+  62 |     |   /// @param tokenID : token ID
+  63 |     |   /// @param price : token price in wei
+  64 | *   |   function setTokenPrice(uint256 tokenID, uint256 price)
+  65 |     |     public
+  66 |     |     override(IOpenMarketable)
+  67 | *   |     onlyTokenOwnerOrApproved(tokenID)
+  68 |     |   {
+  69 |     |     _setTokenPrice(tokenID, price, address(this), Approve.All);
+  70 |     |   }
+  71 |     | 
+  72 |     |   /// @notice SET token royalty info
+  73 |     |   /// @param tokenID : token ID
+  74 |     |   /// @param receiver : address of the royalty receiver, or address(0) to reset
+  75 |     |   /// @param fee : fee Numerator, less than 10_000
+  76 |     |   function setTokenRoyalty(uint256 tokenID, address receiver, uint96 fee)
+  77 |     |     public
+  78 |     |     override(IOpenMarketable)
+  79 |     |     existsToken(tokenID)
+  80 |     |     onlyOwner
+  81 |     |     onlyTokenOwnerOrApproved(tokenID)
+  82 |     |   {
+  83 |     |     _setTokenRoyalty(tokenID, receiver, fee);
+  84 |     |   }
+  85 |     | 
+  86 | *   |   function getMintPrice() public view override(IOpenMarketable) returns (uint256) {
+  87 | *   |     return _mintPrice;
+  88 |     |   }
+  89 |     | 
+  90 | *   |   function getTokenPrice(uint256 tokenID) public view override(IOpenMarketable) returns (uint256) {
+  91 | *   |     return _tokenPrice[tokenID];
+  92 |     |   }
+  93 |     | 
+  94 |     |   /// @notice GET default royalty info
+  95 |     |   /// @return receiver : default royalty receiver infos
+  96 |     |   function getDefaultRoyalty()
+  97 |     |     public
+  98 |     |     view
+  99 |     |     override(IOpenMarketable)
+ 100 |     |     returns (ReceiverInfos memory receiver)
+ 101 |     |   {
+ 102 |     |     receiver = _defaultRoyalty;
+ 103 |     |   }
+ 104 |     | 
+ 105 |     |   /// @notice GET token royalty info
+ 106 |     |   /// @param tokenID : token ID
+ 107 |     |   /// @return receiver :  token royalty receiver infos
+ 108 | *   |   function getTokenRoyalty(uint256 tokenID)
+ 109 |     |     public
+ 110 |     |     view
+ 111 |     |     override(IOpenMarketable)
+ 112 | *   |     returns (ReceiverInfos memory receiver)
+ 113 |     |   {
+ 114 | *   |     receiver = _tokenRoyalty[tokenID];
+ 115 |     |   }
+ 116 |     | 
+ 117 | *   |   function supportsInterface(bytes4 interfaceId)
+ 118 |     |     public
+ 119 |     |     view
+ 120 |     |     virtual
+ 121 |     |     override(OpenERC721, OpenERC173, OpenERC2981)
+ 122 | *   |     returns (bool)
+ 123 |     |   {
+ 124 | *   |     return interfaceId == type(IOpenMarketable).interfaceId || super.supportsInterface(interfaceId);
+ 125 |     |   }
+ 126 |     | 
+ 127 | *   |   function _initialize(
+ 128 |     |     uint256 mintPrice_,
+ 129 |     |     address receiver_,
+ 130 |     |     uint96 fee_,
+ 131 |     |     address treasury_,
+ 132 |     |     uint96 treasuryFee_,
+ 133 |     |     bool minimal_
+ 134 |     |   ) internal {
+ 135 | *   |     minimal = minimal_;
+ 136 | *   |     _mintPrice = mintPrice_;
+ 137 | *   |     _defaultRoyalty = _createReceiverInfos(receiver_, fee_);
+ 138 | *   |     treasury = _createReceiverInfos(treasury_, treasuryFee_);
+ 139 |     |   }
+ 140 |     | 
+ 141 | *   |   function _mint(address to, string memory tokenURI, uint256 tokenID)
+ 142 |     |     internal
+ 143 |     |     virtual
+ 144 |     |     override(OpenERC721)
+ 145 |     |   {
+ 146 | *   |     _setTokenRoyalty(tokenID, _defaultRoyalty.account, _defaultRoyalty.fee);
+ 147 |     | 
+ 148 | *   |     _pay(tokenID, _mintPrice, to, owner());
+ 149 |     | 
+ 150 | *   |     super._mint(to, tokenURI, tokenID);
+ 151 |     |   }
+ 152 |     | 
+ 153 | *   |   function _burn(uint256 tokenID) internal virtual override(OpenERC721) {
+ 154 | *   |     delete _tokenRoyalty[tokenID];
+ 155 | *   |     delete _tokenPrice[tokenID];
+ 156 |     | 
+ 157 | *   |     super._burn(tokenID);
+ 158 |     |   }
+ 159 |     | 
+ 160 |     |   function _transferFromBefore(address from, address to, uint256 tokenID)
+ 161 |     |     internal
+ 162 |     |     virtual
+ 163 |     |     override(OpenERC721)
+ 164 |     |   {
+ 165 |     |     /// Transfer: pay token price (including royalties) to previous token owner (and royalty receiver)
+ 166 |     |     _pay(tokenID, _tokenPrice[tokenID], to, ownerOf(tokenID));
+ 167 |     | 
+ 168 |     |     delete _tokenPrice[tokenID];
+ 169 |     | 
+ 170 |     |     super._transferFromBefore(from, to, tokenID);
+ 171 |     |   }
+ 172 |     | 
+ 173 |     |   function _setDefaultRoyalty(address receiver, uint96 fee) internal lessThanMaxFee(fee) {
+ 174 |     |     _defaultRoyalty = _createReceiverInfos(receiver, fee);
+ 175 |     | 
+ 176 |     |     emit SetDefaultRoyalty(receiver, fee);
+ 177 |     |   }
+ 178 |     | 
+ 179 | *   |   function _setTokenRoyalty(uint256 tokenID, address receiver, uint96 fee)
+ 180 |     |     internal
+ 181 | *   |     lessThanMaxFee(fee)
+ 182 |     |   {
+ 183 | *   |     _tokenRoyalty[tokenID] = _createReceiverInfos(receiver, fee);
+ 184 |     | 
+ 185 | *   |     emit SetTokenRoyalty(tokenID, receiver, fee);
+ 186 |     |   }
+ 187 |     | 
+ 188 |     |   /// @notice SET token price
+ 189 |     |   /// @param tokenID : token ID
+ 190 |     |   /// @param price : token price in wei
+ 191 |     |   function _setTokenPrice(uint256 tokenID, uint256 price, address approved, Approve approveType)
+ 192 |     |     internal
+ 193 |     |     onlyTokenOwnerOrApproved(tokenID)
+ 194 |     |     notTooExpensive(price)
+ 195 |     |   {
+ 196 |     |     _tokenPrice[tokenID] = price;
+ 197 |     | 
+ 198 |     |     emit SetTokenPrice(tokenID, price);
+ 199 |     | 
+ 200 |     |     if (approveType == Approve.All) {
+ 201 |     |       setApprovalForAll(approved, true);
+ 202 |     |     } else if (approveType == Approve.One) {
+ 203 |     |       approve(approved, tokenID);
+ 204 |     |     }
+ 205 |     |   }
+ 206 |     | 
+ 207 |     |   function _setMintPrice(uint256 price) internal notTooExpensive(price) {
+ 208 |     |     _mintPrice = price;
+ 209 |     |     _setDefaultRoyalty(_defaultRoyalty.account, _defaultRoyalty.fee);
+ 210 |     | 
+ 211 |     |     emit SetMintPrice(price);
+ 212 |     |   }
+ 213 |     | 
+ 214 | *   |   function _transferValue(address to, uint256 value) internal virtual returns (uint256) {
+ 215 | *   |     bool success;
+ 216 | *   |     if (value > 0) {
+ 217 |     |       (success,) = to.call{value: value, gas: 2300}("");
+ 218 |     |     }
+ 219 | *   |     return success ? value : 0;
+ 220 |     |   }
+ 221 |     | 
+ 222 |     |   function _withdraw() internal virtual returns (uint256) {
+ 223 |     |     return _transferValue(msg.sender, address(this).balance);
+ 224 |     |   }
+ 225 |     | 
+ 226 | *   |   function _createReceiverInfos(address receiver, uint96 fee)
+ 227 |     |     internal
+ 228 |     |     view
+ 229 | *   |     returns (ReceiverInfos memory)
+ 230 |     |   {
+ 231 | *   |     return ReceiverInfos(receiver, fee, minimal ? _calculateAmount(_mintPrice, fee) : 0);
+ 232 |     |   }
+ 233 |     | 
+ 234 | *   |   function _pay(uint256 tokenID, uint256 price, address buyer, address seller) private reEntryGuard {
+ 235 | *   |     require(buyer != address(0), "Invalid buyer");
+ 236 | *   |     require(seller != address(0), "Invalid seller");
+ 237 |     | 
+ 238 | *   |     address receiver;
+ 239 | *   |     uint256 royalties;
+ 240 | *   |     uint256 fee;
+ 241 | *   |     uint256 paid;
+ 242 | *   |     uint256 unspent;
+ 243 |     | 
+ 244 | *   |     (receiver, royalties) = royaltyInfo(tokenID, price);
+ 245 | *   |     if (receiver == address(0)) royalties = 0;
+ 246 |     | 
+ 247 |     |     // no payment (and no fee) if buyer is seller
+ 248 |     |     // no payment (and no fee) if price and royalties are null
+ 249 | *   |     if (buyer != seller && (price + royalties > 0)) {
+ 250 |     |       fee = _calculateAmount(price, treasury.fee);
+ 251 |     | 
+ 252 |     |       /// Pay seller
+ 253 |     |       if (price > royalties + fee) {
+ 254 |     |         /// when price is sufficient, royalties and fees are deducted from price
+ 255 |     |         require(msg.value >= price, "Not enough funds");
+ 256 |     |         paid = _transferValue(seller, price - (royalties + fee));
+ 257 |     |       } else {
+ 258 |     |         /// when price is zero (or too low), royalties and fees are added to price
+ 259 |     |         /// this is to enforce royalty payment
+ 260 |     |         require(msg.value >= price + royalties + fee, "Not enough funds");
+ 261 |     |         paid = _transferValue(seller, price);
+ 262 |     |       }
+ 263 |     | 
+ 264 |     |       /// Transfer royalties to receiver
+ 265 |     |       paid += _transferValue(receiver, royalties);
+ 266 |     | 
+ 267 |     |       /// Transfer fee to protocol treasury
+ 268 |     |       paid += _transferValue(treasury.account, fee);
+ 269 |     |     }
+ 270 | *   |     unspent = msg.value - paid;
+ 271 |     | 
+ 272 |     |     /// Transfer back unspent funds to buyer
+ 273 | *   |     paid += _transferValue(buyer, unspent);
+ 274 |     | 
+ 275 | *   |     emit Pay(tokenID, price, seller, paid, receiver, royalties, fee, buyer, unspent);
+ 276 |     |   }
+ 277 |     | }
+ 278 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/interfaces/IERC165.sol
+ 1 |     | // SPDX-License-Identifier: MIT
+ 2 |     | pragma solidity ^0.8.19;
+ 3 |     | 
+ 4 |     | interface IERC165 {
+ 5 |     |   function supportsInterface(bytes4 interfaceId) external view returns (bool);
+ 6 |     | }
+ 7 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/interfaces/IERC173.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.19;
+  3 |     | 
+  4 |     | interface IERC173 {
+  5 |     |   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+  6 |     | 
+  7 |     |   function transferOwnership(address newOwner) external;
+  8 |     | 
+  9 |     |   function owner() external view returns (address currentOwner);
+ 10 |     | }
+ 11 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/interfaces/IERC2981.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.19;
+  3 |     | 
+  4 |     | interface IERC2981 {
+  5 |     |   function royaltyInfo(uint256 tokenID, uint256 salePrice)
+  6 |     |     external
+  7 |     |     view
+  8 |     |     returns (address receiver, uint256 royaltyAmount);
+  9 |     | }
+ 10 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/interfaces/IERC721.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.19;
+  3 |     | 
+  4 |     | interface IERC721 {
+  5 |     |   event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+  6 |     |   event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
+  7 |     |   event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
+  8 |     | 
+  9 |     |   function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data)
+ 10 |     |     external
+ 11 |     |     payable;
+ 12 |     | 
+ 13 |     |   function safeTransferFrom(address from, address to, uint256 tokenId) external payable;
+ 14 |     | 
+ 15 |     |   function transferFrom(address from, address to, uint256 tokenId) external payable;
+ 16 |     | 
+ 17 |     |   function approve(address to, uint256 tokenId) external;
+ 18 |     | 
+ 19 |     |   function setApprovalForAll(address operator, bool approved) external;
+ 20 |     | 
+ 21 |     |   function balanceOf(address owner) external view returns (uint256 balance);
+ 22 |     | 
+ 23 |     |   function ownerOf(uint256 tokenId) external view returns (address owner);
+ 24 |     | 
+ 25 |     |   function getApproved(uint256 tokenId) external view returns (address operator);
+ 26 |     | 
+ 27 |     |   function isApprovedForAll(address owner, address operator) external view returns (bool);
+ 28 |     | }
+ 29 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/interfaces/IERC721TokenReceiver.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.19;
+  3 |     | 
+  4 |     | interface IERC721TokenReceiver {
+  5 |     |   function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data)
+  6 |     |     external
+  7 |     |     returns (bytes4);
+  8 |     | }
+  9 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/interfaces/IOpenMarketable.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.19;
+  3 |     | 
+  4 |     | import "OpenNFTs/contracts/interfaces/IOpenReceiverInfos.sol";
+  5 |     | 
+  6 |     | interface IOpenMarketable is IOpenReceiverInfos {
+  7 |     |   enum Approve {
+  8 |     |     None,
+  9 |     |     One,
+ 10 |     |     All
+ 11 |     |   }
+ 12 |     | 
+ 13 |     |   event SetDefaultRoyalty(address receiver, uint96 fee);
+ 14 |     | 
+ 15 |     |   event SetTokenRoyalty(uint256 tokenID, address receiver, uint96 fee);
+ 16 |     | 
+ 17 |     |   event SetMintPrice(uint256 price);
+ 18 |     | 
+ 19 |     |   event SetTokenPrice(uint256 tokenID, uint256 price);
+ 20 |     | 
+ 21 |     |   event Pay(
+ 22 |     |     uint256 tokenID,
+ 23 |     |     uint256 price,
+ 24 |     |     address seller,
+ 25 |     |     uint256 paid,
+ 26 |     |     address receiver,
+ 27 |     |     uint256 royalties,
+ 28 |     |     uint256 fee,
+ 29 |     |     address buyer,
+ 30 |     |     uint256 unspent
+ 31 |     |   );
+ 32 |     | 
+ 33 |     |   function withdraw() external returns (uint256);
+ 34 |     | 
+ 35 |     |   function setMintPrice(uint256 price) external;
+ 36 |     | 
+ 37 |     |   function setDefaultRoyalty(address receiver, uint96 fee) external;
+ 38 |     | 
+ 39 |     |   function setTokenPrice(uint256 tokenID, uint256 price) external;
+ 40 |     | 
+ 41 |     |   function setTokenRoyalty(uint256 tokenID, address receiver, uint96 fee) external;
+ 42 |     | 
+ 43 |     |   function minimal() external view returns (bool);
+ 44 |     | 
+ 45 |     |   function getMintPrice() external view returns (uint256 price);
+ 46 |     | 
+ 47 |     |   function getDefaultRoyalty() external view returns (ReceiverInfos memory receiver);
+ 48 |     | 
+ 49 |     |   function getTokenPrice(uint256 tokenID) external view returns (uint256 price);
+ 50 |     | 
+ 51 |     |   function getTokenRoyalty(uint256 tokenID) external view returns (ReceiverInfos memory receiver);
+ 52 |     | }
+ 53 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/contracts/interfaces/IOpenReceiverInfos.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.19;
+  3 |     | 
+  4 |     | interface IOpenReceiverInfos {
+  5 |     |   struct ReceiverInfos {
+  6 |     |     address account;
+  7 |     |     uint96 fee;
+  8 |     |     uint256 minimum;
+  9 |     |   }
+ 10 |     | }
+ 11 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol
+  1 |     | // SPDX-License-Identifier: MITs
+  2 |     | pragma solidity ^0.8.19;
+  3 |     | 
+  4 |     | import "OpenNFTs/tests/examples/OpenAutoMarketEx.sol";
+  5 |     | 
+  6 | *   | contract OpenAutoMarketExFuzz is OpenAutoMarketEx {
+  7 | *   |   address private _other = address(1);
+  8 | *   |   address private _receiver = address(2);
+  9 | *   |   address private _owner = address(42);
+ 10 |     | 
+ 11 | *   |   address private _echidna = msg.sender;
+ 12 |     | 
+ 13 | *   |   constructor() {
+ 14 | *   |     initialize(_owner, payable(_receiver), 0, false);
+ 15 |     |   }
+ 16 |     | 
+ 17 | *   |   function echidna_owner() public view returns (bool) {
+ 18 | *   |     return _owner == owner();
+ 19 |     |   }
+ 20 |     | 
+ 21 |     |   // function transferOwner() public {
+ 22 |     |   //     _mint(_echidna, "1", 1);
+ 23 |     |   //     safeTransferFrom(_echidna, _other, 1);
+ 24 |     |   // }
+ 25 |     |   // function echidna_balance() public view returns (bool) {
+ 26 |     |   //     return balanceOf(_other) < 1;
+ 27 |     |   // }
+ 28 |     | 
+ 29 |     |   function echidna_balance() public view returns (bool) {
+ 30 |     |     return balanceOf(_other) < 1;
+ 31 |     |   }
+ 32 |     | }
+ 33 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/examples/OpenAutoMarketEx.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | //
+  3 |     | //   OpenERC165
+  4 |     | //   (supports)
+  5 |     | //        |
+  6 |     | //        ————————————————————————————
+  7 |     | //        |            |             |
+  8 |     | //   OpenERC721    OpenERC173   OpenERC2981
+  9 |     | //      (NFT)      (Ownable)   (RoyaltyInfo)
+ 10 |     | //        |            |             |
+ 11 |     | //        ————————————————————————————
+ 12 |     | //        |
+ 13 |     | //  OpenMarketable
+ 14 |     | //        |
+ 15 |     | //  OpenAutoMarketEx —— IOpenAutoMarketEx
+ 16 |     | //
+ 17 |     | pragma solidity ^0.8.19;
+ 18 |     | 
+ 19 |     | import "OpenNFTs/contracts/OpenNFTs/OpenMarketable.sol";
+ 20 |     | 
+ 21 |     | import "OpenNFTs/tests/interfaces/IOpenAutoMarketEx.sol";
+ 22 |     | 
+ 23 |     | contract OpenAutoMarketEx is IOpenAutoMarketEx, OpenMarketable {
+ 24 |     |   uint256 private _tokenID;
+ 25 |     | 
+ 26 | *   |   function mint(string memory tokenURI)
+ 27 |     |     external
+ 28 |     |     payable
+ 29 |     |     override(IOpenAutoMarketEx)
+ 30 | *   |     returns (uint256 tokenID)
+ 31 |     |   {
+ 32 | *   |     tokenID = ++_tokenID;
+ 33 | *   |     _mint(msg.sender, tokenURI, tokenID);
+ 34 |     |   }
+ 35 |     | 
+ 36 | *   |   function burn(uint256 tokenID) external override(IOpenAutoMarketEx) {
+ 37 | *   |     super._burn(tokenID);
+ 38 |     |   }
+ 39 |     | 
+ 40 |     |   function buy(uint256 tokenID) external payable override(IOpenAutoMarketEx) {
+ 41 |     |     require(_tokenPrice[tokenID] > 0, "Not on sale");
+ 42 |     | 
+ 43 |     |     this.safeTransferFrom{value: msg.value}(ownerOf(tokenID), msg.sender, tokenID);
+ 44 |     |   }
+ 45 |     | 
+ 46 | *   |   function initialize(address owner, address payable treasury, uint96 treasuryFee, bool minimal)
+ 47 |     |     public
+ 48 |     |     override(IOpenAutoMarketEx)
+ 49 |     |   {
+ 50 | *   |     OpenERC173._initialize(owner);
+ 51 | *   |     _initialize(0, address(0), 0, treasury, treasuryFee, minimal);
+ 52 |     |   }
+ 53 |     | 
+ 54 | *   |   function supportsInterface(bytes4 interfaceId)
+ 55 |     |     public
+ 56 |     |     view
+ 57 |     |     override(OpenMarketable)
+ 58 | *   |     returns (bool)
+ 59 |     |   {
+ 60 | *   |     return
+ 61 | *   |       interfaceId == type(IOpenAutoMarketEx).interfaceId || super.supportsInterface(interfaceId);
+ 62 |     |   }
+ 63 |     | }
+ 64 |     | 
+
+/home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/interfaces/IOpenAutoMarketEx.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity ^0.8.19;
+  3 |     | 
+  4 |     | interface IOpenAutoMarketEx {
+  5 |     |   function initialize(address owner, address payable treasury, uint96 treasuryFee, bool minimal)
+  6 |     |     external;
+  7 |     | 
+  8 |     |   function buy(uint256 tokenID) external payable;
+  9 |     | 
+ 10 |     |   function mint(string memory tokenURI) external payable returns (uint256);
+ 11 |     | 
+ 12 |     |   function burn(uint256 tokenID) external;
+ 13 |     | }
+ 14 |     | 
+

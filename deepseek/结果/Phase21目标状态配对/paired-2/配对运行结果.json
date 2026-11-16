@@ -1,0 +1,2507 @@
+{
+  "phase": "Phase 21",
+  "manifest": "deepseek/结果/Phase21目标状态配对/实验方案.json",
+  "configuration": {
+    "difference_between_arms": "native 语料为空；V2 语料只含对应既有有效种子。其它配置相同。",
+    "test_mode": "property",
+    "test_limit": 80,
+    "timeout_seconds": 45,
+    "seq_len": 8,
+    "shrink_limit": 1,
+    "workers": 1,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": "从 Phase 20 属性结果逐条读取，并在 native/V2 两臂共用",
+    "repeat_echidna_seeds": [
+      20261130,
+      20261131
+    ]
+  },
+  "samples": [
+    {
+      "project": "OpenNFTs",
+      "property_id": "f0a4ef464239609050c2",
+      "property": "echidna_owner",
+      "seed_id": "seed-db746b34bd044209bb39902d22d7a7bd",
+      "seed_file": "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/种子包/OpenNFTs/f0a4ef464239609050c2/coverage/seed-db746b34bd044209bb39902d22d7a7bd.txt",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0x000000000000000000000000000000000000002a"
+      ],
+      "anvil_recheck": {
+        "project": "OpenNFTs",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "f0a4ef464239-01-f0a4ef464239609050c2-c1",
+        "replay_status": "executable",
+        "target_property_violation": {
+          "transaction_index": 1,
+          "property": "echidna_owner()"
+        },
+        "initial_property_values": {
+          "echidna_balance()": true,
+          "echidna_owner()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [
+          {
+            "signature": "owner()",
+            "expressions": [],
+            "arguments": [],
+            "status": "observed",
+            "value": "0x000000000000000000000000000000000000002A"
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_owner()",
+          "semantics": "Echidna boolean predicate returns false (counterexample state)",
+          "status": "counterexample_state_established",
+          "target_property_state_established": true,
+          "first_established_transaction_index": 1,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "owner()",
+                  "expressions": [],
+                  "arguments": [],
+                  "status": "observed",
+                  "value": "0x000000000000000000000000000000000000002A"
+                }
+              ]
+            },
+            {
+              "transaction_index": 1,
+              "value": false,
+              "predicate_getters": [
+                {
+                  "signature": "owner()",
+                  "expressions": [],
+                  "arguments": [],
+                  "status": "observed",
+                  "value": "0x0000000000000000000000000000000000010000"
+                }
+              ]
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "transferOwnership(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "argument_bindings": [],
+            "sender": "0x000000000000000000000000000000000000002A",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x46a24be621eb9a83979c304bca1cd4e6f91e1bb87854a3f18cb56fa1c01c6b20",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 28850,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 1,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "OwnershipTransferred",
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "fields": {
+                  "previousOwner": "0x000000000000000000000000000000000000002A",
+                  "newOwner": "0x0000000000000000000000000000000000010000"
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 7,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "OpenERC173._owner"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "OpenERC173._owner"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0xea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+            "state_fingerprint_after": "0x3929c77423f9b835ae760f2392480f34de8d87b5aef79ffb0eb4816d1fe88e2e",
+            "target_property": false,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "owner()",
+                "expressions": [],
+                "arguments": [],
+                "status": "observed",
+                "value": "0x0000000000000000000000000000000000010000"
+              }
+            ],
+            "all_property_values": {
+              "echidna_balance()": true,
+              "echidna_owner()": false
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "transferOwnership(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "sender": "0x000000000000000000000000000000000000002a",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          }
+        ]
+      },
+      "pairs": [
+        {
+          "echidna_seed": 20261130,
+          "native": {
+            "project": "OpenNFTs",
+            "property_name": "echidna_owner",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+              "--contract",
+              "OpenAutoMarketExFuzz",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/OpenNFTs-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/OpenNFTs-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261130",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x000000000000000000000000000000000000002a",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261130,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 1.09,
+            "loaded_seed_count": 0,
+            "loaded_seed_evidence": false,
+            "replayed_sequence_count": 0,
+            "replay_evidence": false,
+            "replayed_lines": [],
+            "mutation_evidence": false,
+            "fuzzing_transactions": 87,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 87,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 4082,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_owner: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:04.82] Compiling `sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.527991084s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol:OpenAutoMarketExFuzz\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage\n[2026-11-16 20:06:05.53] [Worker 0] New coverage: 1995 instr, 1 contracts, 1 seqs in corpus\n[2026-11-16 20:06:05.53]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage/5270593310455220334.txt\n[2026-11-16 20:06:05.53] [Worker 0] New coverage: 2770 instr, 1 contracts, 2 seqs in corpus\n[2026-11-16 20:06:05.53]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage/4325615755677687433.txt\n[2026-11-16 20:06:05.54] [Worker 0] New coverage: 3363 instr, 1 contracts, 3 seqs in corpus\n[2026-11-16 20:06:05.54]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage/7057055435799096761.txt\n[2026-11-16 20:06:05.54] [Worker 0] New coverage: 3408 instr, 1 contracts, 4 seqs in corpus\n[2026-11-16 20:06:05.54]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage/7408099492939734355.txt\n[2026-11-16 20:06:05.55] [Worker 0] New coverage: 3728 instr, 1 contracts, 5 seqs in corpus\n[2026-11-16 20:06:05.55]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage/5730427312790481504.txt\n[2026-11-16 20:06:05.55] [Worker 0] New coverage: 3842 instr, 1 contracts, 6 seqs in corpus\n[2026-11-16 20:06:05.55]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage/7704614541400017522.txt\n[2026-11-16 20:06:05.55] [Worker 0] New coverage: 3878 instr, 1 contracts, 7 seqs in corpus\n[2026-11-16 20:06:05.56]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage/2427015048161561985.txt\n[2026-11-16 20:06:05.56] [Worker 0] New coverage: 3988 instr, 1 contracts, 8 seqs in corpus\n[2026-11-16 20:06:05.56]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/native/corpus/coverage/2199168107836102170.txt\n[2026-11-16 20:06:05.56] [Worker 0] New coverage: 4082 instr, 1 contracts, 9 seqs in corpus\n[2026-11-16 20:06:05.56] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:05.56] [status] tests: 0/1, fuzzing: 87/80, values: [], cov: 4082, corpus: 9, gas/s: 0\nechidna_owner: passing\n\nUnique instructions: 4082\nUnique codehashes: 1\nCorpus size: 9\nSeed: 20261130\nTotal calls: 87\n\n[2026-11-16 20:06:05.57] Saving test reproducers... Done! (0.000000631s)\n[2026-11-16 20:06:05.57] Saving corpus... Done! (0.000876594s)\n[2026-11-16 20:06:05.57] Saving foundry reproducers... Done! (0.000294978s)\n[2026-11-16 20:06:05.57] Saving coverage... Done! (0.197703321s)\n"
+          },
+          "v2": {
+            "project": "OpenNFTs",
+            "property_name": "echidna_owner",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+              "--contract",
+              "OpenAutoMarketExFuzz",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/v2/OpenNFTs-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/v2/OpenNFTs-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261130",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x000000000000000000000000000000000000002a",
+              "--disable-slither"
+            ],
+            "exit_code": 1,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261130,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 0.522,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-16 20:06:06.25] [Worker 0] Sequence replayed from corpus file seed-db746b34bd044209bb39902d22d7a7bd.txt (1/1)"
+            ],
+            "mutation_evidence": true,
+            "fuzzing_transactions": 2,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 2,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 771,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-db746b34bd044209bb39902d22d7a7bd.txt"
+            ],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/v2/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "[2026-11-16 20:06:06.25] [Worker 0] Test echidna_owner falsified!",
+              "echidna_owner: failed!💥"
+            ],
+            "property_failures": [
+              "[2026-11-16 20:06:06.25] [Worker 0] Test echidna_owner falsified!",
+              "echidna_owner: failed!💥"
+            ],
+            "first_property_failure_observed_seconds": 0.522,
+            "property_failure_time_is_upper_bound": true,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:05.89] Compiling `sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.30271214s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol:OpenAutoMarketExFuzz\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/v2/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/v2/corpus/coverage\n[2026-11-16 20:06:06.25] [Worker 0] Test echidna_owner falsified!\n  Call sequence:\nOpenAutoMarketExFuzz.transferOwnership(0x65536)\n\n[2026-11-16 20:06:06.25] [Worker 0] New coverage: 771 instr, 1 contracts, 1 seqs in corpus\n[2026-11-16 20:06:06.25]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/v2/corpus/reproducers-unshrunk/8777306943676499553.txt\n[2026-11-16 20:06:06.25]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261130/v2/corpus/coverage/8777306943676499553.txt\n[2026-11-16 20:06:06.25] [Worker 0] Sequence replayed from corpus file seed-db746b34bd044209bb39902d22d7a7bd.txt (1/1)\n[2026-11-16 20:06:06.25] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:06.25] [status] tests: 1/1, fuzzing: 2/80, values: [], cov: 771, corpus: 1, gas/s: 0\nechidna_owner: failed!💥  \n  Call sequence:\n    OpenAutoMarketExFuzz.transferOwnership(0x65536)\n\nTraces: \n\n\nUnique instructions: 771\nUnique codehashes: 1\nCorpus size: 1\nSeed: 20261130\nTotal calls: 2\n\n[2026-11-16 20:06:06.25] Saving test reproducers... Done! (0.000289677s)\n[2026-11-16 20:06:06.25] Saving corpus... Done! (0.000080186s)\n[2026-11-16 20:06:06.25] Saving foundry reproducers... Done! (0.000912311s)\n[2026-11-16 20:06:06.25] Saving coverage... Done! (0.10394475s)\n"
+          },
+          "config_equal_except_corpus_dir": true,
+          "errors": []
+        },
+        {
+          "echidna_seed": 20261131,
+          "native": {
+            "project": "OpenNFTs",
+            "property_name": "echidna_owner",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+              "--contract",
+              "OpenAutoMarketExFuzz",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/OpenNFTs-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/OpenNFTs-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261131",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x000000000000000000000000000000000000002a",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261131,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 0.563,
+            "loaded_seed_count": 0,
+            "loaded_seed_evidence": false,
+            "replayed_sequence_count": 0,
+            "replay_evidence": false,
+            "replayed_lines": [],
+            "mutation_evidence": false,
+            "fuzzing_transactions": 86,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 86,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 4837,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_owner: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:06.49] Compiling `sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.291603721s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol:OpenAutoMarketExFuzz\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/coverage\n[2026-11-16 20:06:06.84] [Worker 0] New coverage: 3050 instr, 1 contracts, 1 seqs in corpus\n[2026-11-16 20:06:06.84]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/coverage/3532884816284331905.txt\n[2026-11-16 20:06:06.84] [Worker 0] New coverage: 3450 instr, 1 contracts, 2 seqs in corpus\n[2026-11-16 20:06:06.84]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/coverage/3988398796519943229.txt\n[2026-11-16 20:06:06.85] [Worker 0] New coverage: 3892 instr, 1 contracts, 3 seqs in corpus\n[2026-11-16 20:06:06.85]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/coverage/1506184116786217269.txt\n[2026-11-16 20:06:06.85] [Worker 0] New coverage: 4277 instr, 1 contracts, 4 seqs in corpus\n[2026-11-16 20:06:06.86]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/coverage/5584967574835428475.txt\n[2026-11-16 20:06:06.86] [Worker 0] New coverage: 4507 instr, 1 contracts, 5 seqs in corpus\n[2026-11-16 20:06:06.86]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/coverage/6673316655140963272.txt\n[2026-11-16 20:06:06.86] [Worker 0] New coverage: 4837 instr, 1 contracts, 6 seqs in corpus\n[2026-11-16 20:06:06.87]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/native/corpus/coverage/1187032534400673345.txt\n[2026-11-16 20:06:06.87] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:06.87] [status] tests: 0/1, fuzzing: 86/80, values: [], cov: 4837, corpus: 6, gas/s: 0\nechidna_owner: passing\n\nUnique instructions: 4837\nUnique codehashes: 1\nCorpus size: 6\nSeed: 20261131\nTotal calls: 86\n\n[2026-11-16 20:06:06.87] Saving test reproducers... Done! (0.000000537s)\n[2026-11-16 20:06:06.87] Saving corpus... Done! (0.000293392s)\n[2026-11-16 20:06:06.87] Saving foundry reproducers... Done! (0.000310726s)\n[2026-11-16 20:06:06.87] Saving coverage... Done! (0.139305637s)\n"
+          },
+          "v2": {
+            "project": "OpenNFTs",
+            "property_name": "echidna_owner",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+              "--contract",
+              "OpenAutoMarketExFuzz",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/v2/OpenNFTs-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/v2/OpenNFTs-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261131",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x000000000000000000000000000000000000002a",
+              "--disable-slither"
+            ],
+            "exit_code": 1,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261131,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 0.595,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-16 20:06:07.48] [Worker 0] Sequence replayed from corpus file seed-db746b34bd044209bb39902d22d7a7bd.txt (1/1)"
+            ],
+            "mutation_evidence": true,
+            "fuzzing_transactions": 2,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 2,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 771,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-db746b34bd044209bb39902d22d7a7bd.txt"
+            ],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/v2/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "[2026-11-16 20:06:07.48] [Worker 0] Test echidna_owner falsified!",
+              "echidna_owner: failed!💥"
+            ],
+            "property_failures": [
+              "[2026-11-16 20:06:07.48] [Worker 0] Test echidna_owner falsified!",
+              "echidna_owner: failed!💥"
+            ],
+            "first_property_failure_observed_seconds": 0.595,
+            "property_failure_time_is_upper_bound": true,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:07.13] Compiling `sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.293626161s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol:OpenAutoMarketExFuzz\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/v2/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/v2/corpus/coverage\n[2026-11-16 20:06:07.48] [Worker 0] Test echidna_owner falsified!\n  Call sequence:\nOpenAutoMarketExFuzz.transferOwnership(0x65536)\n\n[2026-11-16 20:06:07.48] [Worker 0] New coverage: 771 instr, 1 contracts, 1 seqs in corpus\n[2026-11-16 20:06:07.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/v2/corpus/reproducers-unshrunk/8777306943676499553.txt\n[2026-11-16 20:06:07.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/f0a4ef464239609050c2/20261131/v2/corpus/coverage/8777306943676499553.txt\n[2026-11-16 20:06:07.48] [Worker 0] Sequence replayed from corpus file seed-db746b34bd044209bb39902d22d7a7bd.txt (1/1)\n[2026-11-16 20:06:07.48] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:07.48] [status] tests: 1/1, fuzzing: 2/80, values: [], cov: 771, corpus: 1, gas/s: 0\nechidna_owner: failed!💥  \n  Call sequence:\n    OpenAutoMarketExFuzz.transferOwnership(0x65536)\n\nTraces: \n\n\nUnique instructions: 771\nUnique codehashes: 1\nCorpus size: 1\nSeed: 20261131\nTotal calls: 2\n\n[2026-11-16 20:06:07.48] Saving test reproducers... Done! (0.000219708s)\n[2026-11-16 20:06:07.48] Saving corpus... Done! (0.000060015s)\n[2026-11-16 20:06:07.48] Saving foundry reproducers... Done! (0.000511971s)\n[2026-11-16 20:06:07.48] Saving coverage... Done! (0.185532839s)\n"
+          },
+          "config_equal_except_corpus_dir": true,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "project": "OpenNFTs",
+      "property_id": "50cc31144be4bad9bc9d",
+      "property": "echidna_balance",
+      "seed_id": "seed-ea7f25cd2d96465487449ca5907c4b50",
+      "seed_file": "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/种子包/OpenNFTs/50cc31144be4bad9bc9d/coverage/seed-ea7f25cd2d96465487449ca5907c4b50.txt",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0x000000000000000000000000000000000000002a"
+      ],
+      "anvil_recheck": {
+        "project": "OpenNFTs",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "50cc31144be4-01-seq-50cc31144be4bad9bc9d-1",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_balance()": true,
+          "echidna_owner()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "_other"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000000001"
+            ],
+            "status": "observed",
+            "value": 0
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_balance()",
+          "semantics": "Echidna boolean predicate returns false (counterexample state)",
+          "status": "property_remained_true",
+          "target_property_state_established": false,
+          "first_established_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "_other"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000000001"
+                  ],
+                  "status": "observed",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "balanceOf(address)",
+                  "expressions": [
+                    "_other"
+                  ],
+                  "arguments": [
+                    "0x0000000000000000000000000000000000000001"
+                  ],
+                  "status": "observed",
+                  "value": 0
+                }
+              ]
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "mint(string)",
+            "arguments": [
+              "ipfs://seed/50cc31144be4bad9bc9d/1.json"
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x6cd981e8698e7ef4516b0001f90547b9a617ffb8fee3894c0e4fad98a7607a7c",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 120315,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 3,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "SetTokenRoyalty",
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "fields": {
+                  "tokenID": 1,
+                  "receiver": "0x0000000000000000000000000000000000000000",
+                  "fee": 0
+                }
+              },
+              {
+                "name": "Pay",
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "fields": {
+                  "tokenID": 1,
+                  "price": 0,
+                  "seller": "0x000000000000000000000000000000000000002A",
+                  "paid": 0,
+                  "receiver": "0x0000000000000000000000000000000000000000",
+                  "royalties": 0,
+                  "fee": 0,
+                  "buyer": "0x0000000000000000000000000000000000010000",
+                  "unspent": 0
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "fields": {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0x0000000000000000000000000000000000010000",
+                  "tokenId": 1
+                }
+              }
+            ],
+            "observed_view_state_changed": false,
+            "observed_view_count": 7,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "OpenERC721._balances"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "OpenERC721._balances"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0xea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+            "state_fingerprint_after": "0xea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "balanceOf(address)",
+                "expressions": [
+                  "_other"
+                ],
+                "arguments": [
+                  "0x0000000000000000000000000000000000000001"
+                ],
+                "status": "observed",
+                "value": 0
+              }
+            ],
+            "all_property_values": {
+              "echidna_balance()": true,
+              "echidna_owner()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "mint(string)",
+            "arguments": [
+              "ipfs://seed/50cc31144be4bad9bc9d/1.json"
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          }
+        ]
+      },
+      "pairs": [
+        {
+          "echidna_seed": 20261130,
+          "native": {
+            "project": "OpenNFTs",
+            "property_name": "echidna_balance",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+              "--contract",
+              "OpenAutoMarketExFuzz",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/OpenNFTs-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/OpenNFTs-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261130",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x000000000000000000000000000000000000002a",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261130,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 0.577,
+            "loaded_seed_count": 0,
+            "loaded_seed_evidence": false,
+            "replayed_sequence_count": 0,
+            "replay_evidence": false,
+            "replayed_lines": [],
+            "mutation_evidence": false,
+            "fuzzing_transactions": 84,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 84,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 4170,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_balance: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:08.12] Compiling `sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.296854412s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol:OpenAutoMarketExFuzz\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/coverage\n[2026-11-16 20:06:08.47] [Worker 0] New coverage: 1482 instr, 1 contracts, 1 seqs in corpus\n[2026-11-16 20:06:08.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/coverage/159262012105195150.txt\n[2026-11-16 20:06:08.48] [Worker 0] New coverage: 2066 instr, 1 contracts, 2 seqs in corpus\n[2026-11-16 20:06:08.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/coverage/3139527991924722784.txt\n[2026-11-16 20:06:08.48] [Worker 0] New coverage: 2276 instr, 1 contracts, 3 seqs in corpus\n[2026-11-16 20:06:08.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/coverage/2505253747450674531.txt\n[2026-11-16 20:06:08.48] [Worker 0] New coverage: 3026 instr, 1 contracts, 4 seqs in corpus\n[2026-11-16 20:06:08.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/coverage/2828277446886911786.txt\n[2026-11-16 20:06:08.48] [Worker 0] New coverage: 3162 instr, 1 contracts, 5 seqs in corpus\n[2026-11-16 20:06:08.49]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/coverage/1256929574812985665.txt\n[2026-11-16 20:06:08.49] [Worker 0] New coverage: 3592 instr, 1 contracts, 6 seqs in corpus\n[2026-11-16 20:06:08.49]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/coverage/6860178580772692287.txt\n[2026-11-16 20:06:08.49] [Worker 0] New coverage: 3964 instr, 1 contracts, 7 seqs in corpus\n[2026-11-16 20:06:08.49]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/native/corpus/coverage/7811282183215498383.txt\n[2026-11-16 20:06:08.49] [Worker 0] New coverage: 4170 instr, 1 contracts, 8 seqs in corpus\n[2026-11-16 20:06:08.49] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:08.49] [status] tests: 0/1, fuzzing: 84/80, values: [], cov: 4170, corpus: 8, gas/s: 0\nechidna_balance: passing\n\nUnique instructions: 4170\nUnique codehashes: 1\nCorpus size: 8\nSeed: 20261130\nTotal calls: 84\n\n[2026-11-16 20:06:08.49] Saving test reproducers... Done! (0.000000467s)\n[2026-11-16 20:06:08.49] Saving corpus... Done! (0.000521832s)\n[2026-11-16 20:06:08.50] Saving foundry reproducers... Done! (0.000456536s)\n[2026-11-16 20:06:08.50] Saving coverage... Done! (0.144032875s)\n"
+          },
+          "v2": {
+            "project": "OpenNFTs",
+            "property_name": "echidna_balance",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+              "--contract",
+              "OpenAutoMarketExFuzz",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/OpenNFTs-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/OpenNFTs-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261130",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x000000000000000000000000000000000000002a",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261130,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 0.543,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-16 20:06:09.12] [Worker 0] Sequence replayed from corpus file seed-ea7f25cd2d96465487449ca5907c4b50.txt (1/1)"
+            ],
+            "mutation_evidence": true,
+            "fuzzing_transactions": 84,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 84,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 4481,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-ea7f25cd2d96465487449ca5907c4b50.txt"
+            ],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_balance: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:08.77] Compiling `sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.292233286s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol:OpenAutoMarketExFuzz\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage\n[2026-11-16 20:06:09.12] [Worker 0] New coverage: 2159 instr, 1 contracts, 1 seqs in corpus\n[2026-11-16 20:06:09.12]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage/1733371087171272616.txt\n[2026-11-16 20:06:09.12] [Worker 0] Sequence replayed from corpus file seed-ea7f25cd2d96465487449ca5907c4b50.txt (1/1)\n[2026-11-16 20:06:09.12] [Worker 0] New coverage: 2983 instr, 1 contracts, 2 seqs in corpus\n[2026-11-16 20:06:09.12]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage/7812563023360377477.txt\n[2026-11-16 20:06:09.13] [Worker 0] New coverage: 3333 instr, 1 contracts, 3 seqs in corpus\n[2026-11-16 20:06:09.13]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage/4280966556924852693.txt\n[2026-11-16 20:06:09.13] [Worker 0] New coverage: 3697 instr, 1 contracts, 4 seqs in corpus\n[2026-11-16 20:06:09.13]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage/3755659098235984062.txt\n[2026-11-16 20:06:09.13] [Worker 0] New coverage: 3876 instr, 1 contracts, 5 seqs in corpus\n[2026-11-16 20:06:09.13]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage/7340555727378895528.txt\n[2026-11-16 20:06:09.13] [Worker 0] New coverage: 4079 instr, 1 contracts, 6 seqs in corpus\n[2026-11-16 20:06:09.13]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage/873523167953113028.txt\n[2026-11-16 20:06:09.13] [Worker 0] New coverage: 4361 instr, 1 contracts, 7 seqs in corpus\n[2026-11-16 20:06:09.14]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage/7771610301989382337.txt\n[2026-11-16 20:06:09.14] [Worker 0] New coverage: 4481 instr, 1 contracts, 8 seqs in corpus\n[2026-11-16 20:06:09.14]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261130/v2/corpus/coverage/4252018795525752793.txt\n[2026-11-16 20:06:09.14] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:09.14] [status] tests: 0/1, fuzzing: 84/80, values: [], cov: 4481, corpus: 8, gas/s: 0\nechidna_balance: passing\n\nUnique instructions: 4481\nUnique codehashes: 1\nCorpus size: 8\nSeed: 20261130\nTotal calls: 84\n\n[2026-11-16 20:06:09.14] Saving test reproducers... Done! (0.000000475s)\n[2026-11-16 20:06:09.14] Saving corpus... Done! (0.000371975s)\n[2026-11-16 20:06:09.14] Saving foundry reproducers... Done! (0.000272371s)\n[2026-11-16 20:06:09.14] Saving coverage... Done! (0.119171405s)\n"
+          },
+          "config_equal_except_corpus_dir": true,
+          "errors": []
+        },
+        {
+          "echidna_seed": 20261131,
+          "native": {
+            "project": "OpenNFTs",
+            "property_name": "echidna_balance",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+              "--contract",
+              "OpenAutoMarketExFuzz",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/OpenNFTs-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/OpenNFTs-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261131",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x000000000000000000000000000000000000002a",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261131,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 0.599,
+            "loaded_seed_count": 0,
+            "loaded_seed_evidence": false,
+            "replayed_sequence_count": 0,
+            "replay_evidence": false,
+            "replayed_lines": [],
+            "mutation_evidence": false,
+            "fuzzing_transactions": 86,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 86,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 5047,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_balance: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:09.39] Compiling `sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.293732779s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol:OpenAutoMarketExFuzz\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage\n[2026-11-16 20:06:09.74] [Worker 0] New coverage: 3110 instr, 1 contracts, 1 seqs in corpus\n[2026-11-16 20:06:09.74]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/7790335065149900208.txt\n[2026-11-16 20:06:09.75] [Worker 0] New coverage: 3571 instr, 1 contracts, 2 seqs in corpus\n[2026-11-16 20:06:09.75]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/4651632268147185305.txt\n[2026-11-16 20:06:09.75] [Worker 0] New coverage: 3622 instr, 1 contracts, 3 seqs in corpus\n[2026-11-16 20:06:09.75]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/1692656706856132033.txt\n[2026-11-16 20:06:09.75] [Worker 0] New coverage: 3963 instr, 1 contracts, 4 seqs in corpus\n[2026-11-16 20:06:09.75]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/707527560376865051.txt\n[2026-11-16 20:06:09.76] [Worker 0] New coverage: 4065 instr, 1 contracts, 5 seqs in corpus\n[2026-11-16 20:06:09.76]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/4361795753743321669.txt\n[2026-11-16 20:06:09.76] [Worker 0] New coverage: 4583 instr, 1 contracts, 6 seqs in corpus\n[2026-11-16 20:06:09.76]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/3763766775410938198.txt\n[2026-11-16 20:06:09.76] [Worker 0] New coverage: 4728 instr, 1 contracts, 7 seqs in corpus\n[2026-11-16 20:06:09.76]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/725538084332103461.txt\n[2026-11-16 20:06:09.76] [Worker 0] New coverage: 4975 instr, 1 contracts, 8 seqs in corpus\n[2026-11-16 20:06:09.76]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/4744445223427803404.txt\n[2026-11-16 20:06:09.77] [Worker 0] New coverage: 5047 instr, 1 contracts, 9 seqs in corpus\n[2026-11-16 20:06:09.77]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/native/corpus/coverage/6635516231079050069.txt\n[2026-11-16 20:06:09.77] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:09.77] [status] tests: 0/1, fuzzing: 86/80, values: [], cov: 5047, corpus: 9, gas/s: 0\nechidna_balance: passing\n\nUnique instructions: 5047\nUnique codehashes: 1\nCorpus size: 9\nSeed: 20261131\nTotal calls: 86\n\n[2026-11-16 20:06:09.77] Saving test reproducers... Done! (0.000000524s)\n[2026-11-16 20:06:09.77] Saving corpus... Done! (0.000487892s)\n[2026-11-16 20:06:09.77] Saving foundry reproducers... Done! (0.000314413s)\n[2026-11-16 20:06:09.77] Saving coverage... Done! (0.166724373s)\n"
+          },
+          "v2": {
+            "project": "OpenNFTs",
+            "property_name": "echidna_balance",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+              "--contract",
+              "OpenAutoMarketExFuzz",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/OpenNFTs-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/OpenNFTs-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261131",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x000000000000000000000000000000000000002a",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261131,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 0.587,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-16 20:06:10.44] [Worker 0] Sequence replayed from corpus file seed-ea7f25cd2d96465487449ca5907c4b50.txt (1/1)"
+            ],
+            "mutation_evidence": true,
+            "fuzzing_transactions": 88,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 88,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 5047,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-ea7f25cd2d96465487449ca5907c4b50.txt"
+            ],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_balance: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:10.07] Compiling `sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.309476869s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol:OpenAutoMarketExFuzz\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage\n[2026-11-16 20:06:10.44] [Worker 0] New coverage: 2159 instr, 1 contracts, 1 seqs in corpus\n[2026-11-16 20:06:10.44]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/1733371087171272616.txt\n[2026-11-16 20:06:10.44] [Worker 0] Sequence replayed from corpus file seed-ea7f25cd2d96465487449ca5907c4b50.txt (1/1)\n[2026-11-16 20:06:10.44] [Worker 0] New coverage: 3110 instr, 1 contracts, 2 seqs in corpus\n[2026-11-16 20:06:10.45]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/6808381858013998801.txt\n[2026-11-16 20:06:10.45] [Worker 0] New coverage: 3571 instr, 1 contracts, 3 seqs in corpus\n[2026-11-16 20:06:10.45]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/6681293841301353622.txt\n[2026-11-16 20:06:10.45] [Worker 0] New coverage: 3622 instr, 1 contracts, 4 seqs in corpus\n[2026-11-16 20:06:10.45]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/1015999177156695408.txt\n[2026-11-16 20:06:10.45] [Worker 0] New coverage: 3963 instr, 1 contracts, 5 seqs in corpus\n[2026-11-16 20:06:10.46]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/7359660287101611622.txt\n[2026-11-16 20:06:10.46] [Worker 0] New coverage: 4065 instr, 1 contracts, 6 seqs in corpus\n[2026-11-16 20:06:10.46]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/771247607771838440.txt\n[2026-11-16 20:06:10.46] [Worker 0] New coverage: 4583 instr, 1 contracts, 7 seqs in corpus\n[2026-11-16 20:06:10.46]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/3763766775410938198.txt\n[2026-11-16 20:06:10.46] [Worker 0] New coverage: 4728 instr, 1 contracts, 8 seqs in corpus\n[2026-11-16 20:06:10.46]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/2926926890928294930.txt\n[2026-11-16 20:06:10.47] [Worker 0] New coverage: 4975 instr, 1 contracts, 9 seqs in corpus\n[2026-11-16 20:06:10.47]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/4230752000915347108.txt\n[2026-11-16 20:06:10.47] [Worker 0] New coverage: 5047 instr, 1 contracts, 10 seqs in corpus\n[2026-11-16 20:06:10.47]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/OpenNFTs/50cc31144be4bad9bc9d/20261131/v2/corpus/coverage/7155289068999172585.txt\n[2026-11-16 20:06:10.47] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:10.47] [status] tests: 0/1, fuzzing: 88/80, values: [], cov: 5047, corpus: 10, gas/s: 0\nechidna_balance: passing\n\nUnique instructions: 5047\nUnique codehashes: 1\nCorpus size: 10\nSeed: 20261131\nTotal calls: 88\n\n[2026-11-16 20:06:10.47] Saving test reproducers... Done! (0.000000615s)\n[2026-11-16 20:06:10.47] Saving corpus... Done! (0.000465511s)\n[2026-11-16 20:06:10.48] Saving foundry reproducers... Done! (0.00027813s)\n[2026-11-16 20:06:10.48] Saving coverage... Done! (0.129754938s)\n"
+          },
+          "config_equal_except_corpus_dir": true,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "project": "Request",
+      "property_id": "c451c42790194538cf50",
+      "property": "echidna_token_conservation",
+      "seed_id": "seed-031bae72d18e4af3b0dffb3c20c534fb",
+      "seed_file": "deepseek/结果/Agent种子语料/Request/58e77e98bfd646b9844f6819b3f00947/种子包/Request/c451c42790194538cf50/coverage/seed-031bae72d18e4af3b0dffb3c20c534fb.txt",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0x0000000000000000000000000000000000003000"
+      ],
+      "anvil_recheck": {
+        "project": "Request",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "c451c4279019-01-token_conservation_charge_then_refund",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_captured_never_exceeds_authorized()": true,
+          "echidna_escrow_not_token_sink()": true,
+          "echidna_escrow_state_consistent()": true,
+          "echidna_fee_bps_validation_enforced()": true,
+          "echidna_fee_calc_no_overflow()": true,
+          "echidna_fee_never_exceeds_capture()": true,
+          "echidna_fee_receiver_only_gets_fees()": true,
+          "echidna_invalid_fee_bps_reverts()": true,
+          "echidna_merchant_receives_nonnegative()": true,
+          "echidna_no_underflow_in_merchant_payment()": true,
+          "echidna_operator_authorization_enforced()": true,
+          "echidna_payment_ref_counter_monotonic()": true,
+          "echidna_token_conservation()": true,
+          "echidna_token_supply_never_decreases()": true,
+          "echidna_uint96_sufficient_range()": true,
+          "echidna_wrapper_not_token_sink()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [],
+        "target_property_state": {
+          "property": "echidna_token_conservation()",
+          "semantics": "Echidna boolean predicate returns false (counterexample state)",
+          "status": "property_remained_true",
+          "target_property_state_established": false,
+          "first_established_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": []
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": []
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "driver_chargePayment(uint256,uint16)",
+            "arguments": [
+              1000000000000000000,
+              100
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x70ab70586933f3aa5933f95afd18752add4936f2c6a497040529e47fb8cff41f",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 456925,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 16,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                  "value": 0
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "to": "0x0000000000000000000000000000000000002000",
+                  "value": 990000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "to": "0x0000000000000000000000000000000000004000",
+                  "value": 10000000000000000
+                }
+              },
+              {
+                "name": "TransferWithReferenceAndFee",
+                "address": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                "fields": {
+                  "paymentReference": "0x6c31fc15422ebad28aaf9089c306702f67540b53c7eea8b7d2941044b027100f",
+                  "tokenAddress": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "to": "0x0000000000000000000000000000000000002000",
+                  "amount": 990000000000000000,
+                  "feeAmount": 10000000000000000,
+                  "feeAddress": "0x0000000000000000000000000000000000004000"
+                }
+              },
+              {
+                "name": "PaymentCharged",
+                "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "fields": {
+                  "paymentReference": "0x0000000000000001",
+                  "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "merchant": "0x0000000000000000000000000000000000002000",
+                  "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "amount": 1000000000000000000,
+                  "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96"
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 17,
+            "tracked_contract_count": 8,
+            "tracked_contract_types": [
+              "ERC20CommerceEscrowWrapper",
+              "Harness",
+              "IAuthCaptureEscrow",
+              "IERC20",
+              "IERC20FeeProxy",
+              "MockAuthCaptureEscrow",
+              "MockERC20",
+              "MockERC20FeeProxy"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "MockERC20._balances",
+              "MockERC20._totalSupply"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "MockERC20._balances",
+              "MockERC20._totalSupply"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0x54f58d9aac6740a3e45f196d3a462619c915cd70890139ad504703085495e38f",
+            "state_fingerprint_after": "0x23e8621a6a2561627c0531314161e22c3ae4f3fc97748f647c8ddb456883e2fe",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [],
+            "all_property_values": {
+              "echidna_captured_never_exceeds_authorized()": true,
+              "echidna_escrow_not_token_sink()": true,
+              "echidna_escrow_state_consistent()": true,
+              "echidna_fee_bps_validation_enforced()": true,
+              "echidna_fee_calc_no_overflow()": true,
+              "echidna_fee_never_exceeds_capture()": true,
+              "echidna_fee_receiver_only_gets_fees()": true,
+              "echidna_invalid_fee_bps_reverts()": true,
+              "echidna_merchant_receives_nonnegative()": true,
+              "echidna_no_underflow_in_merchant_payment()": true,
+              "echidna_operator_authorization_enforced()": true,
+              "echidna_payment_ref_counter_monotonic()": true,
+              "echidna_token_conservation()": true,
+              "echidna_token_supply_never_decreases()": true,
+              "echidna_uint96_sufficient_range()": true,
+              "echidna_wrapper_not_token_sink()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          },
+          {
+            "index": 2,
+            "function": "driver_refundPayment(uint256,uint256)",
+            "arguments": [
+              0,
+              500000000000000000
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x44dffaf39cc85d7e0931bb2a56b4f8d1af1a932ea03130c284df934cbdb36278",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 198580,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 7,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "spender": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0x0000000000000000000000000000000000000000",
+                  "value": 0
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0x0000000000000000000000000000000000000000",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                  "value": 0
+                }
+              },
+              {
+                "name": "Approval",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 500000000000000000
+                }
+              },
+              {
+                "name": "TransferWithReferenceAndFee",
+                "address": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                "fields": {
+                  "paymentReference": "0x6c31fc15422ebad28aaf9089c306702f67540b53c7eea8b7d2941044b027100f",
+                  "tokenAddress": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "amount": 500000000000000000,
+                  "feeAmount": 0,
+                  "feeAddress": "0x0000000000000000000000000000000000000000"
+                }
+              },
+              {
+                "name": "PaymentRefunded",
+                "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "fields": {
+                  "paymentReference": "0x0000000000000001",
+                  "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96",
+                  "refundedAmount": 500000000000000000,
+                  "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 17,
+            "tracked_contract_count": 8,
+            "tracked_contract_types": [
+              "ERC20CommerceEscrowWrapper",
+              "Harness",
+              "IAuthCaptureEscrow",
+              "IERC20",
+              "IERC20FeeProxy",
+              "MockAuthCaptureEscrow",
+              "MockERC20",
+              "MockERC20FeeProxy"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "MockERC20._totalSupply",
+              "MockERC20._balances"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "MockERC20._totalSupply",
+              "MockERC20._balances"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0x23e8621a6a2561627c0531314161e22c3ae4f3fc97748f647c8ddb456883e2fe",
+            "state_fingerprint_after": "0x54fc0ac2f29a14c765d3b5dd246ee14a46bba46ef552f172eb4d48ec35c735b9",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [],
+            "all_property_values": {
+              "echidna_captured_never_exceeds_authorized()": true,
+              "echidna_escrow_not_token_sink()": true,
+              "echidna_escrow_state_consistent()": true,
+              "echidna_fee_bps_validation_enforced()": true,
+              "echidna_fee_calc_no_overflow()": true,
+              "echidna_fee_never_exceeds_capture()": true,
+              "echidna_fee_receiver_only_gets_fees()": true,
+              "echidna_invalid_fee_bps_reverts()": true,
+              "echidna_merchant_receives_nonnegative()": true,
+              "echidna_no_underflow_in_merchant_payment()": true,
+              "echidna_operator_authorization_enforced()": true,
+              "echidna_payment_ref_counter_monotonic()": true,
+              "echidna_token_conservation()": true,
+              "echidna_token_supply_never_decreases()": true,
+              "echidna_uint96_sufficient_range()": true,
+              "echidna_wrapper_not_token_sink()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "driver_chargePayment(uint256,uint16)",
+            "abi_signature": "driver_chargePayment(uint256,uint16)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "arguments": [
+              1000000000000000000,
+              100
+            ],
+            "expected_outcome": "state_change",
+            "rationale": "先执行 charge 流程：mint 增加 totalSupply 与 address(this) 余额，approve 后 wrapper.chargePayment 将资金分配到 merchant/feeReceiver/escrow，同时递增 paymentRefCounter，为后续 refund 提供已存在的 paymentRef。"
+          },
+          {
+            "function": "driver_refundPayment(uint256,uint256)",
+            "abi_signature": "driver_refundPayment(uint256,uint256)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "arguments": [
+              0,
+              500000000000000000
+            ],
+            "expected_outcome": "state_change",
+            "rationale": "paymentRefCounter 已非零，满足 refund 守卫；refund 流程再次 mint 并 approve wrapper，触发 wrapper.refundPayment 在 payer/operator/merchant/escrow 间转移代币，检验 supply 与各账户余额之和是否仍守恒。",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "event": "PaymentCharged",
+                "field": "paymentReference",
+                "note": "refund 的 paymentIndex=0 会映射到 paymentRefCounter 为 1 时生成的第一个 paymentRef；若事件字段不可用，则依赖 paymentRefCounter 单调递增语义"
+              }
+            ]
+          }
+        ]
+      },
+      "pairs": [
+        {
+          "echidna_seed": 20261130,
+          "native": {
+            "project": "Request",
+            "property_name": "echidna_token_conservation",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+              "--contract",
+              "EchidnaERC20CommerceEscrowWrapper",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/Request-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/Request-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261130",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x0000000000000000000000000000000000003000",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261130,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 1.737,
+            "loaded_seed_count": 0,
+            "loaded_seed_evidence": false,
+            "replayed_sequence_count": 0,
+            "replay_evidence": false,
+            "replayed_lines": [],
+            "mutation_evidence": false,
+            "fuzzing_transactions": 80,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 80,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 18655,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_token_conservation: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:11.76] Compiling `sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.460825181s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol:EchidnaERC20CommerceEscrowWrapper\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage\n[2026-11-16 20:06:12.41] [Worker 0] New coverage: 11159 instr, 5 contracts, 1 seqs in corpus\n[2026-11-16 20:06:12.41]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage/8473206243694054659.txt\n[2026-11-16 20:06:12.48] [Worker 0] New coverage: 16797 instr, 5 contracts, 2 seqs in corpus\n[2026-11-16 20:06:12.48]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage/2801078206401824941.txt\n[2026-11-16 20:06:12.52] [Worker 0] New coverage: 16928 instr, 5 contracts, 3 seqs in corpus\n[2026-11-16 20:06:12.52]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage/1822956317965172129.txt\n[2026-11-16 20:06:12.57] [Worker 0] New coverage: 16960 instr, 5 contracts, 4 seqs in corpus\n[2026-11-16 20:06:12.57]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage/5863204222085197688.txt\n[2026-11-16 20:06:12.66] [Worker 0] New coverage: 17077 instr, 5 contracts, 5 seqs in corpus\n[2026-11-16 20:06:12.66]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage/6399522209518698154.txt\n[2026-11-16 20:06:12.72] [Worker 0] New coverage: 17129 instr, 5 contracts, 6 seqs in corpus\n[2026-11-16 20:06:12.72]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage/4453570597447550506.txt\n[2026-11-16 20:06:12.76] [Worker 0] New coverage: 17207 instr, 5 contracts, 7 seqs in corpus\n[2026-11-16 20:06:12.76]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage/2321181903327448796.txt\n[2026-11-16 20:06:12.85] [Worker 0] New coverage: 17348 instr, 5 contracts, 8 seqs in corpus\n[2026-11-16 20:06:12.85]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/native/corpus/coverage/994203950411593308.txt\n[2026-11-16 20:06:12.95] [Worker 0] New coverage: 18655 instr, 5 contracts, 9 seqs in corpus\n[2026-11-16 20:06:12.95] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:12.95] [status] tests: 0/1, fuzzing: 80/80, values: [], cov: 18655, corpus: 9, gas/s: 15148006\nechidna_token_conservation: passing\n\nUnique instructions: 18655\nUnique codehashes: 5\nCorpus size: 9\nSeed: 20261130\nTotal calls: 80\n\n[2026-11-16 20:06:12.95] Saving test reproducers... Done! (0.000000746s)\n[2026-11-16 20:06:12.95] Saving corpus... Done! (0.000972963s)\n[2026-11-16 20:06:12.95] Saving foundry reproducers... Done! (0.000757508s)\n[2026-11-16 20:06:12.95] Saving coverage... Done! (0.470794115s)\n"
+          },
+          "v2": {
+            "project": "Request",
+            "property_name": "echidna_token_conservation",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+              "--contract",
+              "EchidnaERC20CommerceEscrowWrapper",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/Request-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/Request-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261130",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x0000000000000000000000000000000000003000",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261130,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 1.804,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-16 20:06:14.32] [Worker 0] Sequence replayed from corpus file seed-031bae72d18e4af3b0dffb3c20c534fb.txt (1/1)"
+            ],
+            "mutation_evidence": true,
+            "fuzzing_transactions": 82,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 82,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 19716,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-031bae72d18e4af3b0dffb3c20c534fb.txt"
+            ],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_token_conservation: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:13.58] Compiling `sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.566758468s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol:EchidnaERC20CommerceEscrowWrapper\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage\n[2026-11-16 20:06:14.32] [Worker 0] New coverage: 11900 instr, 5 contracts, 1 seqs in corpus\n[2026-11-16 20:06:14.32]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage/6125680576157329791.txt\n[2026-11-16 20:06:14.32] [Worker 0] Sequence replayed from corpus file seed-031bae72d18e4af3b0dffb3c20c534fb.txt (1/1)\n[2026-11-16 20:06:14.39] [Worker 0] New coverage: 15386 instr, 5 contracts, 2 seqs in corpus\n[2026-11-16 20:06:14.39]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage/462160768986410148.txt\n[2026-11-16 20:06:14.46] [Worker 0] New coverage: 17765 instr, 5 contracts, 3 seqs in corpus\n[2026-11-16 20:06:14.46]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage/286801486165601444.txt\n[2026-11-16 20:06:14.50] [Worker 0] New coverage: 17926 instr, 5 contracts, 4 seqs in corpus\n[2026-11-16 20:06:14.50]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage/8552728366315592246.txt\n[2026-11-16 20:06:14.55] [Worker 0] New coverage: 19375 instr, 5 contracts, 5 seqs in corpus\n[2026-11-16 20:06:14.55]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage/5811440313482863386.txt\n[2026-11-16 20:06:14.64] [Worker 0] New coverage: 19554 instr, 5 contracts, 6 seqs in corpus\n[2026-11-16 20:06:14.64]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage/4639474868032290648.txt\n[2026-11-16 20:06:14.72] [Worker 0] New coverage: 19579 instr, 5 contracts, 7 seqs in corpus\n[2026-11-16 20:06:14.72]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage/1589077513951236007.txt\n[2026-11-16 20:06:14.80] [Worker 0] New coverage: 19682 instr, 5 contracts, 8 seqs in corpus\n[2026-11-16 20:06:14.80]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261130/v2/corpus/coverage/7608609646076086903.txt\n[2026-11-16 20:06:14.93] [Worker 0] New coverage: 19716 instr, 5 contracts, 9 seqs in corpus\n[2026-11-16 20:06:14.94] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:14.94] [status] tests: 0/1, fuzzing: 82/80, values: [], cov: 19716, corpus: 9, gas/s: 21703534\nechidna_token_conservation: passing\n\nUnique instructions: 19716\nUnique codehashes: 5\nCorpus size: 9\nSeed: 20261130\nTotal calls: 82\n\n[2026-11-16 20:06:14.94] Saving test reproducers... Done! (0.00000061s)\n[2026-11-16 20:06:14.94] Saving corpus... Done! (0.000918001s)\n[2026-11-16 20:06:14.94] Saving foundry reproducers... Done! (0.000341045s)\n[2026-11-16 20:06:14.94] Saving coverage... Done! (0.369689476s)\n"
+          },
+          "config_equal_except_corpus_dir": true,
+          "errors": []
+        },
+        {
+          "echidna_seed": 20261131,
+          "native": {
+            "project": "Request",
+            "property_name": "echidna_token_conservation",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+              "--contract",
+              "EchidnaERC20CommerceEscrowWrapper",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/Request-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/Request-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261131",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x0000000000000000000000000000000000003000",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261131,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 1.625,
+            "loaded_seed_count": 0,
+            "loaded_seed_evidence": false,
+            "replayed_sequence_count": 0,
+            "replay_evidence": false,
+            "replayed_lines": [],
+            "mutation_evidence": false,
+            "fuzzing_transactions": 86,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 86,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 16835,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_token_conservation: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:15.46] Compiling `sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.494040906s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol:EchidnaERC20CommerceEscrowWrapper\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage\n[2026-11-16 20:06:16.11] [Worker 0] New coverage: 8486 instr, 5 contracts, 1 seqs in corpus\n[2026-11-16 20:06:16.11]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/7450349022408945503.txt\n[2026-11-16 20:06:16.13] [Worker 0] New coverage: 9573 instr, 5 contracts, 2 seqs in corpus\n[2026-11-16 20:06:16.13]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/3833189464513904279.txt\n[2026-11-16 20:06:16.18] [Worker 0] New coverage: 14369 instr, 5 contracts, 3 seqs in corpus\n[2026-11-16 20:06:16.18]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/7264043522509846245.txt\n[2026-11-16 20:06:16.22] [Worker 0] New coverage: 14493 instr, 5 contracts, 4 seqs in corpus\n[2026-11-16 20:06:16.22]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/6390361583985095561.txt\n[2026-11-16 20:06:16.26] [Worker 0] New coverage: 14717 instr, 5 contracts, 5 seqs in corpus\n[2026-11-16 20:06:16.26]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/2125559593273880145.txt\n[2026-11-16 20:06:16.29] [Worker 0] New coverage: 14790 instr, 5 contracts, 6 seqs in corpus\n[2026-11-16 20:06:16.29]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/6727562599162727851.txt\n[2026-11-16 20:06:16.31] [Worker 0] New coverage: 14848 instr, 5 contracts, 7 seqs in corpus\n[2026-11-16 20:06:16.31]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/5937174174465744070.txt\n[2026-11-16 20:06:16.36] [Worker 0] New coverage: 16810 instr, 5 contracts, 8 seqs in corpus\n[2026-11-16 20:06:16.36]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/8095242409663546702.txt\n[2026-11-16 20:06:16.40] [Worker 0] New coverage: 16835 instr, 5 contracts, 9 seqs in corpus\n[2026-11-16 20:06:16.40]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/native/corpus/coverage/8870875244822666422.txt\n[2026-11-16 20:06:16.43] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:16.43] [status] tests: 0/1, fuzzing: 86/80, values: [], cov: 16835, corpus: 9, gas/s: 0\nechidna_token_conservation: passing\n\nUnique instructions: 16835\nUnique codehashes: 5\nCorpus size: 9\nSeed: 20261131\nTotal calls: 86\n\n[2026-11-16 20:06:16.43] Saving test reproducers... Done! (0.000000619s)\n[2026-11-16 20:06:16.43] Saving corpus... Done! (0.000860894s)\n[2026-11-16 20:06:16.43] Saving foundry reproducers... Done! (0.00031276s)\n[2026-11-16 20:06:16.43] Saving coverage... Done! (0.553440524s)\n"
+          },
+          "v2": {
+            "project": "Request",
+            "property_name": "echidna_token_conservation",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+              "--contract",
+              "EchidnaERC20CommerceEscrowWrapper",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/Request-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/Request-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261131",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0x0000000000000000000000000000000000003000",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261131,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 1.851,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-16 20:06:17.94] [Worker 0] Sequence replayed from corpus file seed-031bae72d18e4af3b0dffb3c20c534fb.txt (1/1)"
+            ],
+            "mutation_evidence": true,
+            "fuzzing_transactions": 84,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 84,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 17896,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-031bae72d18e4af3b0dffb3c20c534fb.txt"
+            ],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_token_conservation: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:17.18] Compiling `sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.557436987s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol:EchidnaERC20CommerceEscrowWrapper\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage\n[2026-11-16 20:06:17.93] [Worker 0] New coverage: 11900 instr, 5 contracts, 1 seqs in corpus\n[2026-11-16 20:06:17.93]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage/6125680576157329791.txt\n[2026-11-16 20:06:17.94] [Worker 0] Sequence replayed from corpus file seed-031bae72d18e4af3b0dffb3c20c534fb.txt (1/1)\n[2026-11-16 20:06:17.99] [Worker 0] New coverage: 15747 instr, 5 contracts, 2 seqs in corpus\n[2026-11-16 20:06:17.99]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage/5535829844464807192.txt\n[2026-11-16 20:06:18.02] [Worker 0] New coverage: 16057 instr, 5 contracts, 3 seqs in corpus\n[2026-11-16 20:06:18.02]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage/7263175781024841718.txt\n[2026-11-16 20:06:18.06] [Worker 0] New coverage: 16552 instr, 5 contracts, 4 seqs in corpus\n[2026-11-16 20:06:18.06]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage/1181746934842280136.txt\n[2026-11-16 20:06:18.10] [Worker 0] New coverage: 16583 instr, 5 contracts, 5 seqs in corpus\n[2026-11-16 20:06:18.10]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage/3884632249408389691.txt\n[2026-11-16 20:06:18.15] [Worker 0] New coverage: 16803 instr, 5 contracts, 6 seqs in corpus\n[2026-11-16 20:06:18.15]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage/4602310066178467669.txt\n[2026-11-16 20:06:18.18] [Worker 0] New coverage: 16866 instr, 5 contracts, 7 seqs in corpus\n[2026-11-16 20:06:18.18]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage/5546472481484127146.txt\n[2026-11-16 20:06:18.24] [Worker 0] New coverage: 17866 instr, 5 contracts, 8 seqs in corpus\n[2026-11-16 20:06:18.24]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Request/c451c42790194538cf50/20261131/v2/corpus/coverage/4303158981792196703.txt\n[2026-11-16 20:06:18.30] [Worker 0] New coverage: 17896 instr, 5 contracts, 9 seqs in corpus\n[2026-11-16 20:06:18.30] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:18.30] [status] tests: 0/1, fuzzing: 84/80, values: [], cov: 17896, corpus: 9, gas/s: 0\nechidna_token_conservation: passing\n\nUnique instructions: 17896\nUnique codehashes: 5\nCorpus size: 9\nSeed: 20261131\nTotal calls: 84\n\n[2026-11-16 20:06:18.31] Saving test reproducers... Done! (0.000000747s)\n[2026-11-16 20:06:18.31] Saving corpus... Done! (0.001370165s)\n[2026-11-16 20:06:18.31] Saving foundry reproducers... Done! (0.000391256s)\n[2026-11-16 20:06:18.31] Saving coverage... Done! (0.610394035s)\n"
+          },
+          "config_equal_except_corpus_dir": true,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "project": "Kink",
+      "property_id": "28d4a5495cb06ab375a1",
+      "property": "echidna_token1_conserved",
+      "seed_id": "seed-e0fd08afaf7f456b88dec368f6e54a73",
+      "seed_file": "deepseek/结果/Agent种子语料/Kink/34c99f73bc2f485786c2166a02fb85aa/种子包/Kink/28d4a5495cb06ab375a1/coverage/seed-e0fd08afaf7f456b88dec368f6e54a73.txt",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+      ],
+      "anvil_recheck": {
+        "project": "Kink",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "28d4a5495cb0-01-28d4a5495cb06ab375a1-c1",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_invariant_matches_supply()": true,
+          "echidna_reserves_match_balances()": false,
+          "echidna_token0_accounting()": true,
+          "echidna_token1_conserved()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [
+          "echidna_reserves_match_balances()"
+        ],
+        "initial_predicate_getters": [],
+        "target_property_state": {
+          "property": "echidna_token1_conserved()",
+          "semantics": "Echidna boolean predicate returns false (counterexample state)",
+          "status": "property_remained_true",
+          "target_property_state_established": false,
+          "first_established_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": []
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": []
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "singleSidedAdd(uint256,uint256)",
+            "arguments": [
+              1000000000000000000,
+              1
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x4d9a1e9f480abd8f8853d07fd90239f436acd8be5b8f00ba19926c40d496170b",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 119906,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 6,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0x0000000000000000000000000000000000000000",
+                  "value": 10000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                  "value": 990000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                "fields": {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 990024690289367387
+                }
+              },
+              {
+                "name": "AddLiquidity",
+                "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                "fields": {
+                  "provider": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "amounts": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "lpAmount": 990024690289367387
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 44,
+            "tracked_contract_count": 4,
+            "tracked_contract_types": [
+              "FeeOnTransferToken",
+              "Harness",
+              "KinkPool",
+              "MockERC20"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "ERC20._balances"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "ERC20._balances"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0x1706b697767b729cc909411d760b47ae17be21b3837fb80751b1d5ee0ab7f3ee",
+            "state_fingerprint_after": "0x01d598f4c138840d754dc314613483e4c892f1f5e2becd54a06ea9e88e332c95",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [],
+            "all_property_values": {
+              "echidna_invariant_matches_supply()": true,
+              "echidna_reserves_match_balances()": false,
+              "echidna_token0_accounting()": true,
+              "echidna_token1_conserved()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": [
+              "echidna_reserves_match_balances()"
+            ]
+          },
+          {
+            "index": 2,
+            "function": "yankLiquidity(uint256)",
+            "arguments": [
+              1000000000000000000
+            ],
+            "argument_bindings": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "0x96cee3118b25776276ceef74356e38e090c63de724c834fa9aaa0e0babb03db7",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 104933,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "changed_storage_slot_count": 8,
+            "trace_error": null,
+            "events": [
+              {
+                "name": "Transfer",
+                "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                "fields": {
+                  "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "to": "0x0000000000000000000000000000000000000000",
+                  "value": 1000000000000000000
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                "fields": {
+                  "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 502487595628879628
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                  "to": "0x0000000000000000000000000000000000000000",
+                  "value": 4975124659445580
+                }
+              },
+              {
+                "name": "Transfer",
+                "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "fields": {
+                  "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                  "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "value": 492537341285112511
+                }
+              },
+              {
+                "name": "RemoveLiquidity",
+                "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                "fields": {
+                  "provider": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                  "amounts": [
+                    502487595628879628,
+                    497512465944558091
+                  ],
+                  "lpAmount": 1000000000000000000
+                }
+              }
+            ],
+            "observed_view_state_changed": true,
+            "observed_view_count": 44,
+            "tracked_contract_count": 4,
+            "tracked_contract_types": [
+              "FeeOnTransferToken",
+              "Harness",
+              "KinkPool",
+              "MockERC20"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "ERC20._balances"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "ERC20._balances"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "0x01d598f4c138840d754dc314613483e4c892f1f5e2becd54a06ea9e88e332c95",
+            "state_fingerprint_after": "0x6be2c5b418cedc0af074da2bc433737f7a7221419f95e3b9466dec7bcc4f7bc2",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [],
+            "all_property_values": {
+              "echidna_invariant_matches_supply()": true,
+              "echidna_reserves_match_balances()": false,
+              "echidna_token0_accounting()": true,
+              "echidna_token1_conserved()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": [
+              "echidna_reserves_match_balances()"
+            ]
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "singleSidedAdd(uint256,uint256)",
+            "arguments": [
+              1000000000000000000,
+              1
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "yankLiquidity(uint256)",
+            "arguments": [
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "relation": "yankLiquidity 的 rawLp 需不超过前序 singleSidedAdd 后 Harness 持有的 LP 余额；此处取 1e18 作为保守值，依赖前序注入产生的 LP"
+              }
+            ]
+          }
+        ]
+      },
+      "pairs": [
+        {
+          "echidna_seed": 20261130,
+          "native": {
+            "project": "Kink",
+            "property_name": "echidna_token1_conserved",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol",
+              "--contract",
+              "KinkPoolEchidna",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/Kink-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/Kink-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261130",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261130,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 16.603,
+            "loaded_seed_count": 0,
+            "loaded_seed_evidence": false,
+            "replayed_sequence_count": 0,
+            "replay_evidence": false,
+            "replayed_lines": [],
+            "mutation_evidence": false,
+            "fuzzing_transactions": 81,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 81,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 10318,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_token1_conserved: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:20.88] Compiling `sol/真实项目/Kink/echidna/KinkPoolEchidna.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (15.49758927s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/echidna/KinkPoolEchidna.sol:KinkPoolEchidna\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/corpus/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/corpus/coverage\n[2026-11-16 20:06:36.64] [Worker 0] New coverage: 9080 instr, 8 contracts, 1 seqs in corpus\n[2026-11-16 20:06:36.64]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/corpus/coverage/8030948458494362014.txt\n[2026-11-16 20:06:36.65] [Worker 0] New coverage: 9404 instr, 8 contracts, 2 seqs in corpus\n[2026-11-16 20:06:36.65]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/corpus/coverage/7144317593647455513.txt\n[2026-11-16 20:06:36.68] [Worker 0] New coverage: 9711 instr, 8 contracts, 3 seqs in corpus\n[2026-11-16 20:06:36.68]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/corpus/coverage/4156596983903137663.txt\n[2026-11-16 20:06:36.71] [Worker 0] New coverage: 10033 instr, 8 contracts, 4 seqs in corpus\n[2026-11-16 20:06:36.71]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/corpus/coverage/4322909109848064533.txt\n[2026-11-16 20:06:36.80] [Worker 0] New coverage: 10318 instr, 8 contracts, 5 seqs in corpus\n[2026-11-16 20:06:36.80]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/native/corpus/coverage/1324187853321400150.txt\n[2026-11-16 20:06:36.86] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:36.86] [status] tests: 0/1, fuzzing: 81/80, values: [], cov: 10318, corpus: 5, gas/s: 0\nechidna_token1_conserved: passing\n\nUnique instructions: 10318\nUnique codehashes: 8\nCorpus size: 5\nSeed: 20261130\nTotal calls: 81\n\n[2026-11-16 20:06:36.87] Saving test reproducers... Done! (0.000000685s)\n[2026-11-16 20:06:36.87] Saving corpus... Done! (0.000438482s)\n[2026-11-16 20:06:36.87] Saving foundry reproducers... Done! (0.000324738s)\n[2026-11-16 20:06:36.87] Saving coverage... Done! (0.535210308s)\n"
+          },
+          "v2": {
+            "project": "Kink",
+            "property_name": "echidna_token1_conserved",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol",
+              "--contract",
+              "KinkPoolEchidna",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/Kink-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/Kink-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261130",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261130,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 13.2,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-16 20:06:49.93] [Worker 0] Sequence replayed from corpus file seed-e0fd08afaf7f456b88dec368f6e54a73.txt (1/1)"
+            ],
+            "mutation_evidence": true,
+            "fuzzing_transactions": 85,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 85,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 10323,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-e0fd08afaf7f456b88dec368f6e54a73.txt"
+            ],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_token1_conserved: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:37.54] Compiling `sol/真实项目/Kink/echidna/KinkPoolEchidna.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (12.179088292s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/echidna/KinkPoolEchidna.sol:KinkPoolEchidna\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/coverage\n[2026-11-16 20:06:49.93] [Worker 0] New coverage: 7488 instr, 8 contracts, 1 seqs in corpus\n[2026-11-16 20:06:49.93]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/coverage/1396571051427213382.txt\n[2026-11-16 20:06:49.93] [Worker 0] Sequence replayed from corpus file seed-e0fd08afaf7f456b88dec368f6e54a73.txt (1/1)\n[2026-11-16 20:06:49.95] [Worker 0] New coverage: 9087 instr, 8 contracts, 2 seqs in corpus\n[2026-11-16 20:06:49.95]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/coverage/2598765672239906579.txt\n[2026-11-16 20:06:49.99] [Worker 0] New coverage: 10018 instr, 8 contracts, 3 seqs in corpus\n[2026-11-16 20:06:49.99]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/coverage/4968999599222813999.txt\n[2026-11-16 20:06:50.02] [Worker 0] New coverage: 10100 instr, 8 contracts, 4 seqs in corpus\n[2026-11-16 20:06:50.02]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/coverage/6005098628514389386.txt\n[2026-11-16 20:06:50.05] [Worker 0] New coverage: 10105 instr, 8 contracts, 5 seqs in corpus\n[2026-11-16 20:06:50.06]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/coverage/5334196703445781492.txt\n[2026-11-16 20:06:50.08] [Worker 0] New coverage: 10105 instr, 8 contracts, 6 seqs in corpus\n[2026-11-16 20:06:50.09]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/coverage/5069490857448822828.txt\n[2026-11-16 20:06:50.11] [Worker 0] New coverage: 10323 instr, 8 contracts, 7 seqs in corpus\n[2026-11-16 20:06:50.11]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261130/v2/corpus/coverage/8034143398572779545.txt\n[2026-11-16 20:06:50.15] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:06:50.15] [status] tests: 0/1, fuzzing: 85/80, values: [], cov: 10323, corpus: 7, gas/s: 0\nechidna_token1_conserved: passing\n\nUnique instructions: 10323\nUnique codehashes: 8\nCorpus size: 7\nSeed: 20261130\nTotal calls: 85\n\n[2026-11-16 20:06:50.15] Saving test reproducers... Done! (0.000000803s)\n[2026-11-16 20:06:50.15] Saving corpus... Done! (0.000504444s)\n[2026-11-16 20:06:50.15] Saving foundry reproducers... Done! (0.000308037s)\n[2026-11-16 20:06:50.15] Saving coverage... Done! (0.518345124s)\n"
+          },
+          "config_equal_except_corpus_dir": true,
+          "errors": []
+        },
+        {
+          "echidna_seed": 20261131,
+          "native": {
+            "project": "Kink",
+            "property_name": "echidna_token1_conserved",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol",
+              "--contract",
+              "KinkPoolEchidna",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/Kink-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/Kink-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261131",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261131,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 13.455,
+            "loaded_seed_count": 0,
+            "loaded_seed_evidence": false,
+            "replayed_sequence_count": 0,
+            "replay_evidence": false,
+            "replayed_lines": [],
+            "mutation_evidence": false,
+            "fuzzing_transactions": 85,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 85,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 10452,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 0,
+            "initial_corpus_files": [],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_token1_conserved: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:06:50.82] Compiling `sol/真实项目/Kink/echidna/KinkPoolEchidna.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (12.181118732s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/echidna/KinkPoolEchidna.sol:KinkPoolEchidna\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage\n[2026-11-16 20:07:03.34] [Worker 0] New coverage: 7100 instr, 8 contracts, 1 seqs in corpus\n[2026-11-16 20:07:03.34]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage/3717873242483990218.txt\n[2026-11-16 20:07:03.36] [Worker 0] New coverage: 8699 instr, 8 contracts, 2 seqs in corpus\n[2026-11-16 20:07:03.36]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage/755630931275210102.txt\n[2026-11-16 20:07:03.38] [Worker 0] New coverage: 8976 instr, 8 contracts, 3 seqs in corpus\n[2026-11-16 20:07:03.38]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage/8968897452320369622.txt\n[2026-11-16 20:07:03.41] [Worker 0] New coverage: 8997 instr, 8 contracts, 4 seqs in corpus\n[2026-11-16 20:07:03.41]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage/4644187250433607014.txt\n[2026-11-16 20:07:03.44] [Worker 0] New coverage: 9024 instr, 8 contracts, 5 seqs in corpus\n[2026-11-16 20:07:03.44]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage/690816996570981310.txt\n[2026-11-16 20:07:03.46] [Worker 0] New coverage: 9309 instr, 8 contracts, 6 seqs in corpus\n[2026-11-16 20:07:03.46]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage/1649986148711334522.txt\n[2026-11-16 20:07:03.51] [Worker 0] New coverage: 9730 instr, 8 contracts, 7 seqs in corpus\n[2026-11-16 20:07:03.51]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage/1215181869053280304.txt\n[2026-11-16 20:07:03.58] [Worker 0] New coverage: 9847 instr, 8 contracts, 8 seqs in corpus\n[2026-11-16 20:07:03.58]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/native/corpus/coverage/4382377836100093081.txt\n[2026-11-16 20:07:03.62] [Worker 0] New coverage: 10452 instr, 8 contracts, 9 seqs in corpus\n[2026-11-16 20:07:03.62] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:07:03.62] [status] tests: 0/1, fuzzing: 85/80, values: [], cov: 10452, corpus: 9, gas/s: 0\nechidna_token1_conserved: passing\n\nUnique instructions: 10452\nUnique codehashes: 8\nCorpus size: 9\nSeed: 20261131\nTotal calls: 85\n\n[2026-11-16 20:07:03.62] Saving test reproducers... Done! (0.000000552s)\n[2026-11-16 20:07:03.62] Saving corpus... Done! (0.000720481s)\n[2026-11-16 20:07:03.62] Saving foundry reproducers... Done! (0.00030266s)\n[2026-11-16 20:07:03.62] Saving coverage... Done! (0.574109463s)\n"
+          },
+          "v2": {
+            "project": "Kink",
+            "property_name": "echidna_token1_conserved",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "sol/真实项目/Kink/echidna/KinkPoolEchidna.sol",
+              "--contract",
+              "KinkPoolEchidna",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/Kink-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/Kink-corpus-echidna.yaml",
+              "--test-limit",
+              "80",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261131",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--sender",
+              "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "--disable-slither"
+            ],
+            "exit_code": 0,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261131,
+            "test_limit": 80,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 13.099,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-16 20:07:16.62] [Worker 0] Sequence replayed from corpus file seed-e0fd08afaf7f456b88dec368f6e54a73.txt (1/1)"
+            ],
+            "mutation_evidence": true,
+            "fuzzing_transactions": 88,
+            "fuzzing_cases": 80,
+            "fuzzing_progress_count": 88,
+            "fuzzing_progress_limit": 80,
+            "worker_crashes": [],
+            "unique_instructions": 10333,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-e0fd08afaf7f456b88dec368f6e54a73.txt"
+            ],
+            "full_log_path": "deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "echidna_token1_conserved: passing"
+            ],
+            "property_failures": [],
+            "first_property_failure_observed_seconds": null,
+            "property_failure_time_is_upper_bound": false,
+            "initial_state_failures": [],
+            "output": "[2026-11-16 20:07:04.34] Compiling `sol/真实项目/Kink/echidna/KinkPoolEchidna.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (12.060071359s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/echidna/KinkPoolEchidna.sol:KinkPoolEchidna\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/coverage\n[2026-11-16 20:07:16.62] [Worker 0] New coverage: 7488 instr, 8 contracts, 1 seqs in corpus\n[2026-11-16 20:07:16.62]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/coverage/1396571051427213382.txt\n[2026-11-16 20:07:16.62] [Worker 0] Sequence replayed from corpus file seed-e0fd08afaf7f456b88dec368f6e54a73.txt (1/1)\n[2026-11-16 20:07:16.63] [Worker 0] New coverage: 8151 instr, 8 contracts, 2 seqs in corpus\n[2026-11-16 20:07:16.63]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/coverage/4230935666698586198.txt\n[2026-11-16 20:07:16.66] [Worker 0] New coverage: 9684 instr, 8 contracts, 3 seqs in corpus\n[2026-11-16 20:07:16.67]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/coverage/2710851675042741177.txt\n[2026-11-16 20:07:16.70] [Worker 0] New coverage: 9964 instr, 8 contracts, 4 seqs in corpus\n[2026-11-16 20:07:16.70]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/coverage/2461587147698022987.txt\n[2026-11-16 20:07:16.76] [Worker 0] New coverage: 9969 instr, 8 contracts, 5 seqs in corpus\n[2026-11-16 20:07:16.76]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/coverage/4403440665807623700.txt\n[2026-11-16 20:07:16.82] [Worker 0] New coverage: 10187 instr, 8 contracts, 6 seqs in corpus\n[2026-11-16 20:07:16.82]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/coverage/1147108427016650243.txt\n[2026-11-16 20:07:16.86] [Worker 0] New coverage: 10333 instr, 8 contracts, 7 seqs in corpus\n[2026-11-16 20:07:16.86]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase21目标状态配对/paired-2/Kink/28d4a5495cb06ab375a1/20261131/v2/corpus/coverage/3240742630380398113.txt\n[2026-11-16 20:07:16.88] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 20:07:16.88] [status] tests: 0/1, fuzzing: 88/80, values: [], cov: 10333, corpus: 7, gas/s: 0\nechidna_token1_conserved: passing\n\nUnique instructions: 10333\nUnique codehashes: 8\nCorpus size: 7\nSeed: 20261131\nTotal calls: 88\n\n[2026-11-16 20:07:16.88] Saving test reproducers... Done! (0.000000679s)\n[2026-11-16 20:07:16.88] Saving corpus... Done! (0.000639793s)\n[2026-11-16 20:07:16.88] Saving foundry reproducers... Done! (0.000352114s)\n[2026-11-16 20:07:16.88] Saving coverage... Done! (0.486436317s)\n"
+          },
+          "config_equal_except_corpus_dir": true,
+          "errors": []
+        }
+      ]
+    }
+  ]
+}

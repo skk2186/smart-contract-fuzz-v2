@@ -1,0 +1,64 @@
+{
+  "phase": "Phase 21",
+  "date": "2026-11-16",
+  "purpose": "统一 native 与 V2 Echidna 配置，核对 OpenNFTs 属性反例语义，评估属性谓词对应状态是否建立，并对既有有效种子做少量配对重复。",
+  "baseline_commit": "517afe8373c936a7f1370ead042e7a87125e5e1a",
+  "scope": {
+    "new_seed_generation": false,
+    "deepseek_api_calls": false,
+    "contract_or_property_changes": false,
+    "new_agents": false,
+    "samples": "Phase 20 已生成且 Anvil 回放有效的四条种子"
+  },
+  "paired_echidna_configuration": {
+    "difference_between_arms": "native 语料为空；V2 语料只含对应既有有效种子。其它配置相同。",
+    "test_mode": "property",
+    "test_limit": 80,
+    "timeout_seconds": 45,
+    "seq_len": 8,
+    "shrink_limit": 1,
+    "workers": 1,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": "从 Phase 20 属性结果逐条读取，并在 native/V2 两臂共用",
+    "repeat_echidna_seeds": [20261130, 20261131]
+  },
+  "samples": [
+    {
+      "project": "OpenNFTs",
+      "property_id": "f0a4ef464239609050c2",
+      "agent_result": "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json",
+      "seed_id": "seed-db746b34bd044209bb39902d22d7a7bd",
+      "semantic_question": "owner address(42) 调用 transferOwnership，把 owner 改为 property_sender 0x0000000000000000000000000000000000010000 后，echidna_owner 为 false；确认是 Harness 的原始 owner 不变断言被正常所有权转移打破，而非权限绕过。"
+    },
+    {
+      "project": "OpenNFTs",
+      "property_id": "50cc31144be4bad9bc9d",
+      "agent_result": "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json",
+      "seed_id": "seed-ea7f25cd2d96465487449ca5907c4b50",
+      "semantic_question": "mint 成功不代表 balanceOf(address(1)) 达到断言违反条件；对 property source 中的直接 view getter 进行部署前与逐笔后观测。"
+    },
+    {
+      "project": "Request",
+      "property_id": "c451c42790194538cf50",
+      "agent_result": "deepseek/结果/Agent种子语料/Request/58e77e98bfd646b9844f6819b3f00947/逐属性Agent种子流程.json",
+      "seed_id": "seed-031bae72d18e4af3b0dffb3c20c534fb",
+      "semantic_question": "以同一 sender pool 和配对 Echidna seed 比较 charge/refund 状态序列与空语料 native campaign。"
+    },
+    {
+      "project": "Kink",
+      "property_id": "28d4a5495cb06ab375a1",
+      "agent_result": "deepseek/结果/Agent种子语料/Kink/34c99f73bc2f485786c2166a02fb85aa/逐属性Agent种子流程.json",
+      "seed_id": "seed-e0fd08afaf7f456b88dec368f6e54a73",
+      "semantic_question": "留出样本已转为可信度重复，不依据配对结果修改种子或合约。"
+    }
+  ],
+  "reporting": [
+    "每一对记录唯一输入差异、两个 arm 的 yaml 配置、random seed、加载/回放/变异证据、属性结果、unique instructions 与时间。",
+    "单独报告 Echidna predicate 是否由 true 变 false、首次发生交易，以及从属性源码中可解析的直接 view getter 及其取值。",
+    "保留全部 Anvil 重放和配对失败；重复次数仅为 2，不据此做统计显著性主张。"
+  ]
+}
