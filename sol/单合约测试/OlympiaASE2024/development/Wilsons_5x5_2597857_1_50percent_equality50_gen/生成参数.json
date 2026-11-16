@@ -1,0 +1,43 @@
+{
+  "sample_id": "Wilsons_5x5_2597857_1_50percent_equality50_gen",
+  "split": "development",
+  "split_rule": "同一维度按 wrapper 输出顺序前 2 个为开发集，第 3 个为独立留出集",
+  "ordinal": 1,
+  "dimension_instance_index": 1,
+  "source": "Wilsons_5x5_2597857_1_50percent_equality50_gen.sol",
+  "source_sha256": "88430e59157d84df023d53d6891e7891f2facfc6fce5ee0f59648cbb594ea0b3",
+  "contract": "Maze",
+  "target": {
+    "property": "echidna_noBug()",
+    "oracle": "bug 标志保持 false；进入终点并在下一次 step 调用后置 true 时该属性应被 falsify",
+    "known_solution_provided_to_agent": false
+  },
+  "generator": {
+    "repository": "https://github.com/Rigorous-Software-Engineering/olympia",
+    "commit": "325b910388416750d3485c7b588aba4411971c2d",
+    "global_wrapper_seed": 20261116,
+    "wrapper_instance_seed": 320586,
+    "algorithm": "Wilsons",
+    "width": 5,
+    "height": 5,
+    "dimension": 5,
+    "maze_seed": 2597857,
+    "program_count": 1,
+    "cycle_percent": 50,
+    "generation_method": "equality",
+    "equality_percent": 50,
+    "method_entry": "equality50_gen",
+    "official_programs_list_entry": "Wilsons,5,5,2597857,1,50percent,equality50_gen"
+  },
+  "generation_validation": {
+    "official_reachability_check": "disabled",
+    "reason": "本地运行仅安装生成所需依赖；生成后的源码由 Echidna 2.2.3 使用 solc 0.8.26 及官方优化参数单独编译和执行"
+  },
+  "excluded_artifacts": [
+    "sol_tx/ 中的交易参数解答",
+    "sln/ 中的迷宫路径解答",
+    "txt/ 中的迷宫矩阵",
+    "png/ 中的迷宫图",
+    "*.foundry.sol 测试包装器"
+  ]
+}

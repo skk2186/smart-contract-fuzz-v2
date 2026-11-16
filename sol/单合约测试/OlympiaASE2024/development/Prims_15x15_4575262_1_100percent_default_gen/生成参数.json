@@ -1,0 +1,43 @@
+{
+  "sample_id": "Prims_15x15_4575262_1_100percent_default_gen",
+  "split": "development",
+  "split_rule": "同一维度按 wrapper 输出顺序前 2 个为开发集，第 3 个为独立留出集",
+  "ordinal": 8,
+  "dimension_instance_index": 2,
+  "source": "Prims_15x15_4575262_1_100percent_default_gen.sol",
+  "source_sha256": "ba57ce4fa1ade017e0ecea376458eb25883981800bab46bf8e9d36759a0a93db",
+  "contract": "Maze",
+  "target": {
+    "property": "echidna_noBug()",
+    "oracle": "bug 标志保持 false；进入终点并在下一次 step 调用后置 true 时该属性应被 falsify",
+    "known_solution_provided_to_agent": false
+  },
+  "generator": {
+    "repository": "https://github.com/Rigorous-Software-Engineering/olympia",
+    "commit": "325b910388416750d3485c7b588aba4411971c2d",
+    "global_wrapper_seed": 20261116,
+    "wrapper_instance_seed": 778525,
+    "algorithm": "Prims",
+    "width": 15,
+    "height": 15,
+    "dimension": 15,
+    "maze_seed": 4575262,
+    "program_count": 1,
+    "cycle_percent": 100,
+    "generation_method": "default",
+    "equality_percent": null,
+    "method_entry": "default_gen",
+    "official_programs_list_entry": "Prims,15,15,4575262,1,100percent,default_gen"
+  },
+  "generation_validation": {
+    "official_reachability_check": "disabled",
+    "reason": "本地运行仅安装生成所需依赖；生成后的源码由 Echidna 2.2.3 使用 solc 0.8.26 及官方优化参数单独编译和执行"
+  },
+  "excluded_artifacts": [
+    "sol_tx/ 中的交易参数解答",
+    "sln/ 中的迷宫路径解答",
+    "txt/ 中的迷宫矩阵",
+    "png/ 中的迷宫图",
+    "*.foundry.sol 测试包装器"
+  ]
+}
