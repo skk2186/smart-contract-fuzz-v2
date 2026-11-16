@@ -11,6 +11,12 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECTS = {
+    "OpenNFTs": {
+        "report": "deepseek/结果/通用依赖泛化验证/OpenNFTs-Slither属性.json",
+        "artifact": "deepseek/结果/通用依赖泛化验证/OpenNFTs-Harness编译.json",
+        "source_root": "sol/真实项目/OpenNFTs",
+        "contract": "OpenAutoMarketExFuzz",
+    },
     "Request": {
         "report": ".tools/results/request-property.json",
         "artifact": ".tools/results/Request-Harness编译.json",

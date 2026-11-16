@@ -653,6 +653,10 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         "target": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
         "contract": "EchidnaERC20CommerceEscrowWrapper",
         "remaps": "@openzeppelin/contracts/=sol/真实项目/依赖/OpenZeppelin4/contracts/"},
+        "OpenNFTs": {
+        "target": "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+        "contract": "OpenAutoMarketExFuzz",
+        "remaps": "OpenNFTs/=sol/真实项目/OpenNFTs/"},
         "Immutable": {
         "target": "sol/真实项目/Immutable/test/token/erc721/fuzz/ERC721PsiV2.Echidna.sol",
         "contract": "ERC721PsiV2Echidna",

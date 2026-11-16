@@ -13,6 +13,12 @@ from crytic_compile import CryticCompile
 ROOT = Path(__file__).resolve().parents[2]
 SOLC = os.environ.get("SOLC_BIN", "solc")
 PROJECTS = {
+    "OpenNFTs": {
+        "target": "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+        "contract": "OpenAutoMarketExFuzz",
+        "remaps": "OpenNFTs/=sol/真实项目/OpenNFTs/",
+        "solc_version": "0.8.20",
+    },
     "Request": {
         "target": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
         "contract": "EchidnaERC20CommerceEscrowWrapper",

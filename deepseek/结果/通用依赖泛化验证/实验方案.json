@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-16",
+  "purpose": "留出项目小规模泛化验证；保留全部失败属性，不按结果替换样本",
+  "project": "OpenNFTs",
+  "source": "https://github.com/Kredeum/OpenNFTs/tree/04fbf1e46ccbb53a07962672fec1463b05768025",
+  "source_entry": "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+  "contract": "OpenAutoMarketExFuzz",
+  "properties": ["echidna_owner", "echidna_balance"],
+  "selection_before_execution": "两条未注释的原生 echidna 属性全部纳入；此前仅做静态分析，未参加定向种子优化",
+  "generation": {"max_candidates_per_property": 1, "max_steps": 8, "planning_repairs": 1, "execution_feedback_repairs": 1},
+  "comparison": {"baseline": "空语料原生 Echidna", "v2": "只注入本轮 Anvil 验证的种子", "test_limit": 80, "seq_len": 8, "shrink_limit": 1, "workers": 1, "random_seed_by_property": {"echidna_owner": 20261116, "echidna_balance": 20261117}, "repeat": 1},
+  "metrics": ["具体候选率", "逐笔真实效果的有效种子率", "目标深层路径到达率", "唯一指令覆盖差", "目标反例差"],
+  "limitations": "单项目两属性、一轮配对仅为诊断；不据此推断总体统计显著性"
+}

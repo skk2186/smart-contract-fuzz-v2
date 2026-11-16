@@ -1,0 +1,39 @@
+{
+  "plan": "实验方案.json",
+  "raw_agent_run": "../Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json",
+  "raw_baseline": "原生基线.json",
+  "sample_count": 2,
+  "agent_a_plan_count": 2,
+  "agent_b_concrete_candidate_count": 1,
+  "anvil_valid_seed_count": 0,
+  "anvil_valid_seed_rate_by_fixed_property": "0/2",
+  "anvil_valid_seed_rate_by_concrete_candidate": "0/1",
+  "planned_target_effect_reached_by_generated_seed": "0/2",
+  "echidna_corpus_loaded_from_agent": 0,
+  "properties": [
+    {
+      "name": "echidna_owner",
+      "property_id": "f0a4ef464239609050c2",
+      "candidate_status": "agent_b_failed",
+      "failure": "initialize 的 bool 参数为字符串 'false'；一次结构修复后仍相同；计划还误判构造器中已完成的初始化为可再次执行",
+      "native_unique_instructions": 5041,
+      "v2_unique_instructions": 5041,
+      "native_target_result": "passing",
+      "v2_target_result": "passing"
+    },
+    {
+      "name": "echidna_balance",
+      "property_id": "50cc31144be4bad9bc9d",
+      "candidate_status": "replay_failed",
+      "failure": "Agent A 只规划 transferFrom，未先 mint；两次 Anvil 回放均因 Invalid token ID 回滚，第二次将 tokenID 猜为 0 仍失败",
+      "native_unique_instructions": 5026,
+      "v2_unique_instructions": 5026,
+      "native_target_result": "passing",
+      "v2_target_result": "passing"
+    }
+  ],
+  "api_total_tokens": 21955,
+  "api_cost_estimate_usd_offpeak": "0.003299586",
+  "api_cost_estimate_usd_peak": "0.006599172",
+  "coverage_delta_interpretation": "两条属性均未注入 Agent 种子，故零差异不是有效种子的效果估计"
+}
