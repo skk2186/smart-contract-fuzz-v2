@@ -1,0 +1,51 @@
+{
+  "experiment": "跨合约深层状态引导验证",
+  "api_calls": "计划内每属性完整 Agent A 与 Agent B 流程；仅在执行时发生",
+  "selection_rule": "预先选择非 BeeStorage 的真实项目属性；已有 Slither/源码证据或历史 Agent A 计划证明至少两笔状态操作存在跨交易依赖；三个合约各取一种不同业务流程；失败属性保留并仍运行 V2 空语料组",
+  "samples": [
+    {
+      "project": "Hokusai",
+      "property_id": "40b35ad5dc128d8aff62",
+      "category": "两步 mint/burn 供应量会计状态依赖",
+      "source": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/逐属性原生对照实验.json"
+    },
+    {
+      "project": "Kink",
+      "property_id": "28d4a5495cb06ab375a1",
+      "category": "两步流动性注入/移除及 LP 余额依赖",
+      "source": "deepseek/结果/逐属性原生对照实验/9abf66b9161b4f67b48de4a561e41a2f/逐属性原生对照实验.json"
+    },
+    {
+      "project": "Request",
+      "property_id": "c451c42790194538cf50",
+      "category": "三步支付授权/扣款/退款及 paymentRef 状态依赖",
+      "source": "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/逐属性原生对照实验.json"
+    }
+  ],
+  "treatments": [
+    "native_echidna_empty_corpus",
+    "current_A_B_seeded"
+  ],
+  "test_limit_per_campaign": 80,
+  "random_seeds_per_pair": [
+    20261218,
+    20261228,
+    20261238
+  ],
+  "settings": {
+    "seq_len": 8,
+    "shrink_limit": 1,
+    "workers": 1,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "exact_property_prefix": true
+  },
+  "generation": {
+    "max_candidates": 1,
+    "max_steps": 8,
+    "planning_repairs": 1,
+    "execution_feedback_repairs": 1,
+    "token_budget_per_property": 30000,
+    "wall_budget_seconds_per_property": 240
+  }
+}

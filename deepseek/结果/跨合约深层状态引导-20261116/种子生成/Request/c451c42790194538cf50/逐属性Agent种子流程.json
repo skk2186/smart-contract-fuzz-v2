@@ -1,0 +1,176 @@
+{
+  "schema_version": 2,
+  "experiment_id": "e66ce60946784f079d259331493004ef",
+  "project": "Request",
+  "property_ids": [
+    "c451c42790194538cf50"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "c451c42790194538cf50",
+      "property": "EchidnaERC20CommerceEscrowWrapper.echidna_token_conservation()",
+      "dependency_status": "statically_supported_with_limits",
+      "seed_compatible_action_count": 3,
+      "slither_action_count": 3,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "candidate_results": [
+        {
+          "candidate_id": "c451c4279019-01-c451c42790194538cf50-seq1",
+          "plan": [
+            {
+              "function": "driver_authorizePayment(uint256,uint256,uint16)",
+              "rationale": "先铸造代币并授权托管，产生授权状态与余额分布，为后续捕获/退款等消费操作提供前置状态；amount 非零守卫需满足。"
+            },
+            {
+              "function": "driver_chargePayment(uint256,uint16)",
+              "rationale": "在已有授权基础上执行 charge（授权+捕获），推动代币在 payer/merchant/feeReceiver/escrow 间转移，检验守恒属性在捕获路径下的余额合计。"
+            },
+            {
+              "function": "driver_refundPayment(uint256,uint256)",
+              "rationale": "依赖 paymentRefCounter 非零（由前序授权/charge 产生），从 operator 侧退款，检验退款路径下各账户余额合计是否仍等于 totalSupply。"
+            }
+          ],
+          "status": "agent_b_failed",
+          "seed_class": "none",
+          "seed_id": null,
+          "corpus_file": null,
+          "concrete_seed": null,
+          "agent_b": {
+            "logical_calls": 1,
+            "failed_logical_calls": 1,
+            "events": [
+              {
+                "tag": "AgentB_Request_c451c4279019-01-c451c42790194538cf50-seq1_try1",
+                "ok": false,
+                "error_kind": "token_budget_exceeded",
+                "error": "token_budget_exceeded: 本次请求最坏上界 26474 将超过剩余 Token 预算 24942",
+                "usage": null,
+                "elapsed_seconds": 0,
+                "attempt": 1,
+                "prompt_utf8_bytes": null,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [],
+          "error": "token_budget_exceeded: 本次请求最坏上界 26474 将超过剩余 Token 预算 24942",
+          "elapsed_seconds": 0.001
+        }
+      ],
+      "status": "no_valid_evm_seed",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Request_c451c42790194538cf50_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 4667,
+              "prompt_cache_hit_tokens": 256,
+              "prompt_cache_miss_tokens": 4411,
+              "completion_tokens": 391,
+              "total_tokens": 5058,
+              "estimated_cost_usd": {
+                "offpeak": "0.000897018",
+                "peak": "0.001794036"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.957,
+            "attempt": 1,
+            "prompt_utf8_bytes": 16877,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "c451c42790194538cf50",
+                "candidate_id": "c451c42790194538cf50-seq1",
+                "steps": [
+                  {
+                    "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                    "rationale": "先铸造代币并授权托管，产生授权状态与余额分布，为后续捕获/退款等消费操作提供前置状态；amount 非零守卫需满足。"
+                  },
+                  {
+                    "function": "driver_chargePayment(uint256,uint16)",
+                    "rationale": "在已有授权基础上执行 charge（授权+捕获），推动代币在 payer/merchant/feeReceiver/escrow 间转移，检验守恒属性在捕获路径下的余额合计。"
+                  },
+                  {
+                    "function": "driver_refundPayment(uint256,uint256)",
+                    "rationale": "依赖 paymentRefCounter 非零（由前序授权/charge 产生），从 operator 侧退款，检验退款路径下各账户余额合计是否仍等于 totalSupply。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "candidate_actions 来自 slither_dependency_candidates，但 unresolved_effect_actions 表明这些入口通过外部调用（token.mint/approve、wrapper.authorizePayment/chargePayment/refundPayment）间接影响余额与供应，Slither 未证明直接写入目标状态；序列仅依据源码推断状态生产/消费顺序。",
+              "driver_refundPayment 依赖 paymentRefCounter 非零，需前序授权或 charge 成功执行；若前序 try 调用失败，退款步骤可能提前返回。",
+              "属性读取 token.totalSupply 与多个地址余额，其成立取决于 MockERC20 与 wrapper 的实际部署及外部调用成功；本规划不证明路径可行或属性可被违反。",
+              "参数具体化不在本任务范围，amount/refundAmount 需非零以满足守卫。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 0,
+      "elapsed_seconds": 2.96
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 60,
+    "token_budget": 30000,
+    "wall_budget_seconds": 240
+  },
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 1,
+    "unmetered_attempts": 1,
+    "prompt_tokens": 4667,
+    "completion_tokens": 391,
+    "total_tokens": 5058,
+    "estimated_cost_usd_offpeak": "0.000897018",
+    "estimated_cost_usd_peak": "0.001794036",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/跨合约深层状态引导-20261116/种子生成/Request/c451c42790194538cf50/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 5058,
+  "total_elapsed_seconds": 3.059,
+  "anvil_start_error": null
+}
