@@ -93,7 +93,7 @@ def _validator(context: dict[str, Any], candidate: dict[str, Any], feedback: str
         transactions = data.get("transactions")
         if not isinstance(transactions, list) or len(transactions) != len(expected_transactions):
             raise ValueError("交易数必须与 Agent A 规划及目标断言调用完全一致")
-        for expected, tx in zip(expected_transactions, transactions):
+        for tx_index, (expected, tx) in enumerate(zip(expected_transactions, transactions)):
             signature = expected["function"]
             if tx.get("function") != signature:
                 raise ValueError(f"Agent B 改变了规划函数：{signature}")
@@ -104,8 +104,21 @@ def _validator(context: dict[str, Any], candidate: dict[str, Any], feedback: str
             arguments = tx.get("arguments")
             if not isinstance(arguments, list) or len(arguments) != len(params):
                 raise ValueError(f"{signature} 参数数量不匹配")
-            tx["arguments"] = [normalize_argument(param["type"], value)
-                                for param, value in zip(params, arguments)]
+            normalized = []
+            for param, value in zip(params, arguments):
+                if isinstance(value, dict):
+                    if (set(value) != {"from_transaction", "event", "field"} or
+                            type(value["from_transaction"]) is not int or
+                            not 1 <= value["from_transaction"] <= tx_index or
+                            not all(isinstance(value[key], str) and value[key]
+                                    for key in ("event", "field"))):
+                        raise ValueError(f"{signature} 的事件参数引用无效")
+                    normalized.append(value)
+                else:
+                    normalized.append(normalize_argument(param["type"], value))
+            tx["arguments"] = normalized
+            if tx.get("expected_outcome") not in {"rejection", "state_change", "no_state_change"}:
+                raise ValueError(f"{signature} 必须声明 expected_outcome")
             sender = tx.get("sender")
             if not isinstance(sender, str) or sender.lower() not in SENDERS:
                 raise ValueError(f"sender 必须来自固定测试账户池：{sender!r}")
@@ -189,6 +202,8 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
             "必须逐笔遵循计划的 function 顺序，不能增删交易。",
             "只根据 ABI、属性谓词、源码、守卫与 Slither 状态依赖推断参数；无法确认的语义写入 assumptions。",
             "负责为每笔交易具体化全部参数、sender 与跨交易数据依赖；需要相同用户、tokenId、paymentId、commit 数据或前序创建对象时，应在后续交易中复用一致的值，并在 assumptions 中说明依赖关系。",
+            "若后续参数是前序交易产生的对象 ID，必须使用事件引用对象 {from_transaction: 1, event: '事件名', field: '字段名'}；序号从 1 开始。不要把 nonce、输入参数或猜测的哈希当作执行结果。若源码未证明可取得，写入 assumptions；本地执行器找不到唯一事件字段时会反馈失败。",
+            "每笔交易必须声明 expected_outcome 为 rejection、state_change 或 no_state_change。只有计划本身要检验权限拒绝时才选 rejection；需要建立后续依赖时选 state_change。",
             "arguments 必须按 inputs 顺序提供，uint/int 使用十进制字符串，address 使用 40 位十六进制地址，bool 使用 JSON 布尔值。",
             "bytesN 使用恰好 N 字节的 0x 十六进制字符串。",
             "sender 只能从 sender_pool 选择；payable=false 时 value_wei 必须为 0。",
@@ -196,7 +211,7 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
             "严格满足函数源码、guard、状态依赖和目标谓词；静态不确定项应写入 assumptions。",
             "不要声称已验证可执行；验证器会实际回放并检查目标属性。",
             "若提供 fixed_shared_prefix_transactions，必须逐字段原样复用这些交易；不得改变函数、参数、sender、金额或延迟。",
-            "严格输出 JSON 对象，字段为 property_id、candidate_id、transactions、assumptions；可附带 data_dependencies 数组，记录依赖的前序交易索引、字段关系与复用值。",
+            "严格输出 JSON 对象，字段为 property_id、candidate_id、transactions、assumptions；每笔交易含 expected_outcome；可附带 data_dependencies 数组，记录依赖的前序交易索引与字段关系。",
         ],
         "property": property_prompt,
         "shared_property_contexts": shared_contexts,

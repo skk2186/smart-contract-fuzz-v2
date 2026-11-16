@@ -140,11 +140,16 @@ def _agent_b_call(context: dict[str, Any], candidate: dict[str, Any], *,
 def _execution_feedback(replay: dict[str, Any]) -> str:
     failing = [row for row in replay.get("transactions", [])
                if row.get("status") != "success" or
-               row.get("observed_effect_status") == "not_observed"]
+               row.get("execution_class") in {"unexpected_internal_revert", "trace_unavailable"} or
+               row.get("dependency_errors") or row.get("execution_effect_error")]
     evidence = {"replay_status": replay.get("replay_status"),
                 "deployment_status": replay.get("deployment_status"),
                 "initial_property_violations": replay.get("initial_property_violations", []),
-                "failed_transactions": failing[:4],
+                "failed_transactions": [{key: row.get(key) for key in
+                                         ("index", "function", "status", "execution_class",
+                                          "expected_outcome", "internal_errors", "dependency_errors",
+                                          "prior_events", "argument_bindings", "execution_effect_error")}
+                                        for row in failing[:4]],
                 "property_errors": [row.get("property_error") for row in failing[:4]]}
     return ("Anvil 逐交易回放失败。仅修正参数、发送者、金额或时间；保持 Agent A 的函数顺序，"
             "并检查相邻交易的身份、对象 ID 与提交/揭示数据一致性。不要声称已验证。证据："
@@ -248,7 +253,8 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                         for repair_index in range(repairs + 1):
                             replay_started = time.monotonic()
                             replay = replay_seed(project, candidate,
-                                                concrete["transactions"], session=session)
+                                                concrete["transactions"], session=session,
+                                                dependency_hints=concrete.get("data_dependencies"))
                             replay["attempt"] = repair_index + 1
                             replay["elapsed_seconds"] = round(time.monotonic() - replay_started, 3)
                             replay["elapsed_from_run_start_seconds"] = round(time.monotonic() - started, 3)
@@ -278,7 +284,7 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                 if final_replay and final_replay.get("replay_status") == "executable" and concrete:
                     seed_id = new_seed_id()
                     try:
-                        path = write_corpus(project, candidate, concrete["transactions"],
+                        path = write_corpus(project, candidate, final_replay["resolved_transactions"],
                                             context, candidate_root,
                                             replay=final_replay, seed_id=seed_id)
                         corpus_file = str(path.relative_to(ROOT))

@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from web3 import HTTPProvider, Web3
+from web3._utils.events import event_abi_to_log_topic, get_event_data
 
 from AgentB import HARNESS_ADDRESS, PROPERTY_SENDER, SENDERS, to_echidna_sequence
 from 属性种子上下文 import PROJECTS, ROOT, read_json
@@ -144,6 +145,119 @@ def _to_rpc_value(value: Any) -> Any:
     return str(value)
 
 
+def _receipt_events(web3: Web3, receipt: Any, contract_abis: dict[str, Any],
+                    harness_abi: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """按编译产物 ABI 解码真实 receipt；同名事件保留地址以便消歧。"""
+    by_topic: dict[bytes, list[dict[str, Any]]] = {}
+    for abi in [harness_abi, *contract_abis.values()]:
+        if not isinstance(abi, list):
+            continue
+        for entry in abi:
+            if entry.get("type") == "event" and not entry.get("anonymous"):
+                by_topic.setdefault(bytes(event_abi_to_log_topic(entry)), []).append(entry)
+    events = []
+    for log in receipt.logs:
+        if not log["topics"]:
+            continue
+        for entry in by_topic.get(bytes(log["topics"][0]), []):
+            try:
+                decoded = get_event_data(web3.codec, entry, log)
+            except Exception:
+                continue
+            item = {"name": entry["name"], "address": log["address"].lower(),
+                    "fields": {key: _to_rpc_value(value)
+                               for key, value in decoded["args"].items()}}
+            if item not in events:
+                events.append(item)
+            break
+    return events
+
+
+def _trace_effects(session: AnvilSession, tx_hash: Any) -> dict[str, Any]:
+    """区分外层收据成功与内部调用回滚，并计数持久存储槽变化。"""
+    call = session.rpc("debug_traceTransaction", [tx_hash.hex(), {"tracer": "callTracer"}])
+    errors = []
+    def visit(node: dict[str, Any], depth: int) -> None:
+        if depth and node.get("error"):
+            errors.append({"depth": depth, "type": node.get("type"),
+                           "address": node.get("to"), "error": node["error"],
+                           "output": node.get("output")})
+        for child in node.get("calls", []):
+            visit(child, depth + 1)
+    visit(call, 0)
+    diff = session.rpc("debug_traceTransaction", [tx_hash.hex(),
+                       {"tracer": "prestateTracer", "tracerConfig": {"diffMode": True}}])
+    before, after = diff.get("pre", {}), diff.get("post", {})
+    slots = sum(len(set(before.get(addr, {}).get("storage", {})) |
+                        set(after.get(addr, {}).get("storage", {})))
+                for addr in set(before) | set(after))
+    return {"internal_errors": errors, "changed_storage_slot_count": slots,
+            "top_level_trace_error": call.get("error")}
+
+
+def _resolve_event_arguments(tx: dict[str, Any], action: dict[str, Any],
+                             prior_events: list[list[dict[str, Any]]],
+                             dependency_hints: list[dict[str, Any]],
+                             prior_inputs: list[dict[str, Any]]) -> tuple[list[Any], list[dict[str, Any]], list[str]]:
+    """仅从已执行交易的唯一事件字段绑定参数，不从 nonce 等输入猜对象 ID。"""
+    from AgentB import normalize_argument
+    resolved = list(tx["arguments"])
+    bindings, errors = [], []
+    tx_index = len(prior_events)  # zero-based index of current transaction
+    for arg_index, param in enumerate(action.get("abi_inputs", [])):
+        raw = resolved[arg_index]
+        explicit = raw if isinstance(raw, dict) else None
+        hint = next((h for h in dependency_hints
+                     if h.get("transaction_index") == tx_index and
+                     h.get("field") == param.get("name")), None)
+        hinted = hint is not None
+        if not explicit and not hinted:
+            continue
+        if explicit:
+            source_index = explicit.get("from_transaction")
+            event_name = explicit.get("event")
+            field = explicit.get("field")
+            if (not isinstance(source_index, int) or isinstance(source_index, bool) or
+                    source_index < 1 or source_index > len(prior_events) or
+                    not isinstance(event_name, str) or not isinstance(field, str)):
+                errors.append(f"参数 {param['name']} 的事件引用无效；需指定已执行交易序号、event、field")
+                continue
+            indexed_events = [(source_index, event) for event in prior_events[source_index - 1]
+                              if event["name"] == event_name and field in event["fields"]]
+        else:
+            field = param["name"]
+            source = hint.get("depends_on_index", hint.get("depends_on_transaction_index"))
+            source = source if type(source) is int and 0 <= source < tx_index else None
+            indexed_events = [(index + 1, event)
+                              for index, events in enumerate(prior_events)
+                              for event in events if (source is None or source == index) and
+                              field in event["fields"]]
+            previous = [item[field] for index, item in enumerate(prior_inputs)
+                        if field in item and (source is None or source == index)]
+            if not indexed_events and previous:
+                # 相同身份等输入可直接复用；它不是前序交易新产生的对象 ID。
+                if raw not in previous:
+                    errors.append(f"参数 {field} 未复用前序交易输入：{previous[-1]}")
+                continue
+        try:
+            values = {(index, event["address"], str(normalize_argument(
+                param["type"], event["fields"][field]))): event["fields"][field]
+                      for index, event in indexed_events}
+        except ValueError:
+            values = {}
+        if len(values) != 1:
+            source = f"{event_name}.{field}" if explicit else field
+            errors.append(f"参数 {param['name']} 未找到唯一的前序事件字段 {source}；候选数={len(values)}")
+            continue
+        (source_index, address, _), value = next(iter(values.items()))
+        resolved[arg_index] = normalize_argument(param["type"], value)
+        bindings.append({"argument_index": arg_index, "argument_name": param["name"],
+                         "from_transaction": source_index, "event": event_name if explicit else None,
+                         "event_address": address, "field": field,
+                         "original": raw, "resolved": resolved[arg_index]})
+    return resolved, bindings, errors
+
+
 def _state_view_snapshot(web3: Web3, contract, contract_abis: dict[str, Any]) -> dict[str, Any]:
     """跟随 Harness 内部合约地址 getter，观测最多三层公开 view 状态。"""
     observations = {}
@@ -264,7 +378,8 @@ def _deploy(session: AnvilSession, project: str):
 
 
 def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict[str, Any]],
-                *, session: AnvilSession | None = None) -> dict[str, Any]:
+                *, session: AnvilSession | None = None,
+                dependency_hints: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     """每个种子从相同创世状态重放；属性调用使用 Echidna 的 psender。"""
     owned = session is None
     session = session or AnvilSession().__enter__()
@@ -297,6 +412,12 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 initial_property_values[tested_property] = None
                 initial_property_errors[tested_property] = f"{type(exc).__name__}: {str(exc)[:200]}"
         records = []
+        resolved_transactions: list[dict[str, Any]] = []
+        prior_events: list[list[dict[str, Any]]] = []
+        property_context = next((item for item in candidate.get("context", {}).get("properties", [])
+                                 if item.get("property_id") == candidate.get("property_id")), {})
+        actions = {item["abi_signature"]: item for item in property_context.get("candidate_actions", [])
+                   if item.get("abi_signature")}
         valid = bool(transactions)
         violation = None
         initial_violations = sorted(name for name, value in initial_property_values.items()
@@ -306,6 +427,20 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                          "initial_state": True}
         last_state = initial_state
         for index, tx in enumerate(transactions, start=1):
+            action = actions.get(tx["function"], {})
+            args, bindings, binding_errors = _resolve_event_arguments(
+                tx, action, prior_events, dependency_hints or [],
+                [{item.get("name"): value for item, value in zip(
+                    actions.get(previous["function"], {}).get("abi_inputs", []),
+                    previous["arguments"])} for previous in resolved_transactions])
+            if binding_errors:
+                valid = False
+                records.append({"index": index, "function": tx["function"],
+                                "status": "dependency_unresolved", "dependency_errors": binding_errors,
+                                "prior_events": prior_events[-2:]})
+                break
+            effective_tx = {**tx, "arguments": args}
+            resolved_transactions.append(effective_tx)
             sender = _checksum(tx["sender"])
             delay_seconds = int(tx.get("delay_seconds", 0))
             delay_blocks = int(tx.get("delay_blocks", 0))
@@ -317,7 +452,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             session.rpc("evm_setNextBlockTimestamp",
                         [latest_timestamp + max(1, delay_seconds)])
             signature = tx["function"]
-            fn = contract.get_function_by_signature(signature)(*tx["arguments"])
+            fn = contract.get_function_by_signature(signature)(*args)
             call_data = fn._encode_transaction_data()
             rpc_tx = {"from": sender, "to": contract.address, "data": call_data,
                       "value": hex(int(tx["value_wei"])), "gas": hex(MAX_TX_GAS),
@@ -330,6 +465,15 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 records.append({"index": index, "function": signature, "sender": sender,
                                 "status": "rpc_error", "error": str(exc)[:500]})
                 break
+            try:
+                trace = _trace_effects(session, tx_hash)
+                events = _receipt_events(session.web3, receipt, contract_abis, contract.abi)
+            except Exception as exc:
+                trace = {"internal_errors": [], "changed_storage_slot_count": None,
+                         "trace_error": f"{type(exc).__name__}: {str(exc)[:300]}"}
+                events = []
+                valid = False
+            prior_events.append(events)
             state_after = _state_view_snapshot(session.web3, contract, contract_abis)
             effect = _observed_effect_status(
                 candidate.get("context", {}), candidate.get("property_id", ""),
@@ -355,23 +499,45 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                     session.web3.eth.call(rpc_tx)
                 except Exception as exc:
                     prop_error = f"tx_revert: {type(exc).__name__}: {str(exc)[:300]}"
-            elif effect["status"] == "not_observed":
+            expected_outcome = tx.get("expected_outcome")
+            internal_revert = bool(trace["internal_errors"])
+            if internal_revert and expected_outcome != "rejection":
+                valid = False
+            if expected_outcome == "rejection" and not internal_revert:
+                valid = False
+            if expected_outcome == "state_change" and trace["changed_storage_slot_count"] == 0:
+                valid = False
+            if (receipt.status == 1 and not internal_revert and
+                    effect["status"] == "not_observed"):
                 # The target function has Slither-backed writes whose public getter
                 # is observed, but none changed. This catches wrappers that swallow
                 # an internal revert while returning success to the outer caller.
                 valid = False
+            execution_class = ("trace_unavailable" if trace.get("trace_error") else
+                               "outer_revert" if receipt.status != 1 else
+                               "expected_rejection" if internal_revert and expected_outcome == "rejection" else
+                               "unexpected_internal_revert" if internal_revert else
+                               "state_established" if trace["changed_storage_slot_count"] else
+                               "no_persistent_state_change")
             if prop_result is False and violation is None:
                 violation = {"transaction_index": index, "property": property_signature}
             other_violations = sorted(name for name, value in property_values.items()
                                       if value is False and name != property_signature)
             records.append({
-                "index": index, "function": signature, "arguments": tx["arguments"],
+                "index": index, "function": signature, "arguments": args,
+                "argument_bindings": bindings,
                 "sender": sender, "value_wei": tx["value_wei"],
                 "delay_seconds": tx.get("delay_seconds", 0),
                 "delay_blocks": tx.get("delay_blocks", 0),
                 "tx_hash": tx_hash.hex(), "block_number": receipt.blockNumber,
                 "status": "success" if receipt.status == 1 else "reverted",
                 "gas_used": receipt.gasUsed,
+                "execution_class": execution_class,
+                "expected_outcome": expected_outcome,
+                "internal_errors": trace["internal_errors"],
+                "changed_storage_slot_count": trace["changed_storage_slot_count"],
+                "trace_error": trace.get("trace_error"),
+                "events": events,
                 "observed_view_state_changed": last_state["fingerprint"] != state_after["fingerprint"],
                 "observed_view_count": state_after["observed_view_count"],
                 "tracked_contract_count": state_after["tracked_contract_count"],
@@ -381,8 +547,14 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "observed_effect_states": effect["observed_states"],
                 "changed_effect_states": effect["changed_states"],
                 "unobserved_effect_states": effect.get("missing_states", []),
-                "execution_effect_error": ("expected Slither-backed write was not observed"
-                                           if effect["status"] == "not_observed" else None),
+                "execution_effect_error": (
+                    "internal call reverted without an explicit rejection expectation"
+                    if execution_class == "unexpected_internal_revert" else
+                    "expected rejection did not occur" if expected_outcome == "rejection" and not internal_revert else
+                    "expected state change was not observed" if expected_outcome == "state_change" and
+                    trace["changed_storage_slot_count"] == 0 else
+                    "expected Slither-backed write was not observed"
+                    if effect["status"] == "not_observed" and not internal_revert else None),
                 "state_fingerprint_before": last_state["fingerprint"],
                 "state_fingerprint_after": state_after["fingerprint"],
                 "target_property": prop_result,
@@ -416,7 +588,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "evm_revision": "shanghai",
                                 "gas_limit_per_transaction": MAX_TX_GAS,
                                 "contract_address": contract.address.lower()},
-                "transactions": records}
+                "transactions": records, "resolved_transactions": resolved_transactions}
     finally:
         if deployment_snapshot is not None:
             try:
