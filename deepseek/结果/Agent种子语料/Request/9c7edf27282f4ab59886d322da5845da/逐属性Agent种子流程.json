@@ -1,0 +1,2253 @@
+{
+  "schema_version": 2,
+  "experiment_id": "304f8fb148ac4a8687f2ca37d038b6e6",
+  "project": "Request",
+  "property_ids": [
+    "c451c42790194538cf50"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "c451c42790194538cf50",
+      "property": "EchidnaERC20CommerceEscrowWrapper.echidna_token_conservation()",
+      "dependency_status": "statically_supported_with_limits",
+      "seed_compatible_action_count": 3,
+      "slither_action_count": 3,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "deployment_state": {
+        "status": "observed",
+        "deployment_block": 4370000,
+        "view_values": {
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:FEE_RECEIVER()": "0x0000000000000000000000000000000000004000",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:MERCHANT()": "0x0000000000000000000000000000000000002000",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:OPERATOR()": "0x0000000000000000000000000000000000003000",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:PAYER()": "0x0000000000000000000000000000000000001000",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:mockEscrow()": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:mockFeeProxy()": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+          "0xfc11d02bd1b627683935c7cd70b328df9af6275d:token()": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "0x54919a19522ce7c842e25735a9cfecef1c0a06da:totalSupply()": 10000000000000000000000000,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:token()": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalAuthorized()": 0,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalCaptured()": 0,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalReclaimed()": 0,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalRefunded()": 0,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalVoided()": 0,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:wrapper()": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+          "0x9491f0dfb965bc45570dd449801432599f0542a0:commerceEscrow()": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+          "0x9491f0dfb965bc45570dd449801432599f0542a0:erc20FeeProxy()": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d"
+        },
+        "view_count": 17,
+        "tracked_contract_types": [
+          "ERC20CommerceEscrowWrapper",
+          "Harness",
+          "IAuthCaptureEscrow",
+          "IERC20",
+          "IERC20FeeProxy",
+          "MockAuthCaptureEscrow",
+          "MockERC20",
+          "MockERC20FeeProxy"
+        ],
+        "role_addresses": [
+          {
+            "getter": "OPERATOR()",
+            "address": "0x0000000000000000000000000000000000003000"
+          }
+        ],
+        "guard_predicate_probes": [],
+        "initial_properties": {
+          "echidna_captured_never_exceeds_authorized()": true,
+          "echidna_escrow_not_token_sink()": true,
+          "echidna_escrow_state_consistent()": true,
+          "echidna_fee_bps_validation_enforced()": true,
+          "echidna_fee_calc_no_overflow()": true,
+          "echidna_fee_never_exceeds_capture()": true,
+          "echidna_fee_receiver_only_gets_fees()": true,
+          "echidna_invalid_fee_bps_reverts()": true,
+          "echidna_merchant_receives_nonnegative()": true,
+          "echidna_no_underflow_in_merchant_payment()": true,
+          "echidna_operator_authorization_enforced()": true,
+          "echidna_payment_ref_counter_monotonic()": true,
+          "echidna_token_conservation()": true,
+          "echidna_token_supply_never_decreases()": true,
+          "echidna_uint96_sufficient_range()": true,
+          "echidna_wrapper_not_token_sink()": true
+        },
+        "limitations": "private state is not read directly; constructor and Slither evidence remain static inference"
+      },
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000",
+        "0x0000000000000000000000000000000000003000"
+      ],
+      "candidate_results": [
+        {
+          "candidate_id": "c451c4279019-01-c451c42790194538cf50-seq1",
+          "plan": [
+            {
+              "function": "driver_authorizePayment(uint256,uint256,uint16)",
+              "rationale": "先执行授权支付驱动：内部 mint 增加 MockERC20 供应与余额，并推进 paymentRefCounter，为后续依赖 paymentRefCounter 的退款驱动建立前置状态；同时产生 wrapper/mockEscrow 余额变化，用于检验 token 守恒。"
+            },
+            {
+              "function": "driver_chargePayment(uint256,uint16)",
+              "rationale": "执行 charge 驱动：再次 mint 并走 wrapper.chargePayment，产生授权+捕获路径下的余额与供应变化，覆盖 fee 相关转账对守恒等式的影响。"
+            },
+            {
+              "function": "driver_refundPayment(uint256,uint256)",
+              "rationale": "在 paymentRefCounter 已由前序驱动推进后执行退款驱动：mint 退款金额并调用 wrapper.refundPayment，检验退款路径下供应与各账户余额之和是否仍等于 totalSupply。"
+            }
+          ],
+          "status": "replay_failed",
+          "seed_class": "echidna_only_diagnostic_candidate",
+          "seed_id": null,
+          "corpus_file": null,
+          "concrete_seed": {
+            "property_id": "c451c42790194538cf50",
+            "candidate_id": "c451c4279019-01-c451c42790194538cf50-seq1",
+            "transactions": [
+              {
+                "index": 1,
+                "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                "abi_signature": "driver_authorizePayment(uint256,uint256,uint16)",
+                "sender": "0x0000000000000000000000000000000000010000",
+                "arguments": [
+                  1000000000000000000,
+                  1000000000000000000,
+                  0
+                ],
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change",
+                "data_dependencies": []
+              },
+              {
+                "index": 2,
+                "function": "driver_chargePayment(uint256,uint16)",
+                "abi_signature": "driver_chargePayment(uint256,uint16)",
+                "sender": "0x0000000000000000000000000000000000010000",
+                "arguments": [
+                  1000000000000000000,
+                  100
+                ],
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change",
+                "data_dependencies": []
+              },
+              {
+                "index": 3,
+                "function": "driver_refundPayment(uint256,uint256)",
+                "abi_signature": "driver_refundPayment(uint256,uint256)",
+                "sender": "0x0000000000000000000000000000000000010000",
+                "arguments": [
+                  0,
+                  1000000000000000000
+                ],
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change",
+                "data_dependencies": [
+                  {
+                    "depends_on_transaction": 1,
+                    "field": "paymentIndex",
+                    "relation": "paymentIndex=0 映射到 paymentRefCounter 推进后的第一个 paymentRef（bytes8(uint64(1+0%counter))），即前序 driver_authorizePayment 创建的授权支付引用"
+                  }
+                ]
+              }
+            ],
+            "assumptions": [
+              "driver_* 函数由 harness 自身调用（address(this) 为 payer/operator），sender 取 sender_pool 中与 property_sender 一致的 0x...010000，仅作为交易发起者，不影响内部角色绑定。",
+              "amount 取 1e18，经 _boundAmount 后非零，满足 amount==0 守卫的 false 分支。",
+              "driver_authorizePayment 的 maxAmount 在源码中被强制覆盖为 amount，故传相同值；feeBps 参数未使用，传 0。",
+              "driver_chargePayment 的 feeBps 取 100（1%），经 feeBps%10001 后仍在 0-10000 范围内，满足 fee 校验。",
+              "driver_refundPayment 的 paymentIndex 取 0，在 paymentRefCounter 已由前两笔驱动推进（>=2）后，paymentRef=bytes8(uint64(1+0%counter))=1，对应第一笔授权支付；refundAmount 取 1e18 不超过该授权可退款额度，避免 'Insufficient refundable amount' 内部回滚。",
+              "退款路径从 operator（harness 自身）拉取代币，源码已 mint 并 approve wrapper，故余额充足。",
+              "所有交易 value_wei 为 0，函数均非 payable；delay 均为 0。",
+              "无法静态确认 wrapper.refundPayment 对 paymentRef=1 的可退款额度精确值，若回放仍报 Insufficient refundable amount，需下调 refundAmount 或调整 paymentIndex。"
+            ],
+            "execution_feedback": "执行反馈分类：execution_failure。检查失败交易的守卫和状态读写；若缺少前序状态则重新规划，否则修正具体参数。 不要声称已验证。证据：{\"replay_status\": \"replay_failed\", \"deployment_status\": \"success\", \"initial_property_violations\": [], \"failed_transactions\": [{\"index\": 3, \"function\": \"driver_refundPayment(uint256,uint256)\", \"status\": \"success\", \"execution_class\": \"unexpected_internal_revert\", \"expected_outcome\": \"state_change\", \"internal_errors\": [{\"depth\": 1, \"type\": \"CALL\", \"address\": \"0x9491f0dfb965bc45570dd449801432599f0542a0\", \"error\": \"execution reverted\", \"output\": \"0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000\"}, {\"depth\": 2, \"type\": \"CALL\", \"address\": \"0x01375317aa980daabf22f990a378eccad9b40dc0\", \"error\": \"execution reverted\", \"output\": \"0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000\"}], \"dependency_errors\": null, \"prior_events\": null, \"argument_bindings\": [], \"execution_effect_error\": \"internal call reverted without an explicit rejection expectation\"}], \"property_errors\": [null]}"
+          },
+          "agent_b": {
+            "logical_calls": 2,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_Request_c451c4279019-01-c451c42790194538cf50-seq1_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 7618,
+                  "prompt_cache_hit_tokens": 1536,
+                  "prompt_cache_miss_tokens": 6082,
+                  "completion_tokens": 700,
+                  "total_tokens": 8318,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.001336908",
+                    "peak": "0.002673816"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 4.084,
+                "attempt": 1,
+                "prompt_utf8_bytes": 26298,
+                "invalid_record_count": null
+              },
+              {
+                "tag": "AgentB_Request_c451c4279019-01-c451c42790194538cf50-seq1_try2",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 8067,
+                  "prompt_cache_hit_tokens": 7552,
+                  "prompt_cache_miss_tokens": 515,
+                  "completion_tokens": 747,
+                  "total_tokens": 8814,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000548106",
+                    "peak": "0.001096212"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 4.374,
+                "attempt": 1,
+                "prompt_utf8_bytes": 27745,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "Request",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "c451c4279019-01-c451c42790194538cf50-seq1",
+              "replay_status": "replay_failed",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_captured_never_exceeds_authorized()": true,
+                "echidna_escrow_not_token_sink()": true,
+                "echidna_escrow_state_consistent()": true,
+                "echidna_fee_bps_validation_enforced()": true,
+                "echidna_fee_calc_no_overflow()": true,
+                "echidna_fee_never_exceeds_capture()": true,
+                "echidna_fee_receiver_only_gets_fees()": true,
+                "echidna_invalid_fee_bps_reverts()": true,
+                "echidna_merchant_receives_nonnegative()": true,
+                "echidna_no_underflow_in_merchant_payment()": true,
+                "echidna_operator_authorization_enforced()": true,
+                "echidna_payment_ref_counter_monotonic()": true,
+                "echidna_token_conservation()": true,
+                "echidna_token_supply_never_decreases()": true,
+                "echidna_uint96_sufficient_range()": true,
+                "echidna_wrapper_not_token_sink()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "arguments": [
+                    1000000000000000000,
+                    1000000000000000000,
+                    0
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "1a0fe92fec66631ff60041654ea3531e50f707a329409feb7851004f83b3dfb9",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 367704,
+                  "execution_class": "state_established",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [],
+                  "changed_storage_slot_count": 14,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "PaymentAuthorized",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000001",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                        "amount": 1000000000000000000,
+                        "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96"
+                      }
+                    },
+                    {
+                      "name": "CommercePaymentAuthorized",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000001",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "amount": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "54f58d9aac6740a3e45f196d3a462619c915cd70890139ad504703085495e38f",
+                  "state_fingerprint_after": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                },
+                {
+                  "index": 2,
+                  "function": "driver_chargePayment(uint256,uint16)",
+                  "arguments": [
+                    1000000000000000000,
+                    100
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "e5957e82ec6c15f9d458be10057638dab4f010020053cc3a42f407c44aa4c431",
+                  "block_number": 4370002,
+                  "status": "success",
+                  "gas_used": 422725,
+                  "execution_class": "state_established",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [],
+                  "changed_storage_slot_count": 16,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                        "value": 0
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "to": "0x0000000000000000000000000000000000002000",
+                        "value": 990000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "to": "0x0000000000000000000000000000000000004000",
+                        "value": 10000000000000000
+                      }
+                    },
+                    {
+                      "name": "TransferWithReferenceAndFee",
+                      "address": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                      "fields": {
+                        "paymentReference": "0x859f11b75569a4eb0496c5138fd42cc52aee8cf5c4e7cfafe58c92b2ed138e04",
+                        "tokenAddress": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                        "to": "0x0000000000000000000000000000000000002000",
+                        "amount": 990000000000000000,
+                        "feeAmount": 10000000000000000,
+                        "feeAddress": "0x0000000000000000000000000000000000004000"
+                      }
+                    },
+                    {
+                      "name": "PaymentCharged",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000002",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                        "amount": 1000000000000000000,
+                        "commercePaymentHash": "0x8f7e54cbc66eb9fa6cc5512b573158e7375a39345f306071093ea89843b0ec22"
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._balances",
+                    "MockERC20._totalSupply"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._balances",
+                    "MockERC20._totalSupply"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+                  "state_fingerprint_after": "b7221dbbdf174861217426fbc04896b685154af860531ad1ed9c17f2ef0f24dc",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                },
+                {
+                  "index": 3,
+                  "function": "driver_refundPayment(uint256,uint256)",
+                  "arguments": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "f2e83f7b2a7fdb3c7505f7bfe47e767d7abf7f73ad3470a5de8106705ca12b61",
+                  "block_number": 4370003,
+                  "status": "success",
+                  "gas_used": 158267,
+                  "execution_class": "unexpected_internal_revert",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [
+                    {
+                      "depth": 1,
+                      "type": "CALL",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "error": "execution reverted",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+                    },
+                    {
+                      "depth": 2,
+                      "type": "CALL",
+                      "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "error": "execution reverted",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+                    }
+                  ],
+                  "changed_storage_slot_count": 4,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "value": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "execution_effect_error": "internal call reverted without an explicit rejection expectation",
+                  "state_fingerprint_before": "b7221dbbdf174861217426fbc04896b685154af860531ad1ed9c17f2ef0f24dc",
+                  "state_fingerprint_after": "2117961d2983da0c1ed2882028f844c7abafaf0a902eb900ea5629e92973733a",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "resolved_transactions": [
+                {
+                  "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "arguments": [
+                    1000000000000000000,
+                    1000000000000000000,
+                    0
+                  ],
+                  "expected_outcome": "state_change"
+                },
+                {
+                  "function": "driver_chargePayment(uint256,uint16)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "arguments": [
+                    1000000000000000000,
+                    100
+                  ],
+                  "expected_outcome": "state_change"
+                },
+                {
+                  "function": "driver_refundPayment(uint256,uint256)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "arguments": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "expected_outcome": "state_change",
+                  "data_dependencies": [
+                    {
+                      "from_transaction": 1,
+                      "event": "",
+                      "field": "paymentRefCounter",
+                      "note": "driver_refundPayment 依赖 paymentRefCounter>0；该计数器由前序 driver_authorizePayment 内部 _getNextPaymentRef() 推进。源码未暴露可引用事件字段，故以状态依赖说明。"
+                    }
+                  ]
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 1.342,
+              "elapsed_from_run_start_seconds": 8.994
+            },
+            {
+              "project": "Request",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "c451c4279019-01-c451c42790194538cf50-seq1",
+              "replay_status": "replay_failed",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_captured_never_exceeds_authorized()": true,
+                "echidna_escrow_not_token_sink()": true,
+                "echidna_escrow_state_consistent()": true,
+                "echidna_fee_bps_validation_enforced()": true,
+                "echidna_fee_calc_no_overflow()": true,
+                "echidna_fee_never_exceeds_capture()": true,
+                "echidna_fee_receiver_only_gets_fees()": true,
+                "echidna_invalid_fee_bps_reverts()": true,
+                "echidna_merchant_receives_nonnegative()": true,
+                "echidna_no_underflow_in_merchant_payment()": true,
+                "echidna_operator_authorization_enforced()": true,
+                "echidna_payment_ref_counter_monotonic()": true,
+                "echidna_token_conservation()": true,
+                "echidna_token_supply_never_decreases()": true,
+                "echidna_uint96_sufficient_range()": true,
+                "echidna_wrapper_not_token_sink()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "arguments": [
+                    1000000000000000000,
+                    1000000000000000000,
+                    0
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "1a0fe92fec66631ff60041654ea3531e50f707a329409feb7851004f83b3dfb9",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 367704,
+                  "execution_class": "state_established",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [],
+                  "changed_storage_slot_count": 14,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "PaymentAuthorized",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000001",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                        "amount": 1000000000000000000,
+                        "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96"
+                      }
+                    },
+                    {
+                      "name": "CommercePaymentAuthorized",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000001",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "amount": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "54f58d9aac6740a3e45f196d3a462619c915cd70890139ad504703085495e38f",
+                  "state_fingerprint_after": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                },
+                {
+                  "index": 2,
+                  "function": "driver_chargePayment(uint256,uint16)",
+                  "arguments": [
+                    1000000000000000000,
+                    100
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "e5957e82ec6c15f9d458be10057638dab4f010020053cc3a42f407c44aa4c431",
+                  "block_number": 4370002,
+                  "status": "success",
+                  "gas_used": 422725,
+                  "execution_class": "state_established",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [],
+                  "changed_storage_slot_count": 16,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                        "value": 0
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "to": "0x0000000000000000000000000000000000002000",
+                        "value": 990000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "to": "0x0000000000000000000000000000000000004000",
+                        "value": 10000000000000000
+                      }
+                    },
+                    {
+                      "name": "TransferWithReferenceAndFee",
+                      "address": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                      "fields": {
+                        "paymentReference": "0x859f11b75569a4eb0496c5138fd42cc52aee8cf5c4e7cfafe58c92b2ed138e04",
+                        "tokenAddress": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                        "to": "0x0000000000000000000000000000000000002000",
+                        "amount": 990000000000000000,
+                        "feeAmount": 10000000000000000,
+                        "feeAddress": "0x0000000000000000000000000000000000004000"
+                      }
+                    },
+                    {
+                      "name": "PaymentCharged",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000002",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                        "amount": 1000000000000000000,
+                        "commercePaymentHash": "0x8f7e54cbc66eb9fa6cc5512b573158e7375a39345f306071093ea89843b0ec22"
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._balances",
+                    "MockERC20._totalSupply"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._balances",
+                    "MockERC20._totalSupply"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+                  "state_fingerprint_after": "b7221dbbdf174861217426fbc04896b685154af860531ad1ed9c17f2ef0f24dc",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                },
+                {
+                  "index": 3,
+                  "function": "driver_refundPayment(uint256,uint256)",
+                  "arguments": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "f2e83f7b2a7fdb3c7505f7bfe47e767d7abf7f73ad3470a5de8106705ca12b61",
+                  "block_number": 4370003,
+                  "status": "success",
+                  "gas_used": 158267,
+                  "execution_class": "unexpected_internal_revert",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [
+                    {
+                      "depth": 1,
+                      "type": "CALL",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "error": "execution reverted",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+                    },
+                    {
+                      "depth": 2,
+                      "type": "CALL",
+                      "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "error": "execution reverted",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+                    }
+                  ],
+                  "changed_storage_slot_count": 4,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "value": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "execution_effect_error": "internal call reverted without an explicit rejection expectation",
+                  "state_fingerprint_before": "b7221dbbdf174861217426fbc04896b685154af860531ad1ed9c17f2ef0f24dc",
+                  "state_fingerprint_after": "2117961d2983da0c1ed2882028f844c7abafaf0a902eb900ea5629e92973733a",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "resolved_transactions": [
+                {
+                  "index": 1,
+                  "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "abi_signature": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "arguments": [
+                    1000000000000000000,
+                    1000000000000000000,
+                    0
+                  ],
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change",
+                  "data_dependencies": []
+                },
+                {
+                  "index": 2,
+                  "function": "driver_chargePayment(uint256,uint16)",
+                  "abi_signature": "driver_chargePayment(uint256,uint16)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "arguments": [
+                    1000000000000000000,
+                    100
+                  ],
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change",
+                  "data_dependencies": []
+                },
+                {
+                  "index": 3,
+                  "function": "driver_refundPayment(uint256,uint256)",
+                  "abi_signature": "driver_refundPayment(uint256,uint256)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "arguments": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change",
+                  "data_dependencies": [
+                    {
+                      "depends_on_transaction": 1,
+                      "field": "paymentIndex",
+                      "relation": "paymentIndex=0 映射到 paymentRefCounter 推进后的第一个 paymentRef（bytes8(uint64(1+0%counter))），即前序 driver_authorizePayment 创建的授权支付引用"
+                    }
+                  ]
+                }
+              ],
+              "attempt": 2,
+              "elapsed_seconds": 1.304,
+              "elapsed_from_run_start_seconds": 14.673
+            }
+          ],
+          "failure_class": "execution_failure",
+          "planned_target_path_reached": false,
+          "error": null,
+          "elapsed_seconds": 11.107
+        },
+        {
+          "candidate_id": "c451c4279019-02-c451c42790194538cf50-seq1",
+          "plan": [
+            {
+              "function": "driver_authorizePayment(uint256,uint256,uint16)",
+              "rationale": "先创建支付引用（paymentRefCounter 从 0 变为非零），并授权一笔可退款支付，使后续 refundPayment 有可退余额；同时 mint 增加 supply 与 wrapper/escrow 余额，保持守恒账户集合覆盖。"
+            },
+            {
+              "function": "driver_refundPayment(uint256,uint256)",
+              "rationale": "在 paymentRefCounter 非零且存在已授权支付后执行退款，避免此前因无支付引用或无可退款金额导致的内部 revert；退款金额需不超过该支付的可退款余额。"
+            }
+          ],
+          "status": "replay_failed",
+          "seed_class": "echidna_only_diagnostic_candidate",
+          "seed_id": null,
+          "corpus_file": null,
+          "concrete_seed": {
+            "property_id": "c451c42790194538cf50",
+            "candidate_id": "c451c4279019-02-c451c42790194538cf50-seq1",
+            "transactions": [
+              {
+                "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                "arguments": [
+                  1000000000000000000,
+                  1000000000000000000,
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change"
+              },
+              {
+                "function": "driver_refundPayment(uint256,uint256)",
+                "arguments": [
+                  0,
+                  1000000000000000000
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change",
+                "data_dependencies": [
+                  {
+                    "from_transaction": 1,
+                    "event": "PaymentAuthorized",
+                    "field": "paymentReference",
+                    "note": "refundPayment 的 paymentRef 由 paymentIndex=0 映射到 paymentRefCounter=1 后的 bytes8(uint64(1))，即第一笔授权产生的引用；若事件字段不可用则依赖 paymentRefCounter 语义"
+                  }
+                ]
+              }
+            ],
+            "assumptions": [
+              "driver_authorizePayment 内部将 amount 经 _boundAmount 处理并 mint 给 harness 自身，随后 approve mockEscrow 并调用 wrapper.authorizePayment；假设 amount=1e18 在 _boundAmount 范围内且非零，授权成功使 paymentRefCounter 从 0 变为 1。",
+              "driver_refundPayment 中 paymentRef = bytes8(uint64(1 + (paymentIndex % paymentRefCounter)))。取 paymentIndex=0 且 paymentRefCounter=1 时 paymentRef=bytes8(uint64(1))，对应第一笔授权使用的 _getNextPaymentRef 结果（假设 _getNextPaymentRef 从 1 开始递增）。",
+              "上一轮失败原因为 refundAmount 超过该支付的可退款余额（Insufficient refundable amount）。本轮将 refundAmount 设为与授权 amount 相同的 1e18，假设该支付的可退款余额等于授权金额（未 capture/void 且无手续费扣减）。",
+              "refund 流程从 operator（harness 自身）拉取代币，driver 已 mint 并 approve wrapper；假设 wrapper 的 refundPayment 对 operator 的扣款路径与 approve 目标一致。",
+              "sender 选择 harness 地址 0x0000000000000000000000000000000000010000，因为 driver 函数以 address(this) 作为 payer/operator，且该地址在 sender_pool 中。",
+              "未声称已验证可执行；实际回放由验证器检查 echidna_token_conservation 属性。"
+            ],
+            "execution_feedback": "执行反馈分类：execution_failure。检查失败交易的守卫和状态读写；若缺少前序状态则重新规划，否则修正具体参数。 不要声称已验证。证据：{\"replay_status\": \"replay_failed\", \"deployment_status\": \"success\", \"initial_property_violations\": [], \"failed_transactions\": [{\"index\": 2, \"function\": \"driver_refundPayment(uint256,uint256)\", \"status\": \"success\", \"execution_class\": \"unexpected_internal_revert\", \"expected_outcome\": \"state_change\", \"internal_errors\": [{\"depth\": 1, \"type\": \"CALL\", \"address\": \"0x9491f0dfb965bc45570dd449801432599f0542a0\", \"error\": \"execution reverted\", \"output\": \"0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000\"}, {\"depth\": 2, \"type\": \"CALL\", \"address\": \"0x01375317aa980daabf22f990a378eccad9b40dc0\", \"error\": \"execution reverted\", \"output\": \"0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000\"}], \"dependency_errors\": null, \"prior_events\": null, \"argument_bindings\": [], \"execution_effect_error\": \"internal call reverted without an explicit rejection expectation\"}], \"property_errors\": [null]}"
+          },
+          "agent_b": {
+            "logical_calls": 2,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_Request_c451c4279019-02-c451c42790194538cf50-seq1_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 5948,
+                  "prompt_cache_hit_tokens": 1536,
+                  "prompt_cache_miss_tokens": 4412,
+                  "completion_tokens": 637,
+                  "total_tokens": 6585,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.001048608",
+                    "peak": "0.002097216"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 3.677,
+                "attempt": 1,
+                "prompt_utf8_bytes": 20356,
+                "invalid_record_count": null
+              },
+              {
+                "tag": "AgentB_Request_c451c4279019-02-c451c42790194538cf50-seq1_try2",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 6397,
+                  "prompt_cache_hit_tokens": 5888,
+                  "prompt_cache_miss_tokens": 509,
+                  "completion_tokens": 607,
+                  "total_tokens": 7004,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000458214",
+                    "peak": "0.000916428"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 3.677,
+                "attempt": 1,
+                "prompt_utf8_bytes": 21803,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "Request",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "c451c4279019-02-c451c42790194538cf50-seq1",
+              "replay_status": "replay_failed",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_captured_never_exceeds_authorized()": true,
+                "echidna_escrow_not_token_sink()": true,
+                "echidna_escrow_state_consistent()": true,
+                "echidna_fee_bps_validation_enforced()": true,
+                "echidna_fee_calc_no_overflow()": true,
+                "echidna_fee_never_exceeds_capture()": true,
+                "echidna_fee_receiver_only_gets_fees()": true,
+                "echidna_invalid_fee_bps_reverts()": true,
+                "echidna_merchant_receives_nonnegative()": true,
+                "echidna_no_underflow_in_merchant_payment()": true,
+                "echidna_operator_authorization_enforced()": true,
+                "echidna_payment_ref_counter_monotonic()": true,
+                "echidna_token_conservation()": true,
+                "echidna_token_supply_never_decreases()": true,
+                "echidna_uint96_sufficient_range()": true,
+                "echidna_wrapper_not_token_sink()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "arguments": [
+                    1000000000000000000,
+                    1000000000000000000,
+                    0
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "1a0fe92fec66631ff60041654ea3531e50f707a329409feb7851004f83b3dfb9",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 367704,
+                  "execution_class": "state_established",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [],
+                  "changed_storage_slot_count": 14,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "PaymentAuthorized",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000001",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                        "amount": 1000000000000000000,
+                        "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96"
+                      }
+                    },
+                    {
+                      "name": "CommercePaymentAuthorized",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000001",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "amount": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "54f58d9aac6740a3e45f196d3a462619c915cd70890139ad504703085495e38f",
+                  "state_fingerprint_after": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                },
+                {
+                  "index": 2,
+                  "function": "driver_refundPayment(uint256,uint256)",
+                  "arguments": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "17bd9359026ffbc658ae1cbd6d8c70cff4c3847dee2886acf27a8c6c1e2eb4d8",
+                  "block_number": 4370002,
+                  "status": "success",
+                  "gas_used": 158267,
+                  "execution_class": "unexpected_internal_revert",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [
+                    {
+                      "depth": 1,
+                      "type": "CALL",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "error": "execution reverted",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+                    },
+                    {
+                      "depth": 2,
+                      "type": "CALL",
+                      "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "error": "execution reverted",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+                    }
+                  ],
+                  "changed_storage_slot_count": 4,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "value": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "execution_effect_error": "internal call reverted without an explicit rejection expectation",
+                  "state_fingerprint_before": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+                  "state_fingerprint_after": "458c9fad80ef587887861dd2d0660409b8368f8ea3b0e010ddca3201e46072ca",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "resolved_transactions": [
+                {
+                  "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "arguments": [
+                    1000000000000000000,
+                    1000000000000000000,
+                    0
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change"
+                },
+                {
+                  "function": "driver_refundPayment(uint256,uint256)",
+                  "arguments": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change",
+                  "data_dependencies": [
+                    {
+                      "from_transaction": 1,
+                      "event": "driver_authorizePayment",
+                      "field": "paymentRefCounter"
+                    }
+                  ]
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 0.981,
+              "elapsed_from_run_start_seconds": 22.155
+            },
+            {
+              "project": "Request",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "c451c4279019-02-c451c42790194538cf50-seq1",
+              "replay_status": "replay_failed",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_captured_never_exceeds_authorized()": true,
+                "echidna_escrow_not_token_sink()": true,
+                "echidna_escrow_state_consistent()": true,
+                "echidna_fee_bps_validation_enforced()": true,
+                "echidna_fee_calc_no_overflow()": true,
+                "echidna_fee_never_exceeds_capture()": true,
+                "echidna_fee_receiver_only_gets_fees()": true,
+                "echidna_invalid_fee_bps_reverts()": true,
+                "echidna_merchant_receives_nonnegative()": true,
+                "echidna_no_underflow_in_merchant_payment()": true,
+                "echidna_operator_authorization_enforced()": true,
+                "echidna_payment_ref_counter_monotonic()": true,
+                "echidna_token_conservation()": true,
+                "echidna_token_supply_never_decreases()": true,
+                "echidna_uint96_sufficient_range()": true,
+                "echidna_wrapper_not_token_sink()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "arguments": [
+                    1000000000000000000,
+                    1000000000000000000,
+                    0
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "1a0fe92fec66631ff60041654ea3531e50f707a329409feb7851004f83b3dfb9",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 367704,
+                  "execution_class": "state_established",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [],
+                  "changed_storage_slot_count": 14,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "PaymentAuthorized",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000001",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+                        "amount": 1000000000000000000,
+                        "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96"
+                      }
+                    },
+                    {
+                      "name": "CommercePaymentAuthorized",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "fields": {
+                        "paymentReference": "0x0000000000000001",
+                        "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "merchant": "0x0000000000000000000000000000000000002000",
+                        "amount": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+                        "value": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "54f58d9aac6740a3e45f196d3a462619c915cd70890139ad504703085495e38f",
+                  "state_fingerprint_after": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                },
+                {
+                  "index": 2,
+                  "function": "driver_refundPayment(uint256,uint256)",
+                  "arguments": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "17bd9359026ffbc658ae1cbd6d8c70cff4c3847dee2886acf27a8c6c1e2eb4d8",
+                  "block_number": 4370002,
+                  "status": "success",
+                  "gas_used": 158267,
+                  "execution_class": "unexpected_internal_revert",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [
+                    {
+                      "depth": 1,
+                      "type": "CALL",
+                      "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                      "error": "execution reverted",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+                    },
+                    {
+                      "depth": 2,
+                      "type": "CALL",
+                      "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "error": "execution reverted",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+                    }
+                  ],
+                  "changed_storage_slot_count": 4,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Approval",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "spender": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+                        "value": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 17,
+                  "tracked_contract_count": 8,
+                  "tracked_contract_types": [
+                    "ERC20CommerceEscrowWrapper",
+                    "Harness",
+                    "IAuthCaptureEscrow",
+                    "IERC20",
+                    "IERC20FeeProxy",
+                    "MockAuthCaptureEscrow",
+                    "MockERC20",
+                    "MockERC20FeeProxy"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "MockERC20._totalSupply",
+                    "MockERC20._balances"
+                  ],
+                  "execution_effect_error": "internal call reverted without an explicit rejection expectation",
+                  "state_fingerprint_before": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+                  "state_fingerprint_after": "458c9fad80ef587887861dd2d0660409b8368f8ea3b0e010ddca3201e46072ca",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_captured_never_exceeds_authorized()": true,
+                    "echidna_escrow_not_token_sink()": true,
+                    "echidna_escrow_state_consistent()": true,
+                    "echidna_fee_bps_validation_enforced()": true,
+                    "echidna_fee_calc_no_overflow()": true,
+                    "echidna_fee_never_exceeds_capture()": true,
+                    "echidna_fee_receiver_only_gets_fees()": true,
+                    "echidna_invalid_fee_bps_reverts()": true,
+                    "echidna_merchant_receives_nonnegative()": true,
+                    "echidna_no_underflow_in_merchant_payment()": true,
+                    "echidna_operator_authorization_enforced()": true,
+                    "echidna_payment_ref_counter_monotonic()": true,
+                    "echidna_token_conservation()": true,
+                    "echidna_token_supply_never_decreases()": true,
+                    "echidna_uint96_sufficient_range()": true,
+                    "echidna_wrapper_not_token_sink()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": []
+                }
+              ],
+              "resolved_transactions": [
+                {
+                  "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                  "arguments": [
+                    1000000000000000000,
+                    1000000000000000000,
+                    0
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change"
+                },
+                {
+                  "function": "driver_refundPayment(uint256,uint256)",
+                  "arguments": [
+                    0,
+                    1000000000000000000
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change",
+                  "data_dependencies": [
+                    {
+                      "from_transaction": 1,
+                      "event": "PaymentAuthorized",
+                      "field": "paymentReference",
+                      "note": "refundPayment 的 paymentRef 由 paymentIndex=0 映射到 paymentRefCounter=1 后的 bytes8(uint64(1))，即第一笔授权产生的引用；若事件字段不可用则依赖 paymentRefCounter 语义"
+                    }
+                  ]
+                }
+              ],
+              "attempt": 2,
+              "elapsed_seconds": 1.219,
+              "elapsed_from_run_start_seconds": 27.053
+            }
+          ],
+          "failure_class": "execution_failure",
+          "planned_target_path_reached": false,
+          "error": null,
+          "elapsed_seconds": 9.558
+        }
+      ],
+      "status": "no_valid_evm_seed",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Request_c451c42790194538cf50_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 10472,
+              "prompt_cache_hit_tokens": 512,
+              "prompt_cache_miss_tokens": 9960,
+              "completion_tokens": 431,
+              "total_tokens": 10903,
+              "estimated_cost_usd": {
+                "offpeak": "0.001754136",
+                "peak": "0.003508272"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 3.105,
+            "attempt": 1,
+            "prompt_utf8_bytes": 35052,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "c451c42790194538cf50",
+                "candidate_id": "c451c42790194538cf50-seq1",
+                "steps": [
+                  {
+                    "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                    "rationale": "先执行授权支付驱动：内部 mint 增加 MockERC20 供应与余额，并推进 paymentRefCounter，为后续依赖 paymentRefCounter 的退款驱动建立前置状态；同时产生 wrapper/mockEscrow 余额变化，用于检验 token 守恒。"
+                  },
+                  {
+                    "function": "driver_chargePayment(uint256,uint16)",
+                    "rationale": "执行 charge 驱动：再次 mint 并走 wrapper.chargePayment，产生授权+捕获路径下的余额与供应变化，覆盖 fee 相关转账对守恒等式的影响。"
+                  },
+                  {
+                    "function": "driver_refundPayment(uint256,uint256)",
+                    "rationale": "在 paymentRefCounter 已由前序驱动推进后执行退款驱动：mint 退款金额并调用 wrapper.refundPayment，检验退款路径下供应与各账户余额之和是否仍等于 totalSupply。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "driver_* 函数在 Echidna 中以 address(this) 作为 payer/operator，且构造函数已预授权 wrapper 与 feeProxy；因此无需额外 approve 准备交易。",
+              "driver_authorizePayment 与 driver_chargePayment 通过 _getNextPaymentRef 推进 paymentRefCounter，可满足 driver_refundPayment 的 paymentRefCounter != 0 守卫；但该生产关系为静态候选，未证明 wrapper 调用一定成功。",
+              "token_conservation 断言读取 token.totalSupply 与多个固定角色地址及 wrapper/mockEscrow 余额之和；若 wrapper 或 escrow 将代币转给未计入的地址，等式可能不成立，但本规划不负责参数具体化。",
+              "candidate_actions 仅含三个 seed_compatible 驱动；capture/reclaim/void 驱动未出现在候选清单中，故未纳入序列。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "replanning": [
+        {
+          "trigger_candidate_id": "c451c4279019-01-c451c42790194538cf50-seq1",
+          "failure_class": "execution_failure",
+          "feedback": "执行反馈分类：execution_failure。检查失败交易的守卫和状态读写；若缺少前序状态则重新规划，否则修正具体参数。 不要声称已验证。证据：{\"replay_status\": \"replay_failed\", \"deployment_status\": \"success\", \"initial_property_violations\": [], \"failed_transactions\": [{\"index\": 3, \"function\": \"driver_refundPayment(uint256,uint256)\", \"status\": \"success\", \"execution_class\": \"unexpected_internal_revert\", \"expected_outcome\": \"state_change\", \"internal_errors\": [{\"depth\": 1, \"type\": \"CALL\", \"address\": \"0x9491f0dfb965bc45570dd449801432599f0542a0\", \"error\": \"execution reverted\", \"output\": \"0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000\"}, {\"depth\": 2, \"type\": \"CALL\", \"address\": \"0x01375317aa980daabf22f990a378eccad9b40dc0\", \"error\": \"execution reverted\", \"output\": \"0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000\"}], \"dependency_errors\": null, \"prior_events\": null, \"argument_bindings\": [], \"execution_effect_error\": \"internal call reverted without an explicit rejection expectation\"}], \"property_errors\": [null]}",
+          "result": {
+            "status": "planned",
+            "plans": [
+              {
+                "property_sequences": [
+                  {
+                    "property_id": "c451c42790194538cf50",
+                    "candidate_id": "c451c42790194538cf50-seq1",
+                    "steps": [
+                      {
+                        "function": "driver_authorizePayment(uint256,uint256,uint16)",
+                        "rationale": "先创建支付引用（paymentRefCounter 从 0 变为非零），并授权一笔可退款支付，使后续 refundPayment 有可退余额；同时 mint 增加 supply 与 wrapper/escrow 余额，保持守恒账户集合覆盖。"
+                      },
+                      {
+                        "function": "driver_refundPayment(uint256,uint256)",
+                        "rationale": "在 paymentRefCounter 非零且存在已授权支付后执行退款，避免此前因无支付引用或无可退款金额导致的内部 revert；退款金额需不超过该支付的可退款余额。"
+                      }
+                    ]
+                  }
+                ],
+                "shared_prefixes": [],
+                "assumptions": [
+                  "driver_authorizePayment 内部以 address(this) 作为 payer/operator，且 MERCHANT 为固定地址；授权成功后 wrapper 与 mockEscrow 的余额变化应被 echidna_token_conservation 的账户集合覆盖。",
+                  "driver_refundPayment 的 refundAmount 必须不超过对应 paymentRef 的可退款金额，否则 wrapper 会以 'Insufficient refundable amount' 回滚；参数具体化由执行器负责。",
+                  "paymentRefCounter 由 _getNextPaymentRef 递增，authorizePayment 成功路径会使其非零；若授权因其他守卫失败，refund 仍可能因无可退款支付而回滚。"
+                ],
+                "shared_prefixes_ignored": true,
+                "applied_shared_prefixes": [],
+                "invalid_records": [],
+                "canonicalized_signatures": [],
+                "recovery_summary": {
+                  "valid_candidate_count": 1,
+                  "invalid_record_count": 0,
+                  "applied_shared_prefix_count": 0
+                }
+              }
+            ]
+          },
+          "agent_a": {
+            "logical_calls": 1,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentA_Request_c451c42790194538cf50_replan1_plan1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 10921,
+                  "prompt_cache_hit_tokens": 512,
+                  "prompt_cache_miss_tokens": 10409,
+                  "completion_tokens": 326,
+                  "total_tokens": 11247,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.001758486",
+                    "peak": "0.003516972"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 2.82,
+                "attempt": 1,
+                "prompt_utf8_bytes": 36499,
+                "invalid_record_count": 0
+              }
+            ]
+          }
+        }
+      ],
+      "valid_evm_seed_count": 0,
+      "elapsed_seconds": 26.922
+    }
+  ],
+  "echidna": [
+    {
+      "project": "Request",
+      "property_name": "echidna_token_conservation",
+      "test_mode": "property",
+      "command": [
+        "/usr/local/bin/echidna",
+        "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+        "--contract",
+        "EchidnaERC20CommerceEscrowWrapper",
+        "--crytic-args",
+        "--config-file /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/Request-c451c42790194538cf50-crytic-compile.json",
+        "--config",
+        "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/Request-c451c42790194538cf50-echidna.yaml",
+        "--test-limit",
+        "80",
+        "--seq-len",
+        "8",
+        "--shrink-limit",
+        "1",
+        "--seed",
+        "20261122",
+        "--workers",
+        "1",
+        "--format",
+        "text",
+        "--deployer",
+        "0x0000000000000000000000000000000000030000",
+        "--contract-addr",
+        "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "--sender",
+        "0x0000000000000000000000000000000000010000",
+        "--sender",
+        "0x0000000000000000000000000000000000020000",
+        "--sender",
+        "0x0000000000000000000000000000000000030000",
+        "--sender",
+        "0x0000000000000000000000000000000000040000",
+        "--sender",
+        "0x0000000000000000000000000000000000050000",
+        "--sender",
+        "0x0000000000000000000000000000000000003000",
+        "--disable-slither"
+      ],
+      "exit_code": 0,
+      "status": "completed",
+      "timed_out": false,
+      "seed": 20261122,
+      "test_limit": 80,
+      "seq_len": 8,
+      "shrink_limit": 1,
+      "elapsed_seconds": 1.428,
+      "loaded_seed_count": 0,
+      "loaded_seed_evidence": false,
+      "replayed_sequence_count": 0,
+      "replay_evidence": false,
+      "replayed_lines": [],
+      "mutation_evidence": false,
+      "fuzzing_transactions": 84,
+      "fuzzing_cases": 80,
+      "fuzzing_progress_count": 84,
+      "fuzzing_progress_limit": 80,
+      "worker_crashes": [],
+      "unique_instructions": 11726,
+      "coverage_source": "final_unique_instructions",
+      "initial_corpus_file_count": 0,
+      "initial_corpus_files": [],
+      "full_log_path": "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/echidna.log",
+      "stop_on_fail": false,
+      "target_property_results": [
+        "echidna_token_conservation: passing"
+      ],
+      "property_failures": [],
+      "first_property_failure_observed_seconds": null,
+      "property_failure_time_is_upper_bound": false,
+      "initial_state_failures": [],
+      "output": "[2026-11-16 18:05:10.37] Compiling `sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.449964586s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol:EchidnaERC20CommerceEscrowWrapper\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/reproducers\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage\n[2026-11-16 18:05:11.01] [Worker 0] New coverage: 2798 instr, 5 contracts, 1 seqs in corpus\n[2026-11-16 18:05:11.01]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/6074757127352086557.txt\n[2026-11-16 18:05:11.03] [Worker 0] New coverage: 2893 instr, 5 contracts, 2 seqs in corpus\n[2026-11-16 18:05:11.04]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/2146948606191278927.txt\n[2026-11-16 18:05:11.06] [Worker 0] New coverage: 3004 instr, 5 contracts, 3 seqs in corpus\n[2026-11-16 18:05:11.06]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/545293093813143619.txt\n[2026-11-16 18:05:11.08] [Worker 0] New coverage: 3029 instr, 5 contracts, 4 seqs in corpus\n[2026-11-16 18:05:11.08]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/5592116692883991964.txt\n[2026-11-16 18:05:11.12] [Worker 0] New coverage: 10911 instr, 5 contracts, 5 seqs in corpus\n[2026-11-16 18:05:11.12]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/3177123743499750194.txt\n[2026-11-16 18:05:11.16] [Worker 0] New coverage: 11296 instr, 5 contracts, 6 seqs in corpus\n[2026-11-16 18:05:11.16]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/4686431955555495571.txt\n[2026-11-16 18:05:11.16] [Worker 0] New coverage: 11321 instr, 5 contracts, 7 seqs in corpus\n[2026-11-16 18:05:11.16]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/6486057326796048246.txt\n[2026-11-16 18:05:11.19] [Worker 0] New coverage: 11572 instr, 5 contracts, 8 seqs in corpus\n[2026-11-16 18:05:11.19]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/7749687909835805977.txt\n[2026-11-16 18:05:11.22] [Worker 0] New coverage: 11658 instr, 5 contracts, 9 seqs in corpus\n[2026-11-16 18:05:11.22]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/Echidna/c451c42790194538cf50/coverage/5677040895575223351.txt\n[2026-11-16 18:05:11.25] [Worker 0] New coverage: 11726 instr, 5 contracts, 10 seqs in corpus\n[2026-11-16 18:05:11.25] [Worker 0] Test limit reached. Stopping.\n[2026-11-16 18:05:11.25] [status] tests: 0/1, fuzzing: 84/80, values: [], cov: 11726, corpus: 10, gas/s: 0\nechidna_token_conservation: passing\n\nUnique instructions: 11726\nUnique codehashes: 5\nCorpus size: 10\nSeed: 20261122\nTotal calls: 84\n\n[2026-11-16 18:05:11.26] Saving test reproducers... Done! (0.000000562s)\n[2026-11-16 18:05:11.26] Saving corpus... Done! (0.001114018s)\n[2026-11-16 18:05:11.26] Saving foundry reproducers... Done! (0.000398337s)\n[2026-11-16 18:05:11.26] Saving coverage... Done! (0.445011607s)\n",
+      "property_id": "c451c42790194538cf50",
+      "input_seed_ids": [],
+      "input_seed_class": "none"
+    }
+  ],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1,
+    "execution_replans_per_property": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 45,
+    "agent_a_execution_replans_per_property": 1,
+    "token_budget": 100000,
+    "wall_budget_seconds": 300
+  },
+  "api_usage": {
+    "request_attempts": 6,
+    "failed_request_attempts": 0,
+    "unmetered_attempts": 0,
+    "prompt_tokens": 49423,
+    "completion_tokens": 3448,
+    "total_tokens": 52871,
+    "estimated_cost_usd_offpeak": "0.006904458",
+    "estimated_cost_usd_peak": "0.013808916",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 52871,
+  "total_elapsed_seconds": 28.488,
+  "anvil_start_error": null
+}

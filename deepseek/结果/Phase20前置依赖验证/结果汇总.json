@@ -1,0 +1,141 @@
+{
+  "phase": "Phase 20",
+  "baseline_commit": "c3ad80a",
+  "date": "2026-11-16",
+  "scope": "初始部署状态、通用前置条件候选链、执行失败分类及 Agent A 有限重规划",
+  "configuration": {
+    "max_candidates_per_property": 1,
+    "max_steps": 8,
+    "planning_repairs": 1,
+    "agent_b_schema_repairs": 1,
+    "agent_b_execution_repairs": 1,
+    "agent_a_execution_replans": 1,
+    "planned_token_budget_per_project": 80000,
+    "actual_token_budget_per_run": 100000,
+    "echidna_test_limit": 80,
+    "echidna_seq_len": 8,
+    "echidna_workers": 1,
+    "contract_source_modified": false
+  },
+  "deviations": [
+    "冻结方案为每项目 80000 Token；OpenNFTs 中间运行在该预算下出现预算预检失败，最终回归命令统一使用 100000 Token。该预算偏离已在报告披露，成功率不应解释为严格同预算的配对估计。",
+    "本阶段和历史基线的 Echidna 随机种子不同；单次 unique-instruction 差异仅作方向性观察。"
+  ],
+  "baseline_records": {
+    "OpenNFTs": {
+      "record": "../Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json",
+      "effective_seeds": "0/2",
+      "deep_path_proxy": "0/2",
+      "native_unique_instructions": {
+        "echidna_owner": 5041,
+        "echidna_balance": 5026
+      }
+    },
+    "Request": {
+      "record": "../Agent种子语料/Request/87d71f44d5a44898831f0cb74158bacc/逐属性Agent种子流程.json",
+      "effective_seeds": "0/1",
+      "deep_path_proxy": "0/1",
+      "note": "同一属性更早的 Phase 12 曾生成过种子；本对照引用 Phase 19 固定失败回归记录，历史随机运行并不一致。"
+    },
+    "Kink": {
+      "record": "../Agent种子语料/Kink/90793ecd687f4d8f8bdffb1a1d555769/逐属性Agent种子流程.json",
+      "effective_seeds": "1/1",
+      "deep_path_proxy": "1/1",
+      "role": "本阶段留出验证样本；不作为调参依据。"
+    }
+  },
+  "phase20_runs": [
+    {
+      "project": "OpenNFTs",
+      "record": "../Agent种子语料/OpenNFTs/e938b5eb980e41ffa735273ec22c8374/逐属性Agent种子流程.json",
+      "status": "failed_intermediate",
+      "valid_seeds": "0/2",
+      "failure_summary": [
+        "owner 属性：Agent B 校验器拒绝从公开 owner() Getter 得到的 address(42)，因为发送者池仍仅含固定账户。",
+        "balance 属性：Agent A 第一次返回无效记录，第二次受 80k Token 预算预检阻止。"
+      ],
+      "api_tokens": 27210
+    },
+    {
+      "project": "OpenNFTs",
+      "record": "../Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json",
+      "status": "completed",
+      "valid_seeds": "2/2",
+      "deep_path_proxy": "2/2",
+      "echidna_seed_loaded_replayed_mutated": "2/2",
+      "property_results": {
+        "echidna_owner": "seed falsified property; 771 unique instructions before early stop",
+        "echidna_balance": "passing; 5052 unique instructions; mint changed state but did not credit the property's target address"
+      },
+      "api_tokens": 29340,
+      "echidna_seeds": [20261120, 20261121]
+    },
+    {
+      "project": "Request",
+      "record": "../Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json",
+      "status": "completed_without_valid_seed",
+      "valid_seeds": "0/1",
+      "agent_a_replans": 1,
+      "failure_summary": "首个序列的 refundPayment 内部回滚，原因是 Insufficient refundable amount；当时分类为 execution_failure。有限重规划改序后仍回滚。",
+      "echidna_without_external_seed": {
+        "unique_instructions": 11726,
+        "target_property": "passing"
+      },
+      "api_tokens": 52871,
+      "echidna_seed": 20261122
+    },
+    {
+      "project": "Kink",
+      "record": "../Agent种子语料/Kink/c08c578f1e10461795553e32343417b9/逐属性Agent种子流程.json",
+      "status": "runtime_compatibility_failure",
+      "valid_seeds": "0/1",
+      "failure_summary": "Agent A 在 API 调用前触发 Python 3.8 不支持 dict | dict 的 TypeError；API 使用量为 0。",
+      "api_tokens": 0
+    },
+    {
+      "project": "Kink",
+      "record": "../Agent种子语料/Kink/34c99f73bc2f485786c2166a02fb85aa/逐属性Agent种子流程.json",
+      "status": "completed",
+      "valid_seeds": "1/1",
+      "deep_path_proxy": "1/1",
+      "sequence": [
+        "singleSidedAdd(uint256,uint256)",
+        "yankLiquidity(uint256)"
+      ],
+      "echidna_seed_loaded_replayed_mutated": "1/1",
+      "echidna_property": "passing",
+      "unique_instructions": 10632,
+      "api_tokens": 17005,
+      "echidna_seed": 20261125,
+      "holdout_note": "运行发生在 Request 驱动的 revert 分类补丁之前；该补丁仅在失败交易上执行，Kink 成功序列未触发该分支。未根据 Kink 结果修改规划机制。"
+    },
+    {
+      "project": "Request",
+      "record": "../Agent种子语料/Request/58e77e98bfd646b9844f6819b3f00947/逐属性Agent种子流程.json",
+      "status": "completed",
+      "valid_seeds": "1/1",
+      "deep_path_proxy": "1/1",
+      "sequence": [
+        "driver_chargePayment(uint256,uint16)",
+        "driver_refundPayment(uint256,uint256)"
+      ],
+      "echidna_seed_loaded_replayed_mutated": "1/1",
+      "echidna_property": "passing",
+      "unique_instructions": 18758,
+      "api_tokens": 17425,
+      "echidna_seed": 20261127
+    }
+  ],
+  "failure_classifier_replay_check": {
+    "source_record": "../Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json",
+    "old_classification": "execution_failure",
+    "classification_after_solidity_error_string_decode": "numeric_constraint",
+    "method": "从 internal_errors.output 解码标准 Solidity Error(string)，再使用通用数值约束词表分类；没有再次调用 API。"
+  },
+  "aggregate": {
+    "phase20_api_tokens": 143851,
+    "estimated_cost_usd_offpeak": "0.019782660",
+    "final_successful_fixed_trials": "4/4 effective seeds and 4/4 operational target-action state establishments",
+    "strict_property_target_note": "上述 operational deep_path_proxy 不是属性断言覆盖率；OpenNFTs echidna_balance 的目标地址余额条件仍未建立。"
+  }
+}

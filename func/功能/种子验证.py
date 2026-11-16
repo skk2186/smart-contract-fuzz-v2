@@ -377,6 +377,78 @@ def _deploy(session: AnvilSession, project: str):
     return web3.eth.contract(address=receipt.contractAddress, abi=artifact["abi"]), receipt
 
 
+def inspect_initial_state(project: str, property_context: dict[str, Any], *,
+                          session: AnvilSession) -> dict[str, Any]:
+    """部署未经交易的 Harness，记录可读状态及守卫相关 getter 的初始值。"""
+    snapshot = session.rpc("evm_snapshot", [])
+    try:
+        contract, receipt = _deploy(session, project)
+        artifact = read_json(PROJECTS[project]["artifact"])
+        views = _state_view_snapshot(session.web3, contract,
+                                     artifact.get("contract_abis", {}))
+        signatures = set()
+        for action in property_context.get("candidate_actions", []):
+            for effect in action.get("effect_evidence", []):
+                for guard in effect.get("guards", []):
+                    signatures.update(item for item in guard.get("predicate_calls", [])
+                                      if isinstance(item, str) and "(" in item)
+        abi = {entry["name"] + "(" + ",".join(x["type"] for x in entry.get("inputs", [])) + ")": entry
+               for entry in contract.abi if entry.get("type") == "function"}
+        probes = []
+        for signature in sorted(signatures):
+            abi_signature = signature.rsplit(".", 1)[-1]
+            entry = abi.get(abi_signature)
+            if entry is None or len(entry.get("inputs", [])) != 1 or entry.get("stateMutability") not in {"view", "pure"}:
+                continue
+            kind = entry["inputs"][0]["type"]
+            values = ([0, 1] if kind.startswith(("uint", "int")) else
+                      [PROPERTY_SENDER] if kind == "address" else
+                      [False, True] if kind == "bool" else [])
+            for value in values:
+                try:
+                    result = contract.get_function_by_signature(abi_signature)(value).call(
+                        {"from": _checksum(PROPERTY_SENDER)})
+                    probes.append({"function": abi_signature, "argument": value,
+                                   "status": "returned", "value": _to_rpc_value(result)})
+                except Exception as exc:
+                    message = str(exc)[:240]
+                    lower = message.lower()
+                    category = ("object_missing" if any(term in lower for term in
+                                ("invalid token id", "does not exist", "not found", "unknown id"))
+                                else "guard_rejected" if "revert" in lower else "call_error")
+                    probes.append({"function": abi_signature, "argument": value,
+                                   "status": category, "error": message})
+        property_values = {}
+        for entry in contract.abi:
+            if (entry.get("type") != "function" or entry.get("inputs") or
+                    not entry["name"].startswith("echidna_") or
+                    not any(out.get("type") == "bool" for out in entry.get("outputs", []))):
+                continue
+            try:
+                property_values[entry["name"] + "()"] = bool(
+                    contract.get_function_by_signature(entry["name"] + "()")().call(
+                        {"from": _checksum(PROPERTY_SENDER)}))
+            except Exception as exc:
+                property_values[entry["name"] + "()"] = {"error": str(exc)[:200]}
+        role_addresses = []
+        for key, value in views["view_values"].items():
+            signature = key.rsplit(":", 1)[-1]
+            if (re.fullmatch(r"(?:owner|admin|governor|controller|operator|manager|guardian)\(\)",
+                             signature, re.IGNORECASE) and
+                    isinstance(value, str) and Web3.is_address(value) and
+                    int(value, 16) != 0):
+                role_addresses.append({"getter": signature, "address": value.lower()})
+        return {"status": "observed", "deployment_block": int(receipt.blockNumber),
+                "view_values": views["view_values"], "view_count": views["observed_view_count"],
+                "tracked_contract_types": views["tracked_contract_types"],
+                "role_addresses": role_addresses,
+                "guard_predicate_probes": probes,
+                "initial_properties": property_values,
+                "limitations": "private state is not read directly; constructor and Slither evidence remain static inference"}
+    finally:
+        session.rpc("evm_revert", [snapshot])
+
+
 def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict[str, Any]],
                 *, session: AnvilSession | None = None,
                 dependency_hints: list[dict[str, Any]] | None = None) -> dict[str, Any]:
@@ -645,7 +717,8 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
                 seq_len: int = 8,
                 shrink_limit: int = 1,
                 stop_on_fail: bool = False,
-                disable_slither: bool = True) -> dict[str, Any]:
+                disable_slither: bool = True,
+                sender_pool: list[str] | None = None) -> dict[str, Any]:
     if not Path(ECHIDNA_BIN).is_file() and shutil.which(ECHIDNA_BIN) is None:
         raise FileNotFoundError(f"找不到 Echidna 2.3.2：{ECHIDNA_BIN}")
     conf = PROJECTS[project]
@@ -695,6 +768,7 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
     compiler_config.write_text(json.dumps(compiler_config_data, ensure_ascii=False, indent=2),
                                encoding="utf-8")
     echidna_config = corpus_root.parent / f"{project}-{corpus_root.name}-echidna.yaml"
+    active_senders = list(dict.fromkeys(item.lower() for item in (sender_pool or SENDERS)))
     config_lines = [
         f'prefix: "{property_prefix or property_name}"', "workers: 1",
         f'testMode: "{test_mode}"',
@@ -702,7 +776,7 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         f'contractAddr: "{HARNESS_ADDRESS.lower()}"',
         f'deployer: "{DEPLOYER.lower()}"',
         f'psender: "{PROPERTY_SENDER.lower()}"',
-        "sender: [" + ", ".join(f'"{item.lower()}"' for item in SENDERS) + "]",
+        "sender: [" + ", ".join(f'"{item}"' for item in active_senders) + "]",
         f"balanceAddr: {INITIAL_BALANCE}", "balanceContract: 0",
         f"testMaxGas: {MAX_TX_GAS}", f"propMaxGas: {MAX_TX_GAS}",
         "maxGasprice: 0", "maxTimeDelay: 86400", "maxBlockDelay: 86400",
@@ -720,7 +794,7 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
                "--shrink-limit", str(shrink_limit),
                "--seed", str(seed), "--workers", "1", "--format", "text",
                "--deployer", DEPLOYER, "--contract-addr", HARNESS_ADDRESS,
-               *sum((["--sender", item] for item in SENDERS), [])]
+               *sum((["--sender", item] for item in active_senders), [])]
     if disable_slither:
         command.append("--disable-slither")
     corpus_root.mkdir(parents=True, exist_ok=True)

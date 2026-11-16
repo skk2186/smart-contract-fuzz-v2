@@ -252,6 +252,7 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
                         shared_prefix_hint: dict[str, Any] | None = None,
                         task_constraints: list[str] | None = None,
                         repair_feedback: str | None = None,
+                        deployment_state: dict[str, Any] | None = None,
                         call_options: dict[str, Any] | None = None):
     """返回 (结构化候选, API 调用记录)。不补造静态分析未提供的入口。"""
     compact_started = time.perf_counter()
@@ -263,6 +264,10 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
             "每条输出必须绑定自己的 property_id，不能把组内属性合并成一个谓词。",
             "只使用 candidate_actions 中 seed_compatible=true 的 abi_signature。",
             "结合 Slither 的 prerequisite_state_closure、read_states、property_write_states、matched_states、effect_evidence、action_guard_evidence、函数源码与守卫推断顺序；状态生产操作应先于依赖它的消费操作，不要把静态候选当成已证明可行。",
+            "先检查 deployment_state、constructor_excerpt 和 constructor_actions。部署时已建立的状态不得重复初始化；实际 getter/守卫探测表明对象不存在时，规划候选必须先创建对象，再授权/配置，再执行依赖对象的目标操作。",
+            "使用 prerequisite_dependencies 连接守卫读取状态与候选生产动作；每条链区分部署时已满足、候选前序可满足和静态未知。不要把 getter 探测失败以外的猜测写成事实。",
+            "sender_pool 可能包含从部署后 owner/admin 等公开角色 getter 观察到的真实地址。需要权限时可安排该角色发送交易；不得假定普通测试账户就是 owner。",
+            "如果 previous_attempt_feedback 指出缺少前置交易、部署身份或数值关系，请允许改变顺序、插入现有 candidate_actions 中的准备交易或改选候选；优先修复失败类别所指出的缺口。",
             "若 action_inventory_source 标记为 generic_abi_fallback_slither_relation_unresolved，candidate_actions 只是 Harness ABI 的通用状态变更入口；必须结合 read_states 和函数源码自行判断相关性，不得声称 Slither 已证明该入口写入目标状态。",
             "每条属性至多给出指定数量的不同序列；避免仅重排同一交易的重复候选。",
             ("若多个属性确实需要同一准备前缀，请在 shared_prefixes 中显式给出，并确保对应候选序列以该前缀开头。"
@@ -279,6 +284,7 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
         "shared_prefix_hint": shared_prefix_hint if use_shared_prefixes else None,
         "sample_constraints": list(task_constraints or []),
         "previous_attempt_feedback": repair_feedback,
+        "deployment_state": deployment_state or context.get("deployment_state"),
         "context": agent_context,
     }
     if any(prop.get("assertion_trigger") for prop in context.get("properties", [])):

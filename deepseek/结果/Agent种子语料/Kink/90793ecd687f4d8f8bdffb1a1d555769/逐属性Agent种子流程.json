@@ -1,0 +1,503 @@
+{
+  "schema_version": 2,
+  "experiment_id": "c54abf2385da465b84db1e06d5ea7bd8",
+  "project": "Kink",
+  "property_ids": [
+    "28d4a5495cb06ab375a1"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "28d4a5495cb06ab375a1",
+      "property": "KinkPoolEchidna.echidna_token1_conserved()",
+      "dependency_status": "incomplete",
+      "seed_compatible_action_count": 2,
+      "slither_action_count": 2,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "candidate_results": [
+        {
+          "candidate_id": "28d4a5495cb0-01-seq_28d4a5495cb06ab375a1_1",
+          "plan": [
+            {
+              "function": "singleSidedAdd(uint256,uint256)",
+              "rationale": "先向池子注入单侧流动性，触发 pool.add_liquidity 与 ERC20._update，改变 token1 在池子与测试合约间的分布，为后续移除流动性建立非零 LP 余额前提。"
+            },
+            {
+              "function": "yankLiquidity(uint256)",
+              "rationale": "在已有 LP 余额后移除流动性，触发 pool.remove_liquidity 与 ERC20._update，使 token1 余额在测试合约与池子间再次变动，检验守恒属性在跨合约余额转移后是否仍成立。"
+            }
+          ],
+          "status": "executable",
+          "seed_class": "evm_valid",
+          "seed_id": "seed-551d15ac632b462db2c260fdad8cd32d",
+          "corpus_file": "deepseek/结果/Agent种子语料/Kink/90793ecd687f4d8f8bdffb1a1d555769/种子包/Kink/28d4a5495cb06ab375a1/coverage/seed-551d15ac632b462db2c260fdad8cd32d.txt",
+          "concrete_seed": {
+            "property_id": "28d4a5495cb06ab375a1",
+            "candidate_id": "28d4a5495cb0-01-seq_28d4a5495cb06ab375a1_1",
+            "transactions": [
+              {
+                "function": "singleSidedAdd(uint256,uint256)",
+                "arguments": [
+                  1000000000000000000,
+                  1
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change"
+              },
+              {
+                "function": "yankLiquidity(uint256)",
+                "arguments": [
+                  1000000000000000000
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change",
+                "data_dependencies": [
+                  {
+                    "from_transaction": 1,
+                    "event": "Transfer",
+                    "field": "value",
+                    "relation": "yankLiquidity 的 rawLp 应不超过 singleSidedAdd 后测试合约获得的 LP 余额；此处使用与注入量同量级的十进制值，由 _bound 截断到实际 LP 余额"
+                  }
+                ]
+              }
+            ],
+            "assumptions": [
+              "singleSidedAdd 的 side=1 走 token1 分支，rawAmount 由 _bound 截断到 token1.balanceOf(address(this))；假设测试合约已持有非零 token1 余额，否则 amount==0 直接返回，后续 yankLiquidity 因 lpBalance==0 无状态变化。",
+              "yankLiquidity 的 rawLp 由 _bound 截断到 pool.balanceOf(address(this))；假设 singleSidedAdd 成功铸造 LP 且 lpAmount > MINIMUM_LIQUIDITY，使后续 remove_liquidity 满足 lpAmount > 0 守卫。",
+              "两笔交易使用同一 sender（property_sender），因为 LP 余额与 token 余额均记在测试合约地址下，跨交易依赖同一地址。",
+              "未使用事件引用对象：yankLiquidity 的 rawLp 为输入参数而非前序事件产生的对象 ID，实际可用 LP 余额由 _bound 在运行时截断。",
+              "属性 echidna_token1_conserved 读取 token1.balanceOf(address(this)) + token1.balanceOf(address(pool)) == initialToken1；假设部署时 initialToken1 已按初始余额设定，且 add/remove_liquidity 不产生 token1 的额外铸造或销毁，否则属性可能因外部调用效果未闭合而失败。",
+              "未声称已验证可执行；由验证器实际回放并检查属性。"
+            ],
+            "execution_feedback": null
+          },
+          "agent_b": {
+            "logical_calls": 1,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_Kink_28d4a5495cb0-01-seq_28d4a5495cb06ab375a1_1_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 4661,
+                  "prompt_cache_hit_tokens": 2560,
+                  "prompt_cache_miss_tokens": 2101,
+                  "completion_tokens": 581,
+                  "total_tokens": 5242,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.00067143",
+                    "peak": "0.00134286"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 3.575,
+                "attempt": 1,
+                "prompt_utf8_bytes": 15892,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "Kink",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "28d4a5495cb0-01-seq_28d4a5495cb06ab375a1_1",
+              "replay_status": "executable",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_invariant_matches_supply()": true,
+                "echidna_reserves_match_balances()": false,
+                "echidna_token0_accounting()": true,
+                "echidna_token1_conserved()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [
+                "echidna_reserves_match_balances()"
+              ],
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "singleSidedAdd(uint256,uint256)",
+                  "arguments": [
+                    1000000000000000000,
+                    1
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "4d9a1e9f480abd8f8853d07fd90239f436acd8be5b8f00ba19926c40d496170b",
+                  "block_number": 4370001,
+                  "status": "success",
+                  "gas_used": 119906,
+                  "execution_class": "state_established",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [],
+                  "changed_storage_slot_count": 6,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0x0000000000000000000000000000000000000000",
+                        "value": 10000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                        "value": 990000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                      "fields": {
+                        "from": "0x0000000000000000000000000000000000000000",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 990024690289367387
+                      }
+                    },
+                    {
+                      "name": "AddLiquidity",
+                      "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                      "fields": {
+                        "provider": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "amounts": [
+                          0,
+                          1000000000000000000
+                        ],
+                        "lpAmount": 990024690289367387
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 44,
+                  "tracked_contract_count": 4,
+                  "tracked_contract_types": [
+                    "FeeOnTransferToken",
+                    "Harness",
+                    "KinkPool",
+                    "MockERC20"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "ERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "ERC20._balances"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "1706b697767b729cc909411d760b47ae17be21b3837fb80751b1d5ee0ab7f3ee",
+                  "state_fingerprint_after": "01d598f4c138840d754dc314613483e4c892f1f5e2becd54a06ea9e88e332c95",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_invariant_matches_supply()": true,
+                    "echidna_reserves_match_balances()": false,
+                    "echidna_token0_accounting()": true,
+                    "echidna_token1_conserved()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": [
+                    "echidna_reserves_match_balances()"
+                  ]
+                },
+                {
+                  "index": 2,
+                  "function": "yankLiquidity(uint256)",
+                  "arguments": [
+                    1000000000000000000
+                  ],
+                  "argument_bindings": [],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "tx_hash": "96cee3118b25776276ceef74356e38e090c63de724c834fa9aaa0e0babb03db7",
+                  "block_number": 4370002,
+                  "status": "success",
+                  "gas_used": 104933,
+                  "execution_class": "state_established",
+                  "expected_outcome": "state_change",
+                  "internal_errors": [],
+                  "changed_storage_slot_count": 8,
+                  "trace_error": null,
+                  "events": [
+                    {
+                      "name": "Transfer",
+                      "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                      "fields": {
+                        "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "to": "0x0000000000000000000000000000000000000000",
+                        "value": 1000000000000000000
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "fields": {
+                        "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 502487595628879628
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                        "to": "0x0000000000000000000000000000000000000000",
+                        "value": 4975124659445580
+                      }
+                    },
+                    {
+                      "name": "Transfer",
+                      "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "fields": {
+                        "from": "0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f",
+                        "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "value": 492537341285112511
+                      }
+                    },
+                    {
+                      "name": "RemoveLiquidity",
+                      "address": "0xca7d73225b58ff6bf96734ef8e63713f4516a06f",
+                      "fields": {
+                        "provider": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                        "amounts": [
+                          502487595628879628,
+                          497512465944558091
+                        ],
+                        "lpAmount": 1000000000000000000
+                      }
+                    }
+                  ],
+                  "observed_view_state_changed": true,
+                  "observed_view_count": 44,
+                  "tracked_contract_count": 4,
+                  "tracked_contract_types": [
+                    "FeeOnTransferToken",
+                    "Harness",
+                    "KinkPool",
+                    "MockERC20"
+                  ],
+                  "observed_effect_status": "unknown",
+                  "expected_effect_states": [
+                    "ERC20._balances"
+                  ],
+                  "observed_effect_states": [],
+                  "changed_effect_states": [],
+                  "unobserved_effect_states": [
+                    "ERC20._balances"
+                  ],
+                  "execution_effect_error": null,
+                  "state_fingerprint_before": "01d598f4c138840d754dc314613483e4c892f1f5e2becd54a06ea9e88e332c95",
+                  "state_fingerprint_after": "6be2c5b418cedc0af074da2bc433737f7a7221419f95e3b9466dec7bcc4f7bc2",
+                  "target_property": true,
+                  "property_error": null,
+                  "all_property_values": {
+                    "echidna_invariant_matches_supply()": true,
+                    "echidna_reserves_match_balances()": false,
+                    "echidna_token0_accounting()": true,
+                    "echidna_token1_conserved()": true
+                  },
+                  "all_property_errors": {},
+                  "other_property_violations_during_prevalidation": [
+                    "echidna_reserves_match_balances()"
+                  ]
+                }
+              ],
+              "resolved_transactions": [
+                {
+                  "function": "singleSidedAdd(uint256,uint256)",
+                  "arguments": [
+                    1000000000000000000,
+                    1
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change"
+                },
+                {
+                  "function": "yankLiquidity(uint256)",
+                  "arguments": [
+                    1000000000000000000
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "0",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change",
+                  "data_dependencies": [
+                    {
+                      "from_transaction": 1,
+                      "event": "Transfer",
+                      "field": "value",
+                      "relation": "yankLiquidity 的 rawLp 应不超过 singleSidedAdd 后测试合约获得的 LP 余额；此处使用与注入量同量级的十进制值，由 _bound 截断到实际 LP 余额"
+                    }
+                  ]
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 2.667,
+              "elapsed_from_run_start_seconds": 9.047
+            }
+          ],
+          "error": null,
+          "elapsed_seconds": 6.332
+        }
+      ],
+      "status": "seed_generated",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Kink_28d4a5495cb06ab375a1_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 3361,
+              "prompt_cache_hit_tokens": 3200,
+              "prompt_cache_miss_tokens": 161,
+              "completion_tokens": 378,
+              "total_tokens": 3739,
+              "estimated_cost_usd": {
+                "offpeak": "0.00026055",
+                "peak": "0.0005211"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.689,
+            "attempt": 1,
+            "prompt_utf8_bytes": 11422,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "28d4a5495cb06ab375a1",
+                "candidate_id": "seq_28d4a5495cb06ab375a1_1",
+                "steps": [
+                  {
+                    "function": "singleSidedAdd(uint256,uint256)",
+                    "rationale": "先向池子注入单侧流动性，触发 pool.add_liquidity 与 ERC20._update，改变 token1 在池子与测试合约间的分布，为后续移除流动性建立非零 LP 余额前提。"
+                  },
+                  {
+                    "function": "yankLiquidity(uint256)",
+                    "rationale": "在已有 LP 余额后移除流动性，触发 pool.remove_liquidity 与 ERC20._update，使 token1 余额在测试合约与池子间再次变动，检验守恒属性在跨合约余额转移后是否仍成立。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "candidate_actions 来自 slither_dependency_candidates，matched_states 为空，未证明这些入口直接写入 initialToken1；仅依据 read_states 中 token1/pool 与外部调用效果推断其可能影响属性读取的余额。",
+              "singleSidedAdd 的 side 参数取 1 时才会操作 token1；参数具体化不在本规划范围内，需由执行器选择满足 _bound 后非零且 amounts[1]>0 的取值。",
+              "yankLiquidity 依赖池子 LP 余额非零，因此必须先执行 singleSidedAdd 产生 LP；若初始 LP 已存在，该顺序仍可执行但非唯一前提。",
+              "属性含外部 balanceOf 调用，实际结果取决于部署环境与 FeeOnTransferToken 的转账行为；未建模的间接影响可能使序列不可行或属性不可违反。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 1,
+      "elapsed_seconds": 9.023
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 45,
+    "token_budget": 80000,
+    "wall_budget_seconds": 300
+  },
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 0,
+    "unmetered_attempts": 0,
+    "prompt_tokens": 8022,
+    "completion_tokens": 959,
+    "total_tokens": 8981,
+    "estimated_cost_usd_offpeak": "0.00093198",
+    "estimated_cost_usd_peak": "0.00186396",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/Agent种子语料/Kink/90793ecd687f4d8f8bdffb1a1d555769/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 8981,
+  "total_elapsed_seconds": 9.138,
+  "anvil_start_error": null
+}

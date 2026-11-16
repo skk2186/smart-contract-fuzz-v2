@@ -125,6 +125,27 @@ def _function_excerpt(project: str, signature: str, limit: int = 3000) -> str | 
     return None
 
 
+def _constructor_excerpt(project: str, source: str, limit: int = 3200) -> str | None:
+    """从 Harness 原始源码提取构造函数，供初始状态推断使用。"""
+    path = _resolve_source(project, source)
+    if path is None:
+        return None
+    text = path.read_text(encoding="utf-8", errors="replace")
+    match = re.search(r"\bconstructor\s*\([^)]*\)[^{]*\{", text)
+    if not match:
+        return None
+    start = match.start()
+    depth = 0
+    for index in range(match.end() - 1, len(text)):
+        if text[index] == "{":
+            depth += 1
+        elif text[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:index + 1][:limit]
+    return text[start:start + limit]
+
+
 def _abi_signature(entry: dict[str, Any]) -> str:
     return entry["name"] + "(" + ",".join(item["type"] for item in entry.get("inputs", [])) + ")"
 
@@ -132,6 +153,8 @@ def _abi_signature(entry: dict[str, Any]) -> str:
 def _seed_abi_supported(entry: dict[str, Any]) -> tuple[bool, str | None]:
     for item in entry.get("inputs", []):
         kind = item["type"]
+        if kind == "string":
+            continue
         if (kind == "address" or kind == "bool" or SEED_TYPES.fullmatch(kind) or
                 FIXED_BYTES_TYPES.fullmatch(kind)):
             continue
@@ -183,7 +206,9 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
             guards = []
             for guard in effect.get("guards", [])[:8]:
                 guards.append({key: guard.get(key) for key in
-                               ("kind", "expression", "branch", "variables_read", "source")})
+                               ("kind", "expression", "branch", "variables_read",
+                                "state_reads", "data_dependencies", "predicate_calls",
+                                "predicate_logic", "source")})
             evidence.append({"state": effect.get("state"), "writer": effect.get("writer"),
                              "expression": effect.get("expression"),
                              "source": effect.get("source"), "guards": guards})
@@ -202,6 +227,69 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
             "source_excerpt": _function_excerpt(project, full_signature),
             "effect_evidence": evidence,
         })
+
+    # Attach helper effects only when the public action source visibly calls the
+    # corresponding helper. This is a candidate relation, not a proof of runtime
+    # reachability or object aliasing.
+    for action in actions:
+        excerpt = action.get("source_excerpt") or ""
+        helper_effects = []
+        for effect in effect_catalog.values():
+            writer = effect.get("writer", "")
+            helper = writer.rsplit(".", 1)[-1].split("(", 1)[0]
+            if helper and helper != action["function"].rsplit(".", 1)[-1].split("(", 1)[0]:
+                if re.search(r"\b" + re.escape(helper) + r"\s*\(", excerpt):
+                    helper_effects.append({"state": effect.get("state"),
+                                           "writer": writer,
+                                           "source": effect.get("source")})
+        action["related_helper_effects"] = helper_effects[:16]
+
+    producers: dict[str, list[dict[str, str]]] = {}
+    action_requirements: dict[str, set[str]] = {}
+    for action in actions:
+        action_key = action["abi_signature"] or action["function"]
+        effects = action.get("effect_evidence", []) + action.get("related_helper_effects", [])
+        for effect in effects:
+            state = effect.get("state")
+            if isinstance(state, str):
+                producer = {"function": action_key,
+                            "evidence": effect.get("source") or effect.get("writer", "")}
+                if producer not in producers.setdefault(state, []):
+                    producers[state].append(producer)
+        action_requirements[action_key] = {
+            state for effect in action.get("effect_evidence", [])
+            for guard in effect.get("guards", [])
+            for state in guard.get("state_reads", []) if isinstance(state, str)}
+    for action in actions:
+        guards = [guard for effect in action.get("effect_evidence", [])
+                  for guard in effect.get("guards", [])]
+        required: dict[str, list[dict[str, Any]]] = {}
+        for guard in guards:
+            for state in guard.get("state_reads", []):
+                if isinstance(state, str):
+                    required.setdefault(state, []).append({
+                        "expression": guard.get("expression"),
+                        "predicate_calls": guard.get("predicate_calls", []),
+                        "source": guard.get("source")})
+        action["prerequisite_dependencies"] = [
+            {"required_state": state,
+             "guard_evidence": evidence[:3],
+             "candidate_producers": [
+                 {**producer,
+                  "producer_guard_reads_same_state": state in action_requirements.get(
+                      producer["function"], set())}
+                 for producer in producers.get(state, [])
+                 if producer["function"] != (action["abi_signature"] or action["function"])][:8],
+             "resolution": "static_candidate_only"}
+            for state, evidence in required.items()]
+
+    constructor_excerpt = _constructor_excerpt(project, prop.get("source", ""))
+    constructor_actions = []
+    if constructor_excerpt:
+        for action in actions:
+            name = action["function"].rsplit(".", 1)[-1].split("(", 1)[0]
+            if re.search(r"\b" + re.escape(name) + r"\s*\(", constructor_excerpt):
+                constructor_actions.append(action["abi_signature"] or action["function"])
 
     slither_action_count = len(actions)
     fallback_action_count = 0
@@ -274,6 +362,8 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
         "assertion_sites": prop.get("assertion_sites", []),
         "assertion_trigger": assertion_trigger,
         "property_source": property_source,
+        "constructor_excerpt": constructor_excerpt,
+        "constructor_actions": constructor_actions,
         "property_predicate": source_excerpt(project, property_source),
         "analysis_contract": prop.get("analysis_contract"),
         "analysis_status": prop.get("analysis_status"),
@@ -339,9 +429,11 @@ def compact_for_agent(context: dict[str, Any]) -> dict[str, Any]:
     shared: dict[str, dict[str, Any]] = {}
     compact_properties = []
     common_fields = ("abi_inputs", "state_mutability", "payable", "seed_compatible",
-                     "seed_limitation", "source_excerpt")
+                     "seed_limitation", "source_excerpt", "prerequisite_dependencies",
+                     "related_helper_effects")
     property_fields = ("function", "abi_signature", "matched_states", "environment_reads",
-                       "static_status", "seed_compatible", "effect_evidence")
+                       "static_status", "seed_compatible", "effect_evidence",
+                       "prerequisite_dependencies", "related_helper_effects")
     for prop in context["properties"]:
         actions = []
         for action in prop.get("candidate_actions", []):
@@ -356,7 +448,8 @@ def compact_for_agent(context: dict[str, Any]) -> dict[str, Any]:
         compact_properties.append({**{key: value for key, value in prop.items()
                                     if key != "candidate_actions"},
                                    "candidate_actions": actions})
-    return {key: value for key, value in context.items() if key != "properties"} | {
-        "shared_function_contexts": shared,
-        "properties": compact_properties,
-    }
+    compact_context = {key: value for key, value in context.items()
+                       if key != "properties"}
+    compact_context["shared_function_contexts"] = shared
+    compact_context["properties"] = compact_properties
+    return compact_context

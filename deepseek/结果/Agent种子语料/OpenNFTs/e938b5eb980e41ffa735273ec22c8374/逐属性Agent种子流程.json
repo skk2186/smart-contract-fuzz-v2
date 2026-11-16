@@ -1,0 +1,365 @@
+{
+  "schema_version": 2,
+  "experiment_id": "a77fbee464a74136b850ca794433016f",
+  "project": "OpenNFTs",
+  "property_ids": [
+    "f0a4ef464239609050c2",
+    "50cc31144be4bad9bc9d"
+  ],
+  "property_count": 2,
+  "property_results": [
+    {
+      "property_id": "f0a4ef464239609050c2",
+      "property": "OpenAutoMarketExFuzz.echidna_owner()",
+      "dependency_status": "statically_supported_with_limits",
+      "seed_compatible_action_count": 2,
+      "slither_action_count": 2,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "deployment_state": {
+        "status": "observed",
+        "deployment_block": 4370000,
+        "view_values": {
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:echidna_balance()": true,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:echidna_owner()": true,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:getDefaultRoyalty()": "('0x0000000000000000000000000000000000000000', 0, 0)",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:getMintPrice()": 0,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:minimal()": false,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:owner()": "0x000000000000000000000000000000000000002A",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:treasury()": [
+            "0x0000000000000000000000000000000000000002",
+            0,
+            0
+          ]
+        },
+        "view_count": 7,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "guard_predicate_probes": [],
+        "initial_properties": {
+          "echidna_balance()": true,
+          "echidna_owner()": true
+        },
+        "limitations": "private state is not read directly; constructor and Slither evidence remain static inference"
+      },
+      "candidate_results": [
+        {
+          "candidate_id": "f0a4ef464239-01-owner-transfer-1",
+          "plan": [
+            {
+              "function": "transferOwnership(address)",
+              "rationale": "构造函数已通过 initialize 建立 _owner（部署时 owner()=0x...2A），因此无需重复 initialize；调用 transferOwnership 会经 _transferOwnership 写入 OpenERC173._owner，改变 echidna_owner 读取的 _owner 与 owner() 的一致性状态，用于探测属性。"
+            }
+          ],
+          "status": "agent_b_failed",
+          "seed_class": "none",
+          "seed_id": null,
+          "corpus_file": null,
+          "concrete_seed": null,
+          "agent_b": {
+            "logical_calls": 2,
+            "failed_logical_calls": 2,
+            "events": [
+              {
+                "tag": "AgentB_OpenNFTs_f0a4ef464239-01-owner-transfer-1_try1",
+                "ok": false,
+                "error_kind": "ValueError",
+                "error": "ValueError: sender 必须来自固定测试账户池：'0x000000000000000000000000000000000000002A'",
+                "usage": {
+                  "prompt_tokens": 2263,
+                  "prompt_cache_hit_tokens": 768,
+                  "prompt_cache_miss_tokens": 1495,
+                  "completion_tokens": 327,
+                  "total_tokens": 2590,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000422754",
+                    "peak": "0.000845508"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 2.634,
+                "attempt": 1,
+                "prompt_utf8_bytes": null,
+                "invalid_record_count": null
+              },
+              {
+                "tag": "AgentB_OpenNFTs_f0a4ef464239-01-owner-transfer-1_try2",
+                "ok": false,
+                "error_kind": "ValueError",
+                "error": "ValueError: sender 必须来自固定测试账户池：'0x000000000000000000000000000000000000002A'",
+                "usage": {
+                  "prompt_tokens": 2311,
+                  "prompt_cache_hit_tokens": 2176,
+                  "prompt_cache_miss_tokens": 135,
+                  "completion_tokens": 340,
+                  "total_tokens": 2651,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000230778",
+                    "peak": "0.000461556"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 2.363,
+                "attempt": 1,
+                "prompt_utf8_bytes": null,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [],
+          "failure_class": "generation_failure",
+          "planned_target_path_reached": false,
+          "error": "ValueError: sender 必须来自固定测试账户池：'0x000000000000000000000000000000000000002A'",
+          "elapsed_seconds": 4.999
+        }
+      ],
+      "status": "no_valid_evm_seed",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_OpenNFTs_f0a4ef464239609050c2_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 4300,
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 4300,
+              "completion_tokens": 242,
+              "total_tokens": 4542,
+              "estimated_cost_usd": {
+                "offpeak": "0.0007902",
+                "peak": "0.0015804"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 1.924,
+            "attempt": 1,
+            "prompt_utf8_bytes": 14991,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "f0a4ef464239609050c2",
+                "candidate_id": "owner-transfer-1",
+                "steps": [
+                  {
+                    "function": "transferOwnership(address)",
+                    "rationale": "构造函数已通过 initialize 建立 _owner（部署时 owner()=0x...2A），因此无需重复 initialize；调用 transferOwnership 会经 _transferOwnership 写入 OpenERC173._owner，改变 echidna_owner 读取的 _owner 与 owner() 的一致性状态，用于探测属性。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "部署时 _openERC173Initialized 已由构造函数置为 true，故 initialize 不可再次调用，不纳入序列。",
+              "transferOwnership 的 onlyOwner 守卫要求 msg.sender 等于当前 _owner；假设测试调用者被配置为部署 owner（0x...2A），否则该交易会回滚。",
+              "echidna_owner 断言 _owner == owner()，两者读取同一 OpenERC173._owner，静态上难以被单次写入破坏；本序列仅作为状态变更探测，不证明可违反属性。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "valid_evm_seed_count": 0,
+      "elapsed_seconds": 7.189
+    },
+    {
+      "property_id": "50cc31144be4bad9bc9d",
+      "property": "OpenAutoMarketExFuzz.echidna_balance()",
+      "dependency_status": "statically_supported_with_limits",
+      "seed_compatible_action_count": 3,
+      "slither_action_count": 5,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "deployment_state": {
+        "status": "observed",
+        "deployment_block": 4370000,
+        "view_values": {
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:echidna_balance()": true,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:echidna_owner()": true,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:getDefaultRoyalty()": "('0x0000000000000000000000000000000000000000', 0, 0)",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:getMintPrice()": 0,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:minimal()": false,
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:owner()": "0x000000000000000000000000000000000000002A",
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:treasury()": [
+            "0x0000000000000000000000000000000000000002",
+            0,
+            0
+          ]
+        },
+        "view_count": 7,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "guard_predicate_probes": [
+          {
+            "function": "getApproved(uint256)",
+            "argument": 0,
+            "status": "object_missing",
+            "error": "('execution reverted: Invalid token ID', '0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010496e76616c696420746f6b656e2049440000000000000000000000000000"
+          },
+          {
+            "function": "getApproved(uint256)",
+            "argument": 1,
+            "status": "object_missing",
+            "error": "('execution reverted: Invalid token ID', '0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010496e76616c696420746f6b656e2049440000000000000000000000000000"
+          },
+          {
+            "function": "ownerOf(uint256)",
+            "argument": 0,
+            "status": "object_missing",
+            "error": "('execution reverted: Invalid token ID', '0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010496e76616c696420746f6b656e2049440000000000000000000000000000"
+          },
+          {
+            "function": "ownerOf(uint256)",
+            "argument": 1,
+            "status": "object_missing",
+            "error": "('execution reverted: Invalid token ID', '0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010496e76616c696420746f6b656e2049440000000000000000000000000000"
+          }
+        ],
+        "initial_properties": {
+          "echidna_balance()": true,
+          "echidna_owner()": true
+        },
+        "limitations": "private state is not read directly; constructor and Slither evidence remain static inference"
+      },
+      "candidate_results": [],
+      "status": "agent_a_error",
+      "agent_a": {
+        "logical_calls": 2,
+        "failed_logical_calls": 1,
+        "events": [
+          {
+            "tag": "AgentA_OpenNFTs_50cc31144be4bad9bc9d_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 17122,
+              "prompt_cache_hit_tokens": 768,
+              "prompt_cache_miss_tokens": 16354,
+              "completion_tokens": 305,
+              "total_tokens": 17427,
+              "estimated_cost_usd": {
+                "offpeak": "0.002638404",
+                "peak": "0.005276808"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.31,
+            "attempt": 1,
+            "prompt_utf8_bytes": 58567,
+            "invalid_record_count": 1
+          },
+          {
+            "tag": "AgentA_OpenNFTs_50cc31144be4bad9bc9d_plan2",
+            "ok": false,
+            "error_kind": "token_budget_exceeded",
+            "error": "token_budget_exceeded: 本次请求最坏上界 63123 将超过剩余 Token 预算 52790",
+            "usage": null,
+            "elapsed_seconds": 0,
+            "attempt": 1,
+            "prompt_utf8_bytes": null,
+            "invalid_record_count": null
+          }
+        ]
+      },
+      "planning": {
+        "status": "agent_a_error",
+        "error": "token_budget_exceeded: 本次请求最坏上界 63123 将超过剩余 Token 预算 52790",
+        "plans": [
+          {
+            "property_sequences": [],
+            "shared_prefixes": [],
+            "assumptions": [
+              "echidna_balance 读取 _other 的余额；_other 由测试合约设定，部署时 _balances[_other]=0，因此初始属性为 true。",
+              "mint(string) 的 seed_compatible=false，Echidna 序列化器暂不支持 string 参数；该步骤为静态状态生产规划，实际可执行性依赖参数具体化。",
+              "burn(uint256) 与 transferFrom/safeTransferFrom 只能减少或搬移已有余额，无法从零创建 _other 的余额，故不作为本属性的前置生产动作。",
+              "mint 的守卫要求 _owners[tokenID]==address(0)，探测显示 token 0/1 均不存在，满足该前置条件。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [
+              {
+                "record_type": "property_sequence",
+                "record_index": 0,
+                "property_id": "50cc31144be4bad9bc9d",
+                "reason": "存在非候选或不可序列化函数"
+              }
+            ],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 0,
+              "invalid_record_count": 1,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ]
+      },
+      "elapsed_seconds": 2.656
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 1,
+    "execution_feedback_repairs_per_candidate": 1,
+    "execution_replans_per_property": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 80,
+    "echidna_timeout_seconds": 45,
+    "agent_a_execution_replans_per_property": 1,
+    "token_budget": 80000,
+    "wall_budget_seconds": 300
+  },
+  "api_usage": {
+    "request_attempts": 5,
+    "failed_request_attempts": 3,
+    "unmetered_attempts": 1,
+    "prompt_tokens": 25996,
+    "completion_tokens": 1214,
+    "total_tokens": 27210,
+    "estimated_cost_usd_offpeak": "0.004082136",
+    "estimated_cost_usd_peak": "0.008164272",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "deepseek/结果/Agent种子语料/OpenNFTs/e938b5eb980e41ffa735273ec22c8374/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 27210,
+  "total_elapsed_seconds": 10.043,
+  "anvil_start_error": null
+}

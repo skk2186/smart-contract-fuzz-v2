@@ -19,6 +19,12 @@ PROPERTY_SENDER = "0x0000000000000000000000000000000000010000"
 
 
 def normalize_argument(kind: str, value: Any) -> Any:
+    if kind == "string":
+        if not isinstance(value, str):
+            raise ValueError(f"string 参数必须是 JSON 字符串：{value!r}")
+        if len(value.encode("utf-8")) > 128:
+            raise ValueError("string 参数 UTF-8 编码长度不得超过 128 字节")
+        return value
     if kind == "address":
         if not isinstance(value, str) or not ADDRESS_RE.fullmatch(value):
             raise ValueError(f"非法 address 参数：{value!r}")
@@ -54,6 +60,24 @@ def normalize_argument(kind: str, value: Any) -> Any:
 
 def _abi_value(kind: str, value: Any) -> dict[str, Any]:
     normalized = normalize_argument(kind, value)
+    if kind == "string":
+        escaped = '"'
+        for byte in normalized.encode("utf-8"):
+            if byte == 34:
+                escaped += '\\"'
+            elif byte == 92:
+                escaped += "\\\\"
+            elif byte == 10:
+                escaped += "\\n"
+            elif byte == 13:
+                escaped += "\\r"
+            elif byte == 9:
+                escaped += "\\t"
+            elif 32 <= byte < 127:
+                escaped += chr(byte)
+            else:
+                escaped += f"\\{byte}\\&"
+        return {"tag": "AbiString", "contents": escaped + '"'}
     if kind == "address":
         return {"tag": "AbiAddress", "contents": str(int(normalized, 16))}
     if kind == "bool":
@@ -120,8 +144,9 @@ def _validator(context: dict[str, Any], candidate: dict[str, Any], feedback: str
             if tx.get("expected_outcome") not in {"rejection", "state_change", "no_state_change"}:
                 raise ValueError(f"{signature} 必须声明 expected_outcome")
             sender = tx.get("sender")
-            if not isinstance(sender, str) or sender.lower() not in SENDERS:
-                raise ValueError(f"sender 必须来自固定测试账户池：{sender!r}")
+            allowed_senders = [item.lower() for item in context.get("sender_pool", SENDERS)]
+            if not isinstance(sender, str) or sender.lower() not in allowed_senders:
+                raise ValueError(f"sender 必须来自当前属性可用账户池：{sender!r}")
             tx["sender"] = sender.lower()
             value_wei = tx.get("value_wei", "0")
             if isinstance(value_wei, bool) or not re.fullmatch(r"[0-9]+", str(value_wei)):
@@ -219,7 +244,7 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
         "shared_prefix_steps": candidate.get("shared_prefix_steps", []),
         "candidate": {key: value for key, value in candidate.items() if key != "context"},
         "transactions_to_instantiate": sequence,
-        "sender_pool": SENDERS,
+        "sender_pool": context.get("sender_pool", SENDERS),
         "environment": {"chain_id": 1, "initial_timestamp": 1524785992,
                         "initial_block_number": 4370000,
                         "evm_revision": "shanghai",
@@ -227,6 +252,7 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
                         "property_sender": PROPERTY_SENDER,
                         "gas_price_wei": 0, "gas_limit_per_transaction": 12500000,
                         **(environment or {})},
+        "deployment_state": context.get("deployment_state"),
         "previous_verifier_feedback": feedback,
         "attempt": attempt,
     }

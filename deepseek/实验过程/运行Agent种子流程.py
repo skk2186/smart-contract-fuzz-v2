@@ -17,10 +17,11 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "deepseek"), str(ROOT / "func/功能")]
 
 from AgentA import generate_candidates
-from AgentB import instantiate_candidate
+from AgentB import SENDERS, instantiate_candidate
 from deepseek接口 import CallBudget, DeepSeekCallError
 from 属性种子上下文 import PROJECTS, find_property, load_project_context
-from 种子验证 import AnvilSession, new_seed_id, replay_seed, run_echidna, write_corpus
+from 种子验证 import (AnvilSession, inspect_initial_state, new_seed_id,
+                    replay_seed, run_echidna, write_corpus)
 
 
 def _load_ids(project: str, property_ids: list[str], contains: list[str]) -> list[str]:
@@ -70,10 +71,11 @@ def _api_summary(log_path: Path) -> dict[str, Any]:
 def _agent_a_for_property(context: dict[str, Any], property_id: str, *,
                            max_candidates: int, max_steps: int,
                            planning_repairs: int, tag: str,
-                           call_options: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+                           call_options: dict[str, Any],
+                           initial_feedback: str | None = None) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     events: list[dict[str, Any]] = []
     plans: list[dict[str, Any]] = []
-    feedback = None
+    feedback = initial_feedback
     for attempt in range(1, planning_repairs + 2):
         try:
             plan, event = generate_candidates(
@@ -137,7 +139,60 @@ def _agent_b_call(context: dict[str, Any], candidate: dict[str, Any], *,
     return None, events, "Agent B 修复循环结束但没有可用种子"
 
 
-def _execution_feedback(replay: dict[str, Any]) -> str:
+def _decode_revert_reason(data: Any) -> str | None:
+    """Decode the standard Solidity Error(string) payload emitted by nested calls."""
+    if not isinstance(data, str):
+        return None
+    encoded = data[2:] if data.startswith("0x") else data
+    try:
+        raw = bytes.fromhex(encoded)
+        if len(raw) < 4 + 64 or raw[:4] != bytes.fromhex("08c379a0"):
+            return None
+        args = raw[4:]
+        offset = int.from_bytes(args[:32], "big")
+        if offset + 32 > len(args):
+            return None
+        length = int.from_bytes(args[offset:offset + 32], "big")
+        start = offset + 32
+        if start + length > len(args):
+            return None
+        return args[start:start + length].decode("utf-8", errors="replace")
+    except (ValueError, OverflowError):
+        return None
+
+
+def _classify_failure(replay: dict[str, Any] | None, error: str | None = None) -> str:
+    evidence = [error or ""]
+    if replay:
+        for row in replay.get("transactions", []):
+            evidence.extend(str(row.get(field, "")) for field in
+                            ("property_error", "execution_effect_error", "internal_errors"))
+            for internal_error in row.get("internal_errors", []):
+                reason = _decode_revert_reason(internal_error.get("output"))
+                if reason:
+                    evidence.append(reason)
+        evidence.extend(str(row) for row in replay.get("initial_property_errors", {}).values())
+    message = " ".join(evidence).lower()
+    if any(term in message for term in ("invalid token id", "batchdoesnotexist", "object_missing",
+                                        "does not exist", "unknown id", "not found")):
+        return "missing_precondition"
+    if any(term in message for term in ("not owner", "unauthorized", "not authorized",
+                                        "accesscontrol", "onlyowner", "not token owner",
+                                        "insufficient permission")):
+        return "permission_constraint"
+    if any(term in message for term in ("insufficient refundable", "insufficient amount",
+                                        "exceeds", "cap", "underflow", "overflow",
+                                        "amount too", "balance too")):
+        return "numeric_constraint"
+    if any(term in message for term in ("bool 参数", "参数数量", "参数类型", "abi",
+                                        "invalid json", "invalid_shape", "must be json")):
+        return "parameter_error"
+    if replay and replay.get("replay_status") == "replay_failed":
+        return "execution_failure"
+    return "generation_failure"
+
+
+def _execution_feedback(replay: dict[str, Any], failure_class: str) -> str:
     failing = [row for row in replay.get("transactions", [])
                if row.get("status") != "success" or
                row.get("execution_class") in {"unexpected_internal_revert", "trace_unavailable"} or
@@ -151,8 +206,14 @@ def _execution_feedback(replay: dict[str, Any]) -> str:
                                           "prior_events", "argument_bindings", "execution_effect_error")}
                                         for row in failing[:4]],
                 "property_errors": [row.get("property_error") for row in failing[:4]]}
-    return ("Anvil 逐交易回放失败。仅修正参数、发送者、金额或时间；保持 Agent A 的函数顺序，"
-            "并检查相邻交易的身份、对象 ID 与提交/揭示数据一致性。不要声称已验证。证据："
+    guidance = {
+        "missing_precondition": "当前操作引用的对象/状态不存在。重新规划时可在目标操作前加入创建或初始化前置动作，重新推导顺序和后续真实 ID；不要只改 ID 猜测值。",
+        "permission_constraint": "当前 sender/owner/operator 不满足守卫。重新规划身份、授权或所有权转移步骤，并确保后续调用复用真实授权主体。",
+        "numeric_constraint": "金额、余额、额度或退款关系不满足。重新规划产生所需余额/可退额度的前置交易，再按实际状态调整参数。",
+        "parameter_error": "参数类型或 ABI 结构错误。保持交易意图，修正 JSON 类型与 ABI 编码。",
+        "execution_failure": "检查失败交易的守卫和状态读写；若缺少前序状态则重新规划，否则修正具体参数。",
+    }.get(failure_class, "检查结构和执行证据，重新规划必要的准备步骤。")
+    return (f"执行反馈分类：{failure_class}。{guidance} 不要声称已验证。证据："
             + json.dumps(evidence, ensure_ascii=False)[:2200])
 
 
@@ -167,6 +228,7 @@ def _event_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
 
 def run_project(project: str, property_ids: list[str], *, max_candidates: int = 1,
                 max_steps: int = 8, repairs: int = 1, planning_repairs: int = 1,
+                execution_replans: int = 1,
                 echidna_limit: int = 80, echidna_timeout: int = 45,
                 echidna_seed: int = 20261114, token_budget: int = 400_000,
                 wall_budget: int = 600, run_fuzzer: bool = True,
@@ -200,7 +262,22 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
         for property_index, property_id in enumerate(property_ids, start=1):
             prop_started = time.monotonic()
             prop = properties[property_id]
-            context = {**full_context, "properties": [prop]}
+            prop_context = {**full_context, "properties": [prop]}
+            if session is not None:
+                try:
+                    deployment_state = inspect_initial_state(project, prop, session=session)
+                except Exception as exc:
+                    deployment_state = {"status": "unavailable",
+                                        "error": f"{type(exc).__name__}: {str(exc)[:500]}"}
+            else:
+                deployment_state = {"status": "unavailable", "error": anvil_error}
+            role_senders = [item["address"] for item in deployment_state.get("role_addresses", [])]
+            sender_pool = list(dict.fromkeys([*SENDERS, *role_senders]))
+            if session is not None:
+                for address in role_senders:
+                    session.rpc("anvil_setBalance", [address, hex(0xffffffff)])
+            context = {**prop_context, "deployment_state": deployment_state,
+                       "sender_pool": sender_pool}
             actions = [action for action in prop.get("candidate_actions", [])
                        if action.get("seed_compatible") and action.get("abi_signature")]
             property_row: dict[str, Any] = {
@@ -211,6 +288,8 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                 "abi_fallback_action_count": prop.get("abi_fallback_action_count", 0),
                 "action_inventory_source": prop.get("action_inventory_source",
                                                      "slither_dependency_candidates"),
+                "deployment_state": deployment_state,
+                "sender_pool": sender_pool,
                 "candidate_results": [], "status": "pending",
             }
             if not prop.get("property_predicate"):
@@ -231,7 +310,10 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                 property_rows.append(property_row)
                 continue
 
-            for candidate_index, raw_candidate in enumerate(candidates, start=1):
+            replans_used = 0
+            candidate_index = 0
+            for raw_candidate in candidates:
+                candidate_index += 1
                 candidate = _candidate_context(raw_candidate, context)
                 candidate["candidate_id"] = f"{property_id[:12]}-{candidate_index:02d}-{raw_candidate['candidate_id']}"
                 candidate_root = run_root / "种子包" / project / property_id
@@ -265,7 +347,7 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                                 break
                             repaired, retry_events, error = _agent_b_call(
                                 context, candidate,
-                                feedback=_execution_feedback(replay),
+                                feedback=_execution_feedback(replay, _classify_failure(replay)),
                                 first_attempt=len(b_events) + 1,
                                 schema_repairs=0, call_options=call_options)
                             b_events.extend(retry_events)
@@ -279,6 +361,7 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                     error = anvil_error or "Anvil session is unavailable"
 
                 final_replay = replay_attempts[-1] if replay_attempts else None
+                failure_class = _classify_failure(final_replay, error)
                 seed_id = None
                 corpus_file = None
                 if final_replay and final_replay.get("replay_status") == "executable" and concrete:
@@ -304,9 +387,40 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                     "concrete_seed": concrete,
                     "agent_b": _event_summary(b_events),
                     "replay_attempts": replay_attempts,
+                    "failure_class": None if corpus_file else failure_class,
+                    "planned_target_path_reached": bool(final_replay and any(
+                        tx.get("function") == candidate["steps"][-1]["function"] and
+                        tx.get("status") == "success" and
+                        tx.get("execution_class") == "state_established"
+                        for tx in final_replay.get("transactions", []))),
                     "error": error,
                     "elapsed_seconds": round(time.monotonic() - candidate_started, 3),
                 })
+                if (not corpus_file and final_replay and
+                        failure_class in {"missing_precondition", "permission_constraint",
+                                          "numeric_constraint", "execution_failure"} and
+                        replans_used < execution_replans):
+                    replans_used += 1
+                    replan_feedback = _execution_feedback(final_replay, failure_class)
+                    replanned, replan_events, replan_info = _agent_a_for_property(
+                        context, property_id, max_candidates=max_candidates,
+                        max_steps=max_steps, planning_repairs=0,
+                        tag=f"AgentA_{project}_{property_id}_replan{replans_used}",
+                        initial_feedback=replan_feedback, call_options=call_options)
+                    all_agent_a_events.extend(replan_events)
+                    property_row.setdefault("replanning", []).append({
+                        "trigger_candidate_id": candidate["candidate_id"],
+                        "failure_class": failure_class,
+                        "feedback": replan_feedback,
+                        "result": replan_info,
+                        "agent_a": _event_summary(replan_events)})
+                    existing = {json.dumps(row.get("steps", []), sort_keys=True)
+                                for row in candidates}
+                    for row in replanned:
+                        fingerprint = json.dumps(row.get("steps", []), sort_keys=True)
+                        if fingerprint not in existing:
+                            candidates.append(row)
+                            existing.add(fingerprint)
             valid = sum(row["status"] == "executable"
                         for row in property_row["candidate_results"])
             property_row["status"] = "seed_generated" if valid else "no_valid_evm_seed"
@@ -332,6 +446,8 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                     source = ROOT / row["corpus_file"]
                     shutil.copy2(source, coverage / source.name)
                     source_ids.append(row["seed_id"])
+            sender_pool = next(item for item in property_rows
+                               if item["property_id"] == property_id).get("sender_pool")
             try:
                 result = run_echidna(
                     project, campaign_root, property_name=property_name,
@@ -339,7 +455,8 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                     seed=echidna_seed + property_index - 1,
                     test_mode="property" if property_name.startswith("echidna_") else "assertion",
                     property_prefix=property_name,
-                    seq_len=8, stop_on_fail=False, disable_slither=True)
+                    seq_len=8, stop_on_fail=False, disable_slither=True,
+                    sender_pool=sender_pool)
                 result["property_id"] = property_id
                 result["input_seed_ids"] = source_ids
                 result["input_seed_class"] = "evm_valid" if source_ids else "none"
@@ -362,9 +479,11 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                           "manual_paths": False, "manual_parameter_templates": False,
                           "agent_b_responsibilities": ["ABI 参数", "发送者", "跨交易数据依赖"],
                           "planning_repairs_per_property": planning_repairs,
-                          "execution_feedback_repairs_per_candidate": repairs},
+                          "execution_feedback_repairs_per_candidate": repairs,
+                          "execution_replans_per_property": execution_replans},
         "budgets": {"echidna_test_limit_per_property": echidna_limit,
                     "echidna_timeout_seconds": echidna_timeout,
+                    "agent_a_execution_replans_per_property": execution_replans,
                     "token_budget": token_budget, "wall_budget_seconds": wall_budget},
         "api_usage": api_usage,
         "token_budget_accounting_upper_bound": budget.spent_tokens,
@@ -383,6 +502,8 @@ def main() -> None:
     parser.add_argument("--planning-repairs", type=int, default=1)
     parser.add_argument("--repairs", type=int, default=1,
                         help="Anvil 执行失败后的 Agent B 反馈修复次数")
+    parser.add_argument("--execution-replans", type=int, default=1,
+                        help="状态/权限/数值前置失败后的 Agent A 重新规划次数")
     parser.add_argument("--echidna-limit", type=int, default=80)
     parser.add_argument("--echidna-timeout", type=int, default=45)
     parser.add_argument("--echidna-seed", type=int, default=20261114)
@@ -392,14 +513,16 @@ def main() -> None:
     args = parser.parse_args()
     if not 1 <= args.max_candidates <= 4 or not 1 <= args.max_steps <= 12:
         parser.error("候选数应为 1–4，序列长度应为 1–12")
-    if not 0 <= args.repairs <= 3 or not 0 <= args.planning_repairs <= 2:
-        parser.error("Agent B 执行修复应为 0–3 次，Agent A 规划修复应为 0–2 次")
+    if (not 0 <= args.repairs <= 3 or not 0 <= args.planning_repairs <= 2 or
+            not 0 <= args.execution_replans <= 2):
+        parser.error("Agent B 执行修复应为 0–3 次，Agent A 规划修复/执行重规划应为 0–2 次")
     property_ids = _load_ids(args.project, args.property_id, args.property_contains)
     run_root = ROOT / "deepseek/结果/Agent种子语料" / args.project / uuid.uuid4().hex
     result = run_project(
         args.project, property_ids, max_candidates=args.max_candidates,
         max_steps=args.max_steps, repairs=args.repairs,
         planning_repairs=args.planning_repairs,
+        execution_replans=args.execution_replans,
         echidna_limit=args.echidna_limit, echidna_timeout=args.echidna_timeout,
         echidna_seed=args.echidna_seed, token_budget=args.token_budget,
         wall_budget=args.wall_budget, run_fuzzer=not args.skip_echidna,

@@ -1,0 +1,14 @@
+{
+  "frozen_before_implementation": "c3ad80a",
+  "date": "2026-11-16",
+  "purpose": "比较初始状态和前置条件增强前后的自动有效种子及计划目标状态到达；不按结果替换属性",
+  "samples": [
+    {"project": "OpenNFTs", "property_id": "50cc31144be4bad9bc9d", "property": "echidna_balance", "role": "既有失败：缺少 mint"},
+    {"project": "OpenNFTs", "property_id": "f0a4ef464239609050c2", "property": "echidna_owner", "role": "既有失败：重复初始化和参数类型"},
+    {"project": "Request", "property_id": "c451c42790194538cf50", "property": "echidna_token_conservation", "role": "既有失败：退款数值约束"},
+    {"project": "Kink", "property_id": "28d4a5495cb06ab375a1", "property": "echidna_token1_conserved", "role": "独立留出样本；开发时不依据其结果调整规则"}
+  ],
+  "run_policy": {"max_candidates": 1, "max_steps": 8, "planning_repairs": 1, "agent_b_schema_repairs": 1, "agent_b_execution_repairs": 1, "agent_a_replan_after_missing_prerequisite": 1, "token_budget_per_project": 80000, "wall_budget_seconds_per_project": 300, "echidna": "本阶段不做大规模覆盖测试"},
+  "metrics": {"valid_seed_rate": "Anvil 逐笔真实效果通过的属性数 / 固定属性总数", "deep_path_rate": "回放中计划目标操作成功并建立预期状态的属性数 / 固定属性总数", "baseline": "改动前同入口新运行或既有不可变原始记录；差异逐项注明"},
+  "failure_policy": "结构失败、部署失败、预算拦截、外层或内部回滚、重新规划失败均保留在分母和原始 JSON"
+}
