@@ -1,0 +1,211 @@
+{
+  "phase": 27,
+  "frozen_at_utc": "2026-11-17 11:40:31 UTC",
+  "status": "candidate_pool_frozen_formal_run_not_started",
+  "base_branch": "main",
+  "base_commit": "3b7b46e3804e9f97b57c4bdc4a6b56a45718f389",
+  "scope_change": {
+    "previous_freeze": "deepseek/结果/Phase26研究主线与可信度核验-20261117-修订1/Phase27独立样本选样冻结.json",
+    "previous_freeze_sha256": "8f1d47c9ae06163dca53855ea63d36477b26e0f2cccff9be4d3cf638612c945d",
+    "reason": "Phase26 的零候选结论仅针对现有 PROJECTS 注册表和不新增数据集限制。本轮用户明确授权从指定公开来源最多检查 8 个项目；旧冻结文件保持原样，本文件仅记录本轮有限范围变更。"
+  },
+  "upstream_sources": [
+    {
+      "url": "https://github.com/crytic/echidna",
+      "branch": "master",
+      "commit": "fb0fd78b9c3c46ac4127279da2313e727a66e5ad",
+      "role": "检查官方工具仓库及 examples；examples 同属工具仓库，不计作独立项目。"
+    },
+    {
+      "url": "https://github.com/perimetersec/public-fuzzing-campaigns-list",
+      "branch": "main",
+      "commit": "64eb4a8c2ae36fed3ab7b1d9159ccaa65fce9e90",
+      "role": "固定公开活动清单来源。"
+    }
+  ],
+  "candidate_cap": 8,
+  "candidate_pool_selection": "固定来源页面中优先选择具有 Solidity/Fuzz 或 Recon 测试目录的公开活动；在核验属性或执行结果前确定本清单，未查看 V2 成功率/覆盖结果。来源树中最多保留八项，无替换规则。",
+  "solidity_tree_hash_algorithm": "对固定 commit 的 GitHub recursive tree API 返回值，筛选全部已跟踪 Solidity 文件，按路径排序后连接每行 path、制表符和 Git blob SHA，再对完整 UTF-8 字节流计算 SHA-256。",
+  "candidates": [
+    {
+      "order": 1,
+      "project": "Very Liquid Vaults",
+      "repository": "rheo-xyz/very-liquid-vaults",
+      "branch": "main",
+      "commit": "7ff55811e7f5617488db1a87d91c140260ac0c28",
+      "source_url": "https://github.com/rheo-xyz/very-liquid-vaults",
+      "solidity_file_count": 101,
+      "solidity_tree_manifest_sha256": "6e7357b5fa27b611b489e8bd2d4ee3805f707bc7aa9fcd278aeee89e6d9ab76b",
+      "evidence_paths": [
+        "echidna.yaml",
+        "test/recon/CryticTester.t.sol",
+        "test/recon/Properties.t.sol",
+        "test/recon/TargetFunctions.t.sol"
+      ]
+    },
+    {
+      "order": 2,
+      "project": "DODO Cross-Chain DEX",
+      "repository": "pyk/dodocc-fuzz",
+      "branch": "main",
+      "commit": "0042646b1b541a2b3adb13205cb4b15e054ce05e",
+      "source_url": "https://github.com/pyk/dodocc-fuzz/tree/main/test/fuzzing",
+      "solidity_file_count": 49,
+      "solidity_tree_manifest_sha256": "8967634912bfed927042500d95f88f57cb975738c22b546e5178b3855fa6c98d",
+      "evidence_paths": [
+        "foundry.toml",
+        "test/fuzzing/Fuzz.sol",
+        "test/fuzzing/properties/ApproveGatewaySend.sol",
+        "test/fuzzing/properties/DepositAndCall.sol",
+        "test/fuzzing/properties/MintAsset.sol"
+      ],
+      "source_read_note": "git ls-remote TLS error; commit and tree obtained from GitHub API."
+    },
+    {
+      "order": 3,
+      "project": "Strata",
+      "repository": "Strata-Money/contracts",
+      "branch": "master",
+      "commit": "51ad892ed5a7c73df8b64e5a11c6c5371037b2d6",
+      "source_url": "https://github.com/Strata-Money/contracts/tree/master/test/recon",
+      "solidity_file_count": 46,
+      "solidity_tree_manifest_sha256": "9115be60010c36c968ec53736f0cce2398474b6dcfac2b904fcfad0c9515160c",
+      "evidence_paths": [
+        "echidna.yaml",
+        "test/recon/CryticTester.sol",
+        "test/recon/Properties.sol",
+        "test/recon/TargetFunctions.sol",
+        "test/recon/Setup.sol"
+      ]
+    },
+    {
+      "order": 4,
+      "project": "Origin Protocol WOETH",
+      "repository": "perimetersec/origin-woeth-fuzz",
+      "branch": "main",
+      "commit": "b71b5ec6ccf93c29e937bc558de5783b51123e14",
+      "source_url": "https://github.com/perimetersec/origin-woeth-fuzz",
+      "solidity_file_count": 17,
+      "solidity_tree_manifest_sha256": "67bfa738a35de3c6b03c6b91058af65df7a8e4c1ccd190ee6147518203fef4d0",
+      "evidence_paths": [
+        "echidna-config.yaml",
+        "test/fuzzing/Fuzz.sol",
+        "test/fuzzing/FuzzIntegrity.sol",
+        "test/fuzzing/FuzzSetup.sol"
+      ]
+    },
+    {
+      "order": 5,
+      "project": "EulerSwap",
+      "repository": "euler-xyz/euler-swap",
+      "branch": "enigmadark-invariant-suite",
+      "commit": "d6adbe0f6daeaa79745ca67e7954652e646dd754",
+      "source_url": "https://github.com/euler-xyz/euler-swap/tree/enigmadark-invariant-suite/test/enigma-dark-invariants",
+      "solidity_file_count": 57,
+      "solidity_tree_manifest_sha256": "e7c6de07f3935f1ceb25db0fb1922405f7cf081e556386f464c1cb94df2ae3ea",
+      "evidence_paths": [
+        "test/enigma-dark-invariants/_config/echidna_config.yaml",
+        "test/enigma-dark-invariants/Tester.t.sol",
+        "test/enigma-dark-invariants/Invariants.t.sol",
+        "test/enigma-dark-invariants/Setup.t.sol",
+        "test/enigma-dark-invariants/HandlerAggregator.t.sol",
+        "test/enigma-dark-invariants/handlers/setup/EulerSwapSetupHandler.t.sol",
+        "test/enigma-dark-invariants/handlers/swap/EulerSwapHandler.t.sol",
+        "test/enigma-dark-invariants/invariants/BaseInvariants.t.sol"
+      ]
+    },
+    {
+      "order": 6,
+      "project": "eBTC BSM",
+      "repository": "ebtc-protocol/ebtc-bsm",
+      "branch": "main",
+      "commit": "e5935b77a19a1b6036a3a1b44f70ac128fbdf7d9",
+      "source_url": "https://github.com/ebtc-protocol/ebtc-bsm/tree/main/test/recon-core",
+      "solidity_file_count": 59,
+      "solidity_tree_manifest_sha256": "fec5bce47a0e5e40f0f7cb42b189c55d223561168e3ad971db75f740fafe65fd",
+      "evidence_paths": [
+        "echidna.yaml",
+        "test/recon-core/CryticTester.sol",
+        "test/recon-core/Properties.sol",
+        "test/recon-core/TargetFunctions.sol",
+        "test/recon-core/Setup.sol"
+      ]
+    },
+    {
+      "order": 7,
+      "project": "Gamma (2025-02 contest snapshot)",
+      "repository": "CodeHawks-Contests/2025-02-gamma",
+      "branch": "main",
+      "commit": "84b9da452fc84762378481fa39b4087b10bab5e0",
+      "source_url": "https://github.com/CodeHawks-Contests/2025-02-gamma/tree/main/test/fuzzing/echidna",
+      "solidity_file_count": 304,
+      "solidity_tree_manifest_sha256": "f5b9f6d50f764bcdbe77f96503a3d323e44f89cb2e04a4b6d422c7016a16ed09",
+      "evidence_paths": [
+        "foundry.toml",
+        "hardhat.config.js",
+        "test/fuzzing/"
+      ]
+    },
+    {
+      "order": 8,
+      "project": "Nerite",
+      "repository": "Recon-Fuzz/nerite",
+      "branch": "invariant-testing",
+      "commit": "ecd542c6ea7ab41ec9d0d371f43b03d06cec0fe3",
+      "source_url": "https://github.com/Recon-Fuzz/nerite/tree/invariant-testing/contracts/test/recon",
+      "solidity_file_count": 238,
+      "solidity_tree_manifest_sha256": "6d9acddf4a891a041e0d4e4a9980e8e2988fd0b2a601554594a107fc0b0f1a07",
+      "evidence_paths": [
+        "contracts/echidna.yaml",
+        "contracts/test/recon/CryticTester.sol",
+        "contracts/test/recon/Properties.sol",
+        "contracts/test/recon/TargetFunctions.sol"
+      ]
+    }
+  ],
+  "eligibility_gate": [
+    "固定公开 commit，有真实 Solidity 源码和可验证源码指纹。",
+    "上游 Harness 原生包含公开/外部 echidna_*() returns (bool) 属性；不得新增或重写 Harness/属性来满足门槛。",
+    "所选 Boolean property 的读取状态须与至少两个 Harness 外部状态变更操作的写入/守卫状态有源代码或 Slither 依赖证据。",
+    "上游 Harness 在当前固定 Echidna/Crytic/solc/Foundry 环境可编译并部署，且部署后目标属性为真。",
+    "项目未在 Phase10–26 参与 V2 开发、调试或基准实验。",
+    "资格只看源代码、属性、依赖和执行环境；不读取 Agent 生成、Anvil 成功率、目标覆盖或 fuzz 结果。"
+  ],
+  "selection_rule": "每个项目最多一个目标属性；按固定 commit 中完整属性签名的字典序选取满足属性状态依赖门槛的第一项；候选项目按 SHA-256(phase27-independent-v1|owner/repo@commit|property_signature) 升序，最多取前 6 个；合格项目少于 4 个即停止正式实验，不补样。",
+  "formal_protocol_if_gate_passes": {
+    "mainline": "安全属性分析 → Agent A 交易顺序规划 → Agent B 参数生成 → Anvil 实际执行反馈 → 跨交易参数自动修复 → 有效种子验证 → Echidna 模糊测试",
+    "tool_versions": {
+      "echidna": "2.3.2",
+      "anvil": "1.9.0-dev (6056c5845d34205a83cf7108042adb137325c9df)",
+      "forge": "1.9.0-dev (6056c5845d34205a83cf7108042adb137325c9df)",
+      "crytic_compile": "0.4.2",
+      "slither": "0.11.6"
+    },
+    "G0": "原生 Echidna，空外部语料，testLimit=5000。",
+    "G1": "V2，关闭 Phase25 runtime constraint repair；与 G2 使用同一次 Agent A/B 产生的原始候选序列；不执行新增约束修复。",
+    "G2": "完整 V2，从与 G1 完全相同的原始候选序列开始，最多进行一次有界运行时参数修复并完整重放验证。",
+    "paired_random_seeds": [
+      20261125,
+      20261135,
+      20261145
+    ],
+    "echidna_controls": "每项目原生编译配置、Harness 和全部布尔属性不变；各组覆盖率开启、workers=1、stopOnFail=false、随机 seed 成对固定、testLimit=5000；Harness 中的 filterFunctions/权限规则按上游固定配置在三组间一致。",
+    "agent_budget": "每项目每属性最多一次 Agent A 规划、一次 Agent B 参数具体化；G2 最多一次约束修复；不重试规划，不追加候选。",
+    "shared_controls": "每个项目内三组固定同一上游源码 commit、Harness、所有原生 Echidna 属性、target action permission、账户/sender 集合、solc 与 remappings、Echidna/Anvil 版本及调用预算。每个项目保留其原生 sender 和编译配置；各组一致。",
+    "coverage": "每个外部种子先做独立 seed-only replay 采集 LCOV；正式 5000-case seeded campaign 结束后再与 replay LCOV 做集合差；G0 同预算空 corpus；分别报种子覆盖、后续新增覆盖和最终覆盖。",
+    "metrics": [
+      "目标交易成功率",
+      "目标状态到达率（getter/属性状态和内部调用证据）",
+      "有效多交易序列比例",
+      "最终源码覆盖",
+      "种子回放覆盖",
+      "回放后新增覆盖",
+      "属性反例数及首次发现时间",
+      "端到端耗时",
+      "DeepSeek API调用数与成本"
+    ],
+    "success_standard": "外层 receipt 成功不充分；目标 transaction receipt 成功，内部调用无目标操作回滚，执行后 getter/相关属性状态确证目标状态，并通过完整 Anvil 序列重放。属性违反另记，不当作状态到达的等价口径。"
+  },
+  "stop_rule": "静态/执行资格门最终合格项目数 < 4 时，不调用 Agent、不运行 G0/G1/G2、不依据 V2 成功率或覆盖另选项目，提交阻塞报告。",
+  "formal_run_started": false
+}

@@ -1,0 +1,117 @@
+{
+  "phase": 27,
+  "status": "STOP_BEFORE_FORMAL_G0_G1_G2",
+  "pool_freeze": "Phase27候选池与方案冻结.json",
+  "candidate_count_checked": 8,
+  "full_eligible_candidate_count": 1,
+  "minimum_required": 4,
+  "formal_runs_started": 0,
+  "agent_calls": 0,
+  "deepseek_api_cost_usd": 0,
+  "historical_independence_check": {
+    "reports": "docs/10至docs/26中的阶段报告",
+    "search_terms": ["Very Liquid Vaults", "DODO", "Strata", "WOETH", "EulerSwap", "eBTC BSM", "Gamma", "Nerite"],
+    "matches": [],
+    "result": "候选名未出现在 Phase10–26 阶段报告；八个仓库均不在 Phase26 固定的七项目注册表中。"
+  },
+  "candidate_results": [
+    {
+      "project": "Very Liquid Vaults",
+      "commit": "7ff55811e7f5617488db1a87d91c140260ac0c28",
+      "solidity_files": 101,
+      "source_tree_manifest_sha256": "6e7357b5fa27b611b489e8bd2d4ee3805f707bc7aa9fcd278aeee89e6d9ab76b",
+      "evidence": ["echidna.yaml", "test/recon/CryticTester.t.sol", "test/recon/Properties.t.sol", "test/recon/TargetFunctions.t.sol"],
+      "screen": "排除",
+      "reason": "原生 Echidna 配置为 testMode=assertion；Harness 属性是无 bool 返回的 property_SOLVENCY_01/property_STRATEGY_02，不满足冻结的 echidna_*() returns (bool) 条件。"
+    },
+    {
+      "project": "DODO Cross-Chain DEX",
+      "commit": "0042646b1b541a2b3adb13205cb4b15e054ce05e",
+      "solidity_files": 49,
+      "source_tree_manifest_sha256": "8967634912bfed927042500d95f88f57cb975738c22b546e5178b3855fa6c98d",
+      "evidence": ["foundry.toml", "test/fuzzing/Fuzz.sol", "test/fuzzing/properties/ApproveGatewaySend.sol", "test/fuzzing/properties/DepositAndCall.sol", "test/fuzzing/properties/MintAsset.sol"],
+      "screen": "排除",
+      "reason": "固定 commit 没有 Echidna 配置；所检查的 Fuzz 合约与三个 properties 模块是 Foundry 测试/动作入口，没有原生 echidna bool 属性。首轮 git ls-remote 遇到 TLS EOF；用 GitHub API 固定 commit 与 Solidity tree manifest。"
+    },
+    {
+      "project": "Strata",
+      "commit": "51ad892ed5a7c73df8b64e5a11c6c5371037b2d6",
+      "solidity_files": 46,
+      "source_tree_manifest_sha256": "9115be60010c36c968ec53736f0cce2398474b6dcfac2b904fcfad0c9515160c",
+      "evidence": ["echidna.yaml", "test/recon/CryticTester.sol", "test/recon/Properties.sol", "test/recon/TargetFunctions.sol", "test/recon/Setup.sol"],
+      "screen": "排除",
+      "reason": "原生配置为 testMode=assertion；Properties.sol 定义的是无 bool 返回的 property_* 断言函数，没有冻结门槛要求的 Echidna Boolean property。"
+    },
+    {
+      "project": "Origin Protocol WOETH",
+      "commit": "b71b5ec6ccf93c29e937bc558de5783b51123e14",
+      "solidity_files": 17,
+      "source_tree_manifest_sha256": "67bfa738a35de3c6b03c6b91058af65df7a8e4c1ccd190ee6147518203fef4d0",
+      "evidence": ["echidna-config.yaml", "test/fuzzing/Fuzz.sol", "test/fuzzing/FuzzIntegrity.sol", "test/fuzzing/FuzzSetup.sol"],
+      "screen": "排除",
+      "reason": "配置为 testMode=assertion；公开入口是 fuzz_* handler，检查通过内部断言完成，不存在原生 echidna_*() returns (bool) 属性。"
+    },
+    {
+      "project": "EulerSwap",
+      "commit": "d6adbe0f6daeaa79745ca67e7954652e646dd754",
+      "solidity_files": 57,
+      "source_tree_manifest_sha256": "e7c6de07f3935f1ceb25db0fb1922405f7cf081e556386f464c1cb94df2ae3ea",
+      "evidence": ["test/enigma-dark-invariants/Tester.t.sol", "test/enigma-dark-invariants/Invariants.t.sol", "test/enigma-dark-invariants/Setup.t.sol", "test/enigma-dark-invariants/HandlerAggregator.t.sol", "test/enigma-dark-invariants/handlers/setup/EulerSwapSetupHandler.t.sol", "test/enigma-dark-invariants/handlers/swap/EulerSwapHandler.t.sol", "test/enigma-dark-invariants/invariants/BaseInvariants.t.sol"],
+      "screen": "通过源代码、依赖与环境门；未进入正式样本集",
+      "native_boolean_properties": ["echidna_CORE_INVARIANTS() returns (bool)", "echidna_STATE_INVARIANTS() returns (bool)", "echidna_DEBT_LIMIT_INVARIANTS() returns (bool)"],
+      "state_dependency_evidence": "Tester 构造器部署并初始化 EVK/EulerSwap；setupEulerSwap 先向两个 EVault 存入资金、创建池并配置 actor approvals；activate 与后续 swap/roundtripSwap 依赖已创建池的 reserves/status。echidna_CORE_INVARIANTS 读取 holder debt 与 EulerSwap reserves/curve 状态。",
+      "environment_probe": {
+        "command_mode": "Echidna 2.3.2 testLimit=0；只编译、静态分析、构造部署并检查初始属性，不执行交易序列。",
+        "result": "编译成功；Echidna 与 Slither 正常结束；三个 Echidna 属性均 passing；0 tests、0 fuzzing、0 total calls。",
+        "elapsed_seconds": 205.558,
+        "compile_seconds": 175.882,
+        "slither_seconds": 25.268,
+        "initial_property_true": true,
+        "evidence_files": ["EulerSwap-native-compile-deploy-probe-with-venv.json"]
+      },
+      "complexity_note": "上游 Harness 的可执行检查需要 Foundry/Echidna/Crytic、四个直接 Git submodule 及其递归依赖；所有检出与构建只发生在 /tmp/phase27-euler。"
+    },
+    {
+      "project": "eBTC BSM",
+      "commit": "e5935b77a19a1b6036a3a1b44f70ac128fbdf7d9",
+      "solidity_files": 59,
+      "source_tree_manifest_sha256": "fec5bce47a0e5e40f0f7cb42b189c55d223561168e3ad971db75f740fafe65fd",
+      "evidence": ["echidna.yaml", "test/recon-core/CryticTester.sol", "test/recon-core/Properties.sol", "test/recon-core/TargetFunctions.sol", "test/recon-core/Setup.sol"],
+      "screen": "排除",
+      "reason": "原生配置为 testMode=assertion、prefix=crytic_；Properties.sol 为无 bool 返回的 property_* 断言函数，不满足冻结属性签名。"
+    },
+    {
+      "project": "Gamma (2025-02 contest snapshot)",
+      "commit": "84b9da452fc84762378481fa39b4087b10bab5e0",
+      "solidity_files": 304,
+      "source_tree_manifest_sha256": "f5b9f6d50f764bcdbe77f96503a3d323e44f89cb2e04a4b6d422c7016a16ed09",
+      "evidence": ["test/fuzzing/echidna/FuzzEchidna.sol", "test/fuzzing/echidna/helpers/GMXSetup.sol", "test/fuzzing/echidna/properties/Properties.sol", "test/fuzzing/echidna/properties/*Properties.sol", "test/fuzzing/echidna/setup/FuzzSetup.sol"],
+      "screen": "排除",
+      "reason": "确有 Echidna 专用 Harness，但 FuzzEchidna 只继承并部署 GMXSetup；公开 fuzz_* 是 handler，Properties 模块使用内部 invariant/postcondition/assertion，没有 echidna_*() returns (bool)。Harness setup 文件约 67 KB，整仓 304 个 Solidity 文件，未尝试接入大型协议或编译整个候选。"
+    },
+    {
+      "project": "Nerite",
+      "commit": "ecd542c6ea7ab41ec9d0d371f43b03d06cec0fe3",
+      "solidity_files": 238,
+      "source_tree_manifest_sha256": "6d9acddf4a891a041e0d4e4a9980e8e2988fd0b2a601554594a107fc0b0f1a07",
+      "evidence": ["contracts/echidna.yaml", "contracts/test/recon/CryticTester.sol", "contracts/test/recon/Properties.sol", "contracts/test/recon/TargetFunctions.sol"],
+      "screen": "排除",
+      "reason": "原生配置为 testMode=assertion、prefix=optimize_，Properties.sol 的公开 property_* 均无 bool 返回；配置还要求多项 Superfluid 部署库和 ERC1820 字节码。"
+    }
+  ],
+  "gate_summary": {
+    "fixed_public_source_and_commit": "8/8",
+    "no_phase10_to_26_participation": "8/8",
+    "native_echidna_boolean_property": "1/8",
+    "state_dependency_in_at_least_two_external_actions": "1/8 verified",
+    "compile_deploy_and_initial_property_pass": "1/8 verified",
+    "fully_eligible": "1/8",
+    "formal_sample_minimum_met": false,
+    "decision_reason": "冻结规则要求至少四个全门槛通过项目，当前仅 EulerSwap 通过。严格按门槛停止，未降低属性要求、未替换样本、未查看覆盖或 V2 成功率后再选样。"
+  },
+  "negative_results_preserved": [
+    "EulerSwap-native-compile-deploy-probe-missing-crytic-compile.json: 首次命令的 PATH 未包含已有 crytic-compile；这是环境启动错误，不能视为项目失败。",
+    "EulerSwap-native-compile-deploy-probe-with-venv.json: 使用项目现有虚拟环境 PATH 的有效 testLimit=0 探测。",
+    "没有启动 Anvil Agent 回放或任何正式 Echidna fuzz campaign。"
+  ]
+}
