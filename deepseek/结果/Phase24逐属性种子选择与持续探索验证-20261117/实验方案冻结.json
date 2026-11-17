@@ -1,0 +1,233 @@
+{
+  "phase": 24,
+  "created_at_utc": "2026-11-17T06:10:01.186227+00:00",
+  "experiment_status": "pre-registered-before-replay-and-fuzzing",
+  "base_commit": "a0adcafdf6af86e17805d4076fb38ee371753abb",
+  "source_report": "deepseek/结果/DeepSeek分组可信度修复实验.json",
+  "source_report_sha256": "ca60c8fcfe1948c2b874ecb1b19c3c8c061c29a9e1bf8363219ff22351e97768",
+  "source_experiment_id": "2860da9f9d884d24898287128b95d0b0",
+  "seed_source": "Phase 10 Request independent_dual, repetitions 1 and 2 only; no new DeepSeek calls",
+  "source_candidate_count": 8,
+  "deduplication": "SHA-256 of normalized ordered transactions (function, arguments, sender, value, delays); retain every alias and invalid source record",
+  "seed_validity_rule": [
+    "Phase 10 corpus serialization must exactly match its Agent transaction record under the current Request ABI encoder.",
+    "Fresh Anvil replay must deploy the same Request Harness; all 16 initial echidna_* properties must evaluate true.",
+    "Every planned transaction must have a successful outer receipt, an available callTracer and prestateTracer result, no unexpected internal call revert, at least one persistent storage slot change, and an observed public-view state change.",
+    "Property violations are recorded as outcomes and do not by themselves invalidate an otherwise effective executable seed.",
+    "All source candidate records, failed replays and duplicate aliases remain in the audit ledger."
+  ],
+  "gate": "Run formal campaigns only if at least 3 unique valid transaction sequences represent at least 3 distinct source property IDs on this exact Harness.",
+  "harness": {
+    "project": "Request",
+    "contract": "EchidnaERC20CommerceEscrowWrapper",
+    "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+    "source_sha256": "e26980ce0abdbec7f9b9be78c6d6209057de6c2402e769faa37a00e47d868f3f",
+    "property_names": [
+      "echidna_captured_never_exceeds_authorized",
+      "echidna_escrow_not_token_sink",
+      "echidna_escrow_state_consistent",
+      "echidna_fee_bps_validation_enforced",
+      "echidna_fee_calc_no_overflow",
+      "echidna_fee_never_exceeds_capture",
+      "echidna_fee_receiver_only_gets_fees",
+      "echidna_invalid_fee_bps_reverts",
+      "echidna_merchant_receives_nonnegative",
+      "echidna_no_underflow_in_merchant_payment",
+      "echidna_operator_authorization_enforced",
+      "echidna_payment_ref_counter_monotonic",
+      "echidna_token_conservation",
+      "echidna_token_supply_never_decreases",
+      "echidna_uint96_sufficient_range",
+      "echidna_wrapper_not_token_sink"
+    ],
+    "property_count": 16,
+    "contract_source_sha256": "efe5be7db5fe99d1b7cc1c1579f2f799a28df39e84869af75ab80f91b9a9721a",
+    "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+  },
+  "environment": {
+    "echidna_version": "2.3.2",
+    "anvil_version": "1.9.0-dev",
+    "solidity": "0.8.20",
+    "chain_id": 1,
+    "initial_timestamp": 1524785992,
+    "initial_block_number": 4370000,
+    "evm_hardfork": "shanghai",
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "account_balance_wei": 4294967295,
+    "gas_price_wei": 0,
+    "gas_limit_per_transaction": 12500000
+  },
+  "echidna_configuration": {
+    "test_mode": "property",
+    "prefix": "echidna_",
+    "workers": 1,
+    "seq_len": 8,
+    "shrink_limit": 1,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "coverage": true,
+    "max_time_delay_seconds": 86400,
+    "max_block_delay": 86400,
+    "max_gas_price": 0,
+    "balance_addr": 4294967295,
+    "balance_contract": 0,
+    "test_max_gas": 12500000,
+    "property_max_gas": 12500000,
+    "formal_test_limit": 500,
+    "formal_campaign_timeout_seconds": 86400
+  },
+  "paired_random_seeds": [
+    20261118,
+    20261128,
+    20261208,
+    20261218,
+    20261228
+  ],
+  "groups": {
+    "G0": "native Echidna, empty external corpus",
+    "G1": "all unique valid Phase 10 seeds",
+    "G2": "greedy half-ceiling by marginal LCOV source lines from independent, test-limit=0 seed replays only; stable tie-break by property ID then sequence SHA-256",
+    "G3": "random sample of the same size from sorted valid seeds using Python random.Random(242417); selected before any formal result is read"
+  },
+  "coverage_separation": {
+    "replay": "separate Echidna test-limit=0 campaign with only the fixed seed bundle (or an empty corpus for G0)",
+    "post_replay_fuzzing": "exact set difference of final campaign LCOV covered source lines minus that group's independent replay LCOV covered source lines",
+    "unique_instruction_limit": "Echidna exposes a scalar unique-instruction total but no instruction-PC bitmap; report final totals and replay-only totals separately, and do not claim exact new unique instructions by scalar subtraction."
+  },
+  "target_related_path_ranges": [
+    {
+      "label": "Harness.driver_authorizePayment",
+      "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+      "first_line": 99,
+      "last_line": 144
+    },
+    {
+      "label": "Harness.driver_capturePayment",
+      "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+      "first_line": 145,
+      "last_line": 169
+    },
+    {
+      "label": "Harness.driver_chargePayment",
+      "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+      "first_line": 186,
+      "last_line": 227
+    },
+    {
+      "label": "Wrapper.authorize_path",
+      "source": "sol/真实项目/Request/src/contracts/ERC20CommerceEscrowWrapper.sol",
+      "first_line": 250,
+      "last_line": 438
+    },
+    {
+      "label": "Wrapper.capturePayment",
+      "source": "sol/真实项目/Request/src/contracts/ERC20CommerceEscrowWrapper.sol",
+      "first_line": 439,
+      "last_line": 504
+    },
+    {
+      "label": "Wrapper.charge_path",
+      "source": "sol/真实项目/Request/src/contracts/ERC20CommerceEscrowWrapper.sol",
+      "first_line": 569,
+      "last_line": 698
+    }
+  ],
+  "pre_registered_decision_rule": {
+    "stable_pair_wins_required": 4,
+    "minimum_relative_mean_gain_percent": 5.0,
+    "minimum_absolute_mean_gain_source_lines": 5,
+    "G1_meaningful_later_exploration": "G1 must beat G0 in at least 4/5 paired runs on exact post-replay new LCOV source lines and its mean gain must be at least max(5 lines, 5% of G0 mean); otherwise recommend stopping this direction.",
+    "G2_versus_G3_stable": "G2 must beat G3 in at least 4/5 paired runs on exact post-replay new LCOV source lines and its mean gain must be at least max(5 lines, 5% of G3 mean); otherwise recommend stopping this direction.",
+    "no_posthoc_adjustment": "Do not alter the frozen candidate pool, selection metric, tie-break, random rule or thresholds after any G0-G3 formal campaign begins."
+  },
+  "candidate_inventory": [
+    {
+      "repetition": 1,
+      "property_id": "63038d1bdccedd2b3b59",
+      "source_seed_id": "seed-f35df318c0524b4c842244449f35c97a",
+      "source_status": "executable",
+      "sequence_sha256": "7162a7e5b0dd52549996786c8295cbfbadf529e11a2380303fdc7f57eb9ab7c6",
+      "source_corpus_sha256": "7e1da67b90c0d70ce6c17a935a26b6a93bd863b5a378ecf8f50cb3e4786cc88b",
+      "source_corpus_matches_agent_transactions": true,
+      "duplicate_of": null
+    },
+    {
+      "repetition": 1,
+      "property_id": "66c6ef28ea17e22739c7",
+      "source_seed_id": "seed-a477823243b04a578ce9133f11e2b7ad",
+      "source_status": "executable",
+      "sequence_sha256": "7162a7e5b0dd52549996786c8295cbfbadf529e11a2380303fdc7f57eb9ab7c6",
+      "source_corpus_sha256": "7e1da67b90c0d70ce6c17a935a26b6a93bd863b5a378ecf8f50cb3e4786cc88b",
+      "source_corpus_matches_agent_transactions": true,
+      "duplicate_of": "seed-f35df318c0524b4c842244449f35c97a"
+    },
+    {
+      "repetition": 1,
+      "property_id": "c451c42790194538cf50",
+      "source_seed_id": "seed-2bcc3b63f9b642008db85184fc0ef094",
+      "source_status": "executable",
+      "sequence_sha256": "409f5547eed4e3d59c63e9d4c9377f4e49d403775906526c8553dfee76fa88c0",
+      "source_corpus_sha256": "0a6554def53067d435f3e2055e6c8f48859736d876397ff418aed51659010035",
+      "source_corpus_matches_agent_transactions": true,
+      "duplicate_of": null
+    },
+    {
+      "repetition": 1,
+      "property_id": "eebf858bb07972b2891e",
+      "source_seed_id": "seed-9fd1bf57030b4e1aa9622ab07e20712d",
+      "source_status": "executable",
+      "sequence_sha256": "5d60a2c67d899a16c766e14d19ff9bffc8f96ec3fee24811900a9ed3c5a49b1f",
+      "source_corpus_sha256": "b87e7c4bcac55008c78a0d53342848d61171e4c2aff2c7128201d8ab51d6cb9e",
+      "source_corpus_matches_agent_transactions": true,
+      "duplicate_of": null
+    },
+    {
+      "repetition": 2,
+      "property_id": "63038d1bdccedd2b3b59",
+      "source_seed_id": "seed-9b601836b72d4f108d8c0f8e92bf3e6a",
+      "source_status": "executable",
+      "sequence_sha256": "7162a7e5b0dd52549996786c8295cbfbadf529e11a2380303fdc7f57eb9ab7c6",
+      "source_corpus_sha256": "7e1da67b90c0d70ce6c17a935a26b6a93bd863b5a378ecf8f50cb3e4786cc88b",
+      "source_corpus_matches_agent_transactions": true,
+      "duplicate_of": "seed-f35df318c0524b4c842244449f35c97a"
+    },
+    {
+      "repetition": 2,
+      "property_id": "66c6ef28ea17e22739c7",
+      "source_seed_id": "seed-09acb4555ddc481c9861519361e515cf",
+      "source_status": "executable",
+      "sequence_sha256": "68b381dbcc2fa773404c735481222e2727c96e624f4ff42bd260f49c501335fc",
+      "source_corpus_sha256": "3ce7be4fe617c9623c373b92f11829f687c8b3c3e2ce0f3980a0598cc40d40d5",
+      "source_corpus_matches_agent_transactions": true,
+      "duplicate_of": null
+    },
+    {
+      "repetition": 2,
+      "property_id": "c451c42790194538cf50",
+      "source_seed_id": "seed-213a9cc46ad04fa8aa1b0c3908b28112",
+      "source_status": "executable",
+      "sequence_sha256": "409f5547eed4e3d59c63e9d4c9377f4e49d403775906526c8553dfee76fa88c0",
+      "source_corpus_sha256": "0a6554def53067d435f3e2055e6c8f48859736d876397ff418aed51659010035",
+      "source_corpus_matches_agent_transactions": true,
+      "duplicate_of": "seed-2bcc3b63f9b642008db85184fc0ef094"
+    },
+    {
+      "repetition": 2,
+      "property_id": "eebf858bb07972b2891e",
+      "source_seed_id": "seed-2fa3cecd155a4814a84ec3d8ce11d9f3",
+      "source_status": "executable",
+      "sequence_sha256": "5d60a2c67d899a16c766e14d19ff9bffc8f96ec3fee24811900a9ed3c5a49b1f",
+      "source_corpus_sha256": "b87e7c4bcac55008c78a0d53342848d61171e4c2aff2c7128201d8ab51d6cb9e",
+      "source_corpus_matches_agent_transactions": true,
+      "duplicate_of": "seed-9fd1bf57030b4e1aa9622ab07e20712d"
+    }
+  ]
+}
