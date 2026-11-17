@@ -1,0 +1,680 @@
+{
+  "phase": 25,
+  "revision_of": "deepseek/结果/Phase25跨交易状态约束参数修复-20261117",
+  "revision_reason": "首轮冻结实验发现同一对象键有多个前序事件值时，单值 getter 观察会拒绝查询；本轮按 Slither 源码中通用零基 index 到顺序事件键映射，查询所有唯一事件键并冻结同一批样本复验。",
+  "prior_run_summary_sha256": "105da0e654e2e3f4b8add19d419b5d56af7f084e7d1443583432756481533b6c",
+  "sample_selection_unchanged": true,
+  "budget_and_environment_unchanged": true,
+  "experiment_status": "frozen-before-first-anvil-replay",
+  "frozen_at_utc": "2026-11-17T07:31:34.488568+00:00",
+  "baseline_commit": "462dabeb50ef1b9c08fe50623fb735759fad0dac",
+  "baseline_source_sha256": "a3158b3e3ec742c62108851504c9f38e93aa028cda4b70023594cd85e88947c0",
+  "current_source_sha256s": {
+    "deepseek/实验过程/运行Agent种子流程.py": "3a6f12f6632b1b941fcd7e67966d59bd6a503d975d54b30eff226c8ebcec3f7b",
+    "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+    "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3",
+    "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+    "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+    "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+    "func/功能/种子验证.py": "0ddd73709be1525b8a448da7ac7bd67d69c060ec776493b1b0a77e9857a3ee4d",
+    "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+    "func/测试过程/Phase25跨交易状态约束实验.py": "216130419a9820187b479462c12fb8b4e7404faa555d6edfcbc3267ddf898130",
+    ".tools/results/Request-Harness编译.json": "9ec90a1506a172e4bf7d39a77e63bdf6126a1d294ccd99c870879e8717579ab6",
+    ".tools/results/Immutable-Harness编译.json": "b9e8dbc601775b13743d60a8186893f5cc55877cf34ec5dd2c02411fce916a02",
+    "deepseek/结果/自主种子质量实验/BeeStorage-Harness编译.json": "b52571c9ec58da207d46ded4f569bcd578f09014c3431c315ffa450a03a33982",
+    "deepseek/结果/通用依赖泛化验证/OpenNFTs-Harness编译.json": "49eae9f7fdd86c9f2c37fc9624e131fc57d152977e56aaf6f3c751a7d17d8cf8"
+  },
+  "samples": [
+    {
+      "sample_id": "request_refund_quota",
+      "project": "Request",
+      "property_id": "c451c42790194538cf50",
+      "property": "EchidnaERC20CommerceEscrowWrapper.echidna_token_conservation()",
+      "target_function": "driver_refundPayment(uint256,uint256)",
+      "property_target_address": null,
+      "harness_path": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol",
+      "harness_sha256": "e26980ce0abdbec7f9b9be78c6d6209057de6c2402e769faa37a00e47d868f3f",
+      "contract_source_sha256s": {
+        "deepseek/实验过程/运行Agent种子流程.py": "3a6f12f6632b1b941fcd7e67966d59bd6a503d975d54b30eff226c8ebcec3f7b",
+        "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+        "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3",
+        "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+        "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+        "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+        "func/功能/种子验证.py": "0ddd73709be1525b8a448da7ac7bd67d69c060ec776493b1b0a77e9857a3ee4d",
+        "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+        "func/测试过程/Phase25跨交易状态约束实验.py": "216130419a9820187b479462c12fb8b4e7404faa555d6edfcbc3267ddf898130",
+        ".tools/results/Request-Harness编译.json": "9ec90a1506a172e4bf7d39a77e63bdf6126a1d294ccd99c870879e8717579ab6"
+      },
+      "source_records": [
+        {
+          "report": "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json",
+          "report_sha256": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+          "candidate_id": "c451c4279019-01-c451c42790194538cf50-seq1",
+          "source_status": "replay_failed",
+          "seed_id": null,
+          "original_transactions": [
+            {
+              "index": 1,
+              "function": "driver_authorizePayment(uint256,uint256,uint16)",
+              "abi_signature": "driver_authorizePayment(uint256,uint256,uint16)",
+              "sender": "0x0000000000000000000000000000000000010000",
+              "arguments": [
+                1000000000000000000,
+                1000000000000000000,
+                0
+              ],
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change",
+              "data_dependencies": []
+            },
+            {
+              "index": 2,
+              "function": "driver_chargePayment(uint256,uint16)",
+              "abi_signature": "driver_chargePayment(uint256,uint16)",
+              "sender": "0x0000000000000000000000000000000000010000",
+              "arguments": [
+                1000000000000000000,
+                100
+              ],
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change",
+              "data_dependencies": []
+            },
+            {
+              "index": 3,
+              "function": "driver_refundPayment(uint256,uint256)",
+              "abi_signature": "driver_refundPayment(uint256,uint256)",
+              "sender": "0x0000000000000000000000000000000000010000",
+              "arguments": [
+                0,
+                1000000000000000000
+              ],
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change",
+              "data_dependencies": [
+                {
+                  "depends_on_transaction": 1,
+                  "field": "paymentIndex",
+                  "relation": "paymentIndex=0 映射到 paymentRefCounter 推进后的第一个 paymentRef（bytes8(uint64(1+0%counter))），即前序 driver_authorizePayment 创建的授权支付引用"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "transactions": [
+        {
+          "index": 1,
+          "function": "driver_authorizePayment(uint256,uint256,uint16)",
+          "abi_signature": "driver_authorizePayment(uint256,uint256,uint16)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            1000000000000000000,
+            1000000000000000000,
+            0
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": []
+        },
+        {
+          "index": 2,
+          "function": "driver_chargePayment(uint256,uint16)",
+          "abi_signature": "driver_chargePayment(uint256,uint16)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            1000000000000000000,
+            100
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": []
+        },
+        {
+          "index": 3,
+          "function": "driver_refundPayment(uint256,uint256)",
+          "abi_signature": "driver_refundPayment(uint256,uint256)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "depends_on_transaction": 1,
+              "field": "paymentIndex",
+              "relation": "paymentIndex=0 映射到 paymentRefCounter 推进后的第一个 paymentRef（bytes8(uint64(1+0%counter))），即前序 driver_authorizePayment 创建的授权支付引用"
+            }
+          ]
+        }
+      ],
+      "dependency_hints": []
+    },
+    {
+      "sample_id": "immutable_mint_then_approve",
+      "project": "Immutable",
+      "property_id": "a9d9745dffe4118dcc3a",
+      "property": "ERC721PsiV2Echidna.echidna_complex_transfer_sequence()",
+      "target_function": "approve(address,uint256)",
+      "property_target_address": null,
+      "harness_path": "sol/真实项目/Immutable/test/token/erc721/fuzz/ERC721PsiV2.Echidna.sol",
+      "harness_sha256": "5b96814001c3c523c768d76a48a3ce5ac429513a1b8af91e8500405ebc18d1dd",
+      "contract_source_sha256s": {
+        "deepseek/实验过程/运行Agent种子流程.py": "3a6f12f6632b1b941fcd7e67966d59bd6a503d975d54b30eff226c8ebcec3f7b",
+        "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+        "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3",
+        "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+        "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+        "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+        "func/功能/种子验证.py": "0ddd73709be1525b8a448da7ac7bd67d69c060ec776493b1b0a77e9857a3ee4d",
+        "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+        "func/测试过程/Phase25跨交易状态约束实验.py": "216130419a9820187b479462c12fb8b4e7404faa555d6edfcbc3267ddf898130",
+        ".tools/results/Immutable-Harness编译.json": "b9e8dbc601775b13743d60a8186893f5cc55877cf34ec5dd2c02411fce916a02"
+      },
+      "source_records": [
+        {
+          "report": "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json",
+          "report_sha256": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+          "candidate_id": "a9d9745dffe4-01-a9d9745dffe4118dcc3a-seq-1",
+          "source_status": "replay_failed",
+          "seed_id": null,
+          "original_transactions": [
+            {
+              "index": 0,
+              "function": "mintForTest(address,uint256)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                1
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            },
+            {
+              "index": 1,
+              "function": "approve(address,uint256)",
+              "arguments": [
+                "0x0000000000000000000000000000000000020000",
+                0
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            },
+            {
+              "index": 2,
+              "function": "transferFrom(address,address,uint256)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000",
+                0
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            },
+            {
+              "index": 3,
+              "function": "safeTransferFrom(address,address,uint256)",
+              "arguments": [
+                "0x0000000000000000000000000000000000020000",
+                "0x0000000000000000000000000000000000030000",
+                0
+              ],
+              "sender": "0x0000000000000000000000000000000000020000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            }
+          ]
+        }
+      ],
+      "transactions": [
+        {
+          "index": 0,
+          "function": "mintForTest(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            1
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "index": 1,
+          "function": "approve(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000",
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "index": 2,
+          "function": "transferFrom(address,address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "index": 3,
+          "function": "safeTransferFrom(address,address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        }
+      ],
+      "dependency_hints": []
+    },
+    {
+      "sample_id": "beestorage_batch_id_no_hint",
+      "project": "BeeStorage",
+      "property_id": "2c68514fc72b1303d6e8",
+      "property": "EchidnaSystemHarness.echidna_stamp_internal_pot_not_above_contract_balance()",
+      "target_function": "act_actor_topUp(uint8,bytes32,uint256)",
+      "property_target_address": null,
+      "harness_path": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol",
+      "harness_sha256": "ac863a20587871404c449ef6fee36496736d495bba80f639880f0c262a2b4332",
+      "contract_source_sha256s": {
+        "deepseek/实验过程/运行Agent种子流程.py": "3a6f12f6632b1b941fcd7e67966d59bd6a503d975d54b30eff226c8ebcec3f7b",
+        "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+        "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3",
+        "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+        "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+        "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+        "func/功能/种子验证.py": "0ddd73709be1525b8a448da7ac7bd67d69c060ec776493b1b0a77e9857a3ee4d",
+        "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+        "func/测试过程/Phase25跨交易状态约束实验.py": "216130419a9820187b479462c12fb8b4e7404faa555d6edfcbc3267ddf898130",
+        "deepseek/结果/自主种子质量实验/BeeStorage-Harness编译.json": "b52571c9ec58da207d46ded4f569bcd578f09014c3431c315ffa450a03a33982"
+      },
+      "source_records": [
+        {
+          "report": "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json",
+          "report_sha256": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+          "seed_id": "seed-d37889b73433477d9d928a9eeb416b1d",
+          "original_replay_status": "replay_failed",
+          "historical_hint_replay_status": "executable",
+          "original_transactions": [
+            {
+              "function": "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+              "arguments": [
+                0,
+                1000000000,
+                17,
+                16,
+                "0x0000000000000000000000000000000000000000000000000000000000000001",
+                false
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            },
+            {
+              "function": "act_actor_topUp(uint8,bytes32,uint256)",
+              "arguments": [
+                0,
+                "0x0000000000000000000000000000000000000000000000000000000000000001",
+                1000000000
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            },
+            {
+              "function": "act_actor_expireAll(uint8)",
+              "arguments": [
+                0
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            }
+          ]
+        }
+      ],
+      "transactions": [
+        {
+          "function": "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+          "arguments": [
+            0,
+            1000000000,
+            17,
+            16,
+            "0x0000000000000000000000000000000000000000000000000000000000000001",
+            false
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "function": "act_actor_topUp(uint8,bytes32,uint256)",
+          "arguments": [
+            0,
+            "0x0000000000000000000000000000000000000000000000000000000000000001",
+            1000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "function": "act_actor_expireAll(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        }
+      ],
+      "dependency_hints": []
+    },
+    {
+      "sample_id": "beestorage_batch_id_explicit_hint_compatibility",
+      "project": "BeeStorage",
+      "property_id": "2c68514fc72b1303d6e8",
+      "property": "EchidnaSystemHarness.echidna_stamp_internal_pot_not_above_contract_balance()",
+      "target_function": "act_actor_topUp(uint8,bytes32,uint256)",
+      "property_target_address": null,
+      "harness_path": "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol",
+      "harness_sha256": "ac863a20587871404c449ef6fee36496736d495bba80f639880f0c262a2b4332",
+      "contract_source_sha256s": {
+        "deepseek/实验过程/运行Agent种子流程.py": "3a6f12f6632b1b941fcd7e67966d59bd6a503d975d54b30eff226c8ebcec3f7b",
+        "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+        "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3",
+        "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+        "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+        "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+        "func/功能/种子验证.py": "0ddd73709be1525b8a448da7ac7bd67d69c060ec776493b1b0a77e9857a3ee4d",
+        "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+        "func/测试过程/Phase25跨交易状态约束实验.py": "216130419a9820187b479462c12fb8b4e7404faa555d6edfcbc3267ddf898130",
+        "deepseek/结果/自主种子质量实验/BeeStorage-Harness编译.json": "b52571c9ec58da207d46ded4f569bcd578f09014c3431c315ffa450a03a33982"
+      },
+      "source_records": [
+        {
+          "report": "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json",
+          "report_sha256": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+          "seed_id": "seed-d37889b73433477d9d928a9eeb416b1d",
+          "original_replay_status": "replay_failed",
+          "historical_hint_replay_status": "executable",
+          "original_transactions": [
+            {
+              "function": "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+              "arguments": [
+                0,
+                1000000000,
+                17,
+                16,
+                "0x0000000000000000000000000000000000000000000000000000000000000001",
+                false
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            },
+            {
+              "function": "act_actor_topUp(uint8,bytes32,uint256)",
+              "arguments": [
+                0,
+                "0x0000000000000000000000000000000000000000000000000000000000000001",
+                1000000000
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            },
+            {
+              "function": "act_actor_expireAll(uint8)",
+              "arguments": [
+                0
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0
+            }
+          ]
+        }
+      ],
+      "transactions": [
+        {
+          "function": "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+          "arguments": [
+            0,
+            1000000000,
+            17,
+            16,
+            "0x0000000000000000000000000000000000000000000000000000000000000001",
+            false
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "function": "act_actor_topUp(uint8,bytes32,uint256)",
+          "arguments": [
+            0,
+            "0x0000000000000000000000000000000000000000000000000000000000000001",
+            1000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        },
+        {
+          "function": "act_actor_expireAll(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0
+        }
+      ],
+      "dependency_hints": [
+        {
+          "transaction_index": 1,
+          "field": "batchId",
+          "depends_on_index": 0,
+          "source": "Phase 15/17 existing explicit event binding"
+        }
+      ]
+    },
+    {
+      "sample_id": "opennfts_reach_other_balance",
+      "project": "OpenNFTs",
+      "property_id": "50cc31144be4bad9bc9d",
+      "property": "OpenAutoMarketExFuzz.echidna_balance()",
+      "target_function": "transferFrom(address,address,uint256)",
+      "property_target_address": "0x0000000000000000000000000000000000000001",
+      "harness_path": "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol",
+      "harness_sha256": "d2f3ff8cc6b69a21c43da7d599a05b25e9583eaa44e58dc4ecce35611cda2df2",
+      "contract_source_sha256s": {
+        "deepseek/实验过程/运行Agent种子流程.py": "3a6f12f6632b1b941fcd7e67966d59bd6a503d975d54b30eff226c8ebcec3f7b",
+        "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+        "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3",
+        "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+        "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+        "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+        "func/功能/种子验证.py": "0ddd73709be1525b8a448da7ac7bd67d69c060ec776493b1b0a77e9857a3ee4d",
+        "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+        "func/测试过程/Phase25跨交易状态约束实验.py": "216130419a9820187b479462c12fb8b4e7404faa555d6edfcbc3267ddf898130",
+        "deepseek/结果/通用依赖泛化验证/OpenNFTs-Harness编译.json": "49eae9f7fdd86c9f2c37fc9624e131fc57d152977e56aaf6f3c751a7d17d8cf8"
+      },
+      "source_records": [
+        {
+          "report": "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json",
+          "report_sha256": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+          "candidate_id": "50cc31144be4-01-seq-50cc31144be4bad9bc9d-1",
+          "source_status": "executable",
+          "original_transactions": [
+            {
+              "function": "mint(string)",
+              "arguments": [
+                "ipfs://seed/50cc31144be4bad9bc9d/1.json"
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change"
+            }
+          ]
+        },
+        {
+          "report": "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json",
+          "report_sha256": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3",
+          "candidate_id": "50cc31144be4-01-seq_balance_transfer_out",
+          "source_status": "replay_failed",
+          "original_transactions": [
+            {
+              "function": "transferFrom(address,address,uint256)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000",
+                0
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change"
+            }
+          ],
+          "fixture_change": {
+            "argument": "to",
+            "from": "historical recipient",
+            "to": "0x0000000000000000000000000000000000000001",
+            "basis": "_other constant parsed from requested balance property source"
+          }
+        }
+      ],
+      "transactions": [
+        {
+          "function": "mint(string)",
+          "arguments": [
+            "ipfs://seed/50cc31144be4bad9bc9d/1.json"
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "transferFrom(address,address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000000001",
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        }
+      ],
+      "dependency_hints": []
+    }
+  ],
+  "groups": {
+    "G0": "冻结 commit 的原始种子验证器；不启用 Phase 25 约束修复",
+    "G1": "当前 V2 回放器，启用唯一前序对象事件绑定、匹配所有唯一事件键的单参数 view getter 观察、根据 Slither 零基索引关系选择对象及最多一次有界数值修复；修复后完整重新部署并回放",
+    "G2": "与 G1 相同源码和配置，runtime_constraints=False；既有显式 dependency_hints 功能保留"
+  },
+  "selection_rule": "所有诊断交易在第一次回放前从指定历史记录冻结；OpenNFTs 仅把已有失败转账样本的接收地址替换为目标属性源码解析出的 _other，使其能检验目标余额可达性；不基于 G0-G2 结果改变种子或规则。",
+  "repetitions": [
+    1,
+    2,
+    3
+  ],
+  "anvil_configuration": {
+    "chain_id": 1,
+    "initial_timestamp": 1524785992,
+    "initial_block_number": 4370000,
+    "evm_revision": "shanghai",
+    "gas_price_wei": 0,
+    "gas_limit_per_transaction": 12500000,
+    "anvil_version": "anvil Version: 1.9.0-dev\nCommit SHA: 6056c5845d34205a83cf7108042adb137325c9df\nBuild Timestamp: 2026-11-02T20:11:04.198713475Z (1793650264)\nBuild Profile: dist",
+    "same_project_session_per_pair": true
+  },
+  "echidna_configuration": {
+    "test_limit": 500,
+    "seeds": [
+      20261125,
+      20261135,
+      20261145
+    ],
+    "seq_len": 8,
+    "shrink_limit": 1,
+    "workers": 1,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "timeout_seconds": 1800,
+    "echidna_version": "Echidna 2.3.2",
+    "runs": "仅对 G1 完整回放有效的种子执行；每个种子与空语料原生组做 3 组配对 500-testLimit 对照。"
+  },
+  "api_calls": 0,
+  "api_cost_usd": 0,
+  "metrics": [
+    "逐交易外层结果",
+    "内部调用回滚与 callTracer",
+    "持久 storage slot 变化",
+    "view getter 状态差异",
+    "目标操作路径到达",
+    "目标属性违反/状态",
+    "运行时间",
+    "Echidna unique instructions",
+    "最终 LCOV 命中行"
+  ],
+  "coverage_separation": "Anvil 回放和 Echidna 模糊测试分开记录；Echidna 的最终 LCOV 是回放与后续变异的累计结果，不能从单份 LCOV 精确拆分，日志会保留种子回放和 fuzzing 计数证据。"
+}

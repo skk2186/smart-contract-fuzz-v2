@@ -1,0 +1,645 @@
+{
+  "project": "OpenNFTs",
+  "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+  "deployment_status": "success",
+  "candidate_id": "phase25-derived-mint-transfer-to-property-target",
+  "replay_status": "replay_failed",
+  "target_property_violation": null,
+  "initial_property_values": {
+    "echidna_balance()": true,
+    "echidna_owner()": true
+  },
+  "initial_property_errors": {},
+  "initial_property_violations": [],
+  "initial_predicate_getters": [
+    {
+      "signature": "balanceOf(address)",
+      "expressions": [
+        "_other"
+      ],
+      "arguments": [
+        "0x0000000000000000000000000000000000000001"
+      ],
+      "receiver": null,
+      "receiver_getter": null,
+      "receiver_type": null,
+      "status": "observed",
+      "receiver_address": null,
+      "value": 0
+    }
+  ],
+  "target_property_state": {
+    "property": "echidna_balance()",
+    "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+    "status": "property_state_unobservable",
+    "target_property_state_established": false,
+    "counterexample_state_established": false,
+    "property_related_state_changed": false,
+    "first_established_transaction_index": null,
+    "first_property_related_change_transaction_index": null,
+    "first_counterexample_transaction_index": null,
+    "trajectory": [
+      {
+        "transaction_index": 0,
+        "value": true,
+        "predicate_getters": [
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "_other"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000000001"
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          }
+        ],
+        "changed_predicate_getters": []
+      },
+      {
+        "transaction_index": 1,
+        "value": true,
+        "predicate_getters": [
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "_other"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000000001"
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          }
+        ],
+        "changed_predicate_getters": []
+      },
+      {
+        "transaction_index": 2,
+        "value": null,
+        "predicate_getters": [],
+        "changed_predicate_getters": []
+      }
+    ]
+  },
+  "environment": {
+    "chain_id": 1,
+    "initial_timestamp": 1524785992,
+    "initial_block_number": 4370000,
+    "deployment_timestamp": 1524785992,
+    "deployment_block_number": 4370000,
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "gas_price_wei": 0,
+    "evm_revision": "shanghai",
+    "gas_limit_per_transaction": 12500000,
+    "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+  },
+  "transactions": [
+    {
+      "index": 1,
+      "function": "mint(string)",
+      "arguments": [
+        "ipfs://seed/50cc31144be4bad9bc9d/1.json"
+      ],
+      "argument_bindings": [],
+      "slither_preconditions": [
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._mint(address,string,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(to != address(0),Mint to zero address)",
+          "branch": null,
+          "variables_read": [
+            "to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#124"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._mint(address,string,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_owners[tokenID] == address(0),Token already minted)",
+          "branch": null,
+          "variables_read": [
+            "_owners",
+            "tokenID"
+          ],
+          "state_reads": [
+            "OpenERC721._owners"
+          ],
+          "data_dependencies": {
+            "_owners": [
+              "_owners",
+              "to"
+            ],
+            "tokenID": [
+              "tokenID"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#125"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._mint(address,string,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_isERC721Receiver(address(0),to,tokenID,),Not ERC721Received)",
+          "branch": null,
+          "variables_read": [
+            "to",
+            "tokenID"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "tokenID": [
+              "tokenID"
+            ]
+          },
+          "predicate_calls": [
+            "OpenERC721._isERC721Receiver(address,address,uint256,bytes)"
+          ],
+          "predicate_logic": [
+            "OpenERC721._isERC721Receiver(address,address,uint256,bytes): to.code.length == 0 || IERC721TokenReceiver(to).onERC721Received(msg.sender,from,tokenID,data) == IERC721TokenReceiver.onERC721Received.selector"
+          ],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#126"
+        }
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "tx_hash": "6cd981e8698e7ef4516b0001f90547b9a617ffb8fee3894c0e4fad98a7607a7c",
+      "block_number": 4370001,
+      "status": "success",
+      "gas_used": 120315,
+      "execution_class": "state_established",
+      "expected_outcome": "state_change",
+      "internal_errors": [],
+      "internal_call_trace": {
+        "type": "CALL",
+        "from": "0x0000000000000000000000000000000000010000",
+        "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+        "input": "0xd85d3d2700000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000027697066733a2f2f736565642f35306363333131343462653462616439626339642f312e6a736f6e00000000000000000000000000000000000000000000000000",
+        "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "calls": []
+      },
+      "changed_storage_slot_count": 3,
+      "trace_error": null,
+      "events": [
+        {
+          "name": "SetTokenRoyalty",
+          "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "fields": {
+            "tokenID": 1,
+            "receiver": "0x0000000000000000000000000000000000000000",
+            "fee": 0
+          }
+        },
+        {
+          "name": "Pay",
+          "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "fields": {
+            "tokenID": 1,
+            "price": 0,
+            "seller": "0x000000000000000000000000000000000000002A",
+            "paid": 0,
+            "receiver": "0x0000000000000000000000000000000000000000",
+            "royalties": 0,
+            "fee": 0,
+            "buyer": "0x0000000000000000000000000000000000010000",
+            "unspent": 0
+          }
+        },
+        {
+          "name": "Transfer",
+          "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "fields": {
+            "from": "0x0000000000000000000000000000000000000000",
+            "to": "0x0000000000000000000000000000000000010000",
+            "tokenId": 1
+          }
+        }
+      ],
+      "observed_view_state_changed": false,
+      "view_state_changes": [],
+      "observed_view_count": 7,
+      "tracked_contract_count": 1,
+      "tracked_contract_types": [
+        "Harness"
+      ],
+      "observed_effect_status": "unknown",
+      "expected_effect_states": [
+        "OpenERC721._balances"
+      ],
+      "observed_effect_states": [],
+      "changed_effect_states": [],
+      "unobserved_effect_states": [
+        "OpenERC721._balances"
+      ],
+      "execution_effect_error": null,
+      "state_fingerprint_before": "ea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+      "state_fingerprint_after": "ea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+      "target_property": true,
+      "property_error": null,
+      "predicate_getter_values": [
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "_other"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000000001"
+          ],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": 0
+        }
+      ],
+      "runtime_constraint_observations": [],
+      "constraint_repair_proposal": null,
+      "all_property_values": {
+        "echidna_balance()": true,
+        "echidna_owner()": true
+      },
+      "all_property_errors": {},
+      "other_property_violations_during_prevalidation": []
+    },
+    {
+      "index": 2,
+      "function": "transferFrom(address,address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000000001",
+        0
+      ],
+      "argument_bindings": [],
+      "slither_preconditions": [
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_isOwnerOrApproved(msg.sender,tokenID),Not token owner nor approved)",
+          "branch": null,
+          "variables_read": [
+            "msg.sender",
+            "tokenID"
+          ],
+          "state_reads": [
+            "OpenERC721._operatorApprovals",
+            "OpenERC721._owners",
+            "OpenERC721._tokenApprovals"
+          ],
+          "data_dependencies": {
+            "tokenID": [
+              "tokenID"
+            ]
+          },
+          "predicate_calls": [
+            "OpenERC721._isOwnerOrApproved(address,uint256)",
+            "OpenERC721._isOwnerOrOperator(address,uint256)",
+            "OpenERC721.existsToken(uint256)",
+            "OpenERC721.getApproved(uint256)",
+            "OpenERC721.isApprovedForAll(address,address)",
+            "OpenERC721.ownerOf(uint256)"
+          ],
+          "predicate_logic": [
+            "OpenERC721._isOwnerOrApproved(address,uint256): ownerOrApproved",
+            "OpenERC721._isOwnerOrOperator(address,uint256): ownerOrOperator",
+            "OpenERC721.getApproved(uint256): _tokenApprovals[tokenID]",
+            "OpenERC721.isApprovedForAll(address,address): _operatorApprovals[owner][operator]",
+            "OpenERC721.ownerOf(uint256): _owners[tokenID]"
+          ],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#33"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(from != address(0),Transfer from zero address)",
+          "branch": null,
+          "variables_read": [
+            "from"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#169"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(to != address(0),Transfer to zero address)",
+          "branch": null,
+          "variables_read": [
+            "to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#170"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(from == ownerOf(tokenID),From not owner)",
+          "branch": null,
+          "variables_read": [
+            "from",
+            "tokenID"
+          ],
+          "state_reads": [
+            "OpenERC721._owners"
+          ],
+          "data_dependencies": {
+            "tokenID": [
+              "tokenID"
+            ],
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [
+            "OpenERC721.existsToken(uint256)",
+            "OpenERC721.ownerOf(uint256)"
+          ],
+          "predicate_logic": [
+            "OpenERC721.ownerOf(uint256): _owners[tokenID]"
+          ],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#171"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "control_branch",
+          "expression": "from != to",
+          "branch": "true",
+          "variables_read": [
+            "from",
+            "to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#177"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_isOwnerOrApproved(msg.sender,tokenID),Not token owner nor approved)",
+          "branch": null,
+          "variables_read": [
+            "msg.sender",
+            "tokenID"
+          ],
+          "state_reads": [
+            "OpenERC721._operatorApprovals",
+            "OpenERC721._owners",
+            "OpenERC721._tokenApprovals"
+          ],
+          "data_dependencies": {
+            "tokenID": [
+              "tokenID"
+            ]
+          },
+          "predicate_calls": [
+            "OpenERC721._isOwnerOrApproved(address,uint256)",
+            "OpenERC721._isOwnerOrOperator(address,uint256)",
+            "OpenERC721.existsToken(uint256)",
+            "OpenERC721.getApproved(uint256)",
+            "OpenERC721.isApprovedForAll(address,address)",
+            "OpenERC721.ownerOf(uint256)"
+          ],
+          "predicate_logic": [
+            "OpenERC721._isOwnerOrApproved(address,uint256): ownerOrApproved",
+            "OpenERC721._isOwnerOrOperator(address,uint256): ownerOrOperator",
+            "OpenERC721.getApproved(uint256): _tokenApprovals[tokenID]",
+            "OpenERC721.isApprovedForAll(address,address): _operatorApprovals[owner][operator]",
+            "OpenERC721.ownerOf(uint256): _owners[tokenID]"
+          ],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#33"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(from != address(0),Transfer from zero address)",
+          "branch": null,
+          "variables_read": [
+            "from"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#169"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(to != address(0),Transfer to zero address)",
+          "branch": null,
+          "variables_read": [
+            "to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#170"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(from == ownerOf(tokenID),From not owner)",
+          "branch": null,
+          "variables_read": [
+            "from",
+            "tokenID"
+          ],
+          "state_reads": [
+            "OpenERC721._owners"
+          ],
+          "data_dependencies": {
+            "tokenID": [
+              "tokenID"
+            ],
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [
+            "OpenERC721.existsToken(uint256)",
+            "OpenERC721.ownerOf(uint256)"
+          ],
+          "predicate_logic": [
+            "OpenERC721.ownerOf(uint256): _owners[tokenID]"
+          ],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#171"
+        },
+        {
+          "state": "OpenERC721._balances",
+          "writer": "OpenERC721._transferFrom(address,address,uint256)",
+          "kind": "control_branch",
+          "expression": "from != to",
+          "branch": "true",
+          "variables_read": [
+            "from",
+            "to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol#177"
+        }
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "tx_hash": "a7b08a3b14aa28f3e6846d13c5364c8e7866dbc6bca188c8d4f1a451d1abf414",
+      "block_number": 4370002,
+      "status": "reverted",
+      "gas_used": 24994,
+      "execution_class": "outer_revert",
+      "expected_outcome": "state_change",
+      "internal_errors": [],
+      "internal_call_trace": {
+        "type": "CALL",
+        "from": "0x0000000000000000000000000000000000010000",
+        "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+        "input": "0x23b872dd000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000",
+        "output": "0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010496e76616c696420746f6b656e20494400000000000000000000000000000000",
+        "error": "execution reverted",
+        "calls": []
+      },
+      "changed_storage_slot_count": 0,
+      "trace_error": null,
+      "events": [],
+      "observed_view_state_changed": false,
+      "view_state_changes": [],
+      "observed_view_count": 7,
+      "tracked_contract_count": 1,
+      "tracked_contract_types": [
+        "Harness"
+      ],
+      "observed_effect_status": "unknown",
+      "expected_effect_states": [
+        "OpenERC721._balances"
+      ],
+      "observed_effect_states": [],
+      "changed_effect_states": [],
+      "unobserved_effect_states": [
+        "OpenERC721._balances"
+      ],
+      "execution_effect_error": "expected state change was not observed",
+      "state_fingerprint_before": "ea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+      "state_fingerprint_after": "ea6a2754a4d2cc9e789fa319e5473f696d29b0eaed7638777cffc58ff4e39ddc",
+      "target_property": null,
+      "property_error": "tx_revert: ContractLogicError: ('execution reverted: Invalid token ID', '0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010496e76616c696420746f6b656e20494400000000000000000000000000000000')",
+      "predicate_getter_values": [],
+      "runtime_constraint_observations": [],
+      "constraint_repair_proposal": null,
+      "all_property_values": {},
+      "all_property_errors": {},
+      "other_property_violations_during_prevalidation": []
+    }
+  ],
+  "resolved_transactions": [
+    {
+      "function": "mint(string)",
+      "arguments": [
+        "ipfs://seed/50cc31144be4bad9bc9d/1.json"
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "transferFrom(address,address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000000001",
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    }
+  ],
+  "attempt_elapsed_seconds": 0.583931
+}

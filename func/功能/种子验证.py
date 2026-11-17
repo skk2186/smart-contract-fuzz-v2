@@ -19,6 +19,8 @@ from web3 import HTTPProvider, Web3
 from web3._utils.events import event_abi_to_log_topic, get_event_data
 
 from AgentB import HARNESS_ADDRESS, PROPERTY_SENDER, SENDERS, to_echidna_sequence
+from 跨交易状态约束 import (infer_object_argument, matching_event_values,
+                           propose_numeric_repair, slither_guard_evidence)
 from 属性种子上下文 import PROJECTS, ROOT, read_json
 
 
@@ -185,20 +187,35 @@ def _trace_effects(session: AnvilSession, tx_hash: Any) -> dict[str, Any]:
         for child in node.get("calls", []):
             visit(child, depth + 1)
     visit(call, 0)
+    trace_nodes = 0
+    def compact(node: dict[str, Any], depth: int = 0) -> dict[str, Any]:
+        nonlocal trace_nodes
+        trace_nodes += 1
+        result = {key: node.get(key) for key in ("type", "from", "to", "input",
+                                                  "output", "error") if key in node}
+        if depth < 12 and trace_nodes < 128:
+            result["calls"] = [compact(child, depth + 1)
+                               for child in node.get("calls", [])[:32]]
+        elif node.get("calls"):
+            result["calls_truncated"] = True
+        return result
+    call_tree = compact(call)
     diff = session.rpc("debug_traceTransaction", [tx_hash.hex(),
                        {"tracer": "prestateTracer", "tracerConfig": {"diffMode": True}}])
     before, after = diff.get("pre", {}), diff.get("post", {})
     slots = sum(len(set(before.get(addr, {}).get("storage", {})) |
                         set(after.get(addr, {}).get("storage", {})))
                 for addr in set(before) | set(after))
-    return {"internal_errors": errors, "changed_storage_slot_count": slots,
+    return {"internal_errors": errors, "internal_call_trace": call_tree,
+            "changed_storage_slot_count": slots,
             "top_level_trace_error": call.get("error")}
 
 
 def _resolve_event_arguments(tx: dict[str, Any], action: dict[str, Any],
                              prior_events: list[list[dict[str, Any]]],
                              dependency_hints: list[dict[str, Any]],
-                             prior_inputs: list[dict[str, Any]]) -> tuple[list[Any], list[dict[str, Any]], list[str]]:
+                             prior_inputs: list[dict[str, Any]], *,
+                             infer_object_ids: bool = False) -> tuple[list[Any], list[dict[str, Any]], list[str]]:
     """仅从已执行交易的唯一事件字段绑定参数，不从 nonce 等输入猜对象 ID。"""
     from AgentB import normalize_argument
     resolved = list(tx["arguments"])
@@ -212,6 +229,21 @@ def _resolve_event_arguments(tx: dict[str, Any], action: dict[str, Any],
                      h.get("field") == param.get("name")), None)
         hinted = hint is not None
         if not explicit and not hinted:
+            if infer_object_ids:
+                inferred, rows = infer_object_argument(
+                    [raw], [param], prior_events, transaction_index=tx_index + 1)
+                if rows:
+                    resolved[arg_index] = inferred[0]
+                    binding = rows[0]
+                    bindings.append({"argument_index": arg_index,
+                                     "argument_name": param["name"],
+                                     "from_transaction": binding["sources"][-1]["from_transaction"],
+                                     "event": binding["sources"][-1]["event"],
+                                     "event_address": binding["sources"][-1]["event_address"],
+                                     "field": binding["sources"][-1]["field"],
+                                     "original": raw, "resolved": inferred[0],
+                                     "binding_mode": binding["binding_mode"],
+                                     "sources": binding["sources"]})
             continue
         if explicit:
             source_index = explicit.get("from_transaction")
@@ -263,6 +295,7 @@ def _state_view_snapshot(web3: Web3, contract, contract_abis: dict[str, Any]) ->
     observations = {}
     visited: set[tuple[str, str]] = set()
     discovered: set[str] = set()
+    instances: list[dict[str, str]] = []
 
     def observe(current, contract_name: str, depth: int) -> None:
         key = (current.address.lower(), contract_name)
@@ -270,6 +303,7 @@ def _state_view_snapshot(web3: Web3, contract, contract_abis: dict[str, Any]) ->
             return
         visited.add(key)
         discovered.add(contract_name)
+        instances.append({"name": contract_name, "address": current.address.lower()})
         for entry in current.abi:
             if (entry.get("type") != "function" or entry.get("inputs") or
                     entry.get("stateMutability") != "view"):
@@ -304,7 +338,114 @@ def _state_view_snapshot(web3: Web3, contract, contract_abis: dict[str, Any]) ->
             "observed_view_count": len(observations),
             "tracked_contract_count": len(visited),
             "tracked_contract_types": sorted(discovered),
+            "contract_instances": instances,
             "view_values": observations}
+
+
+def _flatten_named_outputs(outputs: list[dict[str, Any]], value: Any) -> list[dict[str, Any]]:
+    values = list(value) if isinstance(value, (list, tuple)) else [value]
+    flattened = []
+    for output, item in zip(outputs, values):
+        if output.get("type") == "tuple" and output.get("components"):
+            nested = _flatten_named_outputs(output["components"], item)
+            parent = str(output.get("name") or "")
+            for row in nested:
+                flattened.append({**row, "name": f"{parent}.{row['name']}" if parent else row["name"]})
+        elif output.get("type", "").endswith("[]"):
+            continue
+        else:
+            flattened.append({"name": output.get("name") or "",
+                              "type": output.get("type", ""),
+                              "value": _to_rpc_value(item)})
+    return flattened
+
+
+def _parameterized_getter_observations(web3: Web3, state: dict[str, Any],
+                                       contract_abis: dict[str, Any],
+                                       prior_events: list[list[dict[str, Any]]], *,
+                                       transaction_index: int) -> list[dict[str, Any]]:
+    """用已成功事件中的对象键调用匹配的单参数公开 view getter。"""
+    observations = []
+    seen: set[tuple[str, str, str]] = set()
+    for instance in state.get("contract_instances", []):
+        contract_name = instance.get("name")
+        abi = contract_abis.get(contract_name)
+        if not isinstance(abi, list):
+            continue
+        try:
+            target = web3.eth.contract(address=_checksum(instance["address"]), abi=abi)
+        except Exception:
+            continue
+        for entry in abi:
+            if (entry.get("type") != "function" or
+                    entry.get("stateMutability") != "view" or
+                    len(entry.get("inputs", [])) != 1):
+                continue
+            param = entry["inputs"][0]
+            name, kind = str(param.get("name") or ""), str(param.get("type") or "")
+            if not name:
+                continue
+            matches = matching_event_values(name, kind, prior_events,
+                                            transaction_index=transaction_index)
+            distinct = {repr(row["value"]): row["value"] for row in matches}
+            if not distinct:
+                continue
+            signature = entry["name"] + "(" + kind + ")"
+            for argument_key, argument in distinct.items():
+                key = (instance["address"].lower(), signature, argument_key)
+                if key in seen or len(seen) >= 64:
+                    continue
+                seen.add(key)
+                sources = [row["source"] for row in matches
+                           if repr(row["value"]) == argument_key]
+                try:
+                    value = target.get_function_by_signature(signature)(argument).call(
+                        {"from": DEPLOYER})
+                    outputs = _flatten_named_outputs(entry.get("outputs", []), value)
+                    observations.append({"contract": contract_name,
+                                         "address": instance["address"].lower(),
+                                         "function": signature,
+                                         "input": {"name": name, "type": kind, "value": argument},
+                                         "input_sources": sources,
+                                         "status": "returned", "outputs": outputs})
+                except Exception as exc:
+                    observations.append({"contract": contract_name,
+                                         "address": instance["address"].lower(),
+                                         "function": signature,
+                                         "input": {"name": name, "type": kind, "value": argument},
+                                         "input_sources": sources,
+                                         "status": "error",
+                                         "error": f"{type(exc).__name__}: {str(exc)[:240]}"})
+    return observations
+
+
+def _view_state_delta(before: dict[str, Any], after: dict[str, Any]) -> list[dict[str, Any]]:
+    old_values = before.get("view_values", {})
+    new_values = after.get("view_values", {})
+    return [{"getter": key, "before": old_values.get(key), "after": new_values.get(key)}
+            for key in sorted(set(old_values) | set(new_values))
+            if old_values.get(key) != new_values.get(key)]
+
+
+def _solidity_error_texts(trace: dict[str, Any], property_error: str | None) -> list[str]:
+    texts = [property_error] if property_error else []
+    for row in trace.get("internal_errors", []):
+        output = row.get("output")
+        if not isinstance(output, str):
+            continue
+        try:
+            raw = bytes.fromhex(output[2:] if output.startswith("0x") else output)
+            if len(raw) < 68 or raw[:4] != bytes.fromhex("08c379a0"):
+                continue
+            args = raw[4:]
+            offset = int.from_bytes(args[:32], "big")
+            length = int.from_bytes(args[offset:offset + 32], "big")
+            start = offset + 32
+            if start + length <= len(args):
+                texts.append(args[start:start + length].decode("utf-8", errors="replace"))
+        except (ValueError, IndexError, OverflowError):
+            continue
+    return texts
 
 
 def _split_solidity_arguments(arguments: str) -> list[str]:
@@ -726,7 +867,8 @@ def inspect_initial_state(project: str, property_context: dict[str, Any], *,
 
 def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict[str, Any]],
                 *, session: AnvilSession | None = None,
-                dependency_hints: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+                dependency_hints: list[dict[str, Any]] | None = None,
+                runtime_constraints: bool = False) -> dict[str, Any]:
     """每个种子从相同创世状态重放；属性调用使用 Echidna 的 psender。"""
     owned = session is None
     session = session or AnvilSession().__enter__()
@@ -781,11 +923,13 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
         last_state = initial_state
         for index, tx in enumerate(transactions, start=1):
             action = actions.get(tx["function"], {})
+            static_guards = slither_guard_evidence(action)
             args, bindings, binding_errors = _resolve_event_arguments(
                 tx, action, prior_events, dependency_hints or [],
                 [{item.get("name"): value for item, value in zip(
                     actions.get(previous["function"], {}).get("abi_inputs", []),
-                    previous["arguments"])} for previous in resolved_transactions])
+                    previous["arguments"])} for previous in resolved_transactions],
+                infer_object_ids=runtime_constraints)
             if binding_errors:
                 valid = False
                 records.append({"index": index, "function": tx["function"],
@@ -826,7 +970,8 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                          "trace_error": f"{type(exc).__name__}: {str(exc)[:300]}"}
                 events = []
                 valid = False
-            prior_events.append(events)
+            # 只有没有内部回滚的交易事件才可作为后续对象绑定/状态查询的来源。
+            prior_events.append(events if receipt.status == 1 and not trace["internal_errors"] else [])
             state_after = _state_view_snapshot(session.web3, contract, contract_abis)
             effect = _observed_effect_status(
                 candidate.get("context", {}), candidate.get("property_id", ""),
@@ -876,6 +1021,20 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                                "unexpected_internal_revert" if internal_revert else
                                "state_established" if trace["changed_storage_slot_count"] else
                                "no_persistent_state_change")
+            runtime_observations: list[dict[str, Any]] = []
+            repair_proposal = None
+            if (runtime_constraints and execution_class in {
+                    "outer_revert", "unexpected_internal_revert", "trace_unavailable"}):
+                runtime_observations = _parameterized_getter_observations(
+                    session.web3, state_after, contract_abis, prior_events[:-1],
+                    transaction_index=index)
+                repair_proposal = propose_numeric_repair(
+                    action.get("abi_inputs", []), args, runtime_observations,
+                    _solidity_error_texts(trace, prop_error),
+                    static_guards=static_guards,
+                    source_excerpt=str(action.get("source_excerpt") or ""))
+                if repair_proposal:
+                    repair_proposal["transaction_index"] = index
             if prop_result is False and violation is None:
                 violation = {"transaction_index": index, "property": property_signature}
             other_violations = sorted(name for name, value in property_values.items()
@@ -883,6 +1042,8 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             records.append({
                 "index": index, "function": signature, "arguments": args,
                 "argument_bindings": bindings,
+                "slither_preconditions": static_guards,
+                "slither_source_excerpt": action.get("source_excerpt"),
                 "sender": sender, "value_wei": tx["value_wei"],
                 "delay_seconds": tx.get("delay_seconds", 0),
                 "delay_blocks": tx.get("delay_blocks", 0),
@@ -892,10 +1053,12 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "execution_class": execution_class,
                 "expected_outcome": expected_outcome,
                 "internal_errors": trace["internal_errors"],
+                "internal_call_trace": trace.get("internal_call_trace"),
                 "changed_storage_slot_count": trace["changed_storage_slot_count"],
                 "trace_error": trace.get("trace_error"),
                 "events": events,
                 "observed_view_state_changed": last_state["fingerprint"] != state_after["fingerprint"],
+                "view_state_changes": _view_state_delta(last_state, state_after),
                 "observed_view_count": state_after["observed_view_count"],
                 "tracked_contract_count": state_after["tracked_contract_count"],
                 "tracked_contract_types": state_after["tracked_contract_types"],
@@ -917,6 +1080,8 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "target_property": prop_result,
                 "property_error": prop_error,
                 "predicate_getter_values": predicate_getter_values,
+                "runtime_constraint_observations": runtime_observations,
+                "constraint_repair_proposal": repair_proposal,
                 "all_property_values": property_values,
                 "all_property_errors": property_errors,
                 "other_property_violations_during_prevalidation": other_violations,

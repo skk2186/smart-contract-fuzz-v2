@@ -1,0 +1,546 @@
+{
+  "project": "Immutable",
+  "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+  "deployment_status": "success",
+  "candidate_id": "a9d9745dffe4-01-a9d9745dffe4118dcc3a-seq-1",
+  "replay_status": "replay_failed",
+  "target_property_violation": null,
+  "initial_property_values": {
+    "echidna_approval_clearing()": true,
+    "echidna_approval_consistency()": true,
+    "echidna_balance_consistency()": false,
+    "echidna_balance_sum_property()": false,
+    "echidna_batch_operation_gas()": true,
+    "echidna_boundary_minting_sequence()": false,
+    "echidna_burn()": null,
+    "echidna_burn_unminted()": true,
+    "echidna_burned_tokens_have_no_owner()": true,
+    "echidna_complex_transfer_sequence()": true,
+    "echidna_concurrent_operations()": true,
+    "echidna_cross_group_operations()": null,
+    "echidna_group_boundary_sequence()": true,
+    "echidna_group_occupancy()": true,
+    "echidna_group_operations_sequence()": false,
+    "echidna_max_token_id_overflow()": true,
+    "echidna_mint_boundary_check()": null,
+    "echidna_mint_by_id()": true,
+    "echidna_mint_by_quantity()": true,
+    "echidna_mint_quantity_range()": true,
+    "echidna_mint_threshold_respected()": null,
+    "echidna_minted_tokens_have_owner()": true,
+    "echidna_nonexistent_ownership1()": true,
+    "echidna_nonexistent_ownership2()": true,
+    "echidna_reentrancy_protection()": true,
+    "echidna_safe_transfer_callback()": true,
+    "echidna_sequential_token_ids()": true,
+    "echidna_token_id_uniqueness()": true,
+    "echidna_total_supply_matches()": false,
+    "echidna_total_supply_sequence()": null,
+    "echidna_transfer_ownership_updates()": true,
+    "echidna_zero_address_protection()": true
+  },
+  "initial_property_errors": {
+    "echidna_burn()": "ContractPanicError: ('Panic error 0x12: Division by zero.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000012')",
+    "echidna_cross_group_operations()": "ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000",
+    "echidna_mint_boundary_check()": "ContractPanicError: ('Panic error 0x11: Arithmetic operation results in underflow or overflow.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000011')",
+    "echidna_mint_threshold_respected()": "Web3RPCError: {'code': -32003, 'message': 'EVM error OutOfGas'}",
+    "echidna_total_supply_sequence()": "ContractPanicError: ('Panic error 0x12: Division by zero.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000012')"
+  },
+  "initial_property_violations": [
+    "echidna_balance_consistency()",
+    "echidna_balance_sum_property()",
+    "echidna_boundary_minting_sequence()",
+    "echidna_group_operations_sequence()",
+    "echidna_total_supply_matches()"
+  ],
+  "initial_predicate_getters": [],
+  "target_property_state": {
+    "property": "echidna_complex_transfer_sequence()",
+    "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+    "status": "property_state_unobservable",
+    "target_property_state_established": false,
+    "counterexample_state_established": false,
+    "property_related_state_changed": false,
+    "first_established_transaction_index": null,
+    "first_property_related_change_transaction_index": null,
+    "first_counterexample_transaction_index": null,
+    "trajectory": [
+      {
+        "transaction_index": 0,
+        "value": true,
+        "predicate_getters": [],
+        "changed_predicate_getters": []
+      },
+      {
+        "transaction_index": 1,
+        "value": true,
+        "predicate_getters": [],
+        "changed_predicate_getters": []
+      },
+      {
+        "transaction_index": 2,
+        "value": null,
+        "predicate_getters": [],
+        "changed_predicate_getters": []
+      }
+    ]
+  },
+  "environment": {
+    "chain_id": 1,
+    "initial_timestamp": 1524785992,
+    "initial_block_number": 4370000,
+    "deployment_timestamp": 1524785992,
+    "deployment_block_number": 4370000,
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "gas_price_wei": 0,
+    "evm_revision": "shanghai",
+    "gas_limit_per_transaction": 12500000,
+    "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+  },
+  "transactions": [
+    {
+      "index": 1,
+      "function": "mintForTest(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        1
+      ],
+      "argument_bindings": [],
+      "slither_preconditions": [
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_quantity > 0,ERC721Psi: quantity must be greater 0)",
+          "branch": null,
+          "variables_read": [
+            "_quantity"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "_quantity": [
+              "_quantity"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#239"
+        },
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_to != address(0),ERC721Psi: mint to the zero address)",
+          "branch": null,
+          "variables_read": [
+            "_to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "_to": [
+              "_to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#240"
+        },
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "control_branch",
+          "expression": "i < nextGroupAfterMint",
+          "branch": "true",
+          "variables_read": [
+            "i",
+            "nextGroupAfterMint"
+          ],
+          "state_reads": [],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#248"
+        },
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_quantity > 0,ERC721Psi: quantity must be greater 0)",
+          "branch": null,
+          "variables_read": [
+            "_quantity"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "_quantity": [
+              "_quantity"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#239"
+        },
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_to != address(0),ERC721Psi: mint to the zero address)",
+          "branch": null,
+          "variables_read": [
+            "_to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "_to": [
+              "_to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#240"
+        },
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "control_branch",
+          "expression": "numberWithinGroup == 0",
+          "branch": "false",
+          "variables_read": [
+            "numberWithinGroup"
+          ],
+          "state_reads": [],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#256"
+        },
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_quantity > 0,ERC721Psi: quantity must be greater 0)",
+          "branch": null,
+          "variables_read": [
+            "_quantity"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "_quantity": [
+              "_quantity"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#239"
+        },
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_to != address(0),ERC721Psi: mint to the zero address)",
+          "branch": null,
+          "variables_read": [
+            "_to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "_to": [
+              "_to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#240"
+        },
+        {
+          "state": "ERC721PsiV2.tokenOwners",
+          "writer": "ERC721PsiV2._mintInternal(address,uint256)",
+          "kind": "control_branch",
+          "expression": "numberWithinGroup == 0",
+          "branch": "false",
+          "variables_read": [
+            "numberWithinGroup"
+          ],
+          "state_reads": [],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#256"
+        }
+      ],
+      "slither_source_excerpt": "72:     function mintForTest(address to, uint256 quantity) external {\n73:         _mint(to, quantity);\n74:         for (uint256 i = 0; i < quantity; i++) {\n75:             uint256 tokenId = totalMinted + i;\n76:             minted[tokenId] = true;\n77:             tokenOwnersMap[tokenId] = to;\n78:         }\n79:         totalMinted += quantity;\n80:     }",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "tx_hash": "3743aa87e75c8f2abb4e31816d0783abb818311745d7631a4bdb06080d5e5eb5",
+      "block_number": 4370001,
+      "status": "success",
+      "gas_used": 170311,
+      "execution_class": "state_established",
+      "expected_outcome": null,
+      "internal_errors": [],
+      "internal_call_trace": {
+        "type": "CALL",
+        "from": "0x0000000000000000000000000000000000010000",
+        "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+        "input": "0x2e6a6bd700000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000001",
+        "calls": []
+      },
+      "changed_storage_slot_count": 8,
+      "trace_error": null,
+      "events": [
+        {
+          "name": "Transfer",
+          "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "fields": {
+            "from": "0x0000000000000000000000000000000000000000",
+            "to": "0x0000000000000000000000000000000000010000",
+            "tokenId": 340282366920938463463374607431768211968
+          }
+        }
+      ],
+      "observed_view_state_changed": true,
+      "view_state_changes": [
+        {
+          "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:echidna_minted_tokens_have_owner()",
+          "before": true,
+          "after": false
+        },
+        {
+          "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:mintBatchByQuantityNextTokenId()",
+          "before": 340282366920938463463374607431768211968,
+          "after": 340282366920938463463374607431768212224
+        },
+        {
+          "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalMinted()",
+          "before": 0,
+          "after": 1
+        },
+        {
+          "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalSupply()",
+          "before": 10,
+          "after": 11
+        }
+      ],
+      "observed_view_count": 20,
+      "tracked_contract_count": 3,
+      "tracked_contract_types": [
+        "Harness",
+        "MaliciousReceiver",
+        "TestReceiver"
+      ],
+      "observed_effect_status": "changed",
+      "expected_effect_states": [
+        "ERC721PsiV2.tokenOwners",
+        "ERC721PsiV2Echidna.totalMinted"
+      ],
+      "observed_effect_states": [
+        "ERC721PsiV2Echidna.totalMinted"
+      ],
+      "changed_effect_states": [
+        "ERC721PsiV2Echidna.totalMinted"
+      ],
+      "unobserved_effect_states": [
+        "ERC721PsiV2.tokenOwners"
+      ],
+      "execution_effect_error": null,
+      "state_fingerprint_before": "eb8a507e8ed4de5e0c816af6fe40ae4f084a5c68281b552f901c0634ce470121",
+      "state_fingerprint_after": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+      "target_property": true,
+      "property_error": null,
+      "predicate_getter_values": [],
+      "runtime_constraint_observations": [],
+      "constraint_repair_proposal": null,
+      "all_property_values": {
+        "echidna_approval_clearing()": true,
+        "echidna_approval_consistency()": true,
+        "echidna_balance_consistency()": false,
+        "echidna_balance_sum_property()": false,
+        "echidna_batch_operation_gas()": true,
+        "echidna_boundary_minting_sequence()": false,
+        "echidna_burn()": true,
+        "echidna_burn_unminted()": true,
+        "echidna_burned_tokens_have_no_owner()": true,
+        "echidna_complex_transfer_sequence()": true,
+        "echidna_concurrent_operations()": true,
+        "echidna_cross_group_operations()": null,
+        "echidna_group_boundary_sequence()": true,
+        "echidna_group_occupancy()": true,
+        "echidna_group_operations_sequence()": false,
+        "echidna_max_token_id_overflow()": true,
+        "echidna_mint_boundary_check()": true,
+        "echidna_mint_by_id()": true,
+        "echidna_mint_by_quantity()": true,
+        "echidna_mint_quantity_range()": true,
+        "echidna_mint_threshold_respected()": null,
+        "echidna_minted_tokens_have_owner()": false,
+        "echidna_nonexistent_ownership1()": true,
+        "echidna_nonexistent_ownership2()": true,
+        "echidna_reentrancy_protection()": true,
+        "echidna_safe_transfer_callback()": true,
+        "echidna_sequential_token_ids()": true,
+        "echidna_token_id_uniqueness()": true,
+        "echidna_total_supply_matches()": false,
+        "echidna_total_supply_sequence()": null,
+        "echidna_transfer_ownership_updates()": true,
+        "echidna_zero_address_protection()": true
+      },
+      "all_property_errors": {
+        "echidna_cross_group_operations()": "ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000",
+        "echidna_mint_threshold_respected()": "Web3RPCError: {'code': -32003, 'message': 'EVM error OutOfGas'}",
+        "echidna_total_supply_sequence()": "ContractPanicError: ('Panic error 0x11: Arithmetic operation results in underflow or overflow.', '0x4e487b710000000000000000000000000000000000000000000000000000000000000011')"
+      },
+      "other_property_violations_during_prevalidation": [
+        "echidna_balance_consistency()",
+        "echidna_balance_sum_property()",
+        "echidna_boundary_minting_sequence()",
+        "echidna_group_operations_sequence()",
+        "echidna_minted_tokens_have_owner()",
+        "echidna_total_supply_matches()"
+      ]
+    },
+    {
+      "index": 2,
+      "function": "approve(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000",
+        0
+      ],
+      "argument_bindings": [],
+      "slither_preconditions": [
+        {
+          "state": "ERC721PsiV2.tokenApprovals",
+          "writer": "ERC721PsiV2._approve(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(to != owner,ERC721Psi: approval to current owner)",
+          "branch": null,
+          "variables_read": [
+            "owner",
+            "to"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#99"
+        },
+        {
+          "state": "ERC721PsiV2.tokenApprovals",
+          "writer": "ERC721PsiV2._approve(address,address,uint256)",
+          "kind": "require_or_assert",
+          "expression": "require(bool,string)(_msgSender() == owner || isApprovedForAll(owner,_msgSender()),ERC721Psi: approve caller is not owner nor approved for all)",
+          "branch": null,
+          "variables_read": [
+            "owner"
+          ],
+          "state_reads": [
+            "ERC721PsiV2Echidna._operatorApprovals"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [
+            "Context._msgSender()",
+            "ERC721PsiV2Echidna.isApprovedForAll(address,address)"
+          ],
+          "predicate_logic": [
+            "Context._msgSender(): msg.sender",
+            "ERC721PsiV2Echidna.isApprovedForAll(address,address): _operatorApprovals[owner][operator]"
+          ],
+          "source": "contracts/token/erc721/erc721psi/ERC721PsiV2.sol#101-104"
+        }
+      ],
+      "slither_source_excerpt": "97:     function approve(address to, uint256 tokenId) public virtual override {\n98:         address owner = ownerOf(tokenId);\n99:         require(to != owner, \"ERC721Psi: approval to current owner\");\n100: \n101:         require(\n102:             _msgSender() == owner || isApprovedForAll(owner, _msgSender()),\n103:             \"ERC721Psi: approve caller is not owner nor approved for all\"\n104:         );\n105: \n106:         _approve(owner, to, tokenId);\n107:     }",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "tx_hash": "b94f6fe5345dabfd543ec783335d11bab91507cd09dd6b13ac8c642b7f1e3230",
+      "block_number": 4370002,
+      "status": "reverted",
+      "gas_used": 29629,
+      "execution_class": "outer_revert",
+      "expected_outcome": null,
+      "internal_errors": [],
+      "internal_call_trace": {
+        "type": "CALL",
+        "from": "0x0000000000000000000000000000000000010000",
+        "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+        "input": "0x095ea7b300000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000",
+        "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c4552433732315073693a206f776e657220717565727920666f72206e6f6e6578697374656e7420746f6b656e0000000000000000000000000000000000000000",
+        "error": "execution reverted",
+        "calls": []
+      },
+      "changed_storage_slot_count": 0,
+      "trace_error": null,
+      "events": [],
+      "observed_view_state_changed": false,
+      "view_state_changes": [],
+      "observed_view_count": 20,
+      "tracked_contract_count": 3,
+      "tracked_contract_types": [
+        "Harness",
+        "MaliciousReceiver",
+        "TestReceiver"
+      ],
+      "observed_effect_status": "unknown",
+      "expected_effect_states": [
+        "ERC721PsiV2.tokenApprovals"
+      ],
+      "observed_effect_states": [],
+      "changed_effect_states": [],
+      "unobserved_effect_states": [
+        "ERC721PsiV2.tokenApprovals"
+      ],
+      "execution_effect_error": null,
+      "state_fingerprint_before": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+      "state_fingerprint_after": "fc144f523119a2f01a1cd98f81c45f9f670fa50f87f474db269cad84ec7801a8",
+      "target_property": null,
+      "property_error": "tx_revert: ContractLogicError: ('execution reverted: ERC721Psi: owner query for nonexistent token', '0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c4552433732315073693a206f776e657220717565727920666f72206e6f6e6578697374656e7420746f6b656e0000",
+      "predicate_getter_values": [],
+      "runtime_constraint_observations": [],
+      "constraint_repair_proposal": null,
+      "all_property_values": {},
+      "all_property_errors": {},
+      "other_property_violations_during_prevalidation": []
+    }
+  ],
+  "resolved_transactions": [
+    {
+      "index": 0,
+      "function": "mintForTest(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        1
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "index": 1,
+      "function": "approve(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000",
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    }
+  ],
+  "attempt_elapsed_seconds": 1.642682
+}

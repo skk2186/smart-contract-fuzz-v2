@@ -72,23 +72,41 @@ def _agent_a_for_property(context: dict[str, Any], property_id: str, *,
                            max_candidates: int, max_steps: int,
                            planning_repairs: int, tag: str,
                            call_options: dict[str, Any],
-                           initial_feedback: str | None = None) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+                           initial_feedback: str | None = None,
+                           fixed_prefix_transactions: list[dict[str, Any]] | None = None
+                           ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     events: list[dict[str, Any]] = []
     plans: list[dict[str, Any]] = []
     feedback = initial_feedback
+    fixed_prefix_transactions = fixed_prefix_transactions or []
+    fixed_prefix_functions = [str(row.get("function"))
+                              for row in fixed_prefix_transactions]
+    task_constraints = ([
+        "以下前缀交易已在真实 Anvil 执行中成功，必须原样保留在每条重规划序列开头；只允许在此前缀之后补充准备交易或目标操作。",
+        json.dumps(fixed_prefix_transactions, ensure_ascii=False, sort_keys=True),
+    ] if fixed_prefix_transactions else [])
     for attempt in range(1, planning_repairs + 2):
         try:
             plan, event = generate_candidates(
                 context, max_candidates=max_candidates, max_steps=max_steps,
                 min_steps=1, use_shared_prefixes=False,
                 repair_feedback=feedback,
+                task_constraints=task_constraints,
                 tag=f"{tag}_plan{attempt}", call_options=call_options)
             events.append(event)
             plans.append(plan)
             candidates = [row for row in plan.get("property_sequences", [])
                           if row.get("property_id") == property_id]
+            if fixed_prefix_functions:
+                candidates = [row for row in candidates
+                              if [str(step.get("function")) for step in row.get("steps", [])]
+                              [:len(fixed_prefix_functions)] == fixed_prefix_functions]
             if candidates:
-                return candidates, events, {"status": "planned", "plans": plans}
+                for row in candidates:
+                    if fixed_prefix_transactions:
+                        row["_fixed_prefix_transactions"] = fixed_prefix_transactions
+                return candidates, events, {"status": "planned", "plans": plans,
+                                            "fixed_prefix_transactions": fixed_prefix_transactions}
             if attempt <= planning_repairs:
                 feedback = ("上次没有产生可用候选；请针对当前唯一目标属性重新规划，至少给出一条 1 到 "
                             f"{max_steps} 笔交易的候选。无人工路径和参数模板可用。校验问题："
@@ -110,7 +128,9 @@ def _agent_a_for_property(context: dict[str, Any], property_id: str, *,
 
 def _agent_b_call(context: dict[str, Any], candidate: dict[str, Any], *,
                   feedback: str | None, first_attempt: int, schema_repairs: int,
-                  call_options: dict[str, Any]) -> tuple[dict[str, Any] | None,
+                  call_options: dict[str, Any],
+                  fixed_prefix_transactions: list[dict[str, Any]] | None = None
+                  ) -> tuple[dict[str, Any] | None,
                                                         list[dict[str, Any]], str | None]:
     events: list[dict[str, Any]] = []
     repair_feedback = feedback
@@ -119,6 +139,7 @@ def _agent_b_call(context: dict[str, Any], candidate: dict[str, Any], *,
         try:
             concrete, event = instantiate_candidate(
                 context, candidate, feedback=repair_feedback, attempt=attempt,
+                fixed_prefix_transactions=fixed_prefix_transactions,
                 call_options=call_options)
             events.append(event)
             return concrete, events, None
@@ -217,6 +238,20 @@ def _execution_feedback(replay: dict[str, Any], failure_class: str) -> str:
             + json.dumps(evidence, ensure_ascii=False)[:2200])
 
 
+def _successful_prefix(replay: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """取失败交易之前已执行成功的前缀，供 Agent B 固定使用。"""
+    if not replay:
+        return []
+    prefix = []
+    for transaction, record in zip(replay.get("resolved_transactions", []),
+                                   replay.get("transactions", [])):
+        if (record.get("status") != "success" or record.get("internal_errors") or
+                record.get("trace_error") or record.get("dependency_errors")):
+            break
+        prefix.append(transaction)
+    return prefix
+
+
 def _event_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
     return {"logical_calls": len(events),
             "failed_logical_calls": sum(not item.get("ok", False) for item in events),
@@ -232,6 +267,7 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                 echidna_limit: int = 80, echidna_timeout: int = 45,
                 echidna_seed: int = 20261114, token_budget: int = 400_000,
                 wall_budget: int = 600, run_fuzzer: bool = True,
+                runtime_constraints: bool = True,
                 run_root: Path | None = None, api_log_path: Path | None = None) -> dict[str, Any]:
     started = time.monotonic()
     experiment_id = uuid.uuid4().hex
@@ -321,40 +357,90 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                 candidate_started = time.monotonic()
                 b_events: list[dict[str, Any]] = []
                 replay_attempts: list[dict[str, Any]] = []
+                runtime_repair_events: list[dict[str, Any]] = []
                 concrete: dict[str, Any] | None = None
                 replay: dict[str, Any] | None = None
                 error = None
 
                 concrete, events, error = _agent_b_call(
                     context, candidate, feedback=None, first_attempt=1,
-                    schema_repairs=1, call_options=call_options)
+                    schema_repairs=1, call_options=call_options,
+                    fixed_prefix_transactions=candidate.get("_fixed_prefix_transactions"))
                 b_events.extend(events)
                 all_agent_b_events.extend(events)
                 if concrete and session is not None:
                     try:
-                        for repair_index in range(repairs + 1):
+                        repair_index = 0
+                        agent_repair_count = 0
+                        runtime_repair_applied = False
+                        while True:
                             replay_started = time.monotonic()
                             replay = replay_seed(project, candidate,
                                                 concrete["transactions"], session=session,
-                                                dependency_hints=concrete.get("data_dependencies"))
+                                                dependency_hints=concrete.get("data_dependencies"),
+                                                runtime_constraints=runtime_constraints)
                             replay["attempt"] = repair_index + 1
                             replay["elapsed_seconds"] = round(time.monotonic() - replay_started, 3)
                             replay["elapsed_from_run_start_seconds"] = round(time.monotonic() - started, 3)
                             replay_attempts.append(replay)
                             if replay.get("replay_status") == "executable":
                                 break
-                            if repair_index >= repairs or replay.get("deployment_status") != "success":
+                            if replay.get("deployment_status") != "success":
                                 break
+                            proposal = replay.get("constraint_repair_proposal")
+                            if runtime_constraints and proposal and not runtime_repair_applied:
+                                tx_index = int(proposal["transaction_index"]) - 1
+                                repaired_transactions = [dict(row) for row in concrete["transactions"]]
+                                if 0 <= tx_index < len(repaired_transactions):
+                                    original_tx = repaired_transactions[tx_index]
+                                    original_arguments = list(original_tx.get("arguments", []))
+                                    repaired_arguments = list(original_arguments)
+                                    updates = proposal.get("argument_updates") or [{
+                                        "argument_index": proposal["argument_index"],
+                                        "argument_name": proposal.get("argument_name"),
+                                        "original_value": proposal.get("current_value"),
+                                        "repaired_value": proposal["repaired_value"],
+                                        "reason": proposal.get("repair_mode"),
+                                    }]
+                                    applied_updates = []
+                                    for update in updates:
+                                        arg_index = int(update["argument_index"])
+                                        if not 0 <= arg_index < len(repaired_arguments):
+                                            continue
+                                        previous_value = repaired_arguments[arg_index]
+                                        repaired_arguments[arg_index] = update["repaired_value"]
+                                        applied_updates.append({**update,
+                                                                "previous_value": previous_value})
+                                    if applied_updates:
+                                        original_tx["arguments"] = repaired_arguments
+                                        runtime_repair_events.append({
+                                            "attempt": len(runtime_repair_events) + 1,
+                                            "transaction_index": tx_index + 1,
+                                            "function": original_tx.get("function"),
+                                            "argument_updates": applied_updates,
+                                            "evidence": proposal,
+                                            "validation_required": "完整序列从部署状态重新回放",
+                                        })
+                                        concrete = {**concrete, "transactions": repaired_transactions}
+                                        runtime_repair_applied = True
+                                        repair_index += 1
+                                        continue
+                            if agent_repair_count >= repairs:
+                                break
+                            fixed_prefix = _successful_prefix(replay)
                             repaired, retry_events, error = _agent_b_call(
                                 context, candidate,
                                 feedback=_execution_feedback(replay, _classify_failure(replay)),
                                 first_attempt=len(b_events) + 1,
-                                schema_repairs=0, call_options=call_options)
+                                schema_repairs=0, call_options=call_options,
+                                fixed_prefix_transactions=fixed_prefix)
                             b_events.extend(retry_events)
                             all_agent_b_events.extend(retry_events)
                             if not repaired:
                                 break
                             concrete = repaired
+                            agent_repair_count += 1
+                            repair_index += 1
                     except Exception as exc:
                         error = f"{type(exc).__name__}: {str(exc)[:1000]}"
                 elif concrete:
@@ -387,6 +473,7 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                     "concrete_seed": concrete,
                     "agent_b": _event_summary(b_events),
                     "replay_attempts": replay_attempts,
+                    "runtime_constraint_repairs": runtime_repair_events,
                     "failure_class": None if corpus_file else failure_class,
                     "planned_target_path_reached": bool(final_replay and any(
                         tx.get("function") == candidate["steps"][-1]["function"] and
@@ -406,7 +493,8 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                         context, property_id, max_candidates=max_candidates,
                         max_steps=max_steps, planning_repairs=0,
                         tag=f"AgentA_{project}_{property_id}_replan{replans_used}",
-                        initial_feedback=replan_feedback, call_options=call_options)
+                        initial_feedback=replan_feedback, call_options=call_options,
+                        fixed_prefix_transactions=_successful_prefix(final_replay))
                     all_agent_a_events.extend(replan_events)
                     property_row.setdefault("replanning", []).append({
                         "trigger_candidate_id": candidate["candidate_id"],
@@ -480,7 +568,9 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                           "agent_b_responsibilities": ["ABI 参数", "发送者", "跨交易数据依赖"],
                           "planning_repairs_per_property": planning_repairs,
                           "execution_feedback_repairs_per_candidate": repairs,
-                          "execution_replans_per_property": execution_replans},
+                          "execution_replans_per_property": execution_replans,
+                          "runtime_constraint_repair_enabled": runtime_constraints,
+                          "maximum_observed_constraint_repairs_per_candidate": 1},
         "budgets": {"echidna_test_limit_per_property": echidna_limit,
                     "echidna_timeout_seconds": echidna_timeout,
                     "agent_a_execution_replans_per_property": execution_replans,
@@ -510,6 +600,8 @@ def main() -> None:
     parser.add_argument("--token-budget", type=int, default=400_000)
     parser.add_argument("--wall-budget", type=int, default=600)
     parser.add_argument("--skip-echidna", action="store_true")
+    parser.add_argument("--disable-runtime-constraints", action="store_true",
+                        help="消融：关闭从事件与 getter 观察自动推断和修复参数")
     args = parser.parse_args()
     if not 1 <= args.max_candidates <= 4 or not 1 <= args.max_steps <= 12:
         parser.error("候选数应为 1–4，序列长度应为 1–12")
@@ -525,7 +617,8 @@ def main() -> None:
         execution_replans=args.execution_replans,
         echidna_limit=args.echidna_limit, echidna_timeout=args.echidna_timeout,
         echidna_seed=args.echidna_seed, token_budget=args.token_budget,
-        wall_budget=args.wall_budget, run_fuzzer=not args.skip_echidna,
+                     wall_budget=args.wall_budget, run_fuzzer=not args.skip_echidna,
+                     runtime_constraints=not args.disable_runtime_constraints,
         run_root=run_root)
     output = run_root / "逐属性Agent种子流程.json"
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

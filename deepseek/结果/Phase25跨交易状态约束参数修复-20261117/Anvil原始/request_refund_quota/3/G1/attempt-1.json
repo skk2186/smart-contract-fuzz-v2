@@ -1,0 +1,2718 @@
+{
+  "project": "Request",
+  "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+  "deployment_status": "success",
+  "candidate_id": "c451c4279019-01-c451c42790194538cf50-seq1",
+  "replay_status": "replay_failed",
+  "target_property_violation": null,
+  "initial_property_values": {
+    "echidna_captured_never_exceeds_authorized()": true,
+    "echidna_escrow_not_token_sink()": true,
+    "echidna_escrow_state_consistent()": true,
+    "echidna_fee_bps_validation_enforced()": true,
+    "echidna_fee_calc_no_overflow()": true,
+    "echidna_fee_never_exceeds_capture()": true,
+    "echidna_fee_receiver_only_gets_fees()": true,
+    "echidna_invalid_fee_bps_reverts()": true,
+    "echidna_merchant_receives_nonnegative()": true,
+    "echidna_no_underflow_in_merchant_payment()": true,
+    "echidna_operator_authorization_enforced()": true,
+    "echidna_payment_ref_counter_monotonic()": true,
+    "echidna_token_conservation()": true,
+    "echidna_token_supply_never_decreases()": true,
+    "echidna_uint96_sufficient_range()": true,
+    "echidna_wrapper_not_token_sink()": true
+  },
+  "initial_property_errors": {},
+  "initial_property_violations": [],
+  "initial_predicate_getters": [
+    {
+      "signature": "totalSupply()",
+      "expressions": [],
+      "arguments": [],
+      "receiver": "token",
+      "receiver_getter": "token()",
+      "receiver_type": "MockERC20",
+      "status": "observed",
+      "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+      "value": 10000000000000000000000000
+    },
+    {
+      "signature": "balanceOf(address)",
+      "expressions": [
+        "address(this)"
+      ],
+      "arguments": [
+        "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+      ],
+      "receiver": "token",
+      "receiver_getter": "token()",
+      "receiver_type": "MockERC20",
+      "status": "observed",
+      "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+      "value": 10000000000000000000000000
+    },
+    {
+      "signature": "balanceOf(address)",
+      "expressions": [
+        "PAYER"
+      ],
+      "arguments": [
+        "0x0000000000000000000000000000000000001000"
+      ],
+      "receiver": "token",
+      "receiver_getter": "token()",
+      "receiver_type": "MockERC20",
+      "status": "observed",
+      "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+      "value": 0
+    },
+    {
+      "signature": "balanceOf(address)",
+      "expressions": [
+        "MERCHANT"
+      ],
+      "arguments": [
+        "0x0000000000000000000000000000000000002000"
+      ],
+      "receiver": "token",
+      "receiver_getter": "token()",
+      "receiver_type": "MockERC20",
+      "status": "observed",
+      "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+      "value": 0
+    },
+    {
+      "signature": "balanceOf(address)",
+      "expressions": [
+        "OPERATOR"
+      ],
+      "arguments": [
+        "0x0000000000000000000000000000000000003000"
+      ],
+      "receiver": "token",
+      "receiver_getter": "token()",
+      "receiver_type": "MockERC20",
+      "status": "observed",
+      "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+      "value": 0
+    },
+    {
+      "signature": "balanceOf(address)",
+      "expressions": [
+        "FEE_RECEIVER"
+      ],
+      "arguments": [
+        "0x0000000000000000000000000000000000004000"
+      ],
+      "receiver": "token",
+      "receiver_getter": "token()",
+      "receiver_type": "MockERC20",
+      "status": "observed",
+      "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+      "value": 0
+    },
+    {
+      "signature": "balanceOf(address)",
+      "expressions": [
+        "address(wrapper)"
+      ],
+      "arguments": [
+        "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+      ],
+      "receiver": "token",
+      "receiver_getter": "token()",
+      "receiver_type": "MockERC20",
+      "status": "observed",
+      "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+      "value": 0
+    },
+    {
+      "signature": "balanceOf(address)",
+      "expressions": [
+        "address(mockEscrow)"
+      ],
+      "arguments": [
+        "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+      ],
+      "receiver": "token",
+      "receiver_getter": "token()",
+      "receiver_type": "MockERC20",
+      "status": "observed",
+      "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+      "value": 0
+    },
+    {
+      "signature": "token()",
+      "expressions": [
+        "token"
+      ],
+      "arguments": [],
+      "receiver": null,
+      "receiver_getter": null,
+      "receiver_type": null,
+      "status": "observed",
+      "receiver_address": null,
+      "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+    },
+    {
+      "signature": "PAYER()",
+      "expressions": [
+        "PAYER"
+      ],
+      "arguments": [],
+      "receiver": null,
+      "receiver_getter": null,
+      "receiver_type": null,
+      "status": "observed",
+      "receiver_address": null,
+      "value": "0x0000000000000000000000000000000000001000"
+    },
+    {
+      "signature": "MERCHANT()",
+      "expressions": [
+        "MERCHANT"
+      ],
+      "arguments": [],
+      "receiver": null,
+      "receiver_getter": null,
+      "receiver_type": null,
+      "status": "observed",
+      "receiver_address": null,
+      "value": "0x0000000000000000000000000000000000002000"
+    },
+    {
+      "signature": "OPERATOR()",
+      "expressions": [
+        "OPERATOR"
+      ],
+      "arguments": [],
+      "receiver": null,
+      "receiver_getter": null,
+      "receiver_type": null,
+      "status": "observed",
+      "receiver_address": null,
+      "value": "0x0000000000000000000000000000000000003000"
+    },
+    {
+      "signature": "FEE_RECEIVER()",
+      "expressions": [
+        "FEE_RECEIVER"
+      ],
+      "arguments": [],
+      "receiver": null,
+      "receiver_getter": null,
+      "receiver_type": null,
+      "status": "observed",
+      "receiver_address": null,
+      "value": "0x0000000000000000000000000000000000004000"
+    },
+    {
+      "signature": "wrapper()",
+      "expressions": [
+        "wrapper"
+      ],
+      "arguments": [],
+      "receiver": null,
+      "receiver_getter": null,
+      "receiver_type": null,
+      "status": "observed",
+      "receiver_address": null,
+      "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+    },
+    {
+      "signature": "mockEscrow()",
+      "expressions": [
+        "mockEscrow"
+      ],
+      "arguments": [],
+      "receiver": null,
+      "receiver_getter": null,
+      "receiver_type": null,
+      "status": "observed",
+      "receiver_address": null,
+      "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+    }
+  ],
+  "target_property_state": {
+    "property": "echidna_token_conservation()",
+    "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+    "status": "property_related_state_changed_property_holds",
+    "target_property_state_established": true,
+    "counterexample_state_established": false,
+    "property_related_state_changed": true,
+    "first_established_transaction_index": 1,
+    "first_property_related_change_transaction_index": 1,
+    "first_counterexample_transaction_index": null,
+    "trajectory": [
+      {
+        "transaction_index": 0,
+        "value": true,
+        "predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "expressions": [],
+            "arguments": [],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000000000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(this)"
+            ],
+            "arguments": [
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000000000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000001000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000002000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000003000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000004000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(wrapper)"
+            ],
+            "arguments": [
+              "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(mockEscrow)"
+            ],
+            "arguments": [
+              "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "token()",
+            "expressions": [
+              "token"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+          },
+          {
+            "signature": "PAYER()",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000001000"
+          },
+          {
+            "signature": "MERCHANT()",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000002000"
+          },
+          {
+            "signature": "OPERATOR()",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000003000"
+          },
+          {
+            "signature": "FEE_RECEIVER()",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000004000"
+          },
+          {
+            "signature": "wrapper()",
+            "expressions": [
+              "wrapper"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+          },
+          {
+            "signature": "mockEscrow()",
+            "expressions": [
+              "mockEscrow"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          }
+        ],
+        "changed_predicate_getters": []
+      },
+      {
+        "transaction_index": 1,
+        "value": true,
+        "predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "expressions": [],
+            "arguments": [],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000001000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(this)"
+            ],
+            "arguments": [
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000000000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000001000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000002000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000003000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000004000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(wrapper)"
+            ],
+            "arguments": [
+              "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(mockEscrow)"
+            ],
+            "arguments": [
+              "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 1000000000000000000
+          },
+          {
+            "signature": "token()",
+            "expressions": [
+              "token"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+          },
+          {
+            "signature": "PAYER()",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000001000"
+          },
+          {
+            "signature": "MERCHANT()",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000002000"
+          },
+          {
+            "signature": "OPERATOR()",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000003000"
+          },
+          {
+            "signature": "FEE_RECEIVER()",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000004000"
+          },
+          {
+            "signature": "wrapper()",
+            "expressions": [
+              "wrapper"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+          },
+          {
+            "signature": "mockEscrow()",
+            "expressions": [
+              "mockEscrow"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          }
+        ],
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": "token",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "arguments": [],
+            "before": 10000000000000000000000000,
+            "after": 10000001000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "receiver": "token",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "arguments": [
+              "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ]
+      },
+      {
+        "transaction_index": 2,
+        "value": true,
+        "predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "expressions": [],
+            "arguments": [],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000002000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(this)"
+            ],
+            "arguments": [
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000000000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000001000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000002000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 990000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000003000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000004000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(wrapper)"
+            ],
+            "arguments": [
+              "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(mockEscrow)"
+            ],
+            "arguments": [
+              "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 1000000000000000000
+          },
+          {
+            "signature": "token()",
+            "expressions": [
+              "token"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+          },
+          {
+            "signature": "PAYER()",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000001000"
+          },
+          {
+            "signature": "MERCHANT()",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000002000"
+          },
+          {
+            "signature": "OPERATOR()",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000003000"
+          },
+          {
+            "signature": "FEE_RECEIVER()",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000004000"
+          },
+          {
+            "signature": "wrapper()",
+            "expressions": [
+              "wrapper"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+          },
+          {
+            "signature": "mockEscrow()",
+            "expressions": [
+              "mockEscrow"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          }
+        ],
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": "token",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "arguments": [],
+            "before": 10000001000000000000000000,
+            "after": 10000002000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "receiver": "token",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "arguments": [
+              "0x0000000000000000000000000000000000002000"
+            ],
+            "before": 0,
+            "after": 990000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "receiver": "token",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "arguments": [
+              "0x0000000000000000000000000000000000004000"
+            ],
+            "before": 0,
+            "after": 10000000000000000
+          }
+        ]
+      },
+      {
+        "transaction_index": 3,
+        "value": true,
+        "predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "expressions": [],
+            "arguments": [],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000003000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(this)"
+            ],
+            "arguments": [
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000001000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000001000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000002000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 990000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000003000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [
+              "0x0000000000000000000000000000000000004000"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 10000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(wrapper)"
+            ],
+            "arguments": [
+              "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 0
+          },
+          {
+            "signature": "balanceOf(address)",
+            "expressions": [
+              "address(mockEscrow)"
+            ],
+            "arguments": [
+              "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+            ],
+            "receiver": "token",
+            "receiver_getter": "token()",
+            "receiver_type": "MockERC20",
+            "status": "observed",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "value": 1000000000000000000
+          },
+          {
+            "signature": "token()",
+            "expressions": [
+              "token"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+          },
+          {
+            "signature": "PAYER()",
+            "expressions": [
+              "PAYER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000001000"
+          },
+          {
+            "signature": "MERCHANT()",
+            "expressions": [
+              "MERCHANT"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000002000"
+          },
+          {
+            "signature": "OPERATOR()",
+            "expressions": [
+              "OPERATOR"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000003000"
+          },
+          {
+            "signature": "FEE_RECEIVER()",
+            "expressions": [
+              "FEE_RECEIVER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000004000"
+          },
+          {
+            "signature": "wrapper()",
+            "expressions": [
+              "wrapper"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+          },
+          {
+            "signature": "mockEscrow()",
+            "expressions": [
+              "mockEscrow"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          }
+        ],
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": "token",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "arguments": [],
+            "before": 10000002000000000000000000,
+            "after": 10000003000000000000000000
+          },
+          {
+            "signature": "balanceOf(address)",
+            "receiver": "token",
+            "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "arguments": [
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+            ],
+            "before": 10000000000000000000000000,
+            "after": 10000001000000000000000000
+          }
+        ]
+      }
+    ]
+  },
+  "environment": {
+    "chain_id": 1,
+    "initial_timestamp": 1524785992,
+    "initial_block_number": 4370000,
+    "deployment_timestamp": 1524785992,
+    "deployment_block_number": 4370000,
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "gas_price_wei": 0,
+    "evm_revision": "shanghai",
+    "gas_limit_per_transaction": 12500000,
+    "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+  },
+  "transactions": [
+    {
+      "index": 1,
+      "function": "driver_authorizePayment(uint256,uint256,uint16)",
+      "arguments": [
+        1000000000000000000,
+        1000000000000000000,
+        0
+      ],
+      "argument_bindings": [],
+      "slither_preconditions": [
+        {
+          "state": "MockERC20._totalSupply",
+          "writer": "MockERC20.mint(address,uint256)",
+          "kind": "control_branch",
+          "expression": "amount == 0",
+          "branch": "false",
+          "variables_read": [
+            "amount"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol#106"
+        },
+        {
+          "state": "MockERC20._balances",
+          "writer": "MockERC20.mint(address,uint256)",
+          "kind": "control_branch",
+          "expression": "amount == 0",
+          "branch": "false",
+          "variables_read": [
+            "amount"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol#106"
+        }
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "tx_hash": "1a0fe92fec66631ff60041654ea3531e50f707a329409feb7851004f83b3dfb9",
+      "block_number": 4370001,
+      "status": "success",
+      "gas_used": 367704,
+      "execution_class": "state_established",
+      "expected_outcome": "state_change",
+      "internal_errors": [],
+      "internal_call_trace": {
+        "type": "CALL",
+        "from": "0x0000000000000000000000000000000000010000",
+        "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+        "input": "0x9cafee780000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000000000000000000",
+        "calls": [
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "input": "0x40c10f19000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000000000000000000000000000000de0b6b3a7640000",
+            "calls": []
+          },
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "input": "0x095ea7b300000000000000000000000001375317aa980daabf22f990a378eccad9b40dc00000000000000000000000000000000000000000000000000de0b6b3a7640000",
+            "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "calls": []
+          },
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+            "input": "0x03af28e000000000000000000000000000000000000000000000000000000000000000200000000000000001000000000000000000000000000000000000000000000000000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000000000000000000000000000000000000000002000000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a6600000000000000000000000054919a19522ce7c842e25735a9cfecef1c0a06da0000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000005ae27159000000000000000000000000000000000000000000000000000000005ae27159000000000000000000000000000000000000000000000000000000005ae27f69000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000000",
+            "calls": [
+              {
+                "type": "STATICCALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                "input": "0x063a70ff0000000000000000000000009491f0dfb965bc45570dd449801432599f0542a0000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000009491f0dfb965bc45570dd449801432599f0542a000000000000000000000000054919a19522ce7c842e25735a9cfecef1c0a06da0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000005ae27159000000000000000000000000000000000000000000000000000000005ae27159000000000000000000000000000000000000000000000000000000005ae27f690000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000271000000000000000000000000000000000000000000000000000000000000000006c31fc15422ebad28aaf9089c306702f67540b53c7eea8b7d2941044b027100f",
+                "output": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96",
+                "calls": []
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                "input": "0x41d662020000000000000000000000009491f0dfb965bc45570dd449801432599f0542a0000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000009491f0dfb965bc45570dd449801432599f0542a000000000000000000000000054919a19522ce7c842e25735a9cfecef1c0a06da0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000005ae27159000000000000000000000000000000000000000000000000000000005ae27159000000000000000000000000000000000000000000000000000000005ae27f690000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000271000000000000000000000000000000000000000000000000000000000000000006c31fc15422ebad28aaf9089c306702f67540b53c7eea8b7d2941044b027100f0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000000",
+                "calls": [
+                  {
+                    "type": "CALL",
+                    "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                    "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                    "input": "0x23b872dd000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a6600000000000000000000000001375317aa980daabf22f990a378eccad9b40dc00000000000000000000000000000000000000000000000000de0b6b3a7640000",
+                    "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                    "calls": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "changed_storage_slot_count": 14,
+      "trace_error": null,
+      "events": [
+        {
+          "name": "Transfer",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "from": "0x0000000000000000000000000000000000000000",
+            "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "value": 1000000000000000000
+          }
+        },
+        {
+          "name": "Approval",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+            "value": 1000000000000000000
+          }
+        },
+        {
+          "name": "PaymentAuthorized",
+          "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+          "fields": {
+            "paymentReference": "0x0000000000000001",
+            "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "merchant": "0x0000000000000000000000000000000000002000",
+            "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "amount": 1000000000000000000,
+            "commercePaymentHash": "0x49e49e3c41ba431f22b9dc69e102a621626d243f4ca4f5e5dce34e561d864b96"
+          }
+        },
+        {
+          "name": "CommercePaymentAuthorized",
+          "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+          "fields": {
+            "paymentReference": "0x0000000000000001",
+            "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "merchant": "0x0000000000000000000000000000000000002000",
+            "amount": 1000000000000000000
+          }
+        },
+        {
+          "name": "Transfer",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "to": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+            "value": 1000000000000000000
+          }
+        }
+      ],
+      "observed_view_state_changed": true,
+      "view_state_changes": [
+        {
+          "getter": "0x54919a19522ce7c842e25735a9cfecef1c0a06da:totalSupply()",
+          "before": 10000000000000000000000000,
+          "after": 10000001000000000000000000
+        },
+        {
+          "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalAuthorized()",
+          "before": 0,
+          "after": 1000000000000000000
+        }
+      ],
+      "observed_view_count": 17,
+      "tracked_contract_count": 8,
+      "tracked_contract_types": [
+        "ERC20CommerceEscrowWrapper",
+        "Harness",
+        "IAuthCaptureEscrow",
+        "IERC20",
+        "IERC20FeeProxy",
+        "MockAuthCaptureEscrow",
+        "MockERC20",
+        "MockERC20FeeProxy"
+      ],
+      "observed_effect_status": "unknown",
+      "expected_effect_states": [
+        "MockERC20._totalSupply",
+        "MockERC20._balances"
+      ],
+      "observed_effect_states": [],
+      "changed_effect_states": [],
+      "unobserved_effect_states": [
+        "MockERC20._totalSupply",
+        "MockERC20._balances"
+      ],
+      "execution_effect_error": null,
+      "state_fingerprint_before": "54f58d9aac6740a3e45f196d3a462619c915cd70890139ad504703085495e38f",
+      "state_fingerprint_after": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+      "target_property": true,
+      "property_error": null,
+      "predicate_getter_values": [
+        {
+          "signature": "totalSupply()",
+          "expressions": [],
+          "arguments": [],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 10000001000000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(this)"
+          ],
+          "arguments": [
+            "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 10000000000000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "PAYER"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000001000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "MERCHANT"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000002000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "OPERATOR"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000003000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "FEE_RECEIVER"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000004000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(wrapper)"
+          ],
+          "arguments": [
+            "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(mockEscrow)"
+          ],
+          "arguments": [
+            "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 1000000000000000000
+        },
+        {
+          "signature": "token()",
+          "expressions": [
+            "token"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+        },
+        {
+          "signature": "PAYER()",
+          "expressions": [
+            "PAYER"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000001000"
+        },
+        {
+          "signature": "MERCHANT()",
+          "expressions": [
+            "MERCHANT"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000002000"
+        },
+        {
+          "signature": "OPERATOR()",
+          "expressions": [
+            "OPERATOR"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000003000"
+        },
+        {
+          "signature": "FEE_RECEIVER()",
+          "expressions": [
+            "FEE_RECEIVER"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000004000"
+        },
+        {
+          "signature": "wrapper()",
+          "expressions": [
+            "wrapper"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+        },
+        {
+          "signature": "mockEscrow()",
+          "expressions": [
+            "mockEscrow"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+        }
+      ],
+      "runtime_constraint_observations": [],
+      "constraint_repair_proposal": null,
+      "all_property_values": {
+        "echidna_captured_never_exceeds_authorized()": true,
+        "echidna_escrow_not_token_sink()": true,
+        "echidna_escrow_state_consistent()": true,
+        "echidna_fee_bps_validation_enforced()": true,
+        "echidna_fee_calc_no_overflow()": true,
+        "echidna_fee_never_exceeds_capture()": true,
+        "echidna_fee_receiver_only_gets_fees()": true,
+        "echidna_invalid_fee_bps_reverts()": true,
+        "echidna_merchant_receives_nonnegative()": true,
+        "echidna_no_underflow_in_merchant_payment()": true,
+        "echidna_operator_authorization_enforced()": true,
+        "echidna_payment_ref_counter_monotonic()": true,
+        "echidna_token_conservation()": true,
+        "echidna_token_supply_never_decreases()": true,
+        "echidna_uint96_sufficient_range()": true,
+        "echidna_wrapper_not_token_sink()": true
+      },
+      "all_property_errors": {},
+      "other_property_violations_during_prevalidation": []
+    },
+    {
+      "index": 2,
+      "function": "driver_chargePayment(uint256,uint16)",
+      "arguments": [
+        1000000000000000000,
+        100
+      ],
+      "argument_bindings": [],
+      "slither_preconditions": [
+        {
+          "state": "MockERC20._balances",
+          "writer": "MockERC20.mint(address,uint256)",
+          "kind": "control_branch",
+          "expression": "amount == 0",
+          "branch": "false",
+          "variables_read": [
+            "amount"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol#188"
+        },
+        {
+          "state": "MockERC20._totalSupply",
+          "writer": "MockERC20.mint(address,uint256)",
+          "kind": "control_branch",
+          "expression": "amount == 0",
+          "branch": "false",
+          "variables_read": [
+            "amount"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol#188"
+        }
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "tx_hash": "e5957e82ec6c15f9d458be10057638dab4f010020053cc3a42f407c44aa4c431",
+      "block_number": 4370002,
+      "status": "success",
+      "gas_used": 422725,
+      "execution_class": "state_established",
+      "expected_outcome": "state_change",
+      "internal_errors": [],
+      "internal_call_trace": {
+        "type": "CALL",
+        "from": "0x0000000000000000000000000000000000010000",
+        "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+        "input": "0xcf75108f0000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000000000000000064",
+        "calls": [
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "input": "0x40c10f19000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000000000000000000000000000000de0b6b3a7640000",
+            "calls": []
+          },
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "input": "0x095ea7b300000000000000000000000001375317aa980daabf22f990a378eccad9b40dc00000000000000000000000000000000000000000000000000de0b6b3a7640000",
+            "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "calls": []
+          },
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+            "input": "0x246b52d300000000000000000000000000000000000000000000000000000000000000200000000000000002000000000000000000000000000000000000000000000000000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000000000000000000000000000000000000000002000000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a6600000000000000000000000054919a19522ce7c842e25735a9cfecef1c0a06da0000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000005ae2715a000000000000000000000000000000000000000000000000000000005ae2715a000000000000000000000000000000000000000000000000000000005ae27f6a00000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000",
+            "calls": [
+              {
+                "type": "STATICCALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                "input": "0x063a70ff0000000000000000000000009491f0dfb965bc45570dd449801432599f0542a0000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000009491f0dfb965bc45570dd449801432599f0542a000000000000000000000000054919a19522ce7c842e25735a9cfecef1c0a06da0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000005ae2715a000000000000000000000000000000000000000000000000000000005ae2715a000000000000000000000000000000000000000000000000000000005ae27f6a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000027100000000000000000000000000000000000000000000000000000000000000000859f11b75569a4eb0496c5138fd42cc52aee8cf5c4e7cfafe58c92b2ed138e04",
+                "output": "0x8f7e54cbc66eb9fa6cc5512b573158e7375a39345f306071093ea89843b0ec22",
+                "calls": []
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                "input": "0x9e65819f0000000000000000000000009491f0dfb965bc45570dd449801432599f0542a0000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000009491f0dfb965bc45570dd449801432599f0542a000000000000000000000000054919a19522ce7c842e25735a9cfecef1c0a06da0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000005ae2715a000000000000000000000000000000000000000000000000000000005ae2715a000000000000000000000000000000000000000000000000000000005ae27f6a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000027100000000000000000000000000000000000000000000000000000000000000000859f11b75569a4eb0496c5138fd42cc52aee8cf5c4e7cfafe58c92b2ed138e040000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000220000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                "calls": [
+                  {
+                    "type": "CALL",
+                    "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                    "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                    "input": "0x23b872dd000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000009491f0dfb965bc45570dd449801432599f0542a00000000000000000000000000000000000000000000000000de0b6b3a7640000",
+                    "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                    "calls": []
+                  }
+                ]
+              },
+              {
+                "type": "STATICCALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0x70a082310000000000000000000000009491f0dfb965bc45570dd449801432599f0542a0",
+                "output": "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+                "calls": []
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0x095ea7b3000000000000000000000000fc11d02bd1b627683935c7cd70b328df9af6275d0000000000000000000000000000000000000000000000000000000000000000",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": []
+              },
+              {
+                "type": "STATICCALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0xdd62ed3e0000000000000000000000009491f0dfb965bc45570dd449801432599f0542a0000000000000000000000000fc11d02bd1b627683935c7cd70b328df9af6275d",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "calls": []
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0x095ea7b3000000000000000000000000fc11d02bd1b627683935c7cd70b328df9af6275d0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": []
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                "input": "0xc219a14d00000000000000000000000054919a19522ce7c842e25735a9cfecef1c0a06da00000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000dbd2fc137a3000000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000080000000000000002000000000000000000000000000000000000000000000000",
+                "calls": [
+                  {
+                    "type": "CALL",
+                    "from": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                    "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                    "input": "0x23b872dd0000000000000000000000009491f0dfb965bc45570dd449801432599f0542a000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000dbd2fc137a30000",
+                    "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                    "calls": []
+                  },
+                  {
+                    "type": "CALL",
+                    "from": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+                    "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                    "input": "0x23b872dd0000000000000000000000009491f0dfb965bc45570dd449801432599f0542a00000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000002386f26fc10000",
+                    "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                    "calls": []
+                  }
+                ]
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0x095ea7b3000000000000000000000000fc11d02bd1b627683935c7cd70b328df9af6275d0000000000000000000000000000000000000000000000000000000000000000",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": []
+              }
+            ]
+          }
+        ]
+      },
+      "changed_storage_slot_count": 16,
+      "trace_error": null,
+      "events": [
+        {
+          "name": "Transfer",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "from": "0x0000000000000000000000000000000000000000",
+            "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "value": 1000000000000000000
+          }
+        },
+        {
+          "name": "Approval",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "spender": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+            "value": 1000000000000000000
+          }
+        },
+        {
+          "name": "Transfer",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "from": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "to": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+            "value": 1000000000000000000
+          }
+        },
+        {
+          "name": "Approval",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+            "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+            "value": 0
+          }
+        },
+        {
+          "name": "Approval",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "owner": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+            "spender": "0xFC11D02bd1b627683935C7cD70B328Df9AF6275d",
+            "value": 1000000000000000000
+          }
+        },
+        {
+          "name": "Transfer",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+            "to": "0x0000000000000000000000000000000000002000",
+            "value": 990000000000000000
+          }
+        },
+        {
+          "name": "Transfer",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "from": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+            "to": "0x0000000000000000000000000000000000004000",
+            "value": 10000000000000000
+          }
+        },
+        {
+          "name": "TransferWithReferenceAndFee",
+          "address": "0xfc11d02bd1b627683935c7cd70b328df9af6275d",
+          "fields": {
+            "paymentReference": "0x859f11b75569a4eb0496c5138fd42cc52aee8cf5c4e7cfafe58c92b2ed138e04",
+            "tokenAddress": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "to": "0x0000000000000000000000000000000000002000",
+            "amount": 990000000000000000,
+            "feeAmount": 10000000000000000,
+            "feeAddress": "0x0000000000000000000000000000000000004000"
+          }
+        },
+        {
+          "name": "PaymentCharged",
+          "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+          "fields": {
+            "paymentReference": "0x0000000000000002",
+            "payer": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "merchant": "0x0000000000000000000000000000000000002000",
+            "token": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+            "amount": 1000000000000000000,
+            "commercePaymentHash": "0x8f7e54cbc66eb9fa6cc5512b573158e7375a39345f306071093ea89843b0ec22"
+          }
+        }
+      ],
+      "observed_view_state_changed": true,
+      "view_state_changes": [
+        {
+          "getter": "0x54919a19522ce7c842e25735a9cfecef1c0a06da:totalSupply()",
+          "before": 10000001000000000000000000,
+          "after": 10000002000000000000000000
+        },
+        {
+          "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalAuthorized()",
+          "before": 1000000000000000000,
+          "after": 2000000000000000000
+        },
+        {
+          "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalCaptured()",
+          "before": 0,
+          "after": 1000000000000000000
+        }
+      ],
+      "observed_view_count": 17,
+      "tracked_contract_count": 8,
+      "tracked_contract_types": [
+        "ERC20CommerceEscrowWrapper",
+        "Harness",
+        "IAuthCaptureEscrow",
+        "IERC20",
+        "IERC20FeeProxy",
+        "MockAuthCaptureEscrow",
+        "MockERC20",
+        "MockERC20FeeProxy"
+      ],
+      "observed_effect_status": "unknown",
+      "expected_effect_states": [
+        "MockERC20._balances",
+        "MockERC20._totalSupply"
+      ],
+      "observed_effect_states": [],
+      "changed_effect_states": [],
+      "unobserved_effect_states": [
+        "MockERC20._balances",
+        "MockERC20._totalSupply"
+      ],
+      "execution_effect_error": null,
+      "state_fingerprint_before": "33c53f251be1956e141ef08151e06b41b99e820834571ddb42e5df5cda3a5fc9",
+      "state_fingerprint_after": "b7221dbbdf174861217426fbc04896b685154af860531ad1ed9c17f2ef0f24dc",
+      "target_property": true,
+      "property_error": null,
+      "predicate_getter_values": [
+        {
+          "signature": "totalSupply()",
+          "expressions": [],
+          "arguments": [],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 10000002000000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(this)"
+          ],
+          "arguments": [
+            "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 10000000000000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "PAYER"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000001000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "MERCHANT"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000002000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 990000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "OPERATOR"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000003000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "FEE_RECEIVER"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000004000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 10000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(wrapper)"
+          ],
+          "arguments": [
+            "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(mockEscrow)"
+          ],
+          "arguments": [
+            "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 1000000000000000000
+        },
+        {
+          "signature": "token()",
+          "expressions": [
+            "token"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+        },
+        {
+          "signature": "PAYER()",
+          "expressions": [
+            "PAYER"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000001000"
+        },
+        {
+          "signature": "MERCHANT()",
+          "expressions": [
+            "MERCHANT"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000002000"
+        },
+        {
+          "signature": "OPERATOR()",
+          "expressions": [
+            "OPERATOR"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000003000"
+        },
+        {
+          "signature": "FEE_RECEIVER()",
+          "expressions": [
+            "FEE_RECEIVER"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000004000"
+        },
+        {
+          "signature": "wrapper()",
+          "expressions": [
+            "wrapper"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+        },
+        {
+          "signature": "mockEscrow()",
+          "expressions": [
+            "mockEscrow"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+        }
+      ],
+      "runtime_constraint_observations": [],
+      "constraint_repair_proposal": null,
+      "all_property_values": {
+        "echidna_captured_never_exceeds_authorized()": true,
+        "echidna_escrow_not_token_sink()": true,
+        "echidna_escrow_state_consistent()": true,
+        "echidna_fee_bps_validation_enforced()": true,
+        "echidna_fee_calc_no_overflow()": true,
+        "echidna_fee_never_exceeds_capture()": true,
+        "echidna_fee_receiver_only_gets_fees()": true,
+        "echidna_invalid_fee_bps_reverts()": true,
+        "echidna_merchant_receives_nonnegative()": true,
+        "echidna_no_underflow_in_merchant_payment()": true,
+        "echidna_operator_authorization_enforced()": true,
+        "echidna_payment_ref_counter_monotonic()": true,
+        "echidna_token_conservation()": true,
+        "echidna_token_supply_never_decreases()": true,
+        "echidna_uint96_sufficient_range()": true,
+        "echidna_wrapper_not_token_sink()": true
+      },
+      "all_property_errors": {},
+      "other_property_violations_during_prevalidation": []
+    },
+    {
+      "index": 3,
+      "function": "driver_refundPayment(uint256,uint256)",
+      "arguments": [
+        0,
+        1000000000000000000
+      ],
+      "argument_bindings": [],
+      "slither_preconditions": [
+        {
+          "state": "MockERC20._totalSupply",
+          "writer": "MockERC20.mint(address,uint256)",
+          "kind": "control_branch",
+          "expression": "paymentRefCounter == 0",
+          "branch": "false",
+          "variables_read": [
+            "paymentRefCounter"
+          ],
+          "state_reads": [
+            "EchidnaERC20CommerceEscrowWrapper.paymentRefCounter"
+          ],
+          "data_dependencies": {
+            "paymentRefCounter": [
+              "paymentRefCounter"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol#243"
+        },
+        {
+          "state": "MockERC20._totalSupply",
+          "writer": "MockERC20.mint(address,uint256)",
+          "kind": "control_branch",
+          "expression": "refundAmount == 0",
+          "branch": "false",
+          "variables_read": [
+            "refundAmount"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "refundAmount": [
+              "refundAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol#247"
+        },
+        {
+          "state": "MockERC20._balances",
+          "writer": "MockERC20.mint(address,uint256)",
+          "kind": "control_branch",
+          "expression": "paymentRefCounter == 0",
+          "branch": "false",
+          "variables_read": [
+            "paymentRefCounter"
+          ],
+          "state_reads": [
+            "EchidnaERC20CommerceEscrowWrapper.paymentRefCounter"
+          ],
+          "data_dependencies": {
+            "paymentRefCounter": [
+              "paymentRefCounter"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol#243"
+        },
+        {
+          "state": "MockERC20._balances",
+          "writer": "MockERC20.mint(address,uint256)",
+          "kind": "control_branch",
+          "expression": "refundAmount == 0",
+          "branch": "false",
+          "variables_read": [
+            "refundAmount"
+          ],
+          "state_reads": [],
+          "data_dependencies": {
+            "refundAmount": [
+              "refundAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "source": "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol#247"
+        }
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "tx_hash": "f2e83f7b2a7fdb3c7505f7bfe47e767d7abf7f73ad3470a5de8106705ca12b61",
+      "block_number": 4370003,
+      "status": "success",
+      "gas_used": 158267,
+      "execution_class": "unexpected_internal_revert",
+      "expected_outcome": "state_change",
+      "internal_errors": [
+        {
+          "depth": 1,
+          "type": "CALL",
+          "address": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+          "error": "execution reverted",
+          "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+        },
+        {
+          "depth": 2,
+          "type": "CALL",
+          "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "error": "execution reverted",
+          "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000"
+        }
+      ],
+      "internal_call_trace": {
+        "type": "CALL",
+        "from": "0x0000000000000000000000000000000000010000",
+        "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+        "input": "0x5dff2c3500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000de0b6b3a7640000",
+        "calls": [
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "input": "0x40c10f19000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000000000000000000000000000000de0b6b3a7640000",
+            "calls": []
+          },
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "input": "0x095ea7b30000000000000000000000009491f0dfb965bc45570dd449801432599f0542a00000000000000000000000000000000000000000000000000de0b6b3a7640000",
+            "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "calls": []
+          },
+          {
+            "type": "CALL",
+            "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+            "to": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+            "input": "0xf9b777ea00000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000",
+            "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000",
+            "error": "execution reverted",
+            "calls": [
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0x23b872dd000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000009491f0dfb965bc45570dd449801432599f0542a00000000000000000000000000000000000000000000000000de0b6b3a7640000",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": []
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0x095ea7b300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": []
+              },
+              {
+                "type": "STATICCALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0xdd62ed3e0000000000000000000000009491f0dfb965bc45570dd449801432599f0542a00000000000000000000000000000000000000000000000000000000000000000",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "calls": []
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                "input": "0x095ea7b300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000de0b6b3a7640000",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": []
+              },
+              {
+                "type": "CALL",
+                "from": "0x9491f0dfb965bc45570dd449801432599f0542a0",
+                "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                "input": "0xd458db5a0000000000000000000000009491f0dfb965bc45570dd449801432599f0542a0000000000000000000000000a647ff3c36cfab592509e13860ab8c4f28781a660000000000000000000000009491f0dfb965bc45570dd449801432599f0542a000000000000000000000000054919a19522ce7c842e25735a9cfecef1c0a06da0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000005ae27159000000000000000000000000000000000000000000000000000000005ae27159000000000000000000000000000000000000000000000000000000005ae27f690000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000271000000000000000000000000000000000000000000000000000000000000000006c31fc15422ebad28aaf9089c306702f67540b53c7eea8b7d2941044b027100f0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000000",
+                "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001e496e73756666696369656e7420726566756e6461626c6520616d6f756e740000",
+                "error": "execution reverted",
+                "calls": []
+              }
+            ]
+          }
+        ]
+      },
+      "changed_storage_slot_count": 4,
+      "trace_error": null,
+      "events": [
+        {
+          "name": "Transfer",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "from": "0x0000000000000000000000000000000000000000",
+            "to": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "value": 1000000000000000000
+          }
+        },
+        {
+          "name": "Approval",
+          "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "fields": {
+            "owner": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "spender": "0x9491F0Dfb965BC45570dd449801432599F0542a0",
+            "value": 1000000000000000000
+          }
+        }
+      ],
+      "observed_view_state_changed": true,
+      "view_state_changes": [
+        {
+          "getter": "0x54919a19522ce7c842e25735a9cfecef1c0a06da:totalSupply()",
+          "before": 10000002000000000000000000,
+          "after": 10000003000000000000000000
+        }
+      ],
+      "observed_view_count": 17,
+      "tracked_contract_count": 8,
+      "tracked_contract_types": [
+        "ERC20CommerceEscrowWrapper",
+        "Harness",
+        "IAuthCaptureEscrow",
+        "IERC20",
+        "IERC20FeeProxy",
+        "MockAuthCaptureEscrow",
+        "MockERC20",
+        "MockERC20FeeProxy"
+      ],
+      "observed_effect_status": "unknown",
+      "expected_effect_states": [
+        "MockERC20._totalSupply",
+        "MockERC20._balances"
+      ],
+      "observed_effect_states": [],
+      "changed_effect_states": [],
+      "unobserved_effect_states": [
+        "MockERC20._totalSupply",
+        "MockERC20._balances"
+      ],
+      "execution_effect_error": "internal call reverted without an explicit rejection expectation",
+      "state_fingerprint_before": "b7221dbbdf174861217426fbc04896b685154af860531ad1ed9c17f2ef0f24dc",
+      "state_fingerprint_after": "2117961d2983da0c1ed2882028f844c7abafaf0a902eb900ea5629e92973733a",
+      "target_property": true,
+      "property_error": null,
+      "predicate_getter_values": [
+        {
+          "signature": "totalSupply()",
+          "expressions": [],
+          "arguments": [],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 10000003000000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(this)"
+          ],
+          "arguments": [
+            "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 10000001000000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "PAYER"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000001000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "MERCHANT"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000002000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 990000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "OPERATOR"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000003000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "FEE_RECEIVER"
+          ],
+          "arguments": [
+            "0x0000000000000000000000000000000000004000"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 10000000000000000
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(wrapper)"
+          ],
+          "arguments": [
+            "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 0
+        },
+        {
+          "signature": "balanceOf(address)",
+          "expressions": [
+            "address(mockEscrow)"
+          ],
+          "arguments": [
+            "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          ],
+          "receiver": "token",
+          "receiver_getter": "token()",
+          "receiver_type": "MockERC20",
+          "status": "observed",
+          "receiver_address": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA",
+          "value": 1000000000000000000
+        },
+        {
+          "signature": "token()",
+          "expressions": [
+            "token"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA"
+        },
+        {
+          "signature": "PAYER()",
+          "expressions": [
+            "PAYER"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000001000"
+        },
+        {
+          "signature": "MERCHANT()",
+          "expressions": [
+            "MERCHANT"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000002000"
+        },
+        {
+          "signature": "OPERATOR()",
+          "expressions": [
+            "OPERATOR"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000003000"
+        },
+        {
+          "signature": "FEE_RECEIVER()",
+          "expressions": [
+            "FEE_RECEIVER"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x0000000000000000000000000000000000004000"
+        },
+        {
+          "signature": "wrapper()",
+          "expressions": [
+            "wrapper"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x9491F0Dfb965BC45570dd449801432599F0542a0"
+        },
+        {
+          "signature": "mockEscrow()",
+          "expressions": [
+            "mockEscrow"
+          ],
+          "arguments": [],
+          "receiver": null,
+          "receiver_getter": null,
+          "receiver_type": null,
+          "status": "observed",
+          "receiver_address": null,
+          "value": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+        }
+      ],
+      "runtime_constraint_observations": [],
+      "constraint_repair_proposal": null,
+      "all_property_values": {
+        "echidna_captured_never_exceeds_authorized()": true,
+        "echidna_escrow_not_token_sink()": true,
+        "echidna_escrow_state_consistent()": true,
+        "echidna_fee_bps_validation_enforced()": true,
+        "echidna_fee_calc_no_overflow()": true,
+        "echidna_fee_never_exceeds_capture()": true,
+        "echidna_fee_receiver_only_gets_fees()": true,
+        "echidna_invalid_fee_bps_reverts()": true,
+        "echidna_merchant_receives_nonnegative()": true,
+        "echidna_no_underflow_in_merchant_payment()": true,
+        "echidna_operator_authorization_enforced()": true,
+        "echidna_payment_ref_counter_monotonic()": true,
+        "echidna_token_conservation()": true,
+        "echidna_token_supply_never_decreases()": true,
+        "echidna_uint96_sufficient_range()": true,
+        "echidna_wrapper_not_token_sink()": true
+      },
+      "all_property_errors": {},
+      "other_property_violations_during_prevalidation": []
+    }
+  ],
+  "resolved_transactions": [
+    {
+      "index": 1,
+      "function": "driver_authorizePayment(uint256,uint256,uint16)",
+      "abi_signature": "driver_authorizePayment(uint256,uint256,uint16)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        1000000000000000000,
+        1000000000000000000,
+        0
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": []
+    },
+    {
+      "index": 2,
+      "function": "driver_chargePayment(uint256,uint16)",
+      "abi_signature": "driver_chargePayment(uint256,uint16)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        1000000000000000000,
+        100
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": []
+    },
+    {
+      "index": 3,
+      "function": "driver_refundPayment(uint256,uint256)",
+      "abi_signature": "driver_refundPayment(uint256,uint256)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        0,
+        1000000000000000000
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "depends_on_transaction": 1,
+          "field": "paymentIndex",
+          "relation": "paymentIndex=0 映射到 paymentRefCounter 推进后的第一个 paymentRef（bytes8(uint64(1+0%counter))），即前序 driver_authorizePayment 创建的授权支付引用"
+        }
+      ]
+    }
+  ],
+  "attempt_elapsed_seconds": 3.973491
+}
