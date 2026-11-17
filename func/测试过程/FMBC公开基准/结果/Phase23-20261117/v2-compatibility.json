@@ -1,0 +1,46 @@
+{
+  "assessment": "static integration check; no API or fuzzing process started",
+  "v2_projects_registered": [
+    "OpenNFTs",
+    "Request",
+    "Immutable",
+    "Hokusai",
+    "BeeStorage",
+    "Drips",
+    "Kink"
+  ],
+  "fmbc_registered": false,
+  "project_context_requires_registered_name": true,
+  "agent_cli_restricts_project_to_registry": true,
+  "replay_property_evaluator_requires_echidna_named_bool_entry": true,
+  "replay_loads_compiled_artifact_from_project_registry": true,
+  "fmbc_tasks_with_direct_runtime_oracle": 0,
+  "fmbc_arbitrary_source_end_to_end_ready": false,
+  "blocking_reasons": [
+    "FMBC 没有可直接部署、以 echidna_ 命名且返回 bool 的属性入口；其 SolCMC 文件依赖验证器 ghost/invariant 语义，Certora 文件也不是交易期 Oracle。",
+    "V2 上下文加载和 Agent CLI 都把项目名限制在 PROJECTS 静态注册表；部署使用相应项目的固定 artifact/source_root。",
+    "回放属性评估器只读取 echidna_ bool 函数；不能直接消费 FMBC 的 SolCMC/Certora 属性定义。",
+    "因此无法在不增加通用 SolCMC 到交易期 Oracle 转换器及任意 FMBC 项目上下文加载器的情况下完成同 Oracle 的 G0/G2 配对。"
+  ],
+  "agent_algorithms_modified": false,
+  "deepseek_api_calls": 0,
+  "api_call_time_seconds": 0,
+  "fuzzing_runs_started": 0,
+  "selection_freeze_sha256_matches_manifest": true,
+  "selected_groups": 0,
+  "evidence_files": [
+    "func/功能/属性种子上下文.py",
+    "deepseek/实验过程/运行Agent种子流程.py",
+    "func/功能/种子验证.py"
+  ],
+  "runtime_environment": {
+    "python3": "3.8.10",
+    "echidna": "Echidna 2.2.3",
+    "anvil": "anvil Version: 1.9.0-dev\nCommit SHA: 6056c5845d34205a83cf7108042adb137325c9df\nBuild Timestamp: 2026-11-02T20:11:04.198713475Z (1793650264)\nBuild Profile: dist",
+    "slither": "0.11.6",
+    "solc_default": "solc, the solidity compiler commandline interface\nVersion: 0.4.25+commit.59dbf8f1.Linux.g++",
+    "solc_select_installed_versions": "0.4.23\n0.4.25 (current, set by /home/skk/.solc-select/global-version)\n0.8.20",
+    "additional_solc_0_8_26": "solc, the solidity compiler commandline interface\nVersion: 0.8.26+commit.8a97fa7a.Linux.g++",
+    "fuzzing_started": false
+  }
+}
