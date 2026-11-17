@@ -1173,7 +1173,8 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
                 shrink_limit: int = 1,
                 stop_on_fail: bool = False,
                 disable_slither: bool = True,
-                sender_pool: list[str] | None = None) -> dict[str, Any]:
+                sender_pool: list[str] | None = None,
+                working_directory: Path | None = None) -> dict[str, Any]:
     if not Path(ECHIDNA_BIN).is_file() and shutil.which(ECHIDNA_BIN) is None:
         raise FileNotFoundError(f"找不到 Echidna 2.3.2：{ECHIDNA_BIN}")
     conf = PROJECTS[project]
@@ -1242,8 +1243,9 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
             json.dumps(item, ensure_ascii=False) for item in filter_functions) + "]")
     config_lines.append("")
     echidna_config.write_text("\n".join(config_lines), encoding="utf-8")
+    crytic_args = f"--config-file {compiler_config.resolve()}"
     command = [ECHIDNA_BIN, spec["target"], "--contract", spec["contract"],
-               "--crytic-args", f"--config-file {compiler_config.resolve()}",
+               "--crytic-args", crytic_args,
                "--config", str(echidna_config.resolve()),
                "--test-limit", str(test_limit), "--seq-len", str(seq_len),
                "--shrink-limit", str(shrink_limit),
@@ -1275,7 +1277,10 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         environment["FOUNDRY_OUT"] = str(build_root / "out")
         environment["FOUNDRY_CACHE_PATH"] = str(build_root / "cache")
     try:
-        result = subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE,
+        run_cwd = ROOT if working_directory is None else Path(working_directory).resolve()
+        if not run_cwd.is_dir():
+            raise FileNotFoundError(f"Echidna 工作目录不存在：{run_cwd}")
+        result = subprocess.run(command, cwd=run_cwd, text=True, stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT,
                                 timeout=min(timeout, remaining) if remaining is not None else timeout,
                                 env=environment)

@@ -1,0 +1,204 @@
+{
+  "phase": 26,
+  "status": "frozen-before-phase26-revised-echidna-runs",
+  "revision": 1,
+  "supersedes_plan": {
+    "path": "deepseek/结果/Phase26研究主线与可信度核验-20261117/实验方案.json",
+    "sha256": "37c08697bc268d1de37d30346a06d8a90c672d5c4fc7edc4caed4b52e80b390b",
+    "failed_campaign_summary": "deepseek/结果/Phase26研究主线与可信度核验-20261117/Phase26原始汇总.json",
+    "failed_campaign_summary_sha256": "4eec3971ae3f0c4c255b1a83036717749bd742e149419d728a8ca536ff38071e"
+  },
+  "operational_amendment": {
+    "reason": "初版 48 个 campaign 均因 Echidna 2.3.2 输出 No contracts found in given file 而退出；在源码临时副本中移除 --export-dir 后可发现并分析 OpenNFT Harness。",
+    "change": "正式矩阵改在每个项目的临时源码副本中运行，使用 Echidna 默认 crytic-export 位置；样本、随机种子、属性、预算、sender、编译配置、指标及成功口径不变。",
+    "diagnostic_only_open_nft_test_limit_0_still_passing": true,
+    "diagnostic_evidence_dir": "deepseek/结果/Phase26研究主线与可信度核验-20261117/诊断证据/OpenNFTs-testLimit0-no-export"
+  },
+  "frozen_at_utc": "2026-11-17T10:12:11Z",
+  "baseline_commit": "63f7d0fac29a89a485d71b4faf65b0082acd0255",
+  "objective": "对 Phase25 四个固定案例分离种子单独回放覆盖、500-test 后续新增覆盖和最终覆盖；查明 OpenNFTs corpus replay 与 Anvil 属性状态差异。",
+  "research_freeze": {
+    "mainline": [
+      "安全属性分析",
+      "Agent A/B 多交易规划及参数生成",
+      "Anvil 实际执行反馈与跨交易参数修复",
+      "有效种子验证",
+      "Echidna 模糊测试"
+    ],
+    "research_question": "在不修改 Harness、属性或真实项目合约的条件下，基于事件、getter、Slither 和真实失败结果的有界跨交易约束处理，能否提高独立项目上的有效序列/目标状态到达，并在相同 Echidna 预算下增加纯种子回放之外的新路径？",
+    "method_modules": [
+      "属性与 Slither 读取/写入/守卫分析",
+      "Agent A/B 生成多交易计划和 ABI 参数",
+      "Anvil 事件、返回值、getter、状态差和 revert 反馈",
+      "有界对象键/额度修复并完整重放验证",
+      "有效语料与 Echidna seed-only / fuzz / final 覆盖分离"
+    ],
+    "candidate_contributions": [
+      {
+        "id": "C1",
+        "claim": "通用的真实执行反馈约束解析，可沿事件对象键和可观察额度修复受影响参数，保留成功前缀并经全序列复验。",
+        "status": "Phase25 诊断样本有可重复可行性证据，独立留出泛化待验证。"
+      },
+      {
+        "id": "C2",
+        "claim": "将种子回放状态、回放覆盖、后续变异新增覆盖和最终覆盖分开测量的可信因果验证协议。",
+        "status": "Phase26 先完成固定案例口径核验，学术新颖性待与独立留出实验比较。"
+      }
+    ],
+    "known_failure_types": [
+      "对象尚未创建或事件字段缺失/歧义/ABI 类型不兼容",
+      "数值参数超过前序额度/余额，或 getter 无法观察到约束",
+      "Slither 守卫只给出候选依赖，源码映射无法唯一解释",
+      "外层调用成功但内部调用被 Harness 捕获并回滚",
+      "角色/sender 与对象 owner/operator 不一致",
+      "交易有存储变化但属性目标状态未到达",
+      "RPC/编译/trace 错误导致证据不完整",
+      "外部 corpus 被加载/回放，但目标属性末态未被该 replay 结果证明",
+      "覆盖增加发生在种子回放还是后续 fuzz 阶段无法分离"
+    ],
+    "next_stage_controls": {
+      "G0": "同 Harness/属性/配置的 native Echidna，空语料，testLimit=500。",
+      "G1": "同候选输入启用既有运行时约束机制；只注入 Anvil 完整重放有效的冻结种子，testLimit=500。",
+      "G2": "同一候选序列关闭新增运行时约束修复；Anvil 失败不得伪装成有效种子，Echidna 对照仍运行并明确空语料状态。",
+      "paired_repeats": 3,
+      "random_seeds": [
+        20261125,
+        20261135,
+        20261145
+      ],
+      "other_controls": "Harness、源码、属性、sender/deployer、solc/remappings、seqLen=8、workers=1、shrinkLimit=1、stopOnFail=false、disableSlither=true 完全相同。"
+    },
+    "next_stage_selection_rule": {
+      "pool": "只从仓库中已经存在的真实项目 Harness/属性清单选取；不搜索或接入新基准。",
+      "exclude": "排除 Phase10–25 已作为开发、诊断或回归输入的项目/属性，包括 Request、Immutable、BeeStorage、OpenNFTs 及既有 Hokusai/Kink 固定样本。",
+      "eligibility_before_fuzz": "现有 Harness 可按仓库固定 compiler recipe 编译；部署时目标属性为真；Slither 静态信息显示至少两个外部 Harness 动作之间存在状态读写依赖。资格只用源码/部署前置状态判定，不看回放成功率、覆盖或 fuzz 结果。",
+      "deterministic_order": "对每个合格项目/属性计算 SHA-256('phase27-independent-v1|' + canonical_project_path + '|' + property_signature)，按 digest 升序，每项目最多取首个属性，固定取前 6 个项目。",
+      "no_replacement": "冻结后编译失败、Agent 无有效序列或 Anvil 失败的任务继续留在原位并计入失败；不换属性、不放宽条件、不按成功口径筛样。若合格项目少于 4 个，报告样本不足并停止正式泛化结论。",
+      "generation_budget": "复用现有 Agent A/B；每个样本一次规划、一次 Agent B 候选、至多一次参数修复和一次受成功前缀约束的重规划；不增加 Agent 或重试。"
+    }
+  },
+  "phase25_experiment_summary_sha256": "0bfc9ac5092681b054285f13ef6918eae26a3c503f305de27c05464cfab12d4a",
+  "sample_ids": [
+    "request_refund_quota",
+    "immutable_mint_then_approve",
+    "beestorage_batch_id_no_hint",
+    "opennfts_reach_other_balance"
+  ],
+  "input_seed_files": {
+    "request_refund_quota": {
+      "path": "deepseek/结果/Phase25跨交易状态约束参数修复-索引映射复验-20261117/Echidna输入种子/request_refund_quota/coverage-seed.txt",
+      "sha256": "d59fa19627ebf0cb7210043f24e8dadc6869465222f06ba7fec5f46434e32ae4"
+    },
+    "immutable_mint_then_approve": {
+      "path": "deepseek/结果/Phase25跨交易状态约束参数修复-索引映射复验-20261117/Echidna输入种子/immutable_mint_then_approve/coverage-seed.txt",
+      "sha256": "9a297593881943735e6bd1c10577e3e99d99603102763f2caac370300b9d0a88"
+    },
+    "beestorage_batch_id_no_hint": {
+      "path": "deepseek/结果/Phase25跨交易状态约束参数修复-索引映射复验-20261117/Echidna输入种子/beestorage_batch_id_no_hint/coverage-seed.txt",
+      "sha256": "ecc3dee9175a76366360247c456ab65c92ca801e5ce49d1c5a799cea79a9387d"
+    },
+    "opennfts_reach_other_balance": {
+      "path": "deepseek/结果/Phase25跨交易状态约束参数修复-索引映射复验-20261117/Echidna输入种子/opennfts_reach_other_balance/coverage-seed.txt",
+      "sha256": "6cf8c6f7ee3ee088a56dfa1fcfc0657d3d0574337fe0cf44252dca0601c5d3af"
+    }
+  },
+  "treatments": {
+    "seed_only_replay": {
+      "test_limit": 0,
+      "corpus": "同一 Phase25 已验证种子，仅作初始外部 corpus",
+      "purpose": "测量 Echidna 在 fuzz 测试数为 0 时回放该语料得到的覆盖和属性报告"
+    },
+    "empty_corpus_replay": {
+      "test_limit": 0,
+      "corpus": "空外部 corpus",
+      "purpose": "扣除零预算启动、部署与 worker 初始行为，报告种子回放相对空语料的新增行"
+    },
+    "native_empty_corpus": {
+      "test_limit": 500,
+      "corpus": "空外部 corpus",
+      "purpose": "同 Harness、同随机种子的 native 基线"
+    },
+    "seeded_fuzz": {
+      "test_limit": 500,
+      "corpus": "同一 Phase25 已验证种子",
+      "purpose": "报告最终覆盖；新增 LCOV 行为其最终命中行减 seed_only_replay 的命中行"
+    }
+  },
+  "echidna_configuration": {
+    "version": "Echidna 2.3.2",
+    "random_seeds": [
+      20261125,
+      20261135,
+      20261145
+    ],
+    "test_limit": 500,
+    "seq_len": 8,
+    "shrink_limit": 1,
+    "workers": 1,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "test_mode": "property",
+    "coverage": true,
+    "timeout_seconds": 1800,
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+    "max_gas_per_call": 12500000,
+    "balance": 4294967295,
+    "gas_price": 0,
+    "solc_version": "0.8.20"
+  },
+  "same_configuration_assertions": [
+    "native_empty_corpus 与 seeded_fuzz 的 testLimit、random seed、Harness、property、sender、deployer、compiler config、seqLen、shrinkLimit、worker、stopOnFail 相同；仅 corpusDir 与 corpus 内容不同。",
+    "seed_only_replay 与 seeded_fuzz 使用相同随机种子、Harness、property、sender、deployer、compiler config、seqLen、shrinkLimit、worker、stopOnFail；testLimit 按测量目的分别为 0 与 500。"
+  ],
+  "coverage_metrics": {
+    "seed_only": "testLimit=0 外部语料 replay campaign 的 LCOV 命中源码行集合",
+    "after_fuzz_new_lines": "seeded_fuzz 最终 LCOV 集合减 seed_only_replay LCOV 集合",
+    "final": "seeded_fuzz campaign 最终 LCOV 行集合与 unique instructions",
+    "native": "native_empty_corpus campaign 最终 LCOV 行集合与 unique instructions",
+    "limitation": "LCOV 行差可精确计算；Echidna unique-instruction 数值为 campaign 汇总且不提供按 seed-only 与 fuzzing 阶段的精确拆分。"
+  },
+  "source_sha256": {
+    "AGENTS.md": "d4d7bf4e9c5a98a71402249091483b00cd81d0909951ceaeb5c0f720d16b9644",
+    "deepseek/AgentB.py": "f5815d057899558b4d6db36636e22a857bbf0011af2fb36c3177195c8a4f2f86",
+    "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+    "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3",
+    "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+    "deepseek/结果/Phase25跨交易状态约束参数修复-索引映射复验-20261117/Phase25原始汇总.json": "0bfc9ac5092681b054285f13ef6918eae26a3c503f305de27c05464cfab12d4a",
+    "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+    "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+    "docs/00_项目目录标准.md": "0458e3f0ba19ce575f04bc78d8d3793c0b70ef37e8623c3555142b48bb233fa9",
+    "docs/08_Echidna原生种子加载回放变异验证.md": "d8a5b9e5258fd742eb417d2132e173df15d704bb20c69258adcb7a4b1642a7af",
+    "docs/21_实验可信度与目标状态验证.md": "ffe74cd63b6de1747b23e2d4aea1cab5d2310374cc96557cb19fcbb99cc311e8",
+    "docs/24_逐属性种子选择与持续探索验证.md": "04235a5d98b86c963422356abfb35af089940d8aee161f9c62a396c51e2f997f",
+    "docs/25_跨交易状态约束与参数修复实验.md": "38cc2067644f982740c07a710027b5d64197841678baae9ff8a8ba8230a274d3",
+    "func/功能/种子验证.py": "18741aafe1327a0de11198e3cdb4cb0df8b950ded44af7781c24f22f5522f299",
+    "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+    "func/测试过程/Phase26可信度核验.py": "b2f9e01b6b554fde61dbafe82ecd007350e094c18ac8bae9ac7bd9237a18c6fa",
+    "sol/真实项目/BeeStorage/src/PostageStamp.sol": "cd1ed6426e7ea8bd5be1fee5428a7ea1bf00a075bcd1622dbe81550058d2d9bf",
+    "sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol": "ac863a20587871404c449ef6fee36496736d495bba80f639880f0c262a2b4332",
+    "sol/真实项目/Immutable/contracts/token/erc721/erc721psi/ERC721PsiV2.sol": "b45120d10e6a2492d62281416b9f50d5df6643a812d78d12abff7ea62e6ff7e6",
+    "sol/真实项目/Immutable/test/token/erc721/fuzz/ERC721PsiV2.Echidna.sol": "5b96814001c3c523c768d76a48a3ce5ac429513a1b8af91e8500405ebc18d1dd",
+    "sol/真实项目/OpenNFTs/contracts/OpenERC/OpenERC721.sol": "7c08fb8a505a217c98820d13683694f4250b87e51766c88b5512aa1d7109af25",
+    "sol/真实项目/OpenNFTs/tests/echidna/OpenAutoMarketEx.e.sol": "d2f3ff8cc6b69a21c43da7d599a05b25e9583eaa44e58dc4ecce35611cda2df2",
+    "sol/真实项目/OpenNFTs/tests/examples/OpenAutoMarketEx.sol": "ed8b35c9abd219354012e3a61e66c2e36e0edbb60f2950f0c9db1049db96ff23",
+    "sol/真实项目/Request/src/contracts/ERC20CommerceEscrowWrapper.sol": "efe5be7db5fe99d1b7cc1c1579f2f799a28df39e84869af75ab80f91b9a9721a",
+    "sol/真实项目/Request/src/contracts/test/EchidnaERC20CommerceEscrowWrapper.sol": "e26980ce0abdbec7f9b9be78c6d6209057de6c2402e769faa37a00e47d868f3f"
+  },
+  "seed_provenance_report_sha256": {
+    "deepseek/结果/Agent种子语料/Request/9c7edf27282f4ab59886d322da5845da/逐属性Agent种子流程.json": "96e823fc19ce136a51378f757246d3496ab4526c7a74bdc382889090c2088103",
+    "deepseek/结果/逐属性原生对照实验/2253a6ce251e4d44aea57f6be6378ff3/seed-generation/Immutable/a9d9745dffe4118dcc3a/逐属性Agent种子流程.json": "be2624d7865008d35272ee6f9356cb215c9a370882651a8cfa1bba83f90ed7b8",
+    "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115/状态依赖回归.json": "5494d0209126fd0a9bc50e4dded835a439869ab444d369e273329dee88eec741",
+    "deepseek/结果/Agent种子语料/OpenNFTs/28ede2b017fe45d58f2a41d7a06ad4b1/逐属性Agent种子流程.json": "61487bb8db7f73941a110705719e473569953d806814a57351eeb2845f16c182",
+    "deepseek/结果/Agent种子语料/OpenNFTs/e0a8efee17ed4c9abc72cf4e96066f13/逐属性Agent种子流程.json": "601aeb51ea9d3197e878f25e1c1c0e682efa11edaf44ec7da0e37ea7dc9ee5a3"
+  },
+  "seed_provenance": "完全复用 Phase25 冻结复验中 Anvil 已验证的四条种子；不调用模型、不修改 seed 内容、不根据 Phase26 结果换样。"
+}
