@@ -1,0 +1,224 @@
+{
+  "format": "medusa-1.5.1-call-sequence",
+  "status": "supported",
+  "source_seed": "/home/skk/smart-contract-fuzz-v2/deepseek/结果/Phase25跨交易状态约束参数修复-20261117/Anvil原始/immutable_mint_then_approve/1/G1/attempt-1.json",
+  "source_seed_sha256": "d1aa579ef1b4da43fb14eb4b747a76f140a9690e094fd9ab9d355ce46aa1161d",
+  "abi_artifact": "/home/skk/smart-contract-fuzz-v2/.tools/results/Immutable-Harness编译.json",
+  "abi_artifact_sha256": "b9e8dbc601775b13743d60a8186893f5cc55877cf34ec5dd2c02411fce916a02",
+  "abi_sha256_canonical_json": "47dce15dbb443ff0f4addb11b0ce4f29efbeafcfa6b3c994181f67fe9376afdc",
+  "deployment_metadata": "/home/skk/smart-contract-fuzz-v2/func/测试过程/Medusa双引擎最小验证/结果/实验/Immutable/deployment-map.json",
+  "deployment_metadata_sha256": "c49f2c8d69f3c76f6336bc020fc481594545780cda0237fac819adf4aeac4f9d",
+  "deployment_mapping": {
+    "source_to_medusa": {
+      "0xa647ff3c36cfab592509e13860ab8c4f28781a66": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+    },
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "deployment_address_override": "Medusa fuzzing.predeployedContracts 将目标 Harness 固定在 Phase 25 部署地址，避免静默替换并保持内部 CREATE 地址可复现",
+    "runtime_address_verified": false,
+    "sender_addresses": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "source_initial_block_number": 4370000,
+    "source_initial_timestamp": 1524785992,
+    "source_chain_id": 1,
+    "absolute_initial_block_and_timestamp_supported_by_medusa_1_5_1": false
+  },
+  "source_contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+  "medusa_contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+  "contract_name": "ERC721PsiV2Echidna",
+  "compiler_version": "0.8.20",
+  "source_environment": {
+    "chain_id": 1,
+    "initial_timestamp": 1524785992,
+    "initial_block_number": 4370000,
+    "deployment_timestamp": 1524785992,
+    "deployment_block_number": 4370000,
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "sender_pool": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "gas_price_wei": 0,
+    "evm_revision": "shanghai",
+    "gas_limit_per_transaction": 12500000,
+    "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+  },
+  "execution_context_warnings": [
+    "Medusa 1.5.1 的原生序列可保留每笔交易的区块/时间增量，但该版本没有配置绝对起始区块号和时间戳的选项；源环境已记录在清单，需结合目标语义判断是否影响本案例。"
+  ],
+  "original_transaction_count": 4,
+  "converted_transaction_count": 4,
+  "transactions": [
+    {
+      "position": 1,
+      "function": "mintForTest(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        1
+      ],
+      "resolved_argument_bindings": [],
+      "source_target": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+      "medusa_target": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "nonce_assigned_for_fresh_chain": 0,
+      "value_wei": "0",
+      "blockNumberDelay": 0,
+      "blockTimestampDelay": 0,
+      "calldata": "0x2e6a6bd700000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000001",
+      "calldata_sha256": "d6d5575d2f81d77baa3618cf059f27851a1fa2aa798b647af28cb19fdb3601dd",
+      "original_observation_status": "success",
+      "original_internal_errors": []
+    },
+    {
+      "position": 2,
+      "function": "approve(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000",
+        340282366920938463463374607431768211968
+      ],
+      "resolved_argument_bindings": [
+        {
+          "argument_index": 1,
+          "argument_name": "tokenId",
+          "from_transaction": 1,
+          "event": "Transfer",
+          "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "field": "tokenId",
+          "original": 0,
+          "resolved": 340282366920938463463374607431768211968,
+          "binding_mode": "unique_prior_event_object_id",
+          "sources": [
+            {
+              "from_transaction": 1,
+              "event": "Transfer",
+              "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "field": "tokenId"
+            }
+          ]
+        }
+      ],
+      "source_target": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+      "medusa_target": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "nonce_assigned_for_fresh_chain": 1,
+      "value_wei": "0",
+      "blockNumberDelay": 0,
+      "blockTimestampDelay": 0,
+      "calldata": "0x095ea7b300000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000100000000000000000000000000000200",
+      "calldata_sha256": "ad551b22e85966203b64641a69a8b4bcbf8a8a2c8fc265992b71ffd149537a1f",
+      "original_observation_status": "success",
+      "original_internal_errors": []
+    },
+    {
+      "position": 3,
+      "function": "transferFrom(address,address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        340282366920938463463374607431768211968
+      ],
+      "resolved_argument_bindings": [
+        {
+          "argument_index": 2,
+          "argument_name": "_tokenId",
+          "from_transaction": 2,
+          "event": "Approval",
+          "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "field": "tokenId",
+          "original": 0,
+          "resolved": 340282366920938463463374607431768211968,
+          "binding_mode": "unique_prior_event_object_id",
+          "sources": [
+            {
+              "from_transaction": 1,
+              "event": "Transfer",
+              "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "field": "tokenId"
+            },
+            {
+              "from_transaction": 2,
+              "event": "Approval",
+              "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "field": "tokenId"
+            }
+          ]
+        }
+      ],
+      "source_target": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+      "medusa_target": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "nonce_assigned_for_fresh_chain": 2,
+      "value_wei": "0",
+      "blockNumberDelay": 0,
+      "blockTimestampDelay": 0,
+      "calldata": "0x23b872dd000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000100000000000000000000000000000200",
+      "calldata_sha256": "95e5e12354bc1073fd1e40798cc0360a8c2a6f7a62347c8b9358da9f8c6aba9d",
+      "original_observation_status": "success",
+      "original_internal_errors": []
+    },
+    {
+      "position": 4,
+      "function": "safeTransferFrom(address,address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        340282366920938463463374607431768211968
+      ],
+      "resolved_argument_bindings": [
+        {
+          "argument_index": 2,
+          "argument_name": "tokenId",
+          "from_transaction": 3,
+          "event": "Transfer",
+          "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "field": "tokenId",
+          "original": 0,
+          "resolved": 340282366920938463463374607431768211968,
+          "binding_mode": "unique_prior_event_object_id",
+          "sources": [
+            {
+              "from_transaction": 1,
+              "event": "Transfer",
+              "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "field": "tokenId"
+            },
+            {
+              "from_transaction": 2,
+              "event": "Approval",
+              "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "field": "tokenId"
+            },
+            {
+              "from_transaction": 3,
+              "event": "Transfer",
+              "event_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "field": "tokenId"
+            }
+          ]
+        }
+      ],
+      "source_target": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+      "medusa_target": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+      "sender": "0x0000000000000000000000000000000000020000",
+      "nonce_assigned_for_fresh_chain": 0,
+      "value_wei": "0",
+      "blockNumberDelay": 0,
+      "blockTimestampDelay": 0,
+      "calldata": "0x42842e0e000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000100000000000000000000000000000200",
+      "calldata_sha256": "90df5ed5778bb034d72c63733c28781a1a7ccdc1470439277e180d9cb9b39acc",
+      "original_observation_status": "success",
+      "original_internal_errors": []
+    }
+  ],
+  "unsupported": [],
+  "corpus_file": "/home/skk/smart-contract-fuzz-v2/func/测试过程/Medusa双引擎最小验证/结果/实验/Immutable/converted-seed-corpus/call_sequences/v2_seed.json",
+  "corpus_file_sha256": "f67424179684e9a25d3356a292baca7e6ac07da1ddbc93caaf5b664a0a3509d6"
+}

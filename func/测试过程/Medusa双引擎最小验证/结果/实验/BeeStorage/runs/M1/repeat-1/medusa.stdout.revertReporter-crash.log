@@ -1,0 +1,36 @@
+[1m[32m⇾[0m[0m [1mReading the configuration file at: [1m/home/skk/smart-contract-fuzz-v2/func/测试过程/Medusa双引擎最小验证/结果/实验/BeeStorage/runs/M1/repeat-1/medusa.json[0m[0m
+⇾ No previous revert metrics found at: /home/skk/smart-contract-fuzz-v2/func/测试过程/Medusa双引擎最小验证/结果/实验/BeeStorage/runs/M1/repeat-1/corpus/coverage
+⇾ Compiling targets with crytic-compile
+⇾ Running command:
+/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/bin/crytic-compile /home/skk/smart-contract-fuzz-v2/.tools/medusa/imports/beestorage/sol/真实项目/BeeStorage/src/echidna/EchidnaSystemHarness.sol --export-format solc --export-dir /home/skk/smart-contract-fuzz-v2/func/测试过程/Medusa双引擎最小验证/结果/实验/BeeStorage/runs/M1/repeat-1/output/compiled --compile-force-framework solc --solc-working-dir /home/skk/smart-contract-fuzz-v2/.tools/medusa/imports/beestorage --solc-args --base-path /home/skk/smart-contract-fuzz-v2/.tools/medusa/imports/beestorage --allow-paths /home/skk/smart-contract-fuzz-v2,/home/skk/smart-contract-fuzz-v2/.tools/medusa/imports/beestorage
+⇾ Finished compiling targets in 2s
+⇾ artifacts: Medusa is running against a new set of build artifacts
+⇾ Running with a timeout of 60 seconds
+⇾ Setting up test chain
+⇾ Finished setting up test chain
+⇾ Creating corpus...
+⇾ Initializing corpus...
+⇾ Fuzzing with 1 workers
+⇾ [NOT STARTED] Property Test: EchidnaSystemHarness.echidna_stamp_internal_pot_not_above_contract_balance()
+⇾ [NOT STARTED] Property Test: EchidnaSystemHarness.echidna_tracked_redist_commit_reveal_consistent()
+⇾ fuzz: elapsed:       0s, calls:          0 (     0/sec), seq/s:      0, branches:   1180, corpus:     0, failures: 0/0, gas/s:            0
+⇾ [NOT STARTED] Property Test: EchidnaSystemHarness.echidna_oracle_price_matches_stamp_lastPrice_when_updated()
+⇾ [NOT STARTED] Property Test: EchidnaSystemHarness.echidna_unauthorized_oracle_adjust_never_succeeds()
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0xae4ace]
+
+goroutine 222 [running]:
+github.com/crytic/medusa/fuzzing.(*fuzzerWorkerMetrics).updateRevertMetrics(...)
+	github.com/crytic/medusa/fuzzing/fuzzer_metrics.go:128
+github.com/crytic/medusa/fuzzing.(*FuzzerWorker).testNextCallSequence.func3({0xc002024bf8, 0x1, 0x1})
+	github.com/crytic/medusa/fuzzing/fuzzer_worker.go:401 +0x46e
+github.com/crytic/medusa/fuzzing/calls.ExecuteCallSequenceIteratively(0xc001e8ab00, 0xc0027b5c88, 0xc0027b5c70, {0x0, 0x0, 0x0})
+	github.com/crytic/medusa/fuzzing/calls/call_sequence_execution.go:135 +0x355
+github.com/crytic/medusa/fuzzing.(*FuzzerWorker).testNextCallSequence(0xc00037d8c0)
+	github.com/crytic/medusa/fuzzing/fuzzer_worker.go:414 +0x166
+github.com/crytic/medusa/fuzzing.(*FuzzerWorker).run(0xc00037d8c0, 0xf575e0?)
+	github.com/crytic/medusa/fuzzing/fuzzer_worker.go:742 +0x585
+github.com/crytic/medusa/fuzzing.(*Fuzzer).spawnWorkersLoop.func1({0xadfa25?, 0xc001eae540?})
+	github.com/crytic/medusa/fuzzing/fuzzer.go:930 +0x169
+created by github.com/crytic/medusa/fuzzing.(*Fuzzer).spawnWorkersLoop in goroutine 1
+	github.com/crytic/medusa/fuzzing/fuzzer.go:912 +0x1cc
