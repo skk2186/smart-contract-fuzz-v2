@@ -1,0 +1,21 @@
+[profile.default]
+solc = "0.8.28"
+optimizer = true
+optimizer_runs = 200
+src = 'contracts/contracts/echidna'
+test = 'test'
+libs = ['lib']
+assertions_revert = false
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "forge-std/=lib/forge-std/src/",
+]
+
+[invariant]
+runs = 500000000
+depth = 100
+include_storage = true
+show_solidity = true
+show_metrics = true
+fail_on_revert = false
+corpus_dir = "corpus/foundry"

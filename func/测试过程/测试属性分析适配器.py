@@ -44,7 +44,7 @@ class InstanceAndEvidenceRegression(unittest.TestCase):
     @classmethod
     def new_adapter(cls) -> PropertyAdapter:
         return PropertyAdapter(cls.slither, cls.contract, str(cls.source), None, None,
-                               [], "echidna_", 12, 3, 1000)
+                               [], "echidna_", [], 12, 3, 1000)
 
     def test_two_instances_never_become_same_runtime_object_by_definition(self) -> None:
         report = self.new_adapter().run()
@@ -173,7 +173,7 @@ class InstanceAndEvidenceRegression(unittest.TestCase):
             for contract in slither.contracts:
                 if contract.name in {"RegressionHarness", "RegressionHarnessChild"}:
                     adapter = PropertyAdapter(slither, contract, str(source), None, None,
-                                              [], "echidna_", 12, 3, 1000)
+                                              [], "echidna_", [], 12, 3, 1000)
                     reports[contract.name] = property_named(
                         adapter.run(), "echidna_alpha_bound")
             parent = reports["RegressionHarness"]

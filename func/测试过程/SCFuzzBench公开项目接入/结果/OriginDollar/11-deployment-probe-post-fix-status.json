@@ -1,0 +1,28 @@
+{
+  "project": "OriginDollar",
+  "recorded_attempt": {
+    "receipt_status": 0,
+    "transaction_hash": "36b12adaf79c90212dc5a8bc91a6aec271369f86eb41f76b7034710652e23708",
+    "trace_diagnostic_error": "NameError: name '_decode_revert_reason' is not defined"
+  },
+  "code_fix": {
+    "path": "func/功能/种子验证.py",
+    "change": "add generic Solidity Error(string) and Panic(uint256) revert-data decoder",
+    "additional_evidence": "failed deployment call trace is now recorded in the driver result",
+    "tested": true
+  },
+  "rerun": {
+    "status": "performed",
+    "command": "PHASE29_PYTHON=/home/skk/miniconda3/envs/contract-fuzz/bin/python PATH=/home/skk/smart-contract-fuzz-v2/.tools/foundry/bin:$PATH python func/测试过程/SCFuzzBench公开项目接入/执行Phase29.py OriginDollar --skip-agent-api --collect-existing --repeats 3 --timeout 60 --test-limit 5000",
+    "compile": "passed",
+    "slither_property_recognition": "passed",
+    "receipt_status": 0,
+    "trace_error": "execution reverted",
+    "revert_reason": null,
+    "revert_data": null,
+    "call_trace_summary": "Harness CREATE reverted after creating OUSDEchidna and three Dummy contracts; the trace did not return a decoded failure frame for the final constructor call.",
+    "fuzzing_rerun": false,
+    "agent_api_called": false,
+    "constructor_revert_cause": "likely Foundry cheatcode/Anvil execution mismatch, inferred from the unmodified Harness and target implementation: EchidnaSetup calls hevm.prank(ADDRESS_VAULT) before OUSD.mint, while OUSD.mint is onlyVault. Plain Anvil does not execute Foundry prank cheatcodes. The transaction reverts in Anvil, but the trace did not provide a decoded revert payload; keep this cause as a source-based inference."
+  }
+}

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import sys
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,6 +16,10 @@ from 种子验证 import replay_seed
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path,
+                        help="指定回归结果路径；默认写入历史结果目录")
+    args = parser.parse_args()
     audit_root = ROOT / "deepseek/结果/逐属性原生对照实验/种子效用核验-20261115"
     source = json.loads((audit_root / "种子效用核验.json").read_text(encoding="utf-8"))
     records = []
@@ -54,7 +59,9 @@ def main() -> None:
                             compact(declared_rejection) if declared_rejection else None)})
         print(old["project"], old["property_id"], original["replay_status"],
               rebound["replay_status"], flush=True)
-    destination = audit_root / "状态依赖回归.json"
+    destination = args.output or audit_root / "状态依赖回归.json"
+    if not destination.is_absolute():
+        destination = ROOT / destination
     destination.write_text(json.dumps({"api_calls": 0, "input_seed_count": len(records),
                                        "records": records}, ensure_ascii=False, indent=2),
                            encoding="utf-8")

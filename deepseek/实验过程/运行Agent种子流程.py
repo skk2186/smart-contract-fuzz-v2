@@ -140,6 +140,7 @@ def _agent_b_call(context: dict[str, Any], candidate: dict[str, Any], *,
             concrete, event = instantiate_candidate(
                 context, candidate, feedback=repair_feedback, attempt=attempt,
                 fixed_prefix_transactions=fixed_prefix_transactions,
+                environment=context.get("agent_environment"),
                 call_options=call_options)
             events.append(event)
             return concrete, events, None
@@ -264,6 +265,7 @@ def _event_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
 def run_project(project: str, property_ids: list[str], *, max_candidates: int = 1,
                 max_steps: int = 8, repairs: int = 1, planning_repairs: int = 1,
                 execution_replans: int = 1,
+                schema_repairs: int = 1,
                 echidna_limit: int = 80, echidna_timeout: int = 45,
                 echidna_seed: int = 20261114, token_budget: int = 400_000,
                 wall_budget: int = 600, run_fuzzer: bool = True,
@@ -286,8 +288,23 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
     all_agent_a_events: list[dict[str, Any]] = []
     all_agent_b_events: list[dict[str, Any]] = []
 
+    project_config = PROJECTS[project]
+    deployment = project_config.get("deployment", {})
+    execution = project_config.get("execution", {})
+    runtime = {
+        "chain_id": execution.get("chain_id", 1),
+        "initial_timestamp": execution.get("deployment_timestamp", 1524785992),
+        "initial_block_number": execution.get("deployment_block_number", 4370000),
+        "evm_revision": execution.get("hardfork", "shanghai"),
+        "harness_address": deployment.get("contract_address", execution.get(
+            "contract_address", "0xA647ff3c36cFab592509E13860ab8c4F28781a66")),
+        "property_sender": project_config.get("property", {}).get(
+            "sender", "0x0000000000000000000000000000000000010000"),
+        "gas_price_wei": execution.get("gas_price", 0),
+        "gas_limit_per_transaction": execution.get("max_transaction_gas", 12500000),
+    }
     try:
-        session = AnvilSession()
+        session = AnvilSession(project=project)
         session.__enter__()
         anvil_error = None
     except Exception as exc:
@@ -308,12 +325,13 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
             else:
                 deployment_state = {"status": "unavailable", "error": anvil_error}
             role_senders = [item["address"] for item in deployment_state.get("role_addresses", [])]
-            sender_pool = list(dict.fromkeys([*SENDERS, *role_senders]))
+            sender_pool = list(dict.fromkeys([*(project_config.get("senders") or SENDERS),
+                                               *role_senders]))
             if session is not None:
                 for address in role_senders:
                     session.rpc("anvil_setBalance", [address, hex(0xffffffff)])
             context = {**prop_context, "deployment_state": deployment_state,
-                       "sender_pool": sender_pool}
+                       "sender_pool": sender_pool, "agent_environment": runtime}
             actions = [action for action in prop.get("candidate_actions", [])
                        if action.get("seed_compatible") and action.get("abi_signature")]
             property_row: dict[str, Any] = {
@@ -364,11 +382,12 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
 
                 concrete, events, error = _agent_b_call(
                     context, candidate, feedback=None, first_attempt=1,
-                    schema_repairs=1, call_options=call_options,
+                    schema_repairs=schema_repairs, call_options=call_options,
                     fixed_prefix_transactions=candidate.get("_fixed_prefix_transactions"))
                 b_events.extend(events)
                 all_agent_b_events.extend(events)
                 if concrete and session is not None:
+                    raw_concrete_seed = json.loads(json.dumps(concrete))
                     try:
                         repair_index = 0
                         agent_repair_count = 0
@@ -447,6 +466,7 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                     error = anvil_error or "Anvil session is unavailable"
 
                 final_replay = replay_attempts[-1] if replay_attempts else None
+                raw_replay = replay_attempts[0] if replay_attempts else None
                 failure_class = _classify_failure(final_replay, error)
                 seed_id = None
                 corpus_file = None
@@ -471,6 +491,8 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                                   "echidna_only_diagnostic_candidate" if concrete else "none",
                     "seed_id": seed_id, "corpus_file": corpus_file,
                     "concrete_seed": concrete,
+                    "raw_concrete_seed": raw_concrete_seed if concrete and session is not None else concrete,
+                    "raw_replay": raw_replay,
                     "agent_b": _event_summary(b_events),
                     "replay_attempts": replay_attempts,
                     "runtime_constraint_repairs": runtime_repair_events,
@@ -541,8 +563,10 @@ def run_project(project: str, property_ids: list[str], *, max_candidates: int = 
                     project, campaign_root, property_name=property_name,
                     test_limit=echidna_limit, timeout=echidna_timeout,
                     seed=echidna_seed + property_index - 1,
-                    test_mode="property" if property_name.startswith("echidna_") else "assertion",
-                    property_prefix=property_name,
+                    test_mode=("property" if prop.get("property_kind") == "boolean_property"
+                               else "assertion"),
+                    property_prefix=project_config.get("property", {}).get(
+                        "engine_prefix", "echidna_"),
                     seq_len=8, stop_on_fail=False, disable_slither=True,
                     sender_pool=sender_pool)
                 result["property_id"] = property_id

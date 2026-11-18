@@ -1,0 +1,25 @@
+Phase29 本地验证记录
+
+Python 源码静态编译：PASS
+检查 8 个 Python 文件，使用 compile(source, filename, 'exec')，未生成 __pycache__。
+
+JSON 解析：PASS
+检查 9 个版本、项目配置和结果 JSON 文件。
+
+配置入口：PASS
+旧七项目入口名称仍存在：OpenNFTs、Request、Immutable、Hokusai、BeeStorage、Drips、Kink；OriginDollar JSON profile 被自动注册，可读取 solc 0.8.28、Foundry 与 assertion 模式。
+
+旧项目和新项目静态上下文：PASS
+Linux 仓库环境命令读取到属性数：OpenNFTs 2、Request 16、Immutable 32、Hokusai 5、BeeStorage 4、Drips 1、Kink 4、OriginDollar 1。
+
+属性分析适配器回归：PASS
+初次执行发现旧测试夹具没有传入当前 PropertyAdapter 要求的 property_functions 参数；仅将两处测试调用同步为当前签名，没有修改分析实现。修正后复跑结果：Ran 12 tests in 32.651s; OK。完整最终输出见 OriginDollar/13-属性分析适配器回归.log。
+
+Phase25 已保存种子状态依赖回归：PASS
+7 条种子均与历史报告按项目和 seed_id 匹配；原始回放与历史依赖提示回放两种状态分类均与历史 7/7 相同。另一个种子在有提示的情况下由 replay_failed 转为 executable，与历史记录一致。输出写在 15-旧种子状态依赖回归.json；历史目录中的 状态依赖回归.json 未覆盖。逐条输出见 14-Phase25旧种子回归.log。
+
+OriginDollar 驱动复核：编译 PASS；Slither 原生属性识别 PASS；V2 上下文 PARTIAL（36 个 ABI 兼容动作，依赖证据 incomplete）；Anvil 部署 FAIL（receipt_status=0，trace execution reverted）；已有 G0 日志重新汇总，没有重新运行 fuzz；未调用 Agent API。
+复跑命令使用项目 contract-fuzz Python，设置 PHASE29_PYTHON 与仓库 .tools/foundry/bin PATH 后执行：
+python func/测试过程/SCFuzzBench公开项目接入/执行Phase29.py OriginDollar --skip-agent-api --collect-existing --repeats 3 --timeout 60 --test-limit 5000
+
+没有运行 Medusa 新项目对照或 G1/G2。Origin Dollar 回滚及调用栈证据见 结果/OriginDollar/05-anvil-deploy-probe.json、phase29-result.json；原因分析是源码推断，见 docs/29_公开基准接入与首次独立验证.md。

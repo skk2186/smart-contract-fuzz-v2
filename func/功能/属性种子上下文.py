@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from 项目配置 import register_project_profiles
+
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECTS = {
@@ -54,6 +56,7 @@ PROJECTS = {
         "contract": "KinkPoolEchidna",
     },
 }
+register_project_profiles(PROJECTS)
 SEED_TYPES = re.compile(r"^(u?int)([0-9]*)$")
 FIXED_BYTES_TYPES = re.compile(r"^bytes([1-9]|[12][0-9]|3[0-2])$")
 ADDRESS_RE = re.compile(r"^0x[0-9a-fA-F]{40}$")

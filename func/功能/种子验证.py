@@ -75,10 +75,29 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
 
 
 class AnvilSession:
-    def __init__(self, port: int | None = None):
+    def __init__(self, port: int | None = None, project: str | None = None):
         if not ANVIL_BIN.is_file():
             raise FileNotFoundError(f"找不到项目内 Anvil：{ANVIL_BIN}")
         self.port = port or self._free_port()
+        self.project = project
+        project_config = PROJECTS.get(project, {}) if project else {}
+        execution = project_config.get("execution", {})
+        self.chain_id = int(execution.get("chain_id", CHAIN_ID))
+        self.initial_block_number = int(execution.get(
+            "deployment_block_number", INITIAL_BLOCK_NUMBER))
+        self.initial_timestamp = int(execution.get(
+            "deployment_timestamp", INITIAL_TIMESTAMP))
+        self.base_fee = int(execution.get("base_fee_per_gas", 0))
+        self.gas_price = int(execution.get("gas_price", 0))
+        self.gas_limit = int(execution.get("block_gas_limit", 100_000_000))
+        self.hardfork = str(execution.get("hardfork", "shanghai"))
+        deployment = project_config.get("deployment", {})
+        self.deployer = str(deployment.get("deployer", execution.get("deployer", DEPLOYER)))
+        self.property_sender = str(project_config.get("property", {}).get(
+            "sender", PROPERTY_SENDER))
+        self.senders = list(project_config.get("senders") or SENDERS)
+        self.initial_balance = int(execution.get("initial_balance", INITIAL_BALANCE))
+        self.max_transaction_gas = int(execution.get("max_transaction_gas", MAX_TX_GAS))
         self.process: subprocess.Popen | None = None
         self.web3: Web3 | None = None
 
@@ -91,9 +110,10 @@ class AnvilSession:
     def __enter__(self):
         self.process = subprocess.Popen(
             [str(ANVIL_BIN), "--host", "127.0.0.1", "--port", str(self.port),
-             "--chain-id", str(CHAIN_ID), "--number", str(INITIAL_BLOCK_NUMBER - 1),
-             "--timestamp", str(INITIAL_TIMESTAMP - 1), "--block-base-fee-per-gas", "0",
-             "--gas-price", "0", "--gas-limit", "100000000", "--hardfork", "shanghai",
+             "--chain-id", str(self.chain_id), "--number", str(self.initial_block_number - 1),
+             "--timestamp", str(self.initial_timestamp - 1), "--block-base-fee-per-gas",
+             str(self.base_fee), "--gas-price", str(self.gas_price), "--gas-limit",
+             str(self.gas_limit), "--hardfork", self.hardfork,
              "--auto-impersonate",
              "--disable-code-size-limit", "--silent"],
             cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -105,8 +125,8 @@ class AnvilSession:
                 raise RuntimeError(f"Anvil 异常退出，exit={self.process.returncode}")
             try:
                 if self.web3.is_connected():
-                    for address in [DEPLOYER, *SENDERS]:
-                        self.rpc("anvil_setBalance", [address, hex(INITIAL_BALANCE)])
+                    for address in [self.deployer, *self.senders]:
+                        self.rpc("anvil_setBalance", [address, hex(self.initial_balance)])
                     return self
             except Exception:
                 pass
@@ -130,6 +150,24 @@ class AnvilSession:
 
 def _checksum(address: str) -> str:
     return Web3.to_checksum_address(address)
+
+
+def _decode_revert_reason(data: Any) -> str | None:
+    """解码 Solidity Error(string) 与 Panic(uint256) 返回数据。"""
+    if not isinstance(data, str) or not data.startswith("0x") or len(data) < 10:
+        return None
+    try:
+        payload = bytes.fromhex(data[2:])
+        selector, encoded = payload[:4], payload[4:]
+        if selector == bytes.fromhex("08c379a0"):
+            from eth_abi import decode
+            return str(decode(["string"], encoded)[0])
+        if selector == bytes.fromhex("4e487b71") and len(encoded) >= 32:
+            code = int.from_bytes(encoded[:32], "big")
+            return f"Panic(0x{code:x})"
+        return None
+    except Exception:
+        return None
 
 
 def _to_rpc_value(value: Any) -> Any:
@@ -290,7 +328,8 @@ def _resolve_event_arguments(tx: dict[str, Any], action: dict[str, Any],
     return resolved, bindings, errors
 
 
-def _state_view_snapshot(web3: Web3, contract, contract_abis: dict[str, Any]) -> dict[str, Any]:
+def _state_view_snapshot(web3: Web3, contract, contract_abis: dict[str, Any], *,
+                         sender: str = DEPLOYER) -> dict[str, Any]:
     """跟随 Harness 内部合约地址 getter，观测最多三层公开 view 状态。"""
     observations = {}
     visited: set[tuple[str, str]] = set()
@@ -311,7 +350,7 @@ def _state_view_snapshot(web3: Web3, contract, contract_abis: dict[str, Any]) ->
             signature = entry["name"] + "()"
             observation_key = f"{current.address.lower()}:{signature}"
             try:
-                value = current.get_function_by_signature(signature)().call({"from": DEPLOYER})
+                value = current.get_function_by_signature(signature)().call({"from": sender})
                 observations[observation_key] = _to_rpc_value(value)
             except Exception as exc:
                 observations[observation_key] = {"error": type(exc).__name__}
@@ -363,7 +402,8 @@ def _flatten_named_outputs(outputs: list[dict[str, Any]], value: Any) -> list[di
 def _parameterized_getter_observations(web3: Web3, state: dict[str, Any],
                                        contract_abis: dict[str, Any],
                                        prior_events: list[list[dict[str, Any]]], *,
-                                       transaction_index: int) -> list[dict[str, Any]]:
+                                       transaction_index: int,
+                                       sender: str = DEPLOYER) -> list[dict[str, Any]]:
     """用已成功事件中的对象键调用匹配的单参数公开 view getter。"""
     observations = []
     seen: set[tuple[str, str, str]] = set()
@@ -400,7 +440,7 @@ def _parameterized_getter_observations(web3: Web3, state: dict[str, Any],
                            if repr(row["value"]) == argument_key]
                 try:
                     value = target.get_function_by_signature(signature)(argument).call(
-                        {"from": DEPLOYER})
+                        {"from": sender})
                     outputs = _flatten_named_outputs(entry.get("outputs", []), value)
                     observations.append({"contract": contract_name,
                                          "address": instance["address"].lower(),
@@ -547,7 +587,8 @@ def _resolve_property_argument(expression: str, abi_type: str, declarations: str
 
 
 def _property_getter_specs(property_context: dict[str, Any], contract,
-                           contract_abis: dict[str, Any]) -> list[dict[str, Any]]:
+                           contract_abis: dict[str, Any], *,
+                           property_sender: str = PROPERTY_SENDER) -> list[dict[str, Any]]:
     """从属性源码中的直接 view 调用抽取可解析的 getter 观察点。"""
     reference = property_context.get("property_source", "")
     source_path = ROOT / str(reference).split("#", 1)[0]
@@ -598,7 +639,7 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
         for entry in matches:
             try:
                 values = [_resolve_property_argument(expression, parameter["type"],
-                                                     declarations, PROPERTY_SENDER,
+                                                     declarations, property_sender,
                                                      contract)
                           for expression, parameter in zip(arguments, entry.get("inputs", []))]
                 resolved = {"signature": entry["name"] + "(" +
@@ -630,7 +671,8 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
 
 
 def _observe_property_getters(web3: Web3, contract, contract_abis: dict[str, Any],
-                              specs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+                              specs: list[dict[str, Any]], *,
+                              property_sender: str = PROPERTY_SENDER) -> list[dict[str, Any]]:
     observations = []
     for spec in specs:
         if spec.get("status") == "unresolved":
@@ -641,14 +683,14 @@ def _observe_property_getters(web3: Web3, contract, contract_abis: dict[str, Any
             receiver_address = None
             if spec.get("receiver_getter"):
                 receiver_address = contract.get_function_by_signature(
-                    spec["receiver_getter"])().call({"from": _checksum(PROPERTY_SENDER)})
+                    spec["receiver_getter"])().call({"from": _checksum(property_sender)})
                 target_abi = contract_abis.get(spec.get("receiver_type"))
                 if not isinstance(target_abi, list):
                     raise ValueError("缺少属性 getter 接收合约 ABI")
                 target = web3.eth.contract(address=Web3.to_checksum_address(receiver_address),
                                            abi=target_abi)
             value = target.get_function_by_signature(spec["signature"])(
-                *spec["arguments"]).call({"from": _checksum(PROPERTY_SENDER)})
+                *spec["arguments"]).call({"from": _checksum(property_sender)})
             observations.append({**spec, "status": "observed",
                                  "receiver_address": (_to_rpc_value(receiver_address)
                                                       if receiver_address else None),
@@ -768,26 +810,70 @@ def _observed_effect_status(context: dict[str, Any], property_id: str,
 
 def _deploy(session: AnvilSession, project: str):
     web3 = session.web3
-    artifact = read_json(PROJECTS[project]["artifact"])
+    config = PROJECTS[project]
+    deployment = config.get("deployment", {})
+    constructor_args = deployment.get("constructor_args",
+                                     config.get("constructor_args", []))
+    deployer = deployment.get("deployer", session.deployer)
+    expected_address = deployment.get("contract_address", _project_runtime(project)["contract_address"])
+    artifact = read_json(config["artifact"])
     factory = web3.eth.contract(abi=artifact["abi"], bytecode=artifact["bytecode"])
-    session.rpc("evm_setNextBlockTimestamp", [INITIAL_TIMESTAMP])
-    tx_hash = factory.constructor().transact({"from": _checksum(DEPLOYER),
-                                               "gas": 100_000_000,
+    session.rpc("evm_setNextBlockTimestamp", [session.initial_timestamp])
+    tx_hash = factory.constructor(*constructor_args).transact({"from": _checksum(deployer),
+                                               "gas": session.gas_limit,
                                                "gasPrice": 0})
     receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=60)
     if receipt.status != 1 or not receipt.contractAddress:
-        raise RuntimeError("Harness 部署失败")
+        trace_error = None
+        revert_data = None
+        revert_reason = None
+        trace_summary = None
+        try:
+            trace = session.rpc("debug_traceTransaction", [
+                tx_hash.hex(), {"tracer": "callTracer"}])
+            trace_error = trace.get("error")
+            revert_data = trace.get("output")
+            revert_reason = _decode_revert_reason(revert_data)
+
+            def compact_trace(node: dict[str, Any], depth: int = 0) -> dict[str, Any]:
+                summary = {key: node.get(key) for key in
+                           ("type", "from", "to", "error", "output", "input")
+                           if key in node}
+                for field, limit in (("input", 256), ("output", 1024)):
+                    value = summary.get(field)
+                    if isinstance(value, str) and len(value) > limit:
+                        summary[field] = value[:limit]
+                        summary[field + "_truncated"] = True
+                if depth < 8:
+                    summary["calls"] = [compact_trace(child, depth + 1)
+                                         for child in node.get("calls", [])[:32]]
+                elif node.get("calls"):
+                    summary["calls_truncated"] = True
+                return summary
+
+            trace_summary = compact_trace(trace)
+        except Exception as exc:
+            trace_error = f"{type(exc).__name__}: {str(exc)[:300]}"
+        raise RuntimeError(
+            "Harness 部署失败："
+            + json.dumps({"receipt_status": receipt.status,
+                          "transaction_hash": tx_hash.hex(),
+                          "trace_error": trace_error,
+                          "revert_reason": revert_reason,
+                          "revert_data": (revert_data[:1024] if isinstance(revert_data, str) else None),
+                          "call_trace": trace_summary},
+                         ensure_ascii=False))
     block = web3.eth.get_block(receipt.blockNumber)
     environment = {"chain_id": web3.eth.chain_id,
                    "deployment_block_number": int(block["number"]),
                    "deployment_timestamp": int(block["timestamp"]),
                    "contract_address": receipt.contractAddress.lower(),
                    "base_fee_per_gas": int(block.get("baseFeePerGas") or 0)}
-    expected = {"chain_id": CHAIN_ID,
-                "deployment_block_number": INITIAL_BLOCK_NUMBER,
-                "deployment_timestamp": INITIAL_TIMESTAMP,
-                "contract_address": HARNESS_ADDRESS.lower(),
-                "base_fee_per_gas": 0}
+    expected = {"chain_id": session.chain_id,
+                "deployment_block_number": session.initial_block_number,
+                "deployment_timestamp": session.initial_timestamp,
+                "contract_address": expected_address.lower(),
+                "base_fee_per_gas": session.base_fee}
     if environment != expected:
         raise RuntimeError(f"Anvil/Echidna 环境未对齐：actual={environment}, expected={expected}")
     return web3.eth.contract(address=receipt.contractAddress, abi=artifact["abi"]), receipt
@@ -801,7 +887,7 @@ def inspect_initial_state(project: str, property_context: dict[str, Any], *,
         contract, receipt = _deploy(session, project)
         artifact = read_json(PROJECTS[project]["artifact"])
         views = _state_view_snapshot(session.web3, contract,
-                                     artifact.get("contract_abis", {}))
+                                     artifact.get("contract_abis", {}), sender=session.deployer)
         signatures = set()
         for action in property_context.get("candidate_actions", []):
             for effect in action.get("effect_evidence", []):
@@ -818,12 +904,12 @@ def inspect_initial_state(project: str, property_context: dict[str, Any], *,
                 continue
             kind = entry["inputs"][0]["type"]
             values = ([0, 1] if kind.startswith(("uint", "int")) else
-                      [PROPERTY_SENDER] if kind == "address" else
+                      [session.property_sender] if kind == "address" else
                       [False, True] if kind == "bool" else [])
             for value in values:
                 try:
                     result = contract.get_function_by_signature(abi_signature)(value).call(
-                        {"from": _checksum(PROPERTY_SENDER)})
+                        {"from": _checksum(session.property_sender)})
                     probes.append({"function": abi_signature, "argument": value,
                                    "status": "returned", "value": _to_rpc_value(result)})
                 except Exception as exc:
@@ -843,7 +929,7 @@ def inspect_initial_state(project: str, property_context: dict[str, Any], *,
             try:
                 property_values[entry["name"] + "()"] = bool(
                     contract.get_function_by_signature(entry["name"] + "()")().call(
-                        {"from": _checksum(PROPERTY_SENDER)}))
+                        {"from": _checksum(session.property_sender)}))
             except Exception as exc:
                 property_values[entry["name"] + "()"] = {"error": str(exc)[:200]}
         role_addresses = []
@@ -871,7 +957,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 runtime_constraints: bool = False) -> dict[str, Any]:
     """每个种子从相同创世状态重放；属性调用使用 Echidna 的 psender。"""
     owned = session is None
-    session = session or AnvilSession().__enter__()
+    session = session or AnvilSession(project=project).__enter__()
     deployment_snapshot = None
     try:
         deployment_snapshot = session.rpc("evm_snapshot", [])
@@ -879,7 +965,8 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
         deployment_block = session.web3.eth.get_block(deploy_receipt.blockNumber)
         artifact = read_json(PROJECTS[project]["artifact"])
         contract_abis = artifact.get("contract_abis", {})
-        initial_state = _state_view_snapshot(session.web3, contract, contract_abis)
+        initial_state = _state_view_snapshot(session.web3, contract, contract_abis,
+                                             sender=session.deployer)
         property_name = candidate.get("property", "")
         if not property_name:
             property_context = next(p for p in candidate["context"]["properties"]
@@ -890,8 +977,9 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             property_signature += "()"
         property_context = next((item for item in candidate.get("context", {}).get("properties", [])
                                  if item.get("property_id") == candidate.get("property_id")), {})
-        predicate_getter_specs = _property_getter_specs(property_context, contract,
-                                                        contract_abis)
+        predicate_getter_specs = _property_getter_specs(
+            property_context, contract, contract_abis,
+            property_sender=session.property_sender)
         property_signatures = [entry["name"] + "()" for entry in contract.abi
                                if entry.get("type") == "function" and not entry.get("inputs")
                                and entry["name"].startswith("echidna_")
@@ -902,12 +990,13 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             try:
                 prop_fn = contract.get_function_by_signature(tested_property)()
                 initial_property_values[tested_property] = bool(
-                    prop_fn.call({"from": _checksum(PROPERTY_SENDER)}))
+                    prop_fn.call({"from": _checksum(session.property_sender)}))
             except Exception as exc:
                 initial_property_values[tested_property] = None
                 initial_property_errors[tested_property] = f"{type(exc).__name__}: {str(exc)[:200]}"
         initial_predicate_getters = _observe_property_getters(
-            session.web3, contract, contract_abis, predicate_getter_specs)
+            session.web3, contract, contract_abis, predicate_getter_specs,
+            property_sender=session.property_sender)
         records = []
         resolved_transactions: list[dict[str, Any]] = []
         prior_events: list[list[dict[str, Any]]] = []
@@ -952,7 +1041,8 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             fn = contract.get_function_by_signature(signature)(*args)
             call_data = fn._encode_transaction_data()
             rpc_tx = {"from": sender, "to": contract.address, "data": call_data,
-                      "value": hex(int(tx["value_wei"])), "gas": hex(MAX_TX_GAS),
+                      "value": hex(int(tx["value_wei"])),
+                      "gas": hex(session.max_transaction_gas),
                       "gasPrice": "0x0"}
             try:
                 tx_hash = session.web3.eth.send_transaction(rpc_tx)
@@ -972,7 +1062,8 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 valid = False
             # 只有没有内部回滚的交易事件才可作为后续对象绑定/状态查询的来源。
             prior_events.append(events if receipt.status == 1 and not trace["internal_errors"] else [])
-            state_after = _state_view_snapshot(session.web3, contract, contract_abis)
+            state_after = _state_view_snapshot(session.web3, contract, contract_abis,
+                                               sender=session.deployer)
             effect = _observed_effect_status(
                 candidate.get("context", {}), candidate.get("property_id", ""),
                 signature, last_state, state_after)
@@ -985,14 +1076,15 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                     try:
                         prop_fn = contract.get_function_by_signature(tested_property)()
                         property_values[tested_property] = bool(
-                            prop_fn.call({"from": _checksum(PROPERTY_SENDER)}))
+                            prop_fn.call({"from": _checksum(session.property_sender)}))
                     except Exception as exc:
                         property_values[tested_property] = None
                         property_errors[tested_property] = f"{type(exc).__name__}: {str(exc)[:200]}"
                 prop_result = property_values.get(property_signature)
                 prop_error = property_errors.get(property_signature)
                 predicate_getter_values = _observe_property_getters(
-                    session.web3, contract, contract_abis, predicate_getter_specs)
+                    session.web3, contract, contract_abis, predicate_getter_specs,
+                    property_sender=session.property_sender)
             else:
                 predicate_getter_values = []
             if receipt.status != 1:
@@ -1027,7 +1119,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                     "outer_revert", "unexpected_internal_revert", "trace_unavailable"}):
                 runtime_observations = _parameterized_getter_observations(
                     session.web3, state_after, contract_abis, prior_events[:-1],
-                    transaction_index=index)
+                    transaction_index=index, sender=session.deployer)
                 repair_proposal = propose_numeric_repair(
                     action.get("abi_inputs", []), args, runtime_observations,
                     _solidity_error_texts(trace, prop_error),
@@ -1103,17 +1195,17 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "target_property_state": _target_property_state(
                     property_signature, initial_property_values,
                     initial_predicate_getters, records),
-                "environment": {"chain_id": CHAIN_ID,
-                                "initial_timestamp": INITIAL_TIMESTAMP,
-                                "initial_block_number": INITIAL_BLOCK_NUMBER,
+                "environment": {"chain_id": session.chain_id,
+                                "initial_timestamp": session.initial_timestamp,
+                                "initial_block_number": session.initial_block_number,
                                 "deployment_timestamp": int(deployment_block["timestamp"]),
                                 "deployment_block_number": int(deployment_block["number"]),
-                                "deployer": DEPLOYER.lower(),
-                                "property_sender": PROPERTY_SENDER.lower(),
-                                "sender_pool": [item.lower() for item in SENDERS],
+                                "deployer": session.deployer.lower(),
+                                "property_sender": session.property_sender.lower(),
+                                "sender_pool": [item.lower() for item in session.senders],
                                 "gas_price_wei": 0,
                 "evm_revision": "shanghai",
-                                "gas_limit_per_transaction": MAX_TX_GAS,
+                                "gas_limit_per_transaction": session.max_transaction_gas,
                                 "contract_address": contract.address.lower()},
                 "transactions": records, "resolved_transactions": resolved_transactions}
     finally:
@@ -1128,6 +1220,24 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
 
 def new_seed_id() -> str:
     return "seed-" + uuid.uuid4().hex
+
+
+def _project_runtime(project: str) -> dict[str, Any]:
+    config = PROJECTS.get(project, {})
+    deployment = config.get("deployment", {})
+    execution = config.get("execution", {})
+    return {
+        "deployer": deployment.get("deployer", execution.get("deployer", DEPLOYER)),
+        "contract_address": deployment.get(
+            "contract_address", execution.get("contract_address", HARNESS_ADDRESS)),
+        "property_sender": config.get("property", {}).get("sender", PROPERTY_SENDER),
+        "senders": config.get("senders") or SENDERS,
+        "chain_id": int(execution.get("chain_id", CHAIN_ID)),
+        "timestamp": int(execution.get("deployment_timestamp", INITIAL_TIMESTAMP)),
+        "block_number": int(execution.get("deployment_block_number", INITIAL_BLOCK_NUMBER)),
+        "balance": int(execution.get("initial_balance", INITIAL_BALANCE)),
+        "max_gas": int(execution.get("max_transaction_gas", MAX_TX_GAS)),
+    }
 
 
 def write_corpus(project: str, candidate: dict[str, Any], transactions: list[dict[str, Any]],
@@ -1148,8 +1258,9 @@ def write_corpus(project: str, candidate: dict[str, Any], transactions: list[dic
         collision = next(root.rglob(seed_id + ".txt"), None)
         if collision is not None:
             raise FileExistsError(f"种子 ID 已在工作区语料中使用：{collision}")
-    sequence = to_echidna_sequence(candidate, transactions, context,
-                                   contract_address=HARNESS_ADDRESS)
+    sequence = to_echidna_sequence(
+        candidate, transactions, context,
+        contract_address=_project_runtime(project)["contract_address"])
     path = corpus_root / "coverage" / (seed_id + ".txt")
     if path.exists():
         raise FileExistsError(f"种子 ID 重复：{seed_id}")
@@ -1209,9 +1320,17 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         "contract": "Echidna",
         "remaps": None,
         "foundry": True}}
-    spec = project_data[project]
+    dynamic_target = conf.get("fuzzer_target")
+    if dynamic_target:
+        spec = {"target": dynamic_target, "contract": conf["contract"],
+                "remaps": conf.get("remaps"), "solc_args": conf.get("solc_args"),
+                "foundry": conf.get("foundry", False)}
+    else:
+        spec = project_data[project]
     compiler_config = corpus_root.parent / f"{project}-{corpus_root.name}-crytic-compile.json"
-    solc_candidates = [os.environ.get("SOLC_BIN"),
+    configured_solc_version = str(conf.get("solc_version", "0.8.20"))
+    solc_candidates = [conf.get("solc"), os.environ.get("SOLC_BIN"),
+                       str(Path.home() / f".solc-select/artifacts/solc-{configured_solc_version}/solc-{configured_solc_version}"),
                        str(Path.home() / ".solc-select/artifacts/solc-0.8.20/solc-0.8.20"),
                        shutil.which("solc"), "solc"]
     solc = next((item for item in solc_candidates
@@ -1224,17 +1343,35 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
     compiler_config.write_text(json.dumps(compiler_config_data, ensure_ascii=False, indent=2),
                                encoding="utf-8")
     echidna_config = corpus_root.parent / f"{project}-{corpus_root.name}-echidna.yaml"
-    active_senders = list(dict.fromkeys(item.lower() for item in (sender_pool or SENDERS)))
+    runtime = _project_runtime(project)
+    profile_echidna = conf.get("echidna", {})
+    if filter_functions is None and profile_echidna.get("filter_functions") is not None:
+        filter_functions = profile_echidna["filter_functions"]
+    if filter_functions is None and profile_echidna.get("exclude_functions"):
+        abi = read_json(conf["artifact"]).get("abi", [])
+        excluded = set(profile_echidna["exclude_functions"])
+        filter_functions = []
+        for entry in abi:
+            if entry.get("type") != "function":
+                continue
+            signature = entry["name"] + "(" + ",".join(
+                item["type"] for item in entry.get("inputs", [])) + ")"
+            qualified = f"{conf['contract']}.{signature}"
+            if qualified not in excluded and signature not in excluded:
+                filter_functions.append(qualified)
+    active_senders = list(dict.fromkeys(item.lower() for item in
+                                        (sender_pool or runtime["senders"])))
+    property_sender = runtime["property_sender"].lower()
     config_lines = [
-        f'prefix: "{property_prefix or property_name}"', "workers: 1",
+        f'prefix: "{property_prefix or profile_echidna.get("prefix") or property_name}"', "workers: 1",
         f'testMode: "{test_mode}"',
         f'corpusDir: "{corpus_root}"',
-        f'contractAddr: "{HARNESS_ADDRESS.lower()}"',
-        f'deployer: "{DEPLOYER.lower()}"',
-        f'psender: "{PROPERTY_SENDER.lower()}"',
+        f'contractAddr: "{runtime["contract_address"].lower()}"',
+        f'deployer: "{runtime["deployer"].lower()}"',
+        f'psender: "{property_sender}"',
         "sender: [" + ", ".join(f'"{item}"' for item in active_senders) + "]",
-        f"balanceAddr: {INITIAL_BALANCE}", "balanceContract: 0",
-        f"testMaxGas: {MAX_TX_GAS}", f"propMaxGas: {MAX_TX_GAS}",
+        f"balanceAddr: {runtime['balance']}", "balanceContract: 0",
+        f"testMaxGas: {runtime['max_gas']}", f"propMaxGas: {runtime['max_gas']}",
         "maxGasprice: 0", "maxTimeDelay: 86400", "maxBlockDelay: 86400",
         "coverage: true", f"stopOnFail: {'true' if stop_on_fail else 'false'}"]
     if filter_functions is not None:
@@ -1243,14 +1380,15 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
             json.dumps(item, ensure_ascii=False) for item in filter_functions) + "]")
     config_lines.append("")
     echidna_config.write_text("\n".join(config_lines), encoding="utf-8")
-    crytic_args = f"--config-file {compiler_config.resolve()}"
+    crytic_args = ("--foundry-compile-all " if spec.get("foundry") else "") + \
+        f"--config-file {compiler_config.resolve()}"
     command = [ECHIDNA_BIN, spec["target"], "--contract", spec["contract"],
                "--crytic-args", crytic_args,
                "--config", str(echidna_config.resolve()),
                "--test-limit", str(test_limit), "--seq-len", str(seq_len),
                "--shrink-limit", str(shrink_limit),
                "--seed", str(seed), "--workers", "1", "--format", "text",
-               "--deployer", DEPLOYER, "--contract-addr", HARNESS_ADDRESS,
+               "--deployer", runtime["deployer"], "--contract-addr", runtime["contract_address"],
                *sum((["--sender", item] for item in active_senders), [])]
     if disable_slither:
         command.append("--disable-slither")
@@ -1268,7 +1406,7 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
     if remaining == 0:
         raise TimeoutError("本条件 Echidna 墙钟预算已耗尽")
     environment = {**os.environ,
-                   "SOLC_VERSION": "0.8.20",
+                   "SOLC_VERSION": configured_solc_version,
                    "PATH": str(ROOT / ".tools/foundry/bin") + os.pathsep +
                            "/home/skk/miniconda3/envs/contract-fuzz/bin:" +
                            os.environ.get("PATH", "")}

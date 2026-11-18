@@ -1,0 +1,31 @@
+{
+  "candidate_commit": "5610870e7e91fe6e29f8cfb0c0ae316fe9784e10",
+  "root_checkout": "completed",
+  "root_tree_sha256": "64cde0843ced5bdb1260100f1184b3d7cd020e6f",
+  "attempts": [
+    {
+      "attempt": 1,
+      "action": "fetch pinned Git submodules",
+      "result": "timed_out_on_openzeppelin_contracts_after_other_submodules_started"
+    },
+    {
+      "attempt": 2,
+      "action": "retry pinned submodules over HTTP/1.1 with shallow transport",
+      "result": "failed",
+      "error": "RPC failed; curl 56 GnuTLS recv error (-9): Error decoding the received TLS packet; fatal: early EOF; index-pack failed; clone of https://github.com/OpenZeppelin/openzeppelin-contracts failed; retry scheduled"
+    }
+  ],
+  "submodules": [
+    "lib/forge-std",
+    "lib/openzeppelin-contracts",
+    "lib/v4-core",
+    "lib/solmate",
+    "lib/chimera"
+  ],
+  "compile_attempted": false,
+  "level_1_status": "blocked_before_compile_dependency_retrieval",
+  "notes": [
+    "最多两轮有依据的依赖获取尝试已用完；没有将依赖获取失败记成 Solidity 编译失败。",
+    "浅克隆目录中的部分子模块处于不完整状态，未将其当作冻结输入或提交。"
+  ]
+}

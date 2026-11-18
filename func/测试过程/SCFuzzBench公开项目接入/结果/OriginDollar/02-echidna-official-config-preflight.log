@@ -1,0 +1,100 @@
+[2026-11-18 20:00:26.73] Compiling `test/recon/CryticTester.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (2.362551019s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/OriginDollarSCFuzzBench/test/recon/CryticTester.sol:CryticTester
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/.tools/phase29/OriginDollar/native-preflight/corpus/reproducers
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/.tools/phase29/OriginDollar/native-preflight/corpus/coverage
+[2026-11-18 20:00:29.40] [Worker 3] Test invariant_canary() falsified!
+  Call sequence:
+CryticTester.transferFrom(255,119,45,61141067910809189157667127323529477261432772891202022295577635275936650616099) from: 0x0000000000000000000000000000000000040000 Time delay: 361136 seconds Block delay: 8447
+CryticTester.invariant_canary() from: 0x0000000000000000000000000000000000030000 Time delay: 404997 seconds Block delay: 800
+
+[2026-11-18 20:00:29.40] [Worker 3] Test AssertionFailed(..) falsified!
+  Call sequence:
+CryticTester.transferFrom(255,119,45,61141067910809189157667127323529477261432772891202022295577635275936650616099) from: 0x0000000000000000000000000000000000040000 Time delay: 361136 seconds Block delay: 8447
+CryticTester.invariant_canary() from: 0x0000000000000000000000000000000000030000 Time delay: 404997 seconds Block delay: 800
+
+[2026-11-18 20:00:29.40]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/.tools/phase29/OriginDollar/native-preflight/corpus/reproducers-unshrunk/8149452724959307448.txt
+[2026-11-18 20:00:29.41] [Worker 1] New coverage: 4573 instr, 3 contracts, 1 seqs in corpus
+[2026-11-18 20:00:29.41] [Worker 3] New coverage: 4573 instr, 3 contracts, 2 seqs in corpus
+[2026-11-18 20:00:29.41] [Worker 1] Test limit reached. Stopping.
+[2026-11-18 20:00:29.41]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/.tools/phase29/OriginDollar/native-preflight/corpus/coverage/392772197114431663.txt
+[2026-11-18 20:00:29.41]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/.tools/phase29/OriginDollar/native-preflight/corpus/coverage/917364796951809881.txt
+[2026-11-18 20:00:29.41] [Worker 0] New coverage: 5167 instr, 3 contracts, 3 seqs in corpus
+[2026-11-18 20:00:29.41] [Worker 0] Test limit reached. Stopping.
+[2026-11-18 20:00:29.41]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/.tools/phase29/OriginDollar/native-preflight/corpus/coverage/2721647111286675087.txt
+[2026-11-18 20:00:29.41] [Worker 2] New coverage: 5278 instr, 3 contracts, 4 seqs in corpus
+[2026-11-18 20:00:29.41] [Worker 2] Test limit reached. Stopping.
+[2026-11-18 20:00:29.41]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/.tools/phase29/OriginDollar/native-preflight/corpus/coverage/5048126272980500814.txt
+[2026-11-18 20:00:29.42] [Worker 3] Test limit reached. Stopping.
+[2026-11-18 20:00:29.42] [status] tests: 2/48, fuzzing: 20/20, values: [], cov: 5278, corpus: 4, gas/s: 0
+testTransferWithinBalanceDoesNotRevert(uint8,uint8,uint256): passing
+testMintBalance(uint8,uint256): passing
+getTotalBalance(): passing
+testBurnBalance(uint8,uint256): passing
+testChangeSupply(uint256): passing
+invariant_canary(): failed!💥  
+  Call sequence:
+    CryticTester.invariant_canary()
+
+Traces: 
+emit [36mAssertionFailed[0m(reason=«Canary invariant») [1m(/home/skk/smart-contract-fuzz-v2/sol/真实项目/OriginDollarSCFuzzBench/test/recon/Properties.sol:18)[0m
+
+testTransferSelf(uint8,uint256): passing
+testTotalNonRebasingSupplyLessThanTotalBalance(): passing
+testBurnAllBalanceToZero(uint8): passing
+testTransferFromShouldRevert(uint8,uint8,uint8,uint256): passing
+testApprove(uint8,uint8,uint256): passing
+testTransferBalanceReceivedLessRounding(uint8,uint8,uint256): passing
+changeSupply(uint256): passing
+testTotalSupplyLessThanTotalBalance(): passing
+testTransferBalanceSentLess(uint8,uint8,uint256): passing
+testTransferExceedingBalanceReverts(uint8,uint8,uint256): passing
+debugOUSD(): passing
+burn(uint8,uint256): passing
+testAutoConvertBalance(uint8): passing
+testBalanceOfShouldNotRevert(uint8): passing
+transfer(uint8,uint8,uint256): passing
+testRebasingCreditsPerTokenAboveZero(): passing
+testRebasingCreditsPerTokenNotIncreased(): passing
+transferFrom(uint8,uint8,uint8,uint256): passing
+testOptOutTotalSupply(uint8): passing
+optOut(uint8): passing
+testTransferBalanceSentLessRounding(uint8,uint8,uint256): passing
+testBurnAllBalanceShouldNotRevert(uint8): passing
+testTransferBalanceSentMore(uint8,uint8,uint256): passing
+testOptInBalance(uint8): passing
+testOptInBalanceRounding(uint8): passing
+testTransferToZeroAddress(uint8,uint256): passing
+testOptInTotalSupply(uint8): passing
+testMintZeroBalance(uint8): passing
+testMintBalanceRounding(uint8,uint256): passing
+testCreditsPerTokenVsBalance(uint8): passing
+testTransferFromShouldNotRevert(uint8,uint8,uint8,uint256): passing
+testOptOutBalance(uint8): passing
+optIn(uint8): passing
+testNonRebasingSupplyVsTotalSupply(): passing
+approve(uint8,uint8,uint256): passing
+getTotalNonRebasingBalance(): passing
+testTransferBalanceReceivedLess(uint8,uint8,uint256): passing
+testTransferBalanceReceivedMore(uint8,uint8,uint256): passing
+assert_canary_ASSERTION_CANARY(uint256): passing
+mint(uint8,uint256): passing
+testBurnZeroBalance(uint8): passing
+AssertionFailed(..): failed!💥  
+  Call sequence:
+    CryticTester.invariant_canary()
+
+Traces: 
+emit [36mAssertionFailed[0m(reason=«Canary invariant») [1m(/home/skk/smart-contract-fuzz-v2/sol/真实项目/OriginDollarSCFuzzBench/test/recon/Properties.sol:18)[0m
+
+
+Unique instructions: 5278
+Unique codehashes: 3
+Corpus size: 4
+Seed: 20261129
+Total calls: 20
+
+[2026-11-18 20:00:29.45] Saving test reproducers... Done! (0.000598819s)
+[2026-11-18 20:00:29.45] Saving corpus... Done! (0.000312617s)
+[2026-11-18 20:00:29.45] Saving foundry reproducers... Done! (0.000935741s)
+[2026-11-18 20:00:29.45] Saving coverage... Done! (0.908500331s)

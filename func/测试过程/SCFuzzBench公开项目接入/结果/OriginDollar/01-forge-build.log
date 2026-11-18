@@ -1,0 +1,387 @@
+Compiling 49 files with Solc 0.8.28
+Solc 0.8.28 finished in 2.37s
+Compiler run successful with warnings:
+Warning (8760): This declaration has the same name as another declaration.
+   --> contracts/contracts/token/OUSD.sol:504:18:
+    |
+504 |         returns (uint256 rebasingCredits)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> contracts/contracts/token/OUSD.sol:172:5:
+    |
+172 |     function rebasingCredits() external view returns (uint256) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+  --> contracts/contracts/echidna/EchidnaTestSupply.sol:78:5:
+   |
+78 |     function testNonRebasingSupplyVsTotalSupply() public hasKnownIssue {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+   --> contracts/contracts/echidna/EchidnaTestSupply.sol:111:5:
+    |
+111 |     function testRebasingCreditsPerTokenAboveZero() public {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+   --> contracts/contracts/echidna/EchidnaTestAccounting.sol:102:5:
+    |
+102 |     function testBalanceOfShouldNotRevert(uint8 targetAcc) public {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to pure
+  --> test/recon/CryticToFoundry.sol:26:5:
+   |
+26 |     function invariant_noop() public returns (bool) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+warning[erc20-unchecked-transfer]: ERC20 `transfer` or `transferFrom` call does not check the return value
+   ╭▸ contracts/contracts/echidna/EchidnaHelper.sol:72:9
+   │
+72 │         ousd.transfer(to, amount);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/erc20-unchecked-transfer
+
+warning[arbitrary-send-erc20]: `transferFrom` uses an arbitrary `from`; require it to equal `msg.sender` or `address(this)`
+   ╭▸ contracts/contracts/echidna/EchidnaHelper.sol:93:9
+   │
+93 │         ousd.transferFrom(from, to, amount);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/arbitrary-send-erc20
+
+warning[erc20-unchecked-transfer]: ERC20 `transfer` or `transferFrom` call does not check the return value
+   ╭▸ contracts/contracts/echidna/EchidnaHelper.sol:93:9
+   │
+93 │         ousd.transferFrom(from, to, amount);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/erc20-unchecked-transfer
+
+warning[unused-return]: return value of an external call is not used
+    ╭▸ contracts/contracts/echidna/EchidnaHelper.sol:131:9
+    │
+131 │         ousd.approve(spender, amount);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+   ╭▸ contracts/contracts/echidna/Debugger.sol:60:9
+   │
+60 │         emit Debug(description, data);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/contracts/echidna/EchidnaTestAccounting.sol:51:24
+   │
+51 │         int256 delta = int256(balanceAfter) - int256(balanceBefore);
+   │                        ━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int256' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/contracts/echidna/EchidnaTestAccounting.sol:51:47
+   │
+51 │         int256 delta = int256(balanceAfter) - int256(balanceBefore);
+   │                                               ━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int256' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/contracts/echidna/EchidnaTestAccounting.sol:56:30
+   │
+56 │         assert(-1 * delta <= int256(OPT_IN_ROUNDING_ERROR));
+   │                              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int256' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unused-return]: return value of an external call is not used
+   ╭▸ contracts/contracts/echidna/EchidnaTestAccounting.sol:92:9
+   │
+92 │         ousd._isNonRebasingAccountEchidna(target);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+   ╭▸ contracts/contracts/echidna/Debugger.sol:48:9
+   │
+48 │         emit Debug(description, data);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestTransfer.sol:163:26
+    │
+163 │         int256 toDelta = int256(toBalAfter) - int256(toBalBefore);
+    │                          ━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestTransfer.sol:163:47
+    │
+163 │         int256 toDelta = int256(toBalAfter) - int256(toBalBefore);
+    │                                               ━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestTransfer.sol:168:24
+    │
+168 │         int256 error = int256(amount) - toDelta;
+    │                        ━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestTransfer.sol:177:25
+    │
+177 │         assert(error <= int256(TRANSFER_ROUNDING_ERROR));
+    │                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestTransfer.sol:201:28
+    │
+201 │         int256 fromDelta = int256(fromBalAfter) - int256(fromBalBefore);
+    │                            ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestTransfer.sol:201:51
+    │
+201 │         int256 fromDelta = int256(fromBalAfter) - int256(fromBalBefore);
+    │                                                   ━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestTransfer.sol:206:24
+    │
+206 │         int256 error = int256(amount) + fromDelta;
+    │                        ━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestTransfer.sol:215:25
+    │
+215 │         assert(error <= int256(TRANSFER_ROUNDING_ERROR));
+    │                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[uninitialized-state]: state variable is read but never written
+   ╭▸ contracts/contracts/echidna/EchidnaConfig.sol:17:5
+   │
+17 │     address internal ADDRESS_CONTRACT0;
+   │     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/uninitialized-state
+
+warning[uninitialized-state]: state variable is read but never written
+   ╭▸ contracts/contracts/echidna/EchidnaConfig.sol:18:5
+   │
+18 │     address internal ADDRESS_CONTRACT1;
+   │     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/uninitialized-state
+
+warning[incorrect-modifier]: modifier can finish without executing the modified function
+   ╭▸ contracts/contracts/echidna/EchidnaConfig.sol:80:5
+   │
+80 │ ┏     modifier hasKnownIssue() {
+81 │ ┃         if (TOGGLE_KNOWN_ISSUES) return;
+82 │ ┃         _;
+83 │ ┃     }
+   │ ┗━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/incorrect-modifier
+
+warning[incorrect-modifier]: modifier can finish without executing the modified function
+   ╭▸ contracts/contracts/echidna/EchidnaConfig.sol:89:5
+   │
+89 │ ┏     modifier hasKnownIssueWithinLimits() {
+90 │ ┃         if (TOGGLE_KNOWN_ISSUES_WITHIN_LIMITS) return;
+91 │ ┃         _;
+92 │ ┃     }
+   │ ┗━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/incorrect-modifier
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestMintBurn.sol:112:24
+    │
+112 │         int256 delta = int256(balanceAfter) - int256(balanceBefore);
+    │                        ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestMintBurn.sol:112:47
+    │
+112 │         int256 delta = int256(balanceAfter) - int256(balanceBefore);
+    │                                               ━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestMintBurn.sol:117:24
+    │
+117 │         int256 error = int256(amountMinted) - delta;
+    │                        ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/contracts/echidna/EchidnaTestMintBurn.sol:120:25
+    │
+120 │         assert(error <= int256(MINT_ROUNDING_ERROR));
+    │                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[incorrect-strict-equality]: dangerous strict equality check on an externally-influenced value
+    ╭▸ contracts/contracts/echidna/EchidnaTestMintBurn.sol:131:16
+    │
+131 │         assert(ousd.balanceOf(target) == 0);
+    │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/incorrect-strict-equality
+
+warning[arbitrary-send-erc20]: `transferFrom` uses an arbitrary `from`; require it to equal `msg.sender` or `address(this)`
+   ╭▸ contracts/contracts/echidna/EchidnaTestApproval.sol:34:13
+   │
+34 │         try ousd.transferFrom(from, to, amount) {
+   │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/arbitrary-send-erc20
+
+warning[arbitrary-send-erc20]: `transferFrom` uses an arbitrary `from`; require it to equal `msg.sender` or `address(this)`
+   ╭▸ contracts/contracts/echidna/EchidnaTestApproval.sol:66:13
+   │
+66 │         try ousd.transferFrom(from, to, amount) {
+   │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/arbitrary-send-erc20
+
+warning[unused-return]: return value of an external call is not used
+    ╭▸ contracts/contracts/echidna/EchidnaTestSupply.sol:150:56
+    │
+150 │           (uint256 credits, uint256 creditsPerToken, ) = ousd
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+151 │ ┃             .creditsBalanceOfHighres(target);
+    │ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[empty-block]: empty function body
+   ╭▸ contracts/contracts/echidna/EchidnaDebug.sol:16:38
+   │
+16 │       function debugOUSD() public pure {
+   │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+   ‡ ┃
+22 │ ┃     }
+   │ ┗━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/empty-block
+

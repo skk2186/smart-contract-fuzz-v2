@@ -9,6 +9,8 @@ from pathlib import Path
 
 from crytic_compile import CryticCompile
 
+from 项目配置 import register_project_profiles
+
 
 ROOT = Path(__file__).resolve().parents[2]
 SOLC = os.environ.get("SOLC_BIN", "solc")
@@ -59,10 +61,12 @@ PROJECTS = {
         "solc_args": "--optimize --via-ir",
     },
 }
+register_project_profiles(PROJECTS)
 
 
-def compile_project(name, solc=SOLC):
+def compile_project(name, solc=None):
     config = PROJECTS[name]
+    solc = solc or config.get("solc") or SOLC
     os.environ["SOLC_VERSION"] = config["solc_version"]
     compile_options = {"cwd": str(ROOT)}
     if solc:
@@ -71,6 +75,7 @@ def compile_project(name, solc=SOLC):
         compile_options["solc_remaps"] = config["remaps"]
     if config.get("solc_args"):
         compile_options["solc_args"] = config["solc_args"]
+    compile_options.update(config.get("compile_options", {}))
     previous_path = os.environ.get("PATH", "")
     if config.get("foundry"):
         os.environ["PATH"] = str(ROOT / ".tools/foundry/bin") + os.pathsep + previous_path
@@ -124,19 +129,25 @@ def compile_project(name, solc=SOLC):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("project", choices=list(PROJECTS) + ["all"])
-    parser.add_argument("--solc", default=SOLC,
+    parser.add_argument("--solc", default=None,
                         help="Solidity 编译器可执行文件；可用 SOLC_BIN 设置默认值")
-    parser.add_argument("--output-dir", default=".tools/results",
-                        help="ABI 与字节码输出目录，默认使用本地结果目录")
+    parser.add_argument("--output-dir", default=None,
+                        help="ABI 与字节码输出目录；默认遵循项目配置")
     args = parser.parse_args()
     names = PROJECTS if args.project == "all" else [args.project]
-    output_dir = Path(args.output_dir)
-    if not output_dir.is_absolute():
-        output_dir = ROOT / output_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
     for name in names:
         result = compile_project(name, solc=args.solc)
-        output = output_dir / f"{name}-Harness编译.json"
+        configured_artifact = PROJECTS[name].get("artifact")
+        if args.output_dir:
+            output_dir = Path(args.output_dir)
+            if not output_dir.is_absolute():
+                output_dir = ROOT / output_dir
+            output = output_dir / f"{name}-Harness编译.json"
+        elif configured_artifact:
+            output = ROOT / configured_artifact
+        else:
+            output = ROOT / ".tools/results" / f"{name}-Harness编译.json"
+        output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
         print(name, "ABI", len(result["abi"]), "bytecode_bytes",
               (len(result["bytecode"]) - 2) // 2, flush=True)

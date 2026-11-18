@@ -1,0 +1,87 @@
+{
+  "project": "OriginDollar",
+  "overall_status": "native_baseline_only_external_api_blocked",
+  "stages": [
+    {
+      "stage": 1,
+      "name": "原生 Harness 编译",
+      "status": "passed",
+      "elapsed_seconds": 4.494,
+      "artifact": "func/测试过程/SCFuzzBench公开项目接入/结果/OriginDollar/03-Harness编译.json"
+    },
+    {
+      "stage": 2,
+      "name": "原生测试属性识别",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 29.114,
+      "report": "func/测试过程/SCFuzzBench公开项目接入/结果/OriginDollar/04-slither-properties.json",
+      "log": "func/测试过程/SCFuzzBench公开项目接入/结果/OriginDollar/04-slither.log",
+      "property_count": 1
+    },
+    {
+      "stage": 3,
+      "name": "V2 属性与状态依赖分析",
+      "status": "passed",
+      "property_id": "5aa9d84ca5113dd0ac10",
+      "property": "EchidnaTestApproval.testTransferFromShouldNotRevert(uint8,uint8,uint8,uint256)",
+      "property_kind": "assertion_test",
+      "assertion_sites": [
+        {
+          "call": "TMP_13040(None) = SOLIDITY_CALL assert(bool)(False)",
+          "source": "contracts/contracts/echidna/EchidnaTestApproval.sol#37"
+        }
+      ],
+      "candidate_action_count": 36,
+      "seed_compatible_action_count": 36,
+      "dependency_status": "incomplete"
+    },
+    {
+      "stage": 1.5,
+      "name": "Anvil Harness 部署与初始状态",
+      "status": "blocked",
+      "evidence": "func/测试过程/SCFuzzBench公开项目接入/结果/OriginDollar/05-anvil-deploy-probe.json",
+      "error": "RuntimeError: Harness 部署失败"
+    },
+    {
+      "stage": 4,
+      "name": "Agent A/B 原始候选生成",
+      "status": "blocked_external_api_approval_required",
+      "api_request_sent": false,
+      "elapsed_seconds": 0.0,
+      "error": "auto_review_external_data_egress_blocked: 本机执行器拒绝将项目源码、属性上下文和候选生成提示发送到 DeepSeek API；本轮未发出 API 请求。"
+    },
+    {
+      "stage": 5,
+      "name": "Anvil 候选真实回放",
+      "status": "not_reached_external_api_blocked",
+      "raw_replay_status": null,
+      "raw_replay_error": null,
+      "target_state": null,
+      "failure_class": null
+    },
+    {
+      "stage": 6,
+      "name": "现有跨交易参数修复",
+      "status": "blocked_external_api_approval_required",
+      "repair_events": []
+    },
+    {
+      "stage": 7,
+      "name": "Echidna 原生语料回放资格",
+      "status": "blocked_external_api_approval_required",
+      "G1_seed": null,
+      "G2_seed": null
+    },
+    {
+      "stage": 8,
+      "name": "G0/G1/G2 轻量对照",
+      "status": "completed_with_missing_seed_arms",
+      "group_counts": {
+        "G0": 3,
+        "G1": 1,
+        "G2": 1
+      }
+    }
+  ]
+}
