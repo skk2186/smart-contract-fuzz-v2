@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "phase": "30B",
+  "frozen_at": "2026-11-19T11:52:31Z",
+  "status": "frozen_before_phase30b_agent_calls",
+  "input_freeze": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/01-input-freeze.json",
+  "input_freeze_revision": 2,
+  "sample": {
+    "repository_commit": "230e649123477eff332742a59a1c7cc6dc286cab",
+    "source_sha256": "3bf849eea5a234dcf2755aa526f934b3edfa560ee7eac3d70385887e3bc6ff79",
+    "execution_source_sha256": "f0dd1f1a9e3c5b6744f4af9444be18557816f2a36d9a3abf240f57e61bc32725",
+    "harness_sha256": "af7769e5ca9bf0c5961f2d1c200eb2111e674b682b38b51d6f62c5e0d0dceb02",
+    "compiler": "solc 0.4.24",
+    "property_id": "8e75f62866f6d582a033",
+    "property": "WalletHarness.echidna_wallet_accounting_respected()",
+    "harness_actor_count": 5,
+    "business_logic_changed": false
+  },
+  "diagnostic_oracle_isolation": {
+    "role": "manual_diagnostic_oracle_only",
+    "agent_input": false,
+    "candidate_seed": false,
+    "mutation_template": false,
+    "fuzzing_result": false,
+    "path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/diagnostic-oracle/"
+  },
+  "method_comparison": {
+    "old_planner_control": {
+      "name": "P0-old-planner",
+      "input": "Phase30A original Agent A/B candidate, unchanged",
+      "purpose": "planner-level Anvil and Echidna replay control; not a parameter-repair comparison",
+      "agent_calls": 0
+    },
+    "new_planner": {
+      "name": "P1-source-context-planner",
+      "agent_a_calls": 1,
+      "agent_a_planning_retries": 0,
+      "agent_b_generation_calls": 1,
+      "agent_b_execution_feedback_repairs": 1,
+      "agent_b_schema_repairs": 0,
+      "agent_a_execution_replans": 0,
+      "max_transactions": 8,
+      "feedback_pairing": "G1 raw and G2 repaired candidates must be parameterizations of the same exact P1 plan with the same transaction function order. If the one permitted repair changes function order or adds/removes a step, retain it as a failed protocol deviation and do not treat it as the G2 parameter-repair comparison."
+    },
+    "model": {
+      "name": "deepseek-flash",
+      "thinking": "disabled",
+      "max_tokens_per_call": 4096,
+      "other_parameters": "Same defaults and JSON/schema settings as Phase30A; no increase to request count, token budget, or wall budget."
+    },
+    "budgets": {
+      "token_budget": 400000,
+      "wall_budget_seconds": 600,
+      "agent_a_planning_retries": 0,
+      "agent_b_feedback_repairs": 1
+    }
+  },
+  "execution_environment": {
+    "anvil_and_echidna_initial_balance_wei": "100000000000000000000",
+    "balance_rationale": "Use the post-Phase30A environment amendment uniformly to avoid classifying RPC insufficient-funds errors as argument-constraint failures.",
+    "chain_id": 1,
+    "initial_timestamp": 1524785992,
+    "initial_block_number": 4370000,
+    "gas_price_wei": 0,
+    "hardfork": "shanghai",
+    "sender_pool": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ]
+  },
+  "verification_gates": [
+    "Replay the Phase30A P0 original candidate in Anvil with the uniform 100 ETH funding profile.",
+    "Generate only one P1 plan, one Agent B instantiation, and at most one same-plan Agent B execution-feedback repair.",
+    "Replay P1 raw and, if produced, P1 repaired candidates in Anvil; only a successful state trajectory whose original property evaluates false counts as reaching the target.",
+    "Replay the same full P1 candidate through Echidna from an isolated one-seed corpus and require the property failure to be reported for the same sequence.",
+    "Do not count Sequence replayed, successful transactions, or mutation_evidence as target attainment.",
+    "If P1 produces no target-reaching candidate that Echidna can replay, stop. Do not run G0/G1/G2 fuzzing, make no second algorithm change, and retain all negative results."
+  ],
+  "conditional_fuzz_comparison": {
+    "gate": "Run only if P1 reaches the target in Anvil and the exact same candidate is confirmed by Echidna.",
+    "groups": {
+      "G0": "Native Echidna with empty corpus.",
+      "G1": "P1 original Agent B parameterization, before the single execution-feedback repair.",
+      "G2": "The same P1 plan after the single execution-feedback repair."
+    },
+    "paired_seeds": [20261125, 20261135, 20261145],
+    "test_limit_per_run": 500,
+    "timeout_seconds": 60,
+    "sequence_length": 8,
+    "workers": 1,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "each_group": {
+      "repeats": 3,
+      "seed_only_replay": "Separate zero-fuzzing seed replay, reported only as replay/target status.",
+      "empty_corpus_control": "Separate zero-fuzzing empty-corpus run.",
+      "coverage_gain": "Compare final coverage against that run's same-engine seed-only or empty-corpus baseline; store new coverage separately from loaded seed coverage.",
+      "mutation_evidence": "Never infer mutation from Sequence replayed, tests denominator, successful EVM calls, or fuzzing transaction counters alone."
+    },
+    "planner_control": "P0-old-planner remains a separate planner-level control and is not substituted for G1 or G2."
+  },
+  "reporting": {
+    "record_per_transaction": ["sender", "function", "arguments", "value", "receipt_status", "wallet_balance", "per_actor_deposits", "per_actor_payouts", "property_value"],
+    "record_cost": ["elapsed_seconds", "prompt_tokens", "completion_tokens", "total_tokens"],
+    "retain_failures": true,
+    "wallet_sample_classification": "mechanism validation only; not an independent held-out result",
+    "no_commit_or_push": true
+  }
+}

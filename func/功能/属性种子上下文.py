@@ -96,36 +96,242 @@ def source_excerpt(project: str, reference: str, limit: int = 4800) -> str | Non
     return excerpt[:limit]
 
 
-def _function_excerpt(project: str, signature: str, limit: int = 3000) -> str | None:
-    tail = signature.rsplit(".", 1)[-1]
-    name = tail.split("(", 1)[0]
-    if not name:
-        return None
+def _balanced_end(text: str, opening: int, left: str = "{", right: str = "}") -> int | None:
+    depth = 0
+    quote = None
+    escaped = False
+    line_comment = False
+    block_comment = False
+    index = opening
+    while index < len(text):
+        char = text[index]
+        following = text[index + 1] if index + 1 < len(text) else ""
+        if line_comment:
+            if char == "\n":
+                line_comment = False
+        elif block_comment:
+            if char == "*" and following == "/":
+                block_comment = False
+                index += 1
+        elif quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+        elif char == "/" and following == "/":
+            line_comment = True
+            index += 1
+        elif char == "/" and following == "*":
+            block_comment = True
+            index += 1
+        elif char in {"'", '"'}:
+            quote = char
+        elif char == left:
+            depth += 1
+        elif char == right:
+            depth -= 1
+            if depth == 0:
+                return index + 1
+        index += 1
+    return None
+
+
+def _split_parameters(text: str) -> list[str]:
+    parts, start, depth = [], 0, 0
+    for index, char in enumerate(text):
+        if char in "([<{":
+            depth += 1
+        elif char in ")]}>" and depth:
+            depth -= 1
+        elif char == "," and depth == 0:
+            parts.append(text[start:index].strip())
+            start = index + 1
+    tail = text[start:].strip()
+    if tail or parts:
+        parts.append(tail)
+    return parts
+
+
+def _canonical_source_type(parameter: str) -> str:
+    parameter = re.sub(r"\b(memory|storage|calldata|payable)\b", " ", parameter).strip()
+    tokens = parameter.split()
+    if not tokens:
+        return ""
+    raw = tokens[0]
+    if raw == "uint":
+        return "uint256"
+    if raw == "int":
+        return "int256"
+    if raw == "byte":
+        return "bytes1"
+    return raw
+
+
+def _source_functions(project: str) -> list[dict[str, Any]]:
+    """提取源码中的合约函数；保留合约边界，避免同名函数误匹配。"""
     root = ROOT / PROJECTS[project]["source_root"]
-    needle = re.compile(r"\bfunction\s+" + re.escape(name) + r"\s*\(")
     excluded = {"node_modules", "vendor", ".git", "out", "cache"}
-    for path in root.rglob("*.sol"):
+    found: list[dict[str, Any]] = []
+    for path in sorted(root.rglob("*.sol")):
         if any(part in excluded for part in path.parts):
             continue
         try:
-            lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+            text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        for i, line in enumerate(lines):
-            if not needle.search(line):
+        for contract_match in re.finditer(
+                r"\b(?:contract|library|interface)\s+([A-Za-z_][A-Za-z0-9_]*)[^{}]*\{", text):
+            contract_open = text.find("{", contract_match.start())
+            contract_end = _balanced_end(text, contract_open)
+            if contract_end is None:
                 continue
-            depth = 0
-            opened = False
-            end = min(i + 80, len(lines))
-            for j in range(i, end):
-                depth += lines[j].count("{") - lines[j].count("}")
-                opened |= "{" in lines[j]
-                if opened and depth <= 0:
-                    end = j + 1
-                    break
-            excerpt = "\n".join(f"{n + 1}: {lines[n]}" for n in range(i, end))
-            return excerpt[:limit]
-    return None
+            contract_text = text[contract_open + 1:contract_end - 1]
+            constructor_source = None
+            constructor_match = re.search(r"\bconstructor\s*\(", contract_text)
+            if constructor_match:
+                constructor_paren = contract_text.find("(", constructor_match.start())
+                constructor_paren_end = _balanced_end(contract_text, constructor_paren, "(", ")")
+                if constructor_paren_end is not None:
+                    constructor_brace = contract_text.find("{", constructor_paren_end)
+                    if constructor_brace >= 0:
+                        constructor_end = _balanced_end(contract_text, constructor_brace)
+                        if constructor_end is not None:
+                            absolute_start = contract_open + 1 + constructor_match.start()
+                            absolute_end = contract_open + 1 + constructor_end
+                            first_line = text.count("\n", 0, absolute_start) + 1
+                            constructor_source = "\n".join(
+                                f"{line_number}: {line}" for line_number, line in
+                                enumerate(text[absolute_start:absolute_end].splitlines(), first_line))
+            for function_match in re.finditer(
+                    r"\bfunction\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", contract_text):
+                parameters_open = contract_text.find("(", function_match.start())
+                parameters_end = _balanced_end(contract_text, parameters_open, "(", ")")
+                if parameters_end is None:
+                    continue
+                parameters = _split_parameters(contract_text[parameters_open + 1:parameters_end - 1])
+                types = [_canonical_source_type(item) for item in parameters]
+                delimiter = parameters_end
+                while delimiter < len(contract_text) and contract_text[delimiter] not in "{;":
+                    delimiter += 1
+                if delimiter >= len(contract_text):
+                    continue
+                end = (delimiter + 1 if contract_text[delimiter] == ";" else
+                       _balanced_end(contract_text, delimiter))
+                if end is None:
+                    continue
+                absolute_start = contract_open + 1 + function_match.start()
+                absolute_end = contract_open + 1 + end
+                first_line = text.count("\n", 0, absolute_start) + 1
+                excerpt = "\n".join(
+                    f"{line_number}: {line}" for line_number, line in
+                    enumerate(text[absolute_start:absolute_end].splitlines(), first_line))
+                found.append({"contract": contract_match.group(1),
+                              "name": function_match.group(1),
+                              "types": types,
+                              "signature": function_match.group(1) + "(" + ",".join(types) + ")",
+                              "source": excerpt,
+                              "body": contract_text[function_match.start():end],
+                              "contract_body": contract_text,
+                              "constructor_source": constructor_source,
+                              "path": str(path)})
+    return found
+
+
+def _resolve_source_function(functions: list[dict[str, Any]], contract_name: str | None,
+                             signature: str) -> dict[str, Any] | None:
+    name = signature.split("(", 1)[0].rsplit(".", 1)[-1]
+    wanted = signature[signature.find("("):] if "(" in signature else None
+    candidates = [item for item in functions if item["name"] == name and
+                  (wanted is None or item["signature"].endswith(wanted))]
+    if contract_name:
+        exact_contract = [item for item in candidates if item["contract"] == contract_name]
+        if len(exact_contract) == 1:
+            return exact_contract[0]
+        if exact_contract:
+            return None
+    return candidates[0] if len(candidates) == 1 else None
+
+
+def _function_excerpt(project: str, signature: str, limit: int = 3000,
+                      abi_signature: str | None = None) -> str | None:
+    parts = signature.split(".")
+    contract_name = parts[-2] if len(parts) > 1 else None
+    wanted = abi_signature or parts[-1]
+    function = _resolve_source_function(_source_functions(project), contract_name, wanted)
+    return function["source"][:limit] if function else None
+
+
+def _source_call_chain(project: str, signature: str, abi_signature: str | None,
+                       *, max_depth: int = 4, max_chars: int = 8000) -> list[dict[str, Any]]:
+    """提供源码可解析的外部调用链；未解析的 receiver 保留为未知证据。"""
+    functions = _source_functions(project)
+    parts = signature.split(".")
+    root_contract = parts[-2] if len(parts) > 1 else None
+    root_signature = abi_signature or parts[-1]
+    root = _resolve_source_function(functions, root_contract, root_signature)
+    if not root:
+        return []
+    by_contract = {item["contract"] for item in functions}
+    queue = [(root, 0, None)]
+    seen: set[tuple[str, str]] = set()
+    output = []
+    used_chars = 0
+    while queue and len(output) < 12:
+        current, depth, caller = queue.pop(0)
+        key = (current["contract"], current["signature"])
+        if key in seen:
+            continue
+        seen.add(key)
+        contract_body = current["contract_body"]
+        # Discover contract-typed storage variables, then local contract-typed values.
+        declarations = re.findall(
+            r"\b([A-Z][A-Za-z0-9_]*)\s*(?:\[[^\]]*\])?\s+"
+            r"(?:(?:public|private|internal|external|constant|immutable)\s+)*"
+            r"([A-Za-z_][A-Za-z0-9_]*)\b", contract_body)
+        local_declarations = re.findall(
+            r"\b([A-Z][A-Za-z0-9_]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=", current["body"])
+        types_by_variable = {variable: type_name for type_name, variable in
+                             [*declarations, *local_declarations]
+                             if type_name in by_contract}
+        state_lines = [f"{name}: {type_name}" for name, type_name in
+                       sorted(types_by_variable.items())]
+        constructor = current.get("constructor_source")
+        record = {"contract": current["contract"], "function": current["signature"],
+                  "called_from": caller,
+                  "contract_typed_variables": state_lines,
+                  "constructor_source": constructor,
+                  "source_excerpt": current["source"]}
+        size = len(json.dumps(record, ensure_ascii=False))
+        if used_chars + size > max_chars and output:
+            break
+        output.append(record)
+        used_chars += size
+        if depth >= max_depth:
+            continue
+        for call in re.finditer(
+                r"(?P<receiver>[A-Za-z_][A-Za-z0-9_]*(?:\s*\[[^\]]+\])?)\s*\.\s*"
+                r"(?P<name>[A-Za-z_][A-Za-z0-9_]*)"
+                r"(?:\s*\.\s*(?:value|gas)\s*\([^)]*\))*\s*\(", current["body"]):
+            receiver = call.group("receiver").split("[", 1)[0].strip()
+            target_contract = types_by_variable.get(receiver)
+            if not target_contract:
+                continue
+            arguments_open = call.end() - 1
+            arguments_end = _balanced_end(current["body"], arguments_open, "(", ")")
+            if arguments_end is None:
+                continue
+            argument_text = current["body"][arguments_open + 1:arguments_end - 1].strip()
+            argument_count = len(_split_parameters(argument_text)) if argument_text else 0
+            matches = [item for item in functions if item["contract"] == target_contract and
+                       item["name"] == call.group("name") and
+                       len(item["types"]) == argument_count]
+            if len(matches) == 1:
+                queue.append((matches[0], depth + 1,
+                              f"{current['contract']}.{current['signature']} → "
+                              f"{target_contract}.{matches[0]['signature']} ({receiver})"))
+    return output
 
 
 def _constructor_excerpt(project: str, source: str, limit: int = 3200) -> str | None:
@@ -227,7 +433,10 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
             "static_status": action.get("analysis_status"),
             "seed_compatible": supported,
             "seed_limitation": unsupported_reason,
-            "source_excerpt": _function_excerpt(project, full_signature),
+            "source_excerpt": _function_excerpt(
+                project, full_signature, abi_signature=_abi_signature(abi_entry) if abi_entry else None),
+            "source_call_chain": _source_call_chain(
+                project, full_signature, _abi_signature(abi_entry) if abi_entry else None),
             "effect_evidence": evidence,
         })
 
@@ -323,7 +532,9 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
                 "static_status": "abi_fallback_no_slither_writer_match",
                 "seed_compatible": True,
                 "seed_limitation": "No Slither write mapping; inspect source.",
-                "source_excerpt": _function_excerpt(project, full_signature, limit=500),
+                "source_excerpt": _function_excerpt(project, full_signature, limit=500,
+                                                    abi_signature=signature),
+                "source_call_chain": _source_call_chain(project, full_signature, signature),
                 "effect_evidence": [],
                 "action_source": "generic_abi_fallback",
             })
@@ -433,10 +644,11 @@ def compact_for_agent(context: dict[str, Any]) -> dict[str, Any]:
     compact_properties = []
     common_fields = ("abi_inputs", "state_mutability", "payable", "seed_compatible",
                      "seed_limitation", "source_excerpt", "prerequisite_dependencies",
-                     "related_helper_effects")
+                     "related_helper_effects", "source_call_chain")
     property_fields = ("function", "abi_signature", "matched_states", "environment_reads",
                        "static_status", "seed_compatible", "effect_evidence",
-                       "prerequisite_dependencies", "related_helper_effects")
+                       "prerequisite_dependencies", "related_helper_effects",
+                       "source_call_chain")
     for prop in context["properties"]:
         actions = []
         for action in prop.get("candidate_actions", []):

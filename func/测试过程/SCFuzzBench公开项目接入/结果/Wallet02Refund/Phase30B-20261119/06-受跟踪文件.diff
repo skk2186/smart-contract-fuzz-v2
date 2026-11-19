@@ -1,0 +1,615 @@
+diff --git a/deepseek/AgentA.py b/deepseek/AgentA.py
+index d567db9..d3dedcd 100644
+--- a/deepseek/AgentA.py
++++ b/deepseek/AgentA.py
+@@ -264,11 +264,13 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
+             "每条输出必须绑定自己的 property_id，不能把组内属性合并成一个谓词。",
+             "只使用 candidate_actions 中 seed_compatible=true 的 abi_signature。",
+             "结合 Slither 的 prerequisite_state_closure、read_states、property_write_states、matched_states、effect_evidence、action_guard_evidence、函数源码与守卫推断顺序；状态生产操作应先于依赖它的消费操作，不要把静态候选当成已证明可行。",
++            "沿 source_call_chain 检查声明类型明确的跨合约调用，以及它们触及的状态和构造函数关系；只对源码直接支持的调用关系作结论，不得把同类型合约实例自动视为同一对象。",
+             "先检查 deployment_state、constructor_excerpt 和 constructor_actions。部署时已建立的状态不得重复初始化；实际 getter/守卫探测表明对象不存在时，规划候选必须先创建对象，再授权/配置，再执行依赖对象的目标操作。",
+             "使用 prerequisite_dependencies 连接守卫读取状态与候选生产动作；每条链区分部署时已满足、候选前序可满足和静态未知。不要把 getter 探测失败以外的猜测写成事实。",
+             "sender_pool 可能包含从部署后 owner/admin 等公开角色 getter 观察到的真实地址。需要权限时可安排该角色发送交易；不得假定普通测试账户就是 owner。",
+             "如果 previous_attempt_feedback 指出缺少前置交易、部署身份或数值关系，请允许改变顺序、插入现有 candidate_actions 中的准备交易或改选候选；优先修复失败类别所指出的缺口。",
+             "若 action_inventory_source 标记为 generic_abi_fallback_slither_relation_unresolved，candidate_actions 只是 Harness ABI 的通用状态变更入口；必须结合 read_states 和函数源码自行判断相关性，不得声称 Slither 已证明该入口写入目标状态。",
++            "若源码显示某操作可能保留可重复使用的调用者状态、而实际效果还受另一合约或共享资源余额约束，应在 max_steps 内考虑跨调用者供给、前置操作或重复调用；仅当状态读写和调用链证据支持时这样规划，并在 assumptions 中标明尚未由执行验证的条件。",
+             "每条属性至多给出指定数量的不同序列；避免仅重排同一交易的重复候选。",
+             ("若多个属性确实需要同一准备前缀，请在 shared_prefixes 中显式给出，并确保对应候选序列以该前缀开头。"
+              if use_shared_prefixes else "shared_prefixes 必须为空；不要为候选序列设计跨属性共享前缀。"),
+diff --git a/docs/30_轻量级公开合约接入试点.md b/docs/30_轻量级公开合约接入试点.md
+index c1923c6..9a7ba61 100644
+--- a/docs/30_轻量级公开合约接入试点.md
++++ b/docs/30_轻量级公开合约接入试点.md
+@@ -1,3 +1,68 @@
+ # Phase 30A：轻量级公开合约接入试点
+ 
+-阶段日期：2026-11-19；选样/属性冻结基线：`main / fafc0083558f22d46fcf5531d81698f165dc487c`；恢复执行基线：`main / d41890d`；阶段状态：工程验证完成至冻结停止门，目标状态未达、未运行 G0/G1/G2。
+\ No newline at end of file
++日期：2026-11-19；执行基线：main / fafc0083558f22d46fcf5531d81698f165dc487c
++状态：样本、属性与预算已冻结；执行在原生编译前受环境阻塞
++
++## 基线与变更范围
++
++本阶段开始时 main HEAD 为 fafc0083558f22d46fcf5531d81698f165dc487c，工作区已有 crytic-export/combined_solc.json 与 docs/29_公开基准接入与首次独立验证.md 两项修改，以及未跟踪的研究总览草稿。前两项保持原样并留在工作区；总览草稿的内容保留，移至用户指定的 docs/研究总览与最新进展.md 并更新。未修改 V1 仓库、Agent A/B、跨交易参数修复算法或双引擎实现。
++
++## 样本来源与许可
++
++固定样本为 SmartBugs Curated main 提交 230e649123477eff332742a59a1c7cc6dc286cab 中的 dataset/access_control/wallet_02_refund_nosub.sol。上游 Git blob 为 c1195a49dde9d28a712dc9d8cd2b0cec4257f946；原始文件 SHA-256 为 3bf849eea5a234dcf2755aa526f934b3edfa560ee7eac3d70385887e3bc6ff79。文件与完整来源记录位于 sol/单合约测试/wallet_02_refund_nosub/。
++
++SmartBugs Curated 的 README 说明其合约保留各自原始许可，仓库 LICENSE 适用于其他文件。[样本的源注释指向 SWC Registry](https://github.com/smartbugs/smartbugs-curated/blob/230e649123477eff332742a59a1c7cc6dc286cab/dataset/access_control/wallet_02_refund_nosub.sol)，[SWC Registry LICENSE](https://github.com/SmartContractSecurity/SWC-registry/blob/master/LICENSE) 为 MIT，版权标注为 Copyright (c) 2018-present Smart Contract Weakness Classification Registry；完整 MIT 文本已随样本保存。SmartBugs Curated 其他仓库文件的许可为 Apache-2.0。[其 README 的许可说明](https://github.com/smartbugs/smartbugs-curated/blob/230e649123477eff332742a59a1c7cc6dc286cab/README.md)
++
++该样本属于公开已知漏洞集，不作为未知漏洞发现或正式独立留出样本。为不把漏洞标签和说明泄漏给 Agent，原始文件保持逐字节不变，测试输入中的 Wallet.sol 移除了块注释和行注释，并清除尾随空白；Solidity token 与业务逻辑保持不变；原始标注副本位于 V2 计划使用的 test 源码根目录之外。本轮没有调用 Agent API。
++
++## 属性与冻结方案
++
++参考 OWASP Smart Contract Security Testing Guide 的业务逻辑与经济安全指导，以及 OWASP SC02:2026 对跨操作记账不一致、路径依赖状态与不变量违例的讨论：[SCSVS-GOV 指南](https://scs.owasp.org/SCSTG/tests/SCSVS-GOV/overview/)、[SC02:2026](https://scs.owasp.org/sctop10/SC02-BusinessLogicVulnerabilities/)。这些材料给出安全目标和风险类别，不规定本样本的下列属性；本阶段将其具体化为可执行测试不变量，并在查看任何 Phase30A V2 结果前冻结。
++
++属性为：测试账户通过 withdraw / refund 累计收到的 ETH，不得超过通过 deposit 累计存入的 ETH。Harness 以自身作为 Wallet 的唯一记账账户；只在成功存款后增加存款计数，只按成功调用后的实际余额增量记录提款。初始属性为真，目标状态为累计提款超过累计存款。属性适用于 Harness 暴露的存款、提款和退款操作；owner-only 迁移操作以及绕过 Harness 的强制转账不在此账本范围内。该 Harness 未修改 Wallet 业务代码。
++
++属性语义、适用条件、局限、Agent 预算、Echidna 预算、账户和比较门槛已冻结在 [01-input-freeze.json](../func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/01-input-freeze.json)。环境阻塞证据在 [02-execution-environment.json](../func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/02-execution-environment.json)。
++
++## 适用性与执行状态
++
++| 检查项 | 本轮结果 |
++|---|---|
++| 原始合约是否可编译 | 未运行。需要 Solidity 0.4.24；当前执行环境无法启动 WSL，未获得编译结果。 |
++| 是否能在现有 Anvil 部署 | 未运行。未把环境阻塞记录成部署失败。 |
++| 是否有多交易状态依赖 | 有源码层面的状态依赖：deposit 写入调用者账本，withdraw / refund 依赖该账本。尚无 Slither 或运行时核验。 |
++| 是否有独立规范下的安全属性 | 已定义并冻结上述账户记账不变量；规范来源、语义、条件和局限均已记录。未运行 Echidna 验证其可执行性。 |
++| 是否能用 Harness 而不改业务合约 | Harness 和仅去注释的 Wallet 输入已建立；尚未编译、部署或运行。 |
++| 是否匹配 V2 分析与修复 | 未经 Slither 和 Agent 验证。私有 balances 状态、refund 无参数等因素可能使跨交易参数修复没有可操作参数；这属于待验证的方法适配风险，不是已观察到的方法失败。 |
++
++执行停在原生编译前。Windows 主机启动 wsl.exe --status 及 Ubuntu 命令均返回 Wsl/E_ACCESSDENIED；Windows PATH 中没有 forge、echidna、slither、anvil，Windows Python 也没有 Slither、Crytic Compile、solcx 或 web3。仓库中的 Foundry 工具是 Linux 二进制，无法在当前宿主机直接运行。GitHub 命令行访问还被不可用的本机代理 127.0.0.1:7890 阻断；GitHub 连接器和网页仍成功取得并锁定上游提交、源码与许可文件。
++
++因此原生 Echidna 属性预检、Slither 分析、Agent A/B、Anvil 执行、执行反馈修复、目标状态检查、Echidna 种子回放以及 G0/G1/G2 对照均未启动。没有新种子、目标状态或覆盖数据。Medusa 未运行。
++
++## 问题回答
++
++1. **小型合约是否明显降低适配难度？** 本轮没有可比较的运行证据，不能下结论。样本构造简单、无外部依赖，但 Harness 与私有映射的状态观察仍需验证。
++2. **是否跑通完整 V2 流程？** 没有。执行未越过编译门槛。
++3. **有没有真实有效的新种子？** 没有生成或回放种子。
++4. **原始与修复种子效果如何？** Agent 候选和修复均未运行，暂无效果数据。
++5. **是否产生覆盖或目标状态收益？** 没有运行模糊测试，收益未测量。
++6. **阻碍分别是什么？** 已观察到的阻碍是 WSL / 工具运行环境问题，不是合约编译失败、Slither 失败或算法失败。方法适配风险包括私有余额没有公开 getter，以及主要退款动作无参数；目前尚未通过静态分析或执行确认。
++7. **是否值得把小型状态化合约作为主要实验集之一？** 目前不值得据此纳入正式主实验集。小型状态化合约可保留为工程诊断类别；本样本已知漏洞且本轮未运行，不能支持泛化结论。后续仅在恢复执行环境后按冻结方案继续本样本，不搜索第二批样本、不接入大型 DeFi 项目。
++
++本阶段不自动开始下一阶段。完整冻结输入、源代码、Harness 和许可副本均已入库；未运行结果不填为零值或成功。
++
++## Phase30A 恢复执行记录
++
++记录日期：2026-11-19；执行基线：`96ade661d7ffef5b80b040a0f069afe38533dbd4`
++
++本节追加于原始冻结报告之后，保留其“执行在原生编译前受环境阻塞”的历史判断。恢复运行是在后续阶段解决 WSL 工具可用性之后进行，不回写为原阶段已经具备的证据。
++
++### 恢复后实际执行
++
++- 使用原冻结的 Solidity 0.4.24、Wallet 原始业务逻辑和五账户 Harness 完成编译；Slither 输出记录在 `func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/05-Harness编译.json` 与 `04-slither-property-analysis.json`。
++- Agent A 只生成 `deposit(uint8) → refund(uint8)` 两笔序列。Agent B 保留函数顺序；第一次参数化的存款为 1 ETH，因统一初始余额仅 4294967295 wei 而在 Anvil 报 `Insufficient funds`。一次反馈参数修复将金额改为 0.001 ETH，仍没有增添交易步骤。
++- 按环境修订将 Anvil 与 Echidna 统一初始余额提高到 100 ETH 后，原始和反馈修复候选均能完整执行。两者被选账户的累计提款均等于累计存款，冻结目标仍为假；没有达到目标状态。逐笔记录见 `06b-funded-replay/anvil-replay.json` 与 `target-state-getters.json`。
++- Echidna 从两个分离语料各加载并回放 1 条两笔序列，属性均通过。日志 `tests: 0/1, fuzzing: 3/1`，输出覆盖序列与输入语料在交易语义上相同，没有后续模糊测试新序列或新增覆盖。原始汇总里的 `mutation_evidence: true` 是对 `fuzzing` 计数的过度解释，不能作为变异证据；原记录及其更正解释保存在 `06b-funded-replay/echidna-seed-replay.json`。
++
++### 恢复阶段结论
++
++恢复执行证明 Phase30A 冻结输入可以编译、产生候选并由 Anvil/Echidna 回放；它没有证明目标可达，也没有产生目标反例。目标是否可达及序列规划缺陷留待 Phase30B 通过独立人工诊断和后续受控修复验证。原冻结属性、许可和时间线均未改写；100 ETH 是基于 RPC 余额错误记录的环境修订，不是算法或属性变更。
+diff --git a/docs/研究总览与最新进展.md b/docs/研究总览与最新进展.md
+index 1fc0564..2741ea4 100644
+--- a/docs/研究总览与最新进展.md
++++ b/docs/研究总览与最新进展.md
+@@ -1,6 +1,6 @@
+ # 研究总览与最新进展
+ 
+-更新时间：2026-11-19；仓库：`smart-contract-fuzz-v2`；Phase30A 恢复执行基线：`main / d41890d`
++更新时间：2026-11-19；仓库：`smart-contract-fuzz-v2`；Phase30B 执行基线：`main / 96ade661d7ffef5b80b040a0f069afe38533dbd4`
+ 
+ ## 一、研究方向
+ 
+@@ -35,7 +35,7 @@ V2 已形成可运行的研究原型。Phase25 在四个固定诊断案例中验
+ | Echidna 种子效果 | Phase26 四个固定样本的 12 次 seeded fuzz 中，最终 LCOV 行数均高于配对 native，且每次均有超过 seed-only 回放的新行。 | 不是独立项目结果；OpenNFTs 的目标交易在 Echidna 中于 owner 守卫回滚，目标状态未建立。覆盖结果不能据此证明每条种子都有效。 |
+ | Medusa 接入 | Phase28 BeeStorage、Immutable 历史种子格式转换、真实回放和目标状态 getter 核验通过；BeeStorage 三次 M1 覆盖均高于 M0。 | 固定案例兼容性证据；Immutable 的多属性噪声和 Medusa 执行上下文差异仍在，不能据此推断跨项目泛化或引擎优劣。 |
+ | 独立公开项目实验 | Phase27 的 8 个候选只有 1 个通过原生属性资格门，正式 G0/G1/G2 均未运行。Phase29 固定五候选中完整端到端项目数为 0。 | 目前没有足够的新项目配对数据支撑论文正式实验结论。 |
+-| 轻量公开样本工程试点 | Phase30A 固定 SmartBugs Curated 钱包样本并冻结 OWASP 指导下的记账属性；原始源码/Harness 编译、原生 Echidna 预检、Slither 分析、Agent 候选、Anvil 与 Echidna 种子回放均完成。 | 两条候选可执行和可回放，但未达目标状态；按冻结门槛未运行 G0/G1/G2。属于已知漏洞工程试点，不作为正式留出集。 |
++| 轻量公开样本工程与机制诊断 | Phase30A 完成固定 SmartBugs Curated 钱包样本编译、Slither、Agent 候选和回放；Phase30B 人工 Oracle 证明目标可达，并修正源码上下文、属性 getter 观察和 Echidna 统计。 | P0/P1 自动候选均能回放但未达目标；未运行 G0/G1/G2。Phase30B 的人工 Oracle 仅用于诊断。样本为已知漏洞且参与开发，不作为正式留出集。 |
+ 
+ ## 四、近期阶段记录
+ 
+@@ -51,6 +51,7 @@ V2 已形成可运行的研究原型。Phase25 在四个固定诊断案例中验
+ | Phase28 | Medusa 1.5.1 接收 BeeStorage 和 Immutable 的冻结种子，两者目标状态核验通过；BeeStorage 三次 M1 高于 M0，Immutable 增益较小且混合。 | 建议部分兼容、可选接入，Echidna 仍为主引擎。 |
+ | Phase29 | SCFuzzBench 五个候选依固定顺序尝试。Origin Dollar 编译与 Echidna 原生属性识别通过，但静态依赖不完整、Anvil 构造部署回滚；仅完成 G0 三次。其余四项受依赖或源码获取阻塞。 | 接入配置得到通用化，但没有新项目全链路或 G1/G2，不能判断方法提升。 |
+ | Phase30A | 固定 SmartBugs Curated 钱包样本并冻结 OWASP 指导下的记账属性；原始源码/Harness 编译、原生 Echidna 预检、Slither 分析、Agent 候选、Anvil 与 Echidna 种子回放均完成。 | 两条候选可执行和可回放，但未达目标状态；按冻结门槛未运行 G0/G1/G2。属于已知漏洞工程试点，不作为正式留出集。 |
++| Phase30B | 独立人工 Oracle 以四笔交易在 Anvil/Echidna 一致触发冻结目标；定位源码同名误配、跨合约上下文和 getter 观察缺口；完成一次通用修复与一次同预算规划验证。 | P0/P1 自动候选都未到达目标；P1 `deposit → withdraw` 可完整回放。修复改善状态可观察性和源码对应，但未证明规划成功或覆盖收益；按门槛停止，不运行 G0/G1/G2。 |
+ 
+ ## 五、Phase29 最新实验状态
+ 
+@@ -68,14 +69,14 @@ G1/G2 没有运行，原因包括 V2 状态依赖分析不完整和 Anvil Harnes
+ 
+ Agent A/B 生成一条 `deposit(uint8)` → `refund(uint8)` 候选；一次执行反馈把存款值从 1 ETH 降到 0.001 ETH。首轮 Anvil 配置余额仅 `4294967295 wei`，两者都因余额不足失败。按 RPC 错误中性修正为 100 ETH 后，原始与修复序列均通过完整 Anvil 回放，也都被 Echidna 加载并明确回放；两者属性仍为真，公开账本 getter 分别显示 actor 0 的支出与存款相等，因此冻结目标状态未达到。Echidna 探针预算为每种子 1 个测试，但日志为 `tests: 0/1`，只证实语料加载与序列回放，不证实后续变异。
+ 
+-目标状态门槛未满足，G0/G1/G2 没有运行；本轮没有可归因的覆盖收益。初始 WSL 命令入口、余额、Python 依赖选择和 Slither 框架自动识别问题均已解决，当前阻碍是候选没有到达属性目标，且参数修复没有经历跨交易守卫/绑定失败。详情见 [Phase30A 报告](30_轻量级公开合约接入试点.md)、[冻结记录](../func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/01-input-freeze.json)和[机器结果](../func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/)。
++目标状态门槛未满足，G0/G1/G2 没有运行；没有可归因的覆盖收益。Phase30A 首轮余额不足、WSL 命令入口、Python 依赖选择和 Slither 框架识别问题均有记录并解决。Phase30B 独立人工 Oracle 证明目标真实可达；自动规划依然没有达到目标。详情见 [Phase30A 报告](30_轻量级公开合约接入试点.md)、[Phase30B 报告](31_目标可达性与多交易规划修复.md)、[冻结记录](../func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/01-input-freeze.json)和[机器结果](../func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/)。
+ 
+ ### 当前实验集分类
+ 
+ | 分类 | 当前样本与阶段 | 证据口径 |
+ |---|---|---|
+ | 机制验证 | Phase25/26 固定案例；Phase28 固定案例引擎接入 | 支持当前原型的机制与工程判断，不属于独立留出评估。 |
+-| 公开项目候选筛选/接入 | Phase27/29；Phase30A 工程试点 | Phase30A 有独立来源，但漏洞已公开且目标状态未达；不能计入正式独立评估。 |
++| 公开项目候选筛选/接入 | Phase27/29；Phase30A/30B 钱包工程与机制诊断 | 钱包样本独立来源但漏洞公开，且参与开发、人工 Oracle 与修复；不能计入正式独立评估。 |
+ | 正式独立评估 | 当前为空 | 尚无此前未参与开发的真实项目完成完整 G0/G1/G2 配对评估。 |
+ ## 七、方法边界与结论口径
+ 
+@@ -88,9 +89,9 @@ Agent A/B 生成一条 `deposit(uint8)` → `refund(uint8)` 候选；一次执
+ 
+ ## 八、下一步状态
+ 
+-不搜索第二批样本，也不接入大型 DeFi 项目。Phase30A 已在冻结门槛处停止；不自动开展下一阶段，也不为该样本追加目标知情的人工候选。进入论文正式实验前仍需至少两个此前未参与 V2 开发的真实项目完成属性分析、Agent 候选、Anvil 真实执行、种子回放和 G0/G1/G2 小规模对照，并解决依赖可复现获取、属性状态依赖证据不足和 Anvil/Foundry cheatcode 初始化差异。
++Phase30B 已按预注册门槛停止：P1 候选未达目标，没有启动 G0/G1/G2，不追加 Wallet Agent 调用或第二轮修复。建议下一独立阶段转向此前未参与 Wallet 开发与诊断的公开样本，验证通用源码调用链与属性状态观察能否在独立来源上稳定工作；正式论文评估仍需独立项目完成冻结属性、Agent 候选、Anvil 真实执行、种子回放和 G0/G1/G2 小规模对照，并继续处理依赖可复现获取、状态依赖证据和 Anvil/Foundry 初始化差异。本阶段不自动启动下一实验。
+ 
+-**Phase30A 工程试点已执行至冻结门槛并停止。** 本文维护研究进展索引，不自动开始下一阶段，也不把未达到的目标状态或未运行的对照写成成功结论。
++**Phase30A 工程试点和 Phase30B 机制诊断均已完成并停止。** 本文维护研究进展索引，不把人工 Oracle 计为 V2 发现，也不把未达到的目标状态或未运行的对照写成成功结论。
+ 
+ ## 九、阶段报告索引
+ 
+@@ -105,3 +106,4 @@ Agent A/B 生成一条 `deposit(uint8)` → `refund(uint8)` 候选；一次执
+ - [Phase28：Medusa 双引擎最小可行验证](28_Medusa双引擎最小可行验证.md)
+ - [Phase29：公开基准接入与首次独立验证](29_公开基准接入与首次独立验证.md)
+ - [Phase30A：轻量级公开合约接入试点](30_轻量级公开合约接入试点.md)
++- [Phase30B：目标可达性与多交易规划修复](31_目标可达性与多交易规划修复.md)
+diff --git a/func/功能/属性种子上下文.py b/func/功能/属性种子上下文.py
+index db495fd..be627d7 100644
+--- a/func/功能/属性种子上下文.py
++++ b/func/功能/属性种子上下文.py
+@@ -96,36 +96,242 @@ def source_excerpt(project: str, reference: str, limit: int = 4800) -> str | Non
+     return excerpt[:limit]
+ 
+ 
+-def _function_excerpt(project: str, signature: str, limit: int = 3000) -> str | None:
+-    tail = signature.rsplit(".", 1)[-1]
+-    name = tail.split("(", 1)[0]
+-    if not name:
+-        return None
++def _balanced_end(text: str, opening: int, left: str = "{", right: str = "}") -> int | None:
++    depth = 0
++    quote = None
++    escaped = False
++    line_comment = False
++    block_comment = False
++    index = opening
++    while index < len(text):
++        char = text[index]
++        following = text[index + 1] if index + 1 < len(text) else ""
++        if line_comment:
++            if char == "\n":
++                line_comment = False
++        elif block_comment:
++            if char == "*" and following == "/":
++                block_comment = False
++                index += 1
++        elif quote:
++            if escaped:
++                escaped = False
++            elif char == "\\":
++                escaped = True
++            elif char == quote:
++                quote = None
++        elif char == "/" and following == "/":
++            line_comment = True
++            index += 1
++        elif char == "/" and following == "*":
++            block_comment = True
++            index += 1
++        elif char in {"'", '"'}:
++            quote = char
++        elif char == left:
++            depth += 1
++        elif char == right:
++            depth -= 1
++            if depth == 0:
++                return index + 1
++        index += 1
++    return None
++
++
++def _split_parameters(text: str) -> list[str]:
++    parts, start, depth = [], 0, 0
++    for index, char in enumerate(text):
++        if char in "([<{":
++            depth += 1
++        elif char in ")]}>" and depth:
++            depth -= 1
++        elif char == "," and depth == 0:
++            parts.append(text[start:index].strip())
++            start = index + 1
++    tail = text[start:].strip()
++    if tail or parts:
++        parts.append(tail)
++    return parts
++
++
++def _canonical_source_type(parameter: str) -> str:
++    parameter = re.sub(r"\b(memory|storage|calldata|payable)\b", " ", parameter).strip()
++    tokens = parameter.split()
++    if not tokens:
++        return ""
++    raw = tokens[0]
++    if raw == "uint":
++        return "uint256"
++    if raw == "int":
++        return "int256"
++    if raw == "byte":
++        return "bytes1"
++    return raw
++
++
++def _source_functions(project: str) -> list[dict[str, Any]]:
++    """提取源码中的合约函数；保留合约边界，避免同名函数误匹配。"""
+     root = ROOT / PROJECTS[project]["source_root"]
+-    needle = re.compile(r"\bfunction\s+" + re.escape(name) + r"\s*\(")
+     excluded = {"node_modules", "vendor", ".git", "out", "cache"}
+-    for path in root.rglob("*.sol"):
++    found: list[dict[str, Any]] = []
++    for path in sorted(root.rglob("*.sol")):
+         if any(part in excluded for part in path.parts):
+             continue
+         try:
+-            lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
++            text = path.read_text(encoding="utf-8", errors="replace")
+         except OSError:
+             continue
+-        for i, line in enumerate(lines):
+-            if not needle.search(line):
++        for contract_match in re.finditer(
++                r"\b(?:contract|library|interface)\s+([A-Za-z_][A-Za-z0-9_]*)[^{}]*\{", text):
++            contract_open = text.find("{", contract_match.start())
++            contract_end = _balanced_end(text, contract_open)
++            if contract_end is None:
+                 continue
+-            depth = 0
+-            opened = False
+-            end = min(i + 80, len(lines))
+-            for j in range(i, end):
+-                depth += lines[j].count("{") - lines[j].count("}")
+-                opened |= "{" in lines[j]
+-                if opened and depth <= 0:
+-                    end = j + 1
+-                    break
+-            excerpt = "\n".join(f"{n + 1}: {lines[n]}" for n in range(i, end))
+-            return excerpt[:limit]
+-    return None
++            contract_text = text[contract_open + 1:contract_end - 1]
++            constructor_source = None
++            constructor_match = re.search(r"\bconstructor\s*\(", contract_text)
++            if constructor_match:
++                constructor_paren = contract_text.find("(", constructor_match.start())
++                constructor_paren_end = _balanced_end(contract_text, constructor_paren, "(", ")")
++                if constructor_paren_end is not None:
++                    constructor_brace = contract_text.find("{", constructor_paren_end)
++                    if constructor_brace >= 0:
++                        constructor_end = _balanced_end(contract_text, constructor_brace)
++                        if constructor_end is not None:
++                            absolute_start = contract_open + 1 + constructor_match.start()
++                            absolute_end = contract_open + 1 + constructor_end
++                            first_line = text.count("\n", 0, absolute_start) + 1
++                            constructor_source = "\n".join(
++                                f"{line_number}: {line}" for line_number, line in
++                                enumerate(text[absolute_start:absolute_end].splitlines(), first_line))
++            for function_match in re.finditer(
++                    r"\bfunction\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", contract_text):
++                parameters_open = contract_text.find("(", function_match.start())
++                parameters_end = _balanced_end(contract_text, parameters_open, "(", ")")
++                if parameters_end is None:
++                    continue
++                parameters = _split_parameters(contract_text[parameters_open + 1:parameters_end - 1])
++                types = [_canonical_source_type(item) for item in parameters]
++                delimiter = parameters_end
++                while delimiter < len(contract_text) and contract_text[delimiter] not in "{;":
++                    delimiter += 1
++                if delimiter >= len(contract_text):
++                    continue
++                end = (delimiter + 1 if contract_text[delimiter] == ";" else
++                       _balanced_end(contract_text, delimiter))
++                if end is None:
++                    continue
++                absolute_start = contract_open + 1 + function_match.start()
++                absolute_end = contract_open + 1 + end
++                first_line = text.count("\n", 0, absolute_start) + 1
++                excerpt = "\n".join(
++                    f"{line_number}: {line}" for line_number, line in
++                    enumerate(text[absolute_start:absolute_end].splitlines(), first_line))
++                found.append({"contract": contract_match.group(1),
++                              "name": function_match.group(1),
++                              "types": types,
++                              "signature": function_match.group(1) + "(" + ",".join(types) + ")",
++                              "source": excerpt,
++                              "body": contract_text[function_match.start():end],
++                              "contract_body": contract_text,
++                              "constructor_source": constructor_source,
++                              "path": str(path)})
++    return found
++
++
++def _resolve_source_function(functions: list[dict[str, Any]], contract_name: str | None,
++                             signature: str) -> dict[str, Any] | None:
++    name = signature.split("(", 1)[0].rsplit(".", 1)[-1]
++    wanted = signature[signature.find("("):] if "(" in signature else None
++    candidates = [item for item in functions if item["name"] == name and
++                  (wanted is None or item["signature"].endswith(wanted))]
++    if contract_name:
++        exact_contract = [item for item in candidates if item["contract"] == contract_name]
++        if len(exact_contract) == 1:
++            return exact_contract[0]
++        if exact_contract:
++            return None
++    return candidates[0] if len(candidates) == 1 else None
++
++
++def _function_excerpt(project: str, signature: str, limit: int = 3000,
++                      abi_signature: str | None = None) -> str | None:
++    parts = signature.split(".")
++    contract_name = parts[-2] if len(parts) > 1 else None
++    wanted = abi_signature or parts[-1]
++    function = _resolve_source_function(_source_functions(project), contract_name, wanted)
++    return function["source"][:limit] if function else None
++
++
++def _source_call_chain(project: str, signature: str, abi_signature: str | None,
++                       *, max_depth: int = 4, max_chars: int = 8000) -> list[dict[str, Any]]:
++    """提供源码可解析的外部调用链；未解析的 receiver 保留为未知证据。"""
++    functions = _source_functions(project)
++    parts = signature.split(".")
++    root_contract = parts[-2] if len(parts) > 1 else None
++    root_signature = abi_signature or parts[-1]
++    root = _resolve_source_function(functions, root_contract, root_signature)
++    if not root:
++        return []
++    by_contract = {item["contract"] for item in functions}
++    queue = [(root, 0, None)]
++    seen: set[tuple[str, str]] = set()
++    output = []
++    used_chars = 0
++    while queue and len(output) < 12:
++        current, depth, caller = queue.pop(0)
++        key = (current["contract"], current["signature"])
++        if key in seen:
++            continue
++        seen.add(key)
++        contract_body = current["contract_body"]
++        # Discover contract-typed storage variables, then local contract-typed values.
++        declarations = re.findall(
++            r"\b([A-Z][A-Za-z0-9_]*)\s*(?:\[[^\]]*\])?\s+"
++            r"(?:(?:public|private|internal|external|constant|immutable)\s+)*"
++            r"([A-Za-z_][A-Za-z0-9_]*)\b", contract_body)
++        local_declarations = re.findall(
++            r"\b([A-Z][A-Za-z0-9_]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=", current["body"])
++        types_by_variable = {variable: type_name for type_name, variable in
++                             [*declarations, *local_declarations]
++                             if type_name in by_contract}
++        state_lines = [f"{name}: {type_name}" for name, type_name in
++                       sorted(types_by_variable.items())]
++        constructor = current.get("constructor_source")
++        record = {"contract": current["contract"], "function": current["signature"],
++                  "called_from": caller,
++                  "contract_typed_variables": state_lines,
++                  "constructor_source": constructor,
++                  "source_excerpt": current["source"]}
++        size = len(json.dumps(record, ensure_ascii=False))
++        if used_chars + size > max_chars and output:
++            break
++        output.append(record)
++        used_chars += size
++        if depth >= max_depth:
++            continue
++        for call in re.finditer(
++                r"(?P<receiver>[A-Za-z_][A-Za-z0-9_]*(?:\s*\[[^\]]+\])?)\s*\.\s*"
++                r"(?P<name>[A-Za-z_][A-Za-z0-9_]*)"
++                r"(?:\s*\.\s*(?:value|gas)\s*\([^)]*\))*\s*\(", current["body"]):
++            receiver = call.group("receiver").split("[", 1)[0].strip()
++            target_contract = types_by_variable.get(receiver)
++            if not target_contract:
++                continue
++            arguments_open = call.end() - 1
++            arguments_end = _balanced_end(current["body"], arguments_open, "(", ")")
++            if arguments_end is None:
++                continue
++            argument_text = current["body"][arguments_open + 1:arguments_end - 1].strip()
++            argument_count = len(_split_parameters(argument_text)) if argument_text else 0
++            matches = [item for item in functions if item["contract"] == target_contract and
++                       item["name"] == call.group("name") and
++                       len(item["types"]) == argument_count]
++            if len(matches) == 1:
++                queue.append((matches[0], depth + 1,
++                              f"{current['contract']}.{current['signature']} → "
++                              f"{target_contract}.{matches[0]['signature']} ({receiver})"))
++    return output
+ 
+ 
+ def _constructor_excerpt(project: str, source: str, limit: int = 3200) -> str | None:
+@@ -227,7 +433,10 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
+             "static_status": action.get("analysis_status"),
+             "seed_compatible": supported,
+             "seed_limitation": unsupported_reason,
+-            "source_excerpt": _function_excerpt(project, full_signature),
++            "source_excerpt": _function_excerpt(
++                project, full_signature, abi_signature=_abi_signature(abi_entry) if abi_entry else None),
++            "source_call_chain": _source_call_chain(
++                project, full_signature, _abi_signature(abi_entry) if abi_entry else None),
+             "effect_evidence": evidence,
+         })
+ 
+@@ -323,7 +532,9 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
+                 "static_status": "abi_fallback_no_slither_writer_match",
+                 "seed_compatible": True,
+                 "seed_limitation": "No Slither write mapping; inspect source.",
+-                "source_excerpt": _function_excerpt(project, full_signature, limit=500),
++                "source_excerpt": _function_excerpt(project, full_signature, limit=500,
++                                                    abi_signature=signature),
++                "source_call_chain": _source_call_chain(project, full_signature, signature),
+                 "effect_evidence": [],
+                 "action_source": "generic_abi_fallback",
+             })
+@@ -433,10 +644,11 @@ def compact_for_agent(context: dict[str, Any]) -> dict[str, Any]:
+     compact_properties = []
+     common_fields = ("abi_inputs", "state_mutability", "payable", "seed_compatible",
+                      "seed_limitation", "source_excerpt", "prerequisite_dependencies",
+-                     "related_helper_effects")
++                     "related_helper_effects", "source_call_chain")
+     property_fields = ("function", "abi_signature", "matched_states", "environment_reads",
+                        "static_status", "seed_compatible", "effect_evidence",
+-                       "prerequisite_dependencies", "related_helper_effects")
++                       "prerequisite_dependencies", "related_helper_effects",
++                       "source_call_chain")
+     for prop in context["properties"]:
+         actions = []
+         for action in prop.get("candidate_actions", []):
+diff --git a/func/功能/种子验证.py b/func/功能/种子验证.py
+index 3705979..6459b69 100644
+--- a/func/功能/种子验证.py
++++ b/func/功能/种子验证.py
+@@ -47,13 +47,16 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
+     fuzzing_counts = [(int(txs), int(cases)) for txs, cases in
+                       re.findall(r"fuzzing\s*:\s*(\d+)\s*/\s*(\d+)",
+                                  output, re.IGNORECASE)]
++    tests_counts = [(int(done), int(total)) for done, total in
++                    re.findall(r"\btests\s*:\s*(\d+)\s*/\s*(\d+)",
++                               output, re.IGNORECASE)]
+     worker_crashes = [line.strip() for line in output.splitlines()
+                       if re.search(r"\bCrashed:\s*", line, re.IGNORECASE)]
+-    # 仅有统计区标题或 unique-instruction 汇总不能证明语料已进入后续变异。
+-    # 需要明确看到正数 fuzzing 计数，并且 Echidna worker 没有崩溃。
+-    mutation = (count > 0 and bool(replayed) and
+-                any(txs > 0 and cases > 0 for txs, cases in fuzzing_counts) and
+-                not worker_crashes)
++    # fuzzing 的交易计数包含种子回放，tests 是测试状态计数；两者都不能
++    # 单独证明生成了新序列或新增覆盖。需用输入/输出 coverage 差集另行判断。
++    property_failure = any(re.search(r"\b(?:falsified|failed)\b", line, re.IGNORECASE)
++                          and re.search(r"\b(?:Test|property)\b", line, re.IGNORECASE)
++                          for line in output.splitlines())
+     instruction_counts = [int(match.replace(",", "")) for match in
+                           re.findall(r"unique instructions\s*:\s*([\d,]+)", output, re.IGNORECASE)]
+     coverage_snapshots = [int(match.replace(",", "")) for match in
+@@ -63,11 +66,16 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
+             "replayed_sequence_count": len(replayed),
+             "replay_evidence": bool(replayed),
+             "replayed_lines": replayed,
+-            "mutation_evidence": mutation,
++            "mutation_evidence": False,
++            "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
++            "fuzzing_activity_evidence": any(txs > 0 for txs, _ in fuzzing_counts),
+             "fuzzing_transactions": max((txs for txs, _ in fuzzing_counts), default=0),
+             "fuzzing_cases": max((cases for _, cases in fuzzing_counts), default=0),
+             "fuzzing_progress_count": max((txs for txs, _ in fuzzing_counts), default=0),
+             "fuzzing_progress_limit": max((cases for _, cases in fuzzing_counts), default=0),
++            "tests_status_snapshots": [{"completed": done, "total": total}
++                                        for done, total in tests_counts],
++            "property_failure_reported": property_failure,
+             "worker_crashes": worker_crashes,
+             "unique_instructions": max(instruction_counts or coverage_snapshots, default=None),
+             "coverage_source": ("final_unique_instructions" if instruction_counts else
+@@ -589,7 +597,7 @@ def _resolve_property_argument(expression: str, abi_type: str, declarations: str
+ def _property_getter_specs(property_context: dict[str, Any], contract,
+                            contract_abis: dict[str, Any], *,
+                            property_sender: str = PROPERTY_SENDER) -> list[dict[str, Any]]:
+-    """从属性源码中的直接 view 调用抽取可解析的 getter 观察点。"""
++    """解析属性直接调用及有界索引状态的公开 view getter 观察点。"""
+     reference = property_context.get("property_source", "")
+     source_path = ROOT / str(reference).split("#", 1)[0]
+     if not source_path.is_file():
+@@ -607,6 +615,15 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
+            item.get("stateMutability") in {"view", "pure"}]
+     target_name = property_context.get("property_abi", "").split("(", 1)[0].rsplit(".", 1)[-1]
+     specs = []
++
++    def add_spec(spec: dict[str, Any]) -> None:
++        key = (spec.get("signature"), spec.get("receiver"),
++               json.dumps(spec.get("arguments", []), sort_keys=True), spec.get("status"))
++        if not any((row.get("signature"), row.get("receiver"),
++                    json.dumps(row.get("arguments", []), sort_keys=True), row.get("status")) == key
++                   for row in specs):
++            specs.append(spec)
++
+     for receiver, name, arguments in _property_calls(predicate):
+         if name == target_name:
+             continue
+@@ -652,10 +669,67 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
+             except (ValueError, TypeError) as exc:
+                 errors.append(str(exc))
+         if resolved:
+-            specs.append(resolved)
++            add_spec(resolved)
+         else:
+-            specs.append({"function": name, "expressions": arguments,
+-                          "status": "unresolved", "reason": errors[0] if errors else "ABI 未匹配"})
++            add_spec({"function": name, "expressions": arguments,
++                      "status": "unresolved", "reason": errors[0] if errors else "ABI 未匹配"})
++
++    # Public mapping/array getters are functions with one ABI index argument. Resolve
++    # statically bounded for-loop indices so per-transaction feedback observes the
++    # actual operands of quantified predicates rather than only the final bool.
++    loop_ranges: dict[str, list[int] | None] = {}
++    loop_pattern = re.compile(
++        r"\bfor\s*\(\s*(?:u?int(?:[0-9]+)?)\s+(?P<name>[A-Za-z_]\w*)\s*=\s*"
++        r"(?P<start>[^;]+);\s*(?P=name)\s*<\s*(?P<end>[^;]+);", re.MULTILINE)
++    for loop in loop_pattern.finditer(predicate):
++        variable = loop.group("name")
++        try:
++            start = _resolve_property_argument(loop.group("start"), "uint256", declarations,
++                                               property_sender, contract)
++            end = _resolve_property_argument(loop.group("end"), "uint256", declarations,
++                                             property_sender, contract)
++            if not isinstance(start, int) or not isinstance(end, int) or end < start or end - start > 256:
++                loop_ranges[variable] = None
++            else:
++                loop_ranges[variable] = list(range(start, end))
++        except (ValueError, TypeError):
++            loop_ranges[variable] = None
++
++    mapping_pattern = re.compile(r"\b(?P<name>[A-Za-z_]\w*)\s*\[\s*(?P<index>[^\]]+)\s*\]")
++    for access in mapping_pattern.finditer(predicate):
++        name, index_expression = access.group("name"), access.group("index").strip()
++        if name == target_name:
++            continue
++        entries = [item for item in abi if item.get("type") == "function" and
++                   item.get("name") == name and len(item.get("inputs", [])) == 1 and
++                   item.get("stateMutability") in {"view", "pure"}]
++        if len(entries) != 1:
++            add_spec({"function": name, "expressions": [index_expression],
++                      "status": "unresolved", "reason": "索引状态没有唯一匹配的单参数公开 view getter"})
++            continue
++        entry = entries[0]
++        parameter_type = entry["inputs"][0]["type"]
++        values: list[int] | None = None
++        if index_expression in loop_ranges:
++            values = loop_ranges[index_expression]
++        else:
++            try:
++                value = _resolve_property_argument(index_expression, parameter_type,
++                                                   declarations, property_sender, contract)
++                values = [value] if isinstance(value, int) else None
++            except (ValueError, TypeError):
++                values = None
++        signature = entry["name"] + "(" + ",".join(item["type"] for item in entry["inputs"]) + ")"
++        if values is None:
++            add_spec({"function": name, "expressions": [index_expression],
++                      "status": "unresolved", "reason": "属性索引不是可解析且有界的整数/循环变量"})
++            continue
++        for value in values:
++            add_spec({"signature": signature, "expressions": [index_expression],
++                      "arguments": [value], "receiver": None,
++                      "receiver_getter": None, "receiver_type": None,
++                      "index_source": "statically_bounded_property_loop"
++                      if index_expression in loop_ranges else "property_index_literal"})
+     observed_signatures = {item.get("signature") for item in specs}
+     for identifier in re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*\b", predicate):
+         entry = next((item for item in abi if item.get("name") == identifier and
+@@ -663,9 +737,9 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
+                       item.get("stateMutability") in {"view", "pure"}), None)
+         signature = identifier + "()"
+         if (entry and identifier != target_name and signature not in observed_signatures):
+-            specs.append({"signature": signature, "expressions": [identifier],
+-                          "arguments": [], "receiver": None,
+-                          "receiver_getter": None, "receiver_type": None})
++            add_spec({"signature": signature, "expressions": [identifier],
++                      "arguments": [], "receiver": None,
++                      "receiver_getter": None, "receiver_type": None})
+             observed_signatures.add(signature)
+     return specs
+ 

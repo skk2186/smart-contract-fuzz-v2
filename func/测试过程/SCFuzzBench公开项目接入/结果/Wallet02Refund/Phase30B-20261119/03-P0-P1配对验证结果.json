@@ -1,0 +1,4170 @@
+{
+  "status": "completed",
+  "comparison_scope": "P0 is the Phase30A plan under two historical Agent B parameterizations; P1 is the single Phase30B plan. No manual oracle path was loaded.",
+  "uniform_initial_balance_wei": "100000000000000000000",
+  "property_id": "8e75f62866f6d582a033",
+  "max_sequence_length": 8,
+  "candidates": [
+    {
+      "name": "P0-old-planner-AgentB-raw",
+      "origin": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/06-agent-v2/逐属性Agent种子流程.json",
+      "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+      "plan": [
+        {
+          "function": "deposit(uint8)",
+          "rationale": "先通过 payable 存款增加 cumulativeDeposits[actor]，为后续 refund 的 payout 记账建立可比较的存款基数；部署时该映射未初始化，需由候选前序满足。"
+        },
+        {
+          "function": "refund(uint8)",
+          "rationale": "在已有存款后调用 refund，触发 cumulativePayout[actor] 累加，检验 payout 是否可能超过 cumulativeDeposits，从而尝试违反 echidna_wallet_accounting_respected 的 cumulativePayout[i] > cumulativeDeposits[i] 条件。"
+        }
+      ],
+      "resolved_transactions": [
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "refund(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same_uint8_account_index"
+            }
+          ]
+        }
+      ],
+      "anvil_replay": {
+        "project": "Wallet02Refund",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_wallet_accounting_respected()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              0
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              1
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              2
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              3
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              4
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              0
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              1
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              2
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              3
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              4
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_wallet_accounting_respected()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "property_related_state_changed_property_holds",
+          "target_property_state_established": true,
+          "counterexample_state_established": false,
+          "property_related_state_changed": true,
+          "first_established_transaction_index": 1,
+          "first_property_related_change_transaction_index": 1,
+          "first_counterexample_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "receiver": null,
+                  "receiver_address": null,
+                  "arguments": [
+                    0
+                  ],
+                  "before": 0,
+                  "after": 1000000000000000000
+                }
+              ]
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "receiver": null,
+                  "receiver_address": null,
+                  "arguments": [
+                    0
+                  ],
+                  "before": 0,
+                  "after": 1000000000000000000
+                }
+              ]
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "40: function deposit(uint8 account) public payable {\n41:         uint8 actor = account % ACCOUNT_COUNT;\n42:         accounts[actor].deposit.value(msg.value)();\n43:         cumulativeDeposits[actor] += msg.value;\n44:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "08e0f911f9317c7f94daabff363be98e288779be402a6b432345f119b3dc1015",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 90117,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xebe41b730000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0xd0e30db0",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0xd0e30db0",
+                      "calls": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 2,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000000
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              }
+            ],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          },
+          {
+            "index": 2,
+            "function": "refund(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "53: function refund(uint8 account) public {\n54:         uint8 actor = account % ACCOUNT_COUNT;\n55:         uint256 balanceBefore = address(accounts[actor]).balance;\n56:         accounts[actor].refund();\n57:         cumulativePayout[actor] += address(accounts[actor]).balance - balanceBefore;\n58:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "8f792a907f337a49d23879448f2a7faa4407b2a0a209c342250c433a7791aae2",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 63712,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x04e799bd0000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0x590e1ae3",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0x590e1ae3",
+                      "calls": [
+                        {
+                          "type": "CALL",
+                          "from": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                          "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                          "input": "0x",
+                          "calls": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 1,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000000
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000000
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              }
+            ],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "refund(uint8)",
+            "arguments": [
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "account",
+                "relation": "same_uint8_account_index"
+              }
+            ]
+          }
+        ]
+      },
+      "target_reached": false,
+      "echidna_seed_only": {
+        "project": "Wallet02Refund",
+        "property_name": "WalletHarness.echidna_wallet_accounting_respected()",
+        "test_mode": "property",
+        "command": [
+          "/usr/local/bin/echidna",
+          "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+          "--contract",
+          "WalletHarness",
+          "--crytic-args",
+          "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-raw/Wallet02Refund-corpus-crytic-compile.json",
+          "--config",
+          "/home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-raw/Wallet02Refund-corpus-echidna.yaml",
+          "--test-limit",
+          "1",
+          "--seq-len",
+          "8",
+          "--shrink-limit",
+          "1",
+          "--seed",
+          "20261125",
+          "--workers",
+          "1",
+          "--format",
+          "text",
+          "--deployer",
+          "0x0000000000000000000000000000000000030000",
+          "--contract-addr",
+          "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+          "--sender",
+          "0x0000000000000000000000000000000000010000",
+          "--sender",
+          "0x0000000000000000000000000000000000020000",
+          "--sender",
+          "0x0000000000000000000000000000000000030000",
+          "--sender",
+          "0x0000000000000000000000000000000000040000",
+          "--sender",
+          "0x0000000000000000000000000000000000050000",
+          "--disable-slither"
+        ],
+        "exit_code": 0,
+        "status": "completed",
+        "timed_out": false,
+        "seed": 20261125,
+        "test_limit": 1,
+        "seq_len": 8,
+        "shrink_limit": 1,
+        "elapsed_seconds": 0.75,
+        "loaded_seed_count": 1,
+        "loaded_seed_evidence": true,
+        "replayed_sequence_count": 1,
+        "replay_evidence": true,
+        "replayed_lines": [
+          "[2026-11-19 20:02:18.67] [Worker 0] Sequence replayed from corpus file candidate.txt (1/1)"
+        ],
+        "mutation_evidence": false,
+        "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+        "fuzzing_activity_evidence": true,
+        "fuzzing_transactions": 3,
+        "fuzzing_cases": 1,
+        "fuzzing_progress_count": 3,
+        "fuzzing_progress_limit": 1,
+        "tests_status_snapshots": [
+          {
+            "completed": 0,
+            "total": 1
+          }
+        ],
+        "property_failure_reported": false,
+        "worker_crashes": [],
+        "unique_instructions": 1018,
+        "coverage_source": "final_unique_instructions",
+        "initial_corpus_file_count": 1,
+        "initial_corpus_files": [
+          "candidate.txt"
+        ],
+        "full_log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-raw/corpus/echidna.log",
+        "stop_on_fail": false,
+        "target_property_results": [],
+        "property_failures": [],
+        "first_property_failure_observed_seconds": null,
+        "property_failure_time_is_upper_bound": false,
+        "initial_state_failures": [],
+        "output": "[2026-11-19 20:02:18.12] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.447786531s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol:WalletHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-raw/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-raw/corpus/coverage\n[2026-11-19 20:02:18.67] [Worker 0] New coverage: 1018 instr, 3 contracts, 1 seqs in corpus\n[2026-11-19 20:02:18.67] [Worker 0] Sequence replayed from corpus file candidate.txt (1/1)\n[2026-11-19 20:02:18.67] [Worker 0] Test limit reached. Stopping.\n[2026-11-19 20:02:18.67] [status] tests: 0/1, fuzzing: 3/1, values: [], cov: 1018, corpus: 1, gas/s: 0\nechidna_wallet_accounting_respected: passing\n\nUnique instructions: 1018\nUnique codehashes: 3\nCorpus size: 1\nSeed: 20261125\nTotal calls: 3\n\n[2026-11-19 20:02:18.67] Saving test reproducers... Done! (0.000000483s)\n[2026-11-19 20:02:18.67] Saving corpus... Done! (0.000097749s)\n[2026-11-19 20:02:18.67] Saving foundry reproducers... Done! (0.000329611s)\n[2026-11-19 20:02:18.67] Saving coverage... Done! (0.078203454s)\n",
+        "corpus_seed_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-raw/corpus/coverage/candidate.txt",
+        "purpose": "single Echidna corpus replay/test-limit-1 probe; not fuzz comparison"
+      }
+    },
+    {
+      "name": "P0-old-planner-AgentB-feedback",
+      "origin": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/06-agent-v2/逐属性Agent种子流程.json",
+      "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+      "plan": [
+        {
+          "function": "deposit(uint8)",
+          "rationale": "先通过 payable 存款增加 cumulativeDeposits[actor]，为后续 refund 的 payout 记账建立可比较的存款基数；部署时该映射未初始化，需由候选前序满足。"
+        },
+        {
+          "function": "refund(uint8)",
+          "rationale": "在已有存款后调用 refund，触发 cumulativePayout[actor] 累加，检验 payout 是否可能超过 cumulativeDeposits，从而尝试违反 echidna_wallet_accounting_respected 的 cumulativePayout[i] > cumulativeDeposits[i] 条件。"
+        }
+      ],
+      "resolved_transactions": [
+        {
+          "index": 1,
+          "function": "deposit(uint8)",
+          "abi_signature": "deposit(uint8)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0
+          ],
+          "value_wei": "1000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": []
+        },
+        {
+          "index": 2,
+          "function": "refund(uint8)",
+          "abi_signature": "refund(uint8)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same_uint8_account_index"
+            }
+          ]
+        }
+      ],
+      "anvil_replay": {
+        "project": "Wallet02Refund",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_wallet_accounting_respected()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              0
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              1
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              2
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              3
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              4
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              0
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              1
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              2
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              3
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              4
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_wallet_accounting_respected()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "property_related_state_changed_property_holds",
+          "target_property_state_established": true,
+          "counterexample_state_established": false,
+          "property_related_state_changed": true,
+          "first_established_transaction_index": 1,
+          "first_property_related_change_transaction_index": 1,
+          "first_counterexample_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "receiver": null,
+                  "receiver_address": null,
+                  "arguments": [
+                    0
+                  ],
+                  "before": 0,
+                  "after": 1000000000000000
+                }
+              ]
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "receiver": null,
+                  "receiver_address": null,
+                  "arguments": [
+                    0
+                  ],
+                  "before": 0,
+                  "after": 1000000000000000
+                }
+              ]
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "40: function deposit(uint8 account) public payable {\n41:         uint8 actor = account % ACCOUNT_COUNT;\n42:         accounts[actor].deposit.value(msg.value)();\n43:         cumulativeDeposits[actor] += msg.value;\n44:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "cd71c29064955f5f4a376d5821037278463b6ff7b32f2ad5ca90a7feea98f2e6",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 90117,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xebe41b730000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0xd0e30db0",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0xd0e30db0",
+                      "calls": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 2,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              }
+            ],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          },
+          {
+            "index": 2,
+            "function": "refund(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "53: function refund(uint8 account) public {\n54:         uint8 actor = account % ACCOUNT_COUNT;\n55:         uint256 balanceBefore = address(accounts[actor]).balance;\n56:         accounts[actor].refund();\n57:         cumulativePayout[actor] += address(accounts[actor]).balance - balanceBefore;\n58:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "8f792a907f337a49d23879448f2a7faa4407b2a0a209c342250c433a7791aae2",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 63712,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x04e799bd0000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0x590e1ae3",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0x590e1ae3",
+                      "calls": [
+                        {
+                          "type": "CALL",
+                          "from": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                          "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                          "input": "0x",
+                          "calls": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 1,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              }
+            ],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "index": 1,
+            "function": "deposit(uint8)",
+            "abi_signature": "deposit(uint8)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              0
+            ],
+            "value_wei": "1000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": []
+          },
+          {
+            "index": 2,
+            "function": "refund(uint8)",
+            "abi_signature": "refund(uint8)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              0
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "account",
+                "relation": "same_uint8_account_index"
+              }
+            ]
+          }
+        ]
+      },
+      "target_reached": false,
+      "echidna_seed_only": {
+        "project": "Wallet02Refund",
+        "property_name": "WalletHarness.echidna_wallet_accounting_respected()",
+        "test_mode": "property",
+        "command": [
+          "/usr/local/bin/echidna",
+          "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+          "--contract",
+          "WalletHarness",
+          "--crytic-args",
+          "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-feedback/Wallet02Refund-corpus-crytic-compile.json",
+          "--config",
+          "/home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-feedback/Wallet02Refund-corpus-echidna.yaml",
+          "--test-limit",
+          "1",
+          "--seq-len",
+          "8",
+          "--shrink-limit",
+          "1",
+          "--seed",
+          "20261125",
+          "--workers",
+          "1",
+          "--format",
+          "text",
+          "--deployer",
+          "0x0000000000000000000000000000000000030000",
+          "--contract-addr",
+          "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+          "--sender",
+          "0x0000000000000000000000000000000000010000",
+          "--sender",
+          "0x0000000000000000000000000000000000020000",
+          "--sender",
+          "0x0000000000000000000000000000000000030000",
+          "--sender",
+          "0x0000000000000000000000000000000000040000",
+          "--sender",
+          "0x0000000000000000000000000000000000050000",
+          "--disable-slither"
+        ],
+        "exit_code": 0,
+        "status": "completed",
+        "timed_out": false,
+        "seed": 20261125,
+        "test_limit": 1,
+        "seq_len": 8,
+        "shrink_limit": 1,
+        "elapsed_seconds": 0.306,
+        "loaded_seed_count": 1,
+        "loaded_seed_evidence": true,
+        "replayed_sequence_count": 1,
+        "replay_evidence": true,
+        "replayed_lines": [
+          "[2026-11-19 20:02:19.38] [Worker 0] Sequence replayed from corpus file candidate.txt (1/1)"
+        ],
+        "mutation_evidence": false,
+        "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+        "fuzzing_activity_evidence": true,
+        "fuzzing_transactions": 3,
+        "fuzzing_cases": 1,
+        "fuzzing_progress_count": 3,
+        "fuzzing_progress_limit": 1,
+        "tests_status_snapshots": [
+          {
+            "completed": 0,
+            "total": 1
+          }
+        ],
+        "property_failure_reported": false,
+        "worker_crashes": [],
+        "unique_instructions": 1018,
+        "coverage_source": "final_unique_instructions",
+        "initial_corpus_file_count": 1,
+        "initial_corpus_files": [
+          "candidate.txt"
+        ],
+        "full_log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-feedback/corpus/echidna.log",
+        "stop_on_fail": false,
+        "target_property_results": [],
+        "property_failures": [],
+        "first_property_failure_observed_seconds": null,
+        "property_failure_time_is_upper_bound": false,
+        "initial_state_failures": [],
+        "output": "[2026-11-19 20:02:19.18] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.175611646s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol:WalletHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-feedback/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-feedback/corpus/coverage\n[2026-11-19 20:02:19.37] [Worker 0] New coverage: 1018 instr, 3 contracts, 1 seqs in corpus\n[2026-11-19 20:02:19.38] [Worker 0] Sequence replayed from corpus file candidate.txt (1/1)\n[2026-11-19 20:02:19.38] [Worker 0] Test limit reached. Stopping.\n[2026-11-19 20:02:19.38] [status] tests: 0/1, fuzzing: 3/1, values: [], cov: 1018, corpus: 1, gas/s: 0\nechidna_wallet_accounting_respected: passing\n\nUnique instructions: 1018\nUnique codehashes: 3\nCorpus size: 1\nSeed: 20261125\nTotal calls: 3\n\n[2026-11-19 20:02:19.38] Saving test reproducers... Done! (0.000000447s)\n[2026-11-19 20:02:19.38] Saving corpus... Done! (0.000113097s)\n[2026-11-19 20:02:19.38] Saving foundry reproducers... Done! (0.000308159s)\n[2026-11-19 20:02:19.38] Saving coverage... Done! (0.063520931s)\n",
+        "corpus_seed_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P0-old-planner-AgentB-feedback/corpus/coverage/candidate.txt",
+        "purpose": "single Echidna corpus replay/test-limit-1 probe; not fuzz comparison"
+      }
+    },
+    {
+      "name": "P1-source-context-planner",
+      "origin": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/02-新规划Anvil结果.json",
+      "candidate_id": "8e75f62866f6-01-seq-1",
+      "plan": [
+        {
+          "function": "deposit(uint8)",
+          "rationale": "先通过 WalletHarness.deposit 向 accounts[actor] 存入 msg.value，写入 cumulativeDeposits[actor]，为后续 payout 提供可比较的存款基数。"
+        },
+        {
+          "function": "withdraw(uint8,uint256)",
+          "rationale": "在已有存款后调用 withdraw，使 WalletUser 从 Wallet 取回 amount 并增加 cumulativePayout[actor]，检验 payout 是否可能超过 cumulativeDeposits。"
+        }
+      ],
+      "resolved_transactions": [
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "withdraw(uint8,uint256)",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+            }
+          ]
+        }
+      ],
+      "anvil_replay": {
+        "project": "Wallet02Refund",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "8e75f62866f6-01-seq-1",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_wallet_accounting_respected()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              0
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              1
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              2
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              3
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativePayout(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              4
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              0
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              1
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              2
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              3
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "expressions": [
+              "i"
+            ],
+            "arguments": [
+              4
+            ],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "index_source": "statically_bounded_property_loop",
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          }
+        ],
+        "target_property_state": {
+          "property": "echidna_wallet_accounting_respected()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "property_related_state_changed_property_holds",
+          "target_property_state_established": true,
+          "counterexample_state_established": false,
+          "property_related_state_changed": true,
+          "first_established_transaction_index": 1,
+          "first_property_related_change_transaction_index": 1,
+          "first_counterexample_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "receiver": null,
+                  "receiver_address": null,
+                  "arguments": [
+                    0
+                  ],
+                  "before": 0,
+                  "after": 1000000000000000000
+                }
+              ]
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    0
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 1000000000000000000
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    1
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    2
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    3
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                },
+                {
+                  "signature": "cumulativeDeposits(uint8)",
+                  "expressions": [
+                    "i"
+                  ],
+                  "arguments": [
+                    4
+                  ],
+                  "receiver": null,
+                  "receiver_getter": null,
+                  "receiver_type": null,
+                  "index_source": "statically_bounded_property_loop",
+                  "status": "observed",
+                  "receiver_address": null,
+                  "value": 0
+                }
+              ],
+              "changed_predicate_getters": [
+                {
+                  "signature": "cumulativePayout(uint8)",
+                  "receiver": null,
+                  "receiver_address": null,
+                  "arguments": [
+                    0
+                  ],
+                  "before": 0,
+                  "after": 1000000000000000000
+                }
+              ]
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "40: function deposit(uint8 account) public payable {\n41:         uint8 actor = account % ACCOUNT_COUNT;\n42:         accounts[actor].deposit.value(msg.value)();\n43:         cumulativeDeposits[actor] += msg.value;\n44:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "08e0f911f9317c7f94daabff363be98e288779be402a6b432345f119b3dc1015",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 90117,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xebe41b730000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0xd0e30db0",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0xd0e30db0",
+                      "calls": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 2,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000000
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              }
+            ],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          },
+          {
+            "index": 2,
+            "function": "withdraw(uint8,uint256)",
+            "arguments": [
+              0,
+              1000000000000000000
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "46: function withdraw(uint8 account, uint256 amount) public {\n47:         uint8 actor = account % ACCOUNT_COUNT;\n48:         uint256 balanceBefore = address(accounts[actor]).balance;\n49:         accounts[actor].withdraw(amount);\n50:         cumulativePayout[actor] += address(accounts[actor]).balance - balanceBefore;\n51:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "25413e5dc770838c0146f797b99ce3eeedb00cfe209efd43ddb8e703f84c87a7",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 62429,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x3f48991400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000de0b6b3a7640000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0x2e1a7d4d0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0x2e1a7d4d0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+                      "calls": [
+                        {
+                          "type": "CALL",
+                          "from": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                          "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                          "input": "0x",
+                          "calls": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 2,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000000
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativePayout(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  0
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 1000000000000000000
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  1
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  2
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  3
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              },
+              {
+                "signature": "cumulativeDeposits(uint8)",
+                "expressions": [
+                  "i"
+                ],
+                "arguments": [
+                  4
+                ],
+                "receiver": null,
+                "receiver_getter": null,
+                "receiver_type": null,
+                "index_source": "statically_bounded_property_loop",
+                "status": "observed",
+                "receiver_address": null,
+                "value": 0
+              }
+            ],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "withdraw(uint8,uint256)",
+            "arguments": [
+              0,
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "account",
+                "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+              }
+            ]
+          }
+        ]
+      },
+      "target_reached": false,
+      "echidna_seed_only": {
+        "project": "Wallet02Refund",
+        "property_name": "WalletHarness.echidna_wallet_accounting_respected()",
+        "test_mode": "property",
+        "command": [
+          "/usr/local/bin/echidna",
+          "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+          "--contract",
+          "WalletHarness",
+          "--crytic-args",
+          "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P1-source-context-planner/Wallet02Refund-corpus-crytic-compile.json",
+          "--config",
+          "/home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P1-source-context-planner/Wallet02Refund-corpus-echidna.yaml",
+          "--test-limit",
+          "1",
+          "--seq-len",
+          "8",
+          "--shrink-limit",
+          "1",
+          "--seed",
+          "20261125",
+          "--workers",
+          "1",
+          "--format",
+          "text",
+          "--deployer",
+          "0x0000000000000000000000000000000000030000",
+          "--contract-addr",
+          "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+          "--sender",
+          "0x0000000000000000000000000000000000010000",
+          "--sender",
+          "0x0000000000000000000000000000000000020000",
+          "--sender",
+          "0x0000000000000000000000000000000000030000",
+          "--sender",
+          "0x0000000000000000000000000000000000040000",
+          "--sender",
+          "0x0000000000000000000000000000000000050000",
+          "--disable-slither"
+        ],
+        "exit_code": 0,
+        "status": "completed",
+        "timed_out": false,
+        "seed": 20261125,
+        "test_limit": 1,
+        "seq_len": 8,
+        "shrink_limit": 1,
+        "elapsed_seconds": 0.314,
+        "loaded_seed_count": 1,
+        "loaded_seed_evidence": true,
+        "replayed_sequence_count": 1,
+        "replay_evidence": true,
+        "replayed_lines": [
+          "[2026-11-19 20:02:20.07] [Worker 0] Sequence replayed from corpus file candidate.txt (1/1)"
+        ],
+        "mutation_evidence": false,
+        "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+        "fuzzing_activity_evidence": true,
+        "fuzzing_transactions": 3,
+        "fuzzing_cases": 1,
+        "fuzzing_progress_count": 3,
+        "fuzzing_progress_limit": 1,
+        "tests_status_snapshots": [
+          {
+            "completed": 0,
+            "total": 1
+          }
+        ],
+        "property_failure_reported": false,
+        "worker_crashes": [],
+        "unique_instructions": 1130,
+        "coverage_source": "final_unique_instructions",
+        "initial_corpus_file_count": 1,
+        "initial_corpus_files": [
+          "candidate.txt"
+        ],
+        "full_log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P1-source-context-planner/corpus/echidna.log",
+        "stop_on_fail": false,
+        "target_property_results": [],
+        "property_failures": [],
+        "first_property_failure_observed_seconds": null,
+        "property_failure_time_is_upper_bound": false,
+        "initial_state_failures": [],
+        "output": "[2026-11-19 20:02:19.86] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.185496196s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol:WalletHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P1-source-context-planner/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P1-source-context-planner/corpus/coverage\n[2026-11-19 20:02:20.07] [Worker 0] New coverage: 1130 instr, 3 contracts, 1 seqs in corpus\n[2026-11-19 20:02:20.07] [Worker 0] Sequence replayed from corpus file candidate.txt (1/1)\n[2026-11-19 20:02:20.07] [Worker 0] Test limit reached. Stopping.\n[2026-11-19 20:02:20.07] [status] tests: 0/1, fuzzing: 3/1, values: [], cov: 1130, corpus: 1, gas/s: 0\nechidna_wallet_accounting_respected: passing\n\nUnique instructions: 1130\nUnique codehashes: 3\nCorpus size: 1\nSeed: 20261125\nTotal calls: 3\n\n[2026-11-19 20:02:20.07] Saving test reproducers... Done! (0.000000437s)\n[2026-11-19 20:02:20.07] Saving corpus... Done! (0.000084276s)\n[2026-11-19 20:02:20.07] Saving foundry reproducers... Done! (0.000296966s)\n[2026-11-19 20:02:20.07] Saving coverage... Done! (0.059067844s)\n",
+        "corpus_seed_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/seed-only/P1-source-context-planner/corpus/coverage/candidate.txt",
+        "purpose": "single Echidna corpus replay/test-limit-1 probe; not fuzz comparison"
+      }
+    }
+  ],
+  "fuzz_gate": {
+    "passed": false,
+    "groups_run": [],
+    "reason": "G0/G1/G2 are conditional on the new planner reaching the frozen target in Anvil and the same candidate being falsified by Echidna."
+  }
+}

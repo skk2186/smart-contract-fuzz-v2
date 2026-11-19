@@ -47,13 +47,16 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
     fuzzing_counts = [(int(txs), int(cases)) for txs, cases in
                       re.findall(r"fuzzing\s*:\s*(\d+)\s*/\s*(\d+)",
                                  output, re.IGNORECASE)]
+    tests_counts = [(int(done), int(total)) for done, total in
+                    re.findall(r"\btests\s*:\s*(\d+)\s*/\s*(\d+)",
+                               output, re.IGNORECASE)]
     worker_crashes = [line.strip() for line in output.splitlines()
                       if re.search(r"\bCrashed:\s*", line, re.IGNORECASE)]
-    # 仅有统计区标题或 unique-instruction 汇总不能证明语料已进入后续变异。
-    # 需要明确看到正数 fuzzing 计数，并且 Echidna worker 没有崩溃。
-    mutation = (count > 0 and bool(replayed) and
-                any(txs > 0 and cases > 0 for txs, cases in fuzzing_counts) and
-                not worker_crashes)
+    # fuzzing 的交易计数包含种子回放，tests 是测试状态计数；两者都不能
+    # 单独证明生成了新序列或新增覆盖。需用输入/输出 coverage 差集另行判断。
+    property_failure = any(re.search(r"\b(?:falsified|failed)\b", line, re.IGNORECASE)
+                          and re.search(r"\b(?:Test|property)\b", line, re.IGNORECASE)
+                          for line in output.splitlines())
     instruction_counts = [int(match.replace(",", "")) for match in
                           re.findall(r"unique instructions\s*:\s*([\d,]+)", output, re.IGNORECASE)]
     coverage_snapshots = [int(match.replace(",", "")) for match in
@@ -63,11 +66,16 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
             "replayed_sequence_count": len(replayed),
             "replay_evidence": bool(replayed),
             "replayed_lines": replayed,
-            "mutation_evidence": mutation,
+            "mutation_evidence": False,
+            "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+            "fuzzing_activity_evidence": any(txs > 0 for txs, _ in fuzzing_counts),
             "fuzzing_transactions": max((txs for txs, _ in fuzzing_counts), default=0),
             "fuzzing_cases": max((cases for _, cases in fuzzing_counts), default=0),
             "fuzzing_progress_count": max((txs for txs, _ in fuzzing_counts), default=0),
             "fuzzing_progress_limit": max((cases for _, cases in fuzzing_counts), default=0),
+            "tests_status_snapshots": [{"completed": done, "total": total}
+                                        for done, total in tests_counts],
+            "property_failure_reported": property_failure,
             "worker_crashes": worker_crashes,
             "unique_instructions": max(instruction_counts or coverage_snapshots, default=None),
             "coverage_source": ("final_unique_instructions" if instruction_counts else
@@ -589,7 +597,7 @@ def _resolve_property_argument(expression: str, abi_type: str, declarations: str
 def _property_getter_specs(property_context: dict[str, Any], contract,
                            contract_abis: dict[str, Any], *,
                            property_sender: str = PROPERTY_SENDER) -> list[dict[str, Any]]:
-    """从属性源码中的直接 view 调用抽取可解析的 getter 观察点。"""
+    """解析属性直接调用及有界索引状态的公开 view getter 观察点。"""
     reference = property_context.get("property_source", "")
     source_path = ROOT / str(reference).split("#", 1)[0]
     if not source_path.is_file():
@@ -607,6 +615,15 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
            item.get("stateMutability") in {"view", "pure"}]
     target_name = property_context.get("property_abi", "").split("(", 1)[0].rsplit(".", 1)[-1]
     specs = []
+
+    def add_spec(spec: dict[str, Any]) -> None:
+        key = (spec.get("signature"), spec.get("receiver"),
+               json.dumps(spec.get("arguments", []), sort_keys=True), spec.get("status"))
+        if not any((row.get("signature"), row.get("receiver"),
+                    json.dumps(row.get("arguments", []), sort_keys=True), row.get("status")) == key
+                   for row in specs):
+            specs.append(spec)
+
     for receiver, name, arguments in _property_calls(predicate):
         if name == target_name:
             continue
@@ -652,10 +669,67 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
             except (ValueError, TypeError) as exc:
                 errors.append(str(exc))
         if resolved:
-            specs.append(resolved)
+            add_spec(resolved)
         else:
-            specs.append({"function": name, "expressions": arguments,
-                          "status": "unresolved", "reason": errors[0] if errors else "ABI 未匹配"})
+            add_spec({"function": name, "expressions": arguments,
+                      "status": "unresolved", "reason": errors[0] if errors else "ABI 未匹配"})
+
+    # Public mapping/array getters are functions with one ABI index argument. Resolve
+    # statically bounded for-loop indices so per-transaction feedback observes the
+    # actual operands of quantified predicates rather than only the final bool.
+    loop_ranges: dict[str, list[int] | None] = {}
+    loop_pattern = re.compile(
+        r"\bfor\s*\(\s*(?:u?int(?:[0-9]+)?)\s+(?P<name>[A-Za-z_]\w*)\s*=\s*"
+        r"(?P<start>[^;]+);\s*(?P=name)\s*<\s*(?P<end>[^;]+);", re.MULTILINE)
+    for loop in loop_pattern.finditer(predicate):
+        variable = loop.group("name")
+        try:
+            start = _resolve_property_argument(loop.group("start"), "uint256", declarations,
+                                               property_sender, contract)
+            end = _resolve_property_argument(loop.group("end"), "uint256", declarations,
+                                             property_sender, contract)
+            if not isinstance(start, int) or not isinstance(end, int) or end < start or end - start > 256:
+                loop_ranges[variable] = None
+            else:
+                loop_ranges[variable] = list(range(start, end))
+        except (ValueError, TypeError):
+            loop_ranges[variable] = None
+
+    mapping_pattern = re.compile(r"\b(?P<name>[A-Za-z_]\w*)\s*\[\s*(?P<index>[^\]]+)\s*\]")
+    for access in mapping_pattern.finditer(predicate):
+        name, index_expression = access.group("name"), access.group("index").strip()
+        if name == target_name:
+            continue
+        entries = [item for item in abi if item.get("type") == "function" and
+                   item.get("name") == name and len(item.get("inputs", [])) == 1 and
+                   item.get("stateMutability") in {"view", "pure"}]
+        if len(entries) != 1:
+            add_spec({"function": name, "expressions": [index_expression],
+                      "status": "unresolved", "reason": "索引状态没有唯一匹配的单参数公开 view getter"})
+            continue
+        entry = entries[0]
+        parameter_type = entry["inputs"][0]["type"]
+        values: list[int] | None = None
+        if index_expression in loop_ranges:
+            values = loop_ranges[index_expression]
+        else:
+            try:
+                value = _resolve_property_argument(index_expression, parameter_type,
+                                                   declarations, property_sender, contract)
+                values = [value] if isinstance(value, int) else None
+            except (ValueError, TypeError):
+                values = None
+        signature = entry["name"] + "(" + ",".join(item["type"] for item in entry["inputs"]) + ")"
+        if values is None:
+            add_spec({"function": name, "expressions": [index_expression],
+                      "status": "unresolved", "reason": "属性索引不是可解析且有界的整数/循环变量"})
+            continue
+        for value in values:
+            add_spec({"signature": signature, "expressions": [index_expression],
+                      "arguments": [value], "receiver": None,
+                      "receiver_getter": None, "receiver_type": None,
+                      "index_source": "statically_bounded_property_loop"
+                      if index_expression in loop_ranges else "property_index_literal"})
     observed_signatures = {item.get("signature") for item in specs}
     for identifier in re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*\b", predicate):
         entry = next((item for item in abi if item.get("name") == identifier and
@@ -663,9 +737,9 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
                       item.get("stateMutability") in {"view", "pure"}), None)
         signature = identifier + "()"
         if (entry and identifier != target_name and signature not in observed_signatures):
-            specs.append({"signature": signature, "expressions": [identifier],
-                          "arguments": [], "receiver": None,
-                          "receiver_getter": None, "receiver_type": None})
+            add_spec({"signature": signature, "expressions": [identifier],
+                      "arguments": [], "receiver": None,
+                      "receiver_getter": None, "receiver_type": None})
             observed_signatures.add(signature)
     return specs
 

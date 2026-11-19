@@ -1,0 +1,37 @@
+echidna: Couldn't compile given file
+stdout:
+stderr:
+WARNING:CryticCompile:Multiple frameworks detected: Foundry, solc, Solc-json. Using Foundry (highest priority). Use --compile-force-framework to override.
+ERROR:CryticCompile:Cannot execute `forge`, is it installed and in PATH?
+INFO:CryticCompile:'forge config --json' running
+Traceback (most recent call last):
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/bin/crytic-compile", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/__main__.py", line 222, in main
+    compilations = compile_all(**vars(args))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 870, in compile_all
+    compilations.append(CryticCompile(target, **kwargs))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 279, in __init__
+    self._compile(**kwargs)
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 725, in _compile
+    self._platform.compile(self, **kwargs)
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/platform/foundry.py", line 116, in compile
+    foundry_config = self._get_config()
+                     ^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/platform/foundry.py", line 69, in _get_config
+    self._config = self.config(self._project_root)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/platform/foundry.py", line 225, in config
+    subprocess.run(
+  File "/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11.18-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11.18-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11.18-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'forge'
+
