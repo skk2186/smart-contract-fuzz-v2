@@ -52,8 +52,8 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
                                output, re.IGNORECASE)]
     worker_crashes = [line.strip() for line in output.splitlines()
                       if re.search(r"\bCrashed:\s*", line, re.IGNORECASE)]
-    # fuzzing 的交易计数包含种子回放，tests 是测试状态计数；两者都不能
-    # 单独证明生成了新序列或新增覆盖。需用输入/输出 coverage 差集另行判断。
+    # fuzzing 的第一个数字是调用/交易进度，第二个数字不是可靠的实际 case
+    # 数；tests 是属性通过/失败状态计数。两者都不能单独证明产生了新序列。
     property_failure = any(re.search(r"\b(?:falsified|failed)\b", line, re.IGNORECASE)
                           and re.search(r"\b(?:Test|property)\b", line, re.IGNORECASE)
                           for line in output.splitlines())
@@ -70,11 +70,13 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
             "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
             "fuzzing_activity_evidence": any(txs > 0 for txs, _ in fuzzing_counts),
             "fuzzing_transactions": max((txs for txs, _ in fuzzing_counts), default=0),
-            "fuzzing_cases": max((cases for _, cases in fuzzing_counts), default=0),
+            "fuzzing_cases": None,
+            "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
             "fuzzing_progress_count": max((txs for txs, _ in fuzzing_counts), default=0),
             "fuzzing_progress_limit": max((cases for _, cases in fuzzing_counts), default=0),
             "tests_status_snapshots": [{"completed": done, "total": total}
                                         for done, total in tests_counts],
+            "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
             "property_failure_reported": property_failure,
             "worker_crashes": worker_crashes,
             "unique_instructions": max(instruction_counts or coverage_snapshots, default=None),
@@ -238,7 +240,7 @@ def _trace_effects(session: AnvilSession, tx_hash: Any) -> dict[str, Any]:
         nonlocal trace_nodes
         trace_nodes += 1
         result = {key: node.get(key) for key in ("type", "from", "to", "input",
-                                                  "output", "error") if key in node}
+                                                  "output", "error", "value") if key in node}
         if depth < 12 and trace_nodes < 128:
             result["calls"] = [compact(child, depth + 1)
                                for child in node.get("calls", [])[:32]]
@@ -252,8 +254,25 @@ def _trace_effects(session: AnvilSession, tx_hash: Any) -> dict[str, Any]:
     slots = sum(len(set(before.get(addr, {}).get("storage", {})) |
                         set(after.get(addr, {}).get("storage", {})))
                 for addr in set(before) | set(after))
+    balance_changes = []
+    for address in sorted(set(before) | set(after)):
+        old = before.get(address, {}).get("balance")
+        new = after.get(address, {}).get("balance")
+        if old is None or new is None:
+            continue
+        try:
+            old_wei = int(old, 16) if isinstance(old, str) else int(old)
+            new_wei = int(new, 16) if isinstance(new, str) else int(new)
+        except (TypeError, ValueError):
+            continue
+        if old_wei != new_wei:
+            balance_changes.append({"address": address.lower(),
+                                    "before_wei": old_wei,
+                                    "after_wei": new_wei,
+                                    "delta_wei": new_wei - old_wei})
     return {"internal_errors": errors, "internal_call_trace": call_tree,
             "changed_storage_slot_count": slots,
+            "balance_changes": balance_changes,
             "top_level_trace_error": call.get("error")}
 
 
@@ -1131,6 +1150,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 events = _receipt_events(session.web3, receipt, contract_abis, contract.abi)
             except Exception as exc:
                 trace = {"internal_errors": [], "changed_storage_slot_count": None,
+                         "balance_changes": [],
                          "trace_error": f"{type(exc).__name__}: {str(exc)[:300]}"}
                 events = []
                 valid = False
@@ -1221,6 +1241,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "internal_errors": trace["internal_errors"],
                 "internal_call_trace": trace.get("internal_call_trace"),
                 "changed_storage_slot_count": trace["changed_storage_slot_count"],
+                "balance_changes": trace.get("balance_changes", []),
                 "trace_error": trace.get("trace_error"),
                 "events": events,
                 "observed_view_state_changed": last_state["fingerprint"] != state_after["fingerprint"],
@@ -1257,6 +1278,17 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 break
         session.rpc("evm_revert", [deployment_snapshot])
         deployment_snapshot = None
+        target_state = _target_property_state(
+            property_signature, initial_property_values,
+            initial_predicate_getters, records)
+        trajectory_by_index = {int(row.get("transaction_index", 0)): row
+                               for row in target_state.get("trajectory", [])}
+        for tx_record in records:
+            trajectory = trajectory_by_index.get(int(tx_record.get("index", -1)), {})
+            tx_record["changed_predicate_getters"] = trajectory.get(
+                "changed_predicate_getters", [])
+            tx_record["property_related_state_changed"] = bool(
+                tx_record["changed_predicate_getters"])
         return {"project": project, "contract_address": contract.address,
                 "deployment_status": "success" if deploy_receipt.status == 1 else "failed",
                 "candidate_id": candidate["candidate_id"],
@@ -1266,9 +1298,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "initial_property_errors": initial_property_errors,
                 "initial_property_violations": initial_violations,
                 "initial_predicate_getters": initial_predicate_getters,
-                "target_property_state": _target_property_state(
-                    property_signature, initial_property_values,
-                    initial_predicate_getters, records),
+                "target_property_state": target_state,
                 "environment": {"chain_id": session.chain_id,
                                 "initial_timestamp": session.initial_timestamp,
                                 "initial_block_number": session.initial_block_number,

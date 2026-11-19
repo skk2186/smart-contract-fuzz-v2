@@ -1,0 +1,1535 @@
+diff --git a/docs/研究总览与最新进展.md b/docs/研究总览与最新进展.md
+index 2741ea4..47ca0ee 100644
+--- a/docs/研究总览与最新进展.md
++++ b/docs/研究总览与最新进展.md
+@@ -1,6 +1,6 @@
+ # 研究总览与最新进展
+ 
+-更新时间：2026-11-19；仓库：`smart-contract-fuzz-v2`；Phase30B 执行基线：`main / 96ade661d7ffef5b80b040a0f069afe38533dbd4`
++更新时间：2026-11-20；仓库：`smart-contract-fuzz-v2`；Phase31 开始基线：`main / 82fb576410ea31878a29c4101e0ced38179c63c3`
+ 
+ ## 一、研究方向
+ 
+@@ -16,7 +16,7 @@
+ 
+ V2 已形成可运行的研究原型。Phase25 在四个固定诊断案例中验证了跨交易参数修复对 Anvil 目标状态到达的帮助；Phase26 在固定样本中观察到种子辅助 Echidna 的覆盖收益；Phase28 证明 BeeStorage 和 Immutable 的历史种子可以转换并由 Medusa 回放。
+ 
+-这些结果仍不足以证明独立项目泛化。Phase27 没有启动正式对照，Phase29 的五个公开候选中没有一个完成全链路。Phase30A 已在小型公开样本上完成编译、属性分析、Agent 候选、Anvil 执行和 Echidna 语料回放检查；两条候选均可回放，但没有达到冻结目标状态，因此未启动 G0/G1/G2。它仍是工程试点，不构成正式独立评估，也不能证明 V2 优于原生模糊测试。
++这些结果仍不足以证明独立项目泛化。Phase27 没有启动正式对照，Phase29 的五个公开候选中没有一个完成全链路。Phase30A/30B 的 Wallet 样本原先只有人工 Oracle 能到达目标。Phase31 新增一次通用状态反馈序列扩展，在同一 Wallet 上自动生成并经 Anvil、Echidna 重放确认一条目标反例；这是机制验证，不是独立留出评估。Phase31 的四个预冻结独立候选均未通过接入门，论文主张仍缺独立项目数据。
+ 
+ 引擎定位暂定为：**Echidna 继续作为主引擎，Medusa 保留为可选实验路径。** 双引擎兼容性已经有固定案例技术证据，但新项目泛化、两引擎结果可比性和稳定收益尚未建立。
+ 
+@@ -24,6 +24,7 @@ V2 已形成可运行的研究原型。Phase25 在四个固定诊断案例中验
+ |---|---|
+ | C1：基于事件、getter、Slither 守卫和执行 trace 的跨交易约束解析与修复 | Phase25 固定案例提供正向证据；独立项目泛化未验证，仍是候选贡献。 |
+ | C2：按阶段区分状态到达、种子回放、后续变异和最终覆盖的测量协议 | Phase26、28、29 证明这种区分对避免错误归因很重要；学术新颖性和独立任务效用仍未验证，不单独宣称算法贡献。 |
++| C3：预算受限的状态反馈序列扩展 | Phase31 在开发过的 Wallet 上自动到达并重放目标；仅有单个机制样本，且序列扩展、依赖排序和运行时反馈已有 SMARTIAN、ConFuzzius、IR-Fuzz、MuFuzz、EchoFuzz 等先行方法。新颖性和独立收益未成立。 |
+ 
+ ## 三、研究证据总表
+ 
+@@ -36,6 +37,8 @@ V2 已形成可运行的研究原型。Phase25 在四个固定诊断案例中验
+ | Medusa 接入 | Phase28 BeeStorage、Immutable 历史种子格式转换、真实回放和目标状态 getter 核验通过；BeeStorage 三次 M1 覆盖均高于 M0。 | 固定案例兼容性证据；Immutable 的多属性噪声和 Medusa 执行上下文差异仍在，不能据此推断跨项目泛化或引擎优劣。 |
+ | 独立公开项目实验 | Phase27 的 8 个候选只有 1 个通过原生属性资格门，正式 G0/G1/G2 均未运行。Phase29 固定五候选中完整端到端项目数为 0。 | 目前没有足够的新项目配对数据支撑论文正式实验结论。 |
+ | 轻量公开样本工程与机制诊断 | Phase30A 完成固定 SmartBugs Curated 钱包样本编译、Slither、Agent 候选和回放；Phase30B 人工 Oracle 证明目标可达，并修正源码上下文、属性 getter 观察和 Echidna 统计。 | P0/P1 自动候选均能回放但未达目标；未运行 G0/G1/G2。Phase30B 的人工 Oracle 仅用于诊断。样本为已知漏洞且参与开发，不作为正式留出集。 |
++| 属性状态反馈序列扩展 | Phase31 从原 P1 候选扩展出 4 笔交易；Anvil 和 3 个 Echidna 固定随机种子均报告同一目标属性反例。 | Wallet 是开发/诊断样本。E3 遇到反例后没有完成 500 测试预算，seed-only 后新增 LCOV 为 0；随机扩展没有到达目标，静态扩展没有产生可用种子。 |
++| Phase31 独立样本接入 | 四个预冻结候选按固定 commit 获取；保留属性入口和构建探针失败原因。 | 四个均未通过布尔属性/构建资格门，未启动 Echidna 正式比较，也未替换样本。 |
+ 
+ ## 四、近期阶段记录
+ 
+@@ -52,6 +55,7 @@ V2 已形成可运行的研究原型。Phase25 在四个固定诊断案例中验
+ | Phase29 | SCFuzzBench 五个候选依固定顺序尝试。Origin Dollar 编译与 Echidna 原生属性识别通过，但静态依赖不完整、Anvil 构造部署回滚；仅完成 G0 三次。其余四项受依赖或源码获取阻塞。 | 接入配置得到通用化，但没有新项目全链路或 G1/G2，不能判断方法提升。 |
+ | Phase30A | 固定 SmartBugs Curated 钱包样本并冻结 OWASP 指导下的记账属性；原始源码/Harness 编译、原生 Echidna 预检、Slither 分析、Agent 候选、Anvil 与 Echidna 种子回放均完成。 | 两条候选可执行和可回放，但未达目标状态；按冻结门槛未运行 G0/G1/G2。属于已知漏洞工程试点，不作为正式留出集。 |
+ | Phase30B | 独立人工 Oracle 以四笔交易在 Anvil/Echidna 一致触发冻结目标；定位源码同名误配、跨合约上下文和 getter 观察缺口；完成一次通用修复与一次同预算规划验证。 | P0/P1 自动候选都未到达目标；P1 `deposit → withdraw` 可完整回放。修复改善状态可观察性和源码对应，但未证明规划成功或覆盖收益；按门槛停止，不运行 G0/G1/G2。 |
++| Phase31 | 新增有限状态反馈序列扩展。以 Phase30B P1 的 `deposit → withdraw` 为起点，10 次候选执行内生成 `deposit(0) → refund(0) → deposit(1) → withdraw(0, 1 ETH)`；Anvil 和 3 次 Echidna 回放一致观察到属性反例。 | 仅是 Wallet 机制证据。E3 的 500 上限运行在种子反例后只记录 5 次调用、没有后续覆盖；首次随机/静态对照误选基线，已保留并剔除，随机组用正确扩展种子补跑，静态组无可用候选。独立样本门失败，不足以支持泛化。 |
+ 
+ ## 五、Phase29 最新实验状态
+ 
+@@ -71,6 +75,16 @@ Agent A/B 生成一条 `deposit(uint8)` → `refund(uint8)` 候选；一次执
+ 
+ 目标状态门槛未满足，G0/G1/G2 没有运行；没有可归因的覆盖收益。Phase30A 首轮余额不足、WSL 命令入口、Python 依赖选择和 Slither 框架识别问题均有记录并解决。Phase30B 独立人工 Oracle 证明目标真实可达；自动规划依然没有达到目标。详情见 [Phase30A 报告](30_轻量级公开合约接入试点.md)、[Phase30B 报告](31_目标可达性与多交易规划修复.md)、[冻结记录](../func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/01-input-freeze.json)和[机器结果](../func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/)。
+ 
++## Phase31 当前结果
++
++Phase31 在不改 Wallet 原合约、Harness 或属性的前提下，从冻结的 Phase30B P1 序列出发，自动补入属性相关前置操作和第二个 Harness actor 的存款。四笔调用使 actor 0 的累计提款成为 2 ETH、累计存款为 1 ETH；共享 Wallet 资金池的余额轨迹为 `0 → 1 → 0 → 1 → 0 ETH`。该自动候选区别于 Phase30B 人工 Oracle，且没有作为 Agent 输入或初始语料。
++
++Echidna 2.3.2 对同一 E3 候选在三个固定随机种子的 seed-only 回放中均报告属性失败。`testLimit=500` 组同样先回放并触发反例，只完成 5 次总调用，没有达到 500 个模糊测试预算；E3 seed-only 行覆盖为 41，后续新增行为 0。E0 平均 seed-only 12 行、500 预算后平均 40 行；E1/E2 和正确输入的随机扩展均为 32 行、后续各增加 11 行。E1/E2 是相同候选，参数修复没有提出修改。静态扩展只生成两个候选，分别因共享资金不足回滚、或末笔无持久状态变化而没有合格种子。
++
++首次对照的输入审计发现 A_random/A_static 语料与 E1 完全相同，原因是实验驱动把基线记录选作首个合格候选。这 12 次运行原样保留，不作为消融证据；A_random 用真正的非基线扩展候选补跑三组，A_static 则按预注册门记为无合格种子。Echidna 的 `tests: x/y` 是属性状态计数，`fuzzing: n/500` 也不直接等于独立测试 case 数；本阶段另以 seed-only 与 fuzz 后 LCOV 差集统计覆盖。历史 Phase30A 的 `mutation_evidence=true` 同样是计数误读，已在 Phase30B 原报告中更正。
++
++四个预冻结独立候选 Strata、DODO Cross-Chain DEX、eBTC BSM、Very Liquid Vaults 均因既有属性入口类型或依赖构建问题未进入正式 fuzz；未追加候选。Phase31 结果只支持 Wallet 上的机制可行性，不支持独立泛化。详细数据、原始日志、版本和命令见 [Phase31 报告](32_属性状态反馈与有界序列扩展.md)。
++
+ ### 当前实验集分类
+ 
+ | 分类 | 当前样本与阶段 | 证据口径 |
+@@ -89,9 +103,9 @@ Agent A/B 生成一条 `deposit(uint8)` → `refund(uint8)` 候选；一次执
+ 
+ ## 八、下一步状态
+ 
+-Phase30B 已按预注册门槛停止：P1 候选未达目标，没有启动 G0/G1/G2，不追加 Wallet Agent 调用或第二轮修复。建议下一独立阶段转向此前未参与 Wallet 开发与诊断的公开样本，验证通用源码调用链与属性状态观察能否在独立来源上稳定工作；正式论文评估仍需独立项目完成冻结属性、Agent 候选、Anvil 真实执行、种子回放和 G0/G1/G2 小规模对照，并继续处理依赖可复现获取、状态依赖证据和 Anvil/Foundry 初始化差异。本阶段不自动启动下一实验。
++Phase31 已完成且停止。当前机制证据来自参与开发与诊断的 Wallet，不能算独立留出结果；预冻结四个候选均未通过正式接入门。下一阶段需要先建立新的、具有现成可运行属性且依赖可复现的独立样本池，再冻结小规模方案；只有至少两个独立样本出现方向一致的收益后，才考虑扩大样本数。本阶段不自动启动下一实验。
+ 
+-**Phase30A 工程试点和 Phase30B 机制诊断均已完成并停止。** 本文维护研究进展索引，不把人工 Oracle 计为 V2 发现，也不把未达到的目标状态或未运行的对照写成成功结论。
++**Phase30A 工程试点、Phase30B 人工可达性诊断和 Phase31 Wallet 机制验证均已完成并停止。** 本文维护研究进展索引，不把人工 Oracle 计为 V2 发现，不把钱包机制结果写成独立泛化，也不把未完成的 500-case campaign 或未运行的独立对照写成成功结论。
+ 
+ ## 九、阶段报告索引
+ 
+@@ -107,3 +121,4 @@ Phase30B 已按预注册门槛停止：P1 候选未达目标，没有启动 G0/G
+ - [Phase29：公开基准接入与首次独立验证](29_公开基准接入与首次独立验证.md)
+ - [Phase30A：轻量级公开合约接入试点](30_轻量级公开合约接入试点.md)
+ - [Phase30B：目标可达性与多交易规划修复](31_目标可达性与多交易规划修复.md)
++- [Phase31：属性状态反馈与有界序列扩展](32_属性状态反馈与有界序列扩展.md)
+
+diff --git a/func/功能/种子验证.py b/func/功能/种子验证.py
+index 6459b69..a8ee987 100644
+--- a/func/功能/种子验证.py
++++ b/func/功能/种子验证.py
+@@ -52,8 +52,8 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
+                                output, re.IGNORECASE)]
+     worker_crashes = [line.strip() for line in output.splitlines()
+                       if re.search(r"\bCrashed:\s*", line, re.IGNORECASE)]
+-    # fuzzing 的交易计数包含种子回放，tests 是测试状态计数；两者都不能
+-    # 单独证明生成了新序列或新增覆盖。需用输入/输出 coverage 差集另行判断。
++    # fuzzing 的第一个数字是调用/交易进度，第二个数字不是可靠的实际 case
++    # 数；tests 是属性通过/失败状态计数。两者都不能单独证明产生了新序列。
+     property_failure = any(re.search(r"\b(?:falsified|failed)\b", line, re.IGNORECASE)
+                           and re.search(r"\b(?:Test|property)\b", line, re.IGNORECASE)
+                           for line in output.splitlines())
+@@ -70,11 +70,13 @@ def echidna_corpus_evidence(output: str) -> dict[str, Any]:
+             "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+             "fuzzing_activity_evidence": any(txs > 0 for txs, _ in fuzzing_counts),
+             "fuzzing_transactions": max((txs for txs, _ in fuzzing_counts), default=0),
+-            "fuzzing_cases": max((cases for _, cases in fuzzing_counts), default=0),
++            "fuzzing_cases": None,
++            "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+             "fuzzing_progress_count": max((txs for txs, _ in fuzzing_counts), default=0),
+             "fuzzing_progress_limit": max((cases for _, cases in fuzzing_counts), default=0),
+             "tests_status_snapshots": [{"completed": done, "total": total}
+                                         for done, total in tests_counts],
++            "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+             "property_failure_reported": property_failure,
+             "worker_crashes": worker_crashes,
+             "unique_instructions": max(instruction_counts or coverage_snapshots, default=None),
+@@ -238,7 +240,7 @@ def _trace_effects(session: AnvilSession, tx_hash: Any) -> dict[str, Any]:
+         nonlocal trace_nodes
+         trace_nodes += 1
+         result = {key: node.get(key) for key in ("type", "from", "to", "input",
+-                                                  "output", "error") if key in node}
++                                                  "output", "error", "value") if key in node}
+         if depth < 12 and trace_nodes < 128:
+             result["calls"] = [compact(child, depth + 1)
+                                for child in node.get("calls", [])[:32]]
+@@ -252,8 +254,25 @@ def _trace_effects(session: AnvilSession, tx_hash: Any) -> dict[str, Any]:
+     slots = sum(len(set(before.get(addr, {}).get("storage", {})) |
+                         set(after.get(addr, {}).get("storage", {})))
+                 for addr in set(before) | set(after))
++    balance_changes = []
++    for address in sorted(set(before) | set(after)):
++        old = before.get(address, {}).get("balance")
++        new = after.get(address, {}).get("balance")
++        if old is None or new is None:
++            continue
++        try:
++            old_wei = int(old, 16) if isinstance(old, str) else int(old)
++            new_wei = int(new, 16) if isinstance(new, str) else int(new)
++        except (TypeError, ValueError):
++            continue
++        if old_wei != new_wei:
++            balance_changes.append({"address": address.lower(),
++                                    "before_wei": old_wei,
++                                    "after_wei": new_wei,
++                                    "delta_wei": new_wei - old_wei})
+     return {"internal_errors": errors, "internal_call_trace": call_tree,
+             "changed_storage_slot_count": slots,
++            "balance_changes": balance_changes,
+             "top_level_trace_error": call.get("error")}
+ 
+ 
+@@ -1131,6 +1150,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
+                 events = _receipt_events(session.web3, receipt, contract_abis, contract.abi)
+             except Exception as exc:
+                 trace = {"internal_errors": [], "changed_storage_slot_count": None,
++                         "balance_changes": [],
+                          "trace_error": f"{type(exc).__name__}: {str(exc)[:300]}"}
+                 events = []
+                 valid = False
+@@ -1221,6 +1241,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
+                 "internal_errors": trace["internal_errors"],
+                 "internal_call_trace": trace.get("internal_call_trace"),
+                 "changed_storage_slot_count": trace["changed_storage_slot_count"],
++                "balance_changes": trace.get("balance_changes", []),
+                 "trace_error": trace.get("trace_error"),
+                 "events": events,
+                 "observed_view_state_changed": last_state["fingerprint"] != state_after["fingerprint"],
+@@ -1257,6 +1278,17 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
+                 break
+         session.rpc("evm_revert", [deployment_snapshot])
+         deployment_snapshot = None
++        target_state = _target_property_state(
++            property_signature, initial_property_values,
++            initial_predicate_getters, records)
++        trajectory_by_index = {int(row.get("transaction_index", 0)): row
++                               for row in target_state.get("trajectory", [])}
++        for tx_record in records:
++            trajectory = trajectory_by_index.get(int(tx_record.get("index", -1)), {})
++            tx_record["changed_predicate_getters"] = trajectory.get(
++                "changed_predicate_getters", [])
++            tx_record["property_related_state_changed"] = bool(
++                tx_record["changed_predicate_getters"])
+         return {"project": project, "contract_address": contract.address,
+                 "deployment_status": "success" if deploy_receipt.status == 1 else "failed",
+                 "candidate_id": candidate["candidate_id"],
+@@ -1266,9 +1298,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
+                 "initial_property_errors": initial_property_errors,
+                 "initial_property_violations": initial_violations,
+                 "initial_predicate_getters": initial_predicate_getters,
+-                "target_property_state": _target_property_state(
+-                    property_signature, initial_property_values,
+-                    initial_predicate_getters, records),
++                "target_property_state": target_state,
+                 "environment": {"chain_id": session.chain_id,
+                                 "initial_timestamp": session.initial_timestamp,
+                                 "initial_block_number": session.initial_block_number,
+
+diff --git a/docs/32_属性状态反馈与有界序列扩展.md b/docs/32_属性状态反馈与有界序列扩展.md
+new file mode 100644
+index 0000000..16fe9d6
+--- /dev/null
++++ b/docs/32_属性状态反馈与有界序列扩展.md
+@@ -0,0 +1,192 @@
++# Phase31：属性状态反馈与有界序列扩展
++
++日期：2026-11-20  
++仓库：smart-contract-fuzz-v2  
++执行基线：main / 82fb576410ea31878a29c4101e0ced38179c63c3  
++本阶段没有提交或推送。
++
++## 1. 结论摘要
++
++本阶段在 Phase30B 冻结的 Agent A/B 候选 deposit(0) → withdraw(0, 1 ETH) 上，加入预算受限的序列扩展模块。模块依据 Anvil 逐笔执行、属性 getter、调用 trace 和余额变化，决定是否补步骤、重复已有操作或改变 ABI 角色参数。没有调用新 Agent；Phase30B 人工 Oracle 没有作为输入、模板、种子或 Echidna 语料。
++
++模块在 10 次扩展候选执行内生成四笔序列：
++
++    deposit(account=0, value=1 ETH)
++    → refund(account=0)
++    → deposit(account=1, value=1 ETH)
++    → withdraw(account=0, amount=1 ETH)
++
++Wallet 原始业务源码、Harness 和属性均未修改。Anvil 四笔均成功；第 4 笔后 actor 0 累计提款 2 ETH、累计存款 1 ETH，属性变假。Echidna 2.3.2 在三个冻结随机种子的 seed-only 回放中均重现该属性反例。这是自动生成且经另一执行引擎重放确认的 Wallet 机制正向结果；不是未知漏洞发现，也不是独立留出样本结论。
++
++E3 的 testLimit=500 运行在种子重放时立即触发属性反例，随后仅记录 5 次总调用便停止，没有完成 500 预算；E3 后续 fuzz 新增 LCOV 行数为 0。四个预冻结独立项目都没有通过接入门，没有独立样本对照。当前证据不支持覆盖收益、跨项目泛化或新颖性主张。
++
++## 2. 参考研究及方法差异
++
++| 研究 | 论文实际机制 | 代码和公开实验资源 | 对 V2 的借鉴及差异 |
++|---|---|---|---|
++| [SMARTIAN（ASE 2021）](https://doi.org/10.1109/ASE51524.2021.9678888) | 静态分析 EVM 字节码的数据流，生成带函数顺序和调用者约束的初始种子；再用轻量动态数据流反馈演化语料。 | [实现仓库](https://github.com/SoftSec-KAIST/Smartian)；论文报告了 500 个真实合约基准，并有[复现工件](https://github.com/SoftSec-KAIST/Smartian-Artifact)。 | 借鉴依赖关系、角色和运行反馈。Phase31 是 A/B 后处理，用属性 getter、调用 trace 与余额变化；不是 SMARTIAN 灰盒模糊器，也未复刻其字节码分析或动态污点跟踪。相关思想已有先例，没有完整相同实现。 |
++| [ConFuzzius（EuroS&P 2021）](https://doi.org/10.1109/EuroSP51992.2021.00018) | 结合进化模糊测试、动态数据依赖和符号约束求解；依赖辅助生成交易序列，求解器处理难满足的分支条件。 | [公开代码](https://github.com/christoftorres/ConFuzzius)；论文报告 128 个整理合约和约 2.1 万真实合约。数据说明见[论文记录](https://discovery.ucl.ac.uk/id/eprint/10182330/)，不把公开评估描述等同于本地可复现数据包。 | 借鉴动态依赖和真实执行验证。Phase31 没有符号执行、种群演化或约束求解。 |
++| [IR-Fuzz（IEEE TIFS 2023）](https://arxiv.org/abs/2301.03943) | 依据函数间依赖排序；把新调用序列接到既有序列以延长探索；使用分支距离、重要分支重访和能量分配。 | [实现及基准说明](https://github.com/Messi-Q/IR-Fuzz)；README 指向超过 1.2 万合约、八类漏洞数据集。 | 借鉴依赖序列延长和目标距离。Phase31 没有重要分支调度、能量分配或 IR-Fuzz 静态分析器。 |
++| [MuFuzz（ICDE 2024）](https://arxiv.org/abs/2312.04512) | 以数据流反馈决定交易顺序，使用序列感知变异探索深状态，以 seed mask 引导参数字段，并动态调整能量。 | [公开实现仓库](https://github.com/Messi-Q/MuFuzz)；论文在三个基准上评估。 | 借鉴交易顺序与输入字段协同。Phase31 只生成有限 ABI 角色参数变体，不实现 mask、能量调度或完整模糊器。 |
++| [Towards Effective Guidance…（Electronics 2025）](https://www.mdpi.com/2079-9292/14/4/806) | 对字节码做细粒度污点分析，跟踪打包存储变量访问；生成紧凑初始种子以减少相似调用序列冗余。 | [实现与实验工件](https://github.com/SoftSec-KAIST/Smartian-Artifact)及 [Zenodo 包](https://zenodo.org/records/14738106)。 | 借鉴紧凑候选集与精细状态证据。Phase31 不分析字节码打包字段；ABI 与现有静态依赖仅用于候选合法性和相关性。 |
++| [EchoFuzz（2026 预印本/ICSE 2026）](https://arxiv.org/abs/2609.14475) | LLM 结合静态分析生成合约相关的最小调用序列，再将实时 fuzz 反馈送回 LLM 迭代引导未覆盖分支。 | [公开实现](https://github.com/iceray00/EchoFuzz)及论文公开材料。 | 与“序列 + 反馈”最接近。EchoFuzz 用 LLM 参与链式规划及持续引导；Phase31 不增加 Agent，只对既有 A/B 候选作有限确定性扩展。该核心思路已有直接先例，Phase31 不据此宣称新颖。 |
++
++上述工作已覆盖依赖序列、数据流反馈、序列扩展、种子初始化与执行反馈。因此，Phase31 的贡献候选只能描述为接入 V2 既有 A/B、参数修复和 Echidna 管线的一种局部、可复现实现。论文价值仍须由未参与开发的项目和强基线对照证明。
++
++另检查了 [SmartBugs Curated](https://github.com/smartbugs/smartbugs-curated) 与 [Crytic Properties](https://github.com/crytic/properties)。前者主要是带漏洞标注的源码集，不含统一可执行属性 Harness；后者是可复用常见资产属性，需要兼容目标合约及 Harness，不能直接充作独立项目样本。
++
++## 3. 冻结条件和实现
++
++方案在 Phase31 编译、Agent 结果、Anvil 执行和 Echidna 结果之前冻结于 00-Phase31实验方案冻结.json，SHA-256 为 3344289a8f408de863b1e754bebf90091f4e98839b75e2b9763879e7c153201b。
++
++| 项目 | 冻结值 |
++|---|---|
++| 合约、Harness、属性 | Phase30A SmartBugs Wallet；保持原样；属性 WalletHarness.echidna_wallet_accounting_respected() |
++| A/B 输入 | 原样复用 Phase30B P1；Phase31 新 Agent 调用为 0 |
++| 序列长度 / 保留前缀 | 最大 8 / 最多 4 个多样前缀 |
++| 候选预算 | 每属性、每模式最多 24 次候选 Anvil 执行；每候选至多一次现有参数修复 |
++| 初始余额 | 每个测试账户 100 ETH |
++| Echidna | 2.3.2；种子 20261125、20261135、20261145；testLimit=0 与 500；单 worker、长度 8、stopOnFail=false、禁用 Slither、60 秒 |
++| Oracle 隔离 | 不进入 Agent、扩展模板、候选语料或 Echidna；机器结果记录 manual_oracle_read=false、manual_oracle_used=false |
++
++新增通用模块 [状态反馈序列扩展.py](../func/功能/状态反馈序列扩展.py)。模块不按函数名称判断业务语义，名称只用于匹配 ABI。候选通过 ABI 参数数量和类型检查，并需要属性动作、静态读写、角色或真实执行反馈之一作为证据；每个候选都重新部署并由 Anvil 回放。
++
++模块目前支持三类操作：一是按属性动作的静态读写证据插入已有动作并保留已成功前缀；二是仅重复曾成功且改变属性 getter/跟踪状态、同时具有存储或余额影响的交易；三是 trace 证明同一合约地址被调用、观察到正向资源变化且依赖调用失败后，基于 ABI 角色参数或发送者池生成变体。所有新候选继续受 ABI 检查和 Anvil 验证约束。
++
++反馈向量包括交易成功、属性相关 getter 变化、相关状态新颖性、后续依赖证据、可解析数值不变量的归一化距离及实际反例。无法可靠解析的属性不计算目标距离，退化为状态新颖性、依赖证据和执行成功性。保留策略在至多四个前缀中兼顾执行结果、角色、序列形状与状态变化，避免只留当前距离最小的路径。
++
++修改 [种子验证.py](../func/功能/种子验证.py)：逐笔记录调用 trace 的 value、余额前后变化、changed_predicate_getters 和 property_related_state_changed。Echidna 解析器不再把 tests:x/y 或 fuzzing:n/500 当作测试用例数，也固定将 mutation_evidence 记为 false，因为这些进度文字不能证明新变异序列。
++
++新增驱动 [Phase31状态反馈序列扩展.py](../func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py) 和 [Phase31非Wallet回归.py](../func/测试过程/SCFuzzBench公开项目接入/Phase31非Wallet回归.py)。后者在 PaperExample 做人工静态依赖夹具，只确认通用插入机制可运行，不作为自动发现或独立样本结果。Agent A/B、原参数修复和 Echidna 主引擎均保留。E2 没有修复提案，所以 E2 与 E1 候选完全相同；扩展器不替代参数修复。
++
++## 4. Wallet 回归、根因及逐笔反例
++
++### 4.1 Phase30B 原规划缺口
++
++Phase30B P1 是 deposit(0) → withdraw(0, 1 ETH)，P0 是 deposit(0) → refund(0)。两条都只有 actor 0 的动作，没有第二个 Harness 账户提供共享资金。
++
++| 环节 | 已核实证据 | 结论范围 |
++|---|---|---|
++| Slither | 04-slither-property-analysis.json 的 cross_contract.observations、balance_observations、prerequisite_state_closure 均为空，并将外部调用/别名列为未知。 | 已证实静态输出缺少跨 Wallet 调用与共享池依赖闭包；单独不能证明 Agent 的内部推理。 |
++| Agent A | 冻结 P0/P1 输出各只有两步，账户索引均为 0；没有 actor1 注资及 actor0 后续提款。 | 已证实输出遗漏；没有思维链或单变量实验确定唯一内部原因。“共享池/跨 actor 表示不足”仍是有支持的解释，不是唯一因果结论。 |
++| Agent B/参数修复 | P1 完整执行成功，参数修复没有提案；Phase31 E2 与 E1 fingerprint 完全相同。接口只改参数，不会插入交易步骤。 | 已证实参数修复不能填补缺失动作。 |
++| 执行反馈 | Phase30B 已记录属性 getter，因此“回放完全没有 getter”不成立。旧流程没有将逐笔反馈送入序列扩展闭环；Phase31 才连接 getter 差分、共享资源 trace 和失败执行。 | 已证实反馈流程差别；原 getter 是否进 Agent A 初始提示，证据不足，不能断言没有提供。 |
++| 环境 | Phase30A RPC 余额问题由 Phase30B/31 每账户 100 ETH 排除；P1 在该余额下完整执行但未达标。 | 不是缺少序列步骤的原因。 |
++| Echidna 统计 | Phase30A tests: 0/1 是一项属性未失败，不是 fuzz case 数；Sequence replayed 只说明语料回放。 | mutation_evidence=true 无法由该日志推出。本轮使用 LCOV 差集，不将进度分母解释为 case 数。 |
++
++因此，已确认的是静态上下文缺跨合约/共享余额关系、A/B 候选没有跨 actor 资金操作、参数修复只能改参数，以及旧执行反馈没有驱动扩展。内部模型为何没有提出特定序列，仍不能唯一归因。
++
++### 4.2 自动生成的逐笔 Anvil 轨迹
++
++原始记录为 Wallet机制回归/attempt-02-feedback-priority/E3-扩展回放.json。候选 #10 的扩展类型为 shared_resource_role_expansion。每笔交易外部 sender 相同；account=0、account=1 经 Harness 映射到两个不同 WalletUser/actor。表中 Wallet 内部余额映射是由原始源码推导，并非直接 getter；其它数值来自每笔 getter 与余额 trace。
++
++| 步骤 | 调用 | Anvil 状态 | Wallet 池余额 | 累计存款 actor0 / actor1 | 累计提款 actor0 / actor1 | 属性 |
++|---|---|---|---:|---:|---:|---|
++| 初始 | — | — | 0 ETH | 0 / 0 ETH | 0 / 0 ETH | 真 |
++| 1 | actor0 deposit 1 ETH | 成功 | 0→1 ETH | 1 / 0 ETH | 0 / 0 ETH | 真 |
++| 2 | actor0 refund | 成功 | 1→0 ETH | 1 / 0 ETH | 1 / 0 ETH | 真 |
++| 3 | actor1 deposit 1 ETH | 成功 | 0→1 ETH | 1 / 1 ETH | 1 / 0 ETH | 真 |
++| 4 | actor0 withdraw 1 ETH | 成功 | 1→0 ETH | 1 / 1 ETH | 2 / 0 ETH | **假** |
++
++原始 Wallet.refund() 将 actor0 对应 WalletUser 的 1 ETH 转出，但没有清零 Wallet 内部余额映射。之后 actor1 向同一个 Wallet 合约注入 1 ETH 共享资金，actor0 再按未清除的 1 ETH 记账提款。故 actor0 累计提款为 2 ETH，累计存款为 1 ETH。该解释由原始代码、调用 trace、池余额和逐笔 getter 共同支持。
++
++候选 #10 的提案证据是：同一 trace 地址出现正向资源变化，依赖操作失败，于是改变角色值后在失败调用前尝试新前置步骤。没有向扩展器提供人工 Oracle。E3 共执行 10 个扩展候选、加一次基线 Anvil 回放，共 11 次，耗时 8.012526 秒，Agent/API 调用和 Token 为 0。反例 fingerprint 为 e24710d808cfea34ac5438fcdd925b69f5a4b4906833c831a10fa4f3cddcc2f3。
++
++### 4.3 非 Wallet 回归
++
++PaperExample 源码不变。人工夹具提供的依赖关系是 set0 写 flag0、set1 读 flag0 并写 flag1，属性读取 flag1。模块将 set0(23) 扩展为 set0(23) → set1(5)，两笔 Anvil 均成功，echidna_flag() 从真变假。该结果明确标记为 manual non-Wallet regression fixture，因为关系由测试夹具指定；它只说明模块不依赖 Wallet 结构，不计自动发现、独立验证或覆盖收益。
++
++## 5. E0/E1/E2/E3、消融及成本
++
++覆盖以同组、同随机种子的 seed-only LCOV 与 testLimit=500 最终 LCOV 做差，单位为命中源代码行。E3 种子重放时触发反例，因此未完成 500 预算，不是等预算吞吐比较。
++
++| 组别 | 有效运行数 | Seed-only 行 | fuzz 阶段最终行 | fuzz 后新增行 | 属性反例 | 平均 seed-only / fuzz 秒 |
++|---|---:|---:|---:|---:|---|---:|
++| E0 原生空语料 | 3+3 | 12 | 40 | 29、26、29（均值 28） | 0/3 | 0.269 / 0.468 |
++| E1 Agent A/B 候选 | 3+3 | 32 | 43 | 11、11、11 | 0/3 | 0.332 / 0.582 |
++| E2 A/B + 参数修复 | 3+3 | 32 | 43 | 11、11、11 | 0/3 | 0.408 / 0.529 |
++| E3 A/B + 序列扩展 + 参数修复 | 3+3 | 41 | 41 | 0、0、0 | 3/3；种子回放即失败 | 0.322 / 0.311（提前结束） |
++| A_random 随机扩展（修正输入） | 3+3 | 32 | 43 | 11、11、11 | 0/3 | 0.384 / 0.578 |
++| A_static 仅静态依赖扩展 | 0 | 无有效种子 | — | — | — | — |
++
++E1、E2 语料完全相同，原因是参数修复没有提案，不能视为参数修复效果对照。E0/E1/E2/正确随机扩展完成配置的阶段且未触发目标；E3 的正向证据是反例回放，不是完成 500 fuzz 后的覆盖收益。
++
++正确随机消融实际回放的序列为 deposit(0) → withdraw(0, 1 ETH) → deposit(0, 1 ETH)，末笔使用另一个外部 sender，但仍映射到 Harness actor0；该序列可执行且改变属性相关状态，却没有到达反例。它与 E1/E2 的 seed-only 覆盖均为 32 行，fuzz 后每次各增加 11 行。
++
++首次 echidna-rerun-01 的 36 次原始运行均保留。fingerprint 审计发现 A_random 和 A_static 的语料都与 E1/E2 相同，驱动选中 frozen_base_replay，而非扩展候选。故这 12 次保留但排除为消融证据。之后只用真正可执行的非基线随机扩展种子，补跑 3 次 seed-only 和 3 次 testLimit=500；每次新增 11 行，未触发目标。静态扩展两个候选分别因共享余额不足而回滚、或末笔没有持久状态变化；无有效种子，因此未启动 Echidna。
++
++目前磁盘保留 42 次 Echidna 运行；有效对照为 E0–E3 共 24 次，加正确输入 A_random 的 6 次，共 30 次。A_static 正式运行数为 0。输入与 fingerprint 审计见 04-Phase31-对照组和输入核验.json；首轮统计 03-统计口径复核.json 已新增纠正标记。
++
++按冻结门槛计数：自动生成的唯一 Wallet 目标反例种子为 1 条，Echidna 独立回放 3/3；另有 1 条非反例但可执行、会改变属性相关状态的随机扩展序列，且没有覆盖增益超过 E1/E2。E1/E2 是同一个原始种子，不能重复计数；A_static 合格种子为 0。PaperExample 的人工夹具单独记录，不计自动种子。
++
++| 模式 | 扩展 Anvil 次数 | 含基线回放总数 | 种子准备耗时 | 新 Agent/API/Token | Echidna fuzz 均值 |
++|---|---:|---:|---:|---:|---:|
++| E3 状态反馈 | 10 | 11 | 8.013 秒 | 0 / 0 | 0.311 秒，提前终止 |
++| A_random | 24 | 25 | 15.491 秒 | 0 / 0 | 0.578 秒 |
++| A_static | 2 | 3 | 2.043 秒 | 0 / 0 | 不运行，无有效种子 |
++
++Phase31 复用历史 P1，其 Agent A/B 共同成本为 2 次 API 请求、8465 Tokens、6.191 秒；该值单独列为历史前置成本，不计作 Phase31 新调用。各阶段耗时相加的估算为 E3 约 14.514 秒、正确随机组约 22.260 秒；这是估算值，不是单一端到端墙钟实测。
++
++Echidna 的 tests:x/y 是属性状态数，fuzzing:n/500 是状态进度文字，不能当作实际独立 case 数。Phase31 日志解析器将 fuzzing_cases 置为 null、mutation_evidence 置为 false。覆盖只依据 LCOV 集合差异，不依据 Sequence replayed、属性状态计数或 mutation 标记。
++
++## 6. 独立候选接入
++
++候选依 Phase27 冻结池按文件数筛选，正式结果出现前固定 commit、源码 tree hash 和属性入口规则；失败不替换。机器记录见 独立样本/05-独立样本接入筛查.json。
++
++| 项目 / 固定 commit | 接入失败依据 | Echidna 正式运行 |
++|---|---|---:|
++| Strata 51ad892ed5a7c73df8b64e5a11c6c5371037b2d6 | assertion 模式，没有符合冻结规则的 Boolean echidna_*() returns(bool) 属性；Forge 缺 OpenZeppelin ERC1967Proxy。 | 0 |
++| DODO Cross-Chain DEX 0042646b1b541a2b3adb13205cb4b15e054ce05e | 找到 Foundry fuzz 属性，但没有合格 Echidna Boolean 属性；离线构建探针仍启动嵌套依赖抓取，编译前中止。 | 0 |
++| eBTC BSM e5935b77a19a1b6036a3a1b44f70ac128fbdf7d9 | assertion 属性模式，不符合 Boolean 属性入口门；离线环境没有固定 solc 0.8.29。 | 0 |
++| Very Liquid Vaults 7ff55811e7f5617488db1a87d91c140260ac0c28 | assertion 属性模式，不符合 Boolean 属性入口门；依赖图庞大，离线探针启动子模块获取后停止。 | 0 |
++
++四个项目目录、固定 commit、部分依赖获取痕迹和失败日志均保留；没有修改上游 Solidity，也没有补选样本。这说明冻结接入门未通过，不表示项目性质无法测试。
++
++## 7. 证据判断与下一步
++
++可用于论文内部机制论证的真实证据：冻结 A/B 输入下模块自主生成与人工 Oracle 不同的 4 步序列；Anvil 第 4 笔后目标属性为假；账户 getter 与 Wallet 共享池轨迹一致；Echidna 三个随机种子均回放同一反例。PaperExample 只作为人工关系回归夹具。
++
++负面结果同时保留：E3 未完成 500 预算且 fuzz 新增覆盖为 0；随机扩展没到达目标，且覆盖增量与 E1/E2 一样；静态扩展没有合格种子；首次随机/静态组输入误接，12 次运行被排除；四个独立项目没有任何正式运行。因而尚未在两个独立样本观察到同向收益，也尚未获得可支持论文结论的独立项目证据。已引用研究也表明序列依赖和反馈扩展已有先例，不能将当前实现描述为已证明的新算法。
++
++下一阶段建议先建立具有原生可运行属性和可离线复现依赖的独立样本池，再开展至少两个独立样本的冻结配对试验。只有两个样本呈方向一致的收益、计入种子准备成本后仍然成立，才考虑扩展到 20–30 个样本。本阶段在代码及报告完成后停止，不自动进入下一阶段。
++
++## 8. 复现命令与环境
++
++以下为同一冻结脚本的重跑命令。使用仓库已有 .tools/olympia-venv（含 web3 7.16.0）、项目内 Anvil 和系统 Echidna。所有原始 JSON 与日志仍是本轮执行记录。
++
++    cd /home/skk/smart-contract-fuzz-v2
++    export PYTHONPATH="func/功能:func/测试过程/SCFuzzBench公开项目接入"
++    PY=.tools/olympia-venv/bin/python3
++
++    # 三种扩展模式，单模式候选执行上限 24
++    "$PY" func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py \
++      --phase wallet-extension --mode all --run-tag attempt-02-feedback-priority
++
++    # E0/E1/E2/E3 及初次消融运行
++    "$PY" func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py \
++      --phase wallet-fuzz --run-tag echidna-rerun-01 \
++      --expansion-tag attempt-02-feedback-priority
++
++    # 修正输入映射后，只补跑有效随机扩展消融
++    "$PY" func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py \
++      --phase wallet-fuzz --groups A_random \
++      --run-tag echidna-corrected-ablation-01 \
++      --expansion-tag attempt-02-feedback-priority
++
++    # PaperExample 人工静态依赖回归，不计自动发现
++    "$PY" func/测试过程/SCFuzzBench公开项目接入/Phase31非Wallet回归.py
++
++版本：Echidna 2.3.2；Anvil 1.9.0-dev，commit 6056c5845d34205a83cf7108042adb137325c9df；Wallet 使用原冻结 solc 0.4.24；PaperExample 使用 solc 0.8.20。独立项目构建探针命令和输出见各候选的 *-forge-build.log 与筛查 JSON。
++
++## 9. 原始记录、代码和工作区
++
++- 冻结方案：00-Phase31实验方案冻结.json
++- 扩展候选、反馈及 Anvil 轨迹：Wallet机制回归/attempt-02-feedback-priority/
++- E0–E3 原始结果：Wallet机制回归/echidna-rerun-01/
++- 修正随机消融：Wallet机制回归/echidna-corrected-ablation-01/
++- 统计与输入审计：Wallet机制回归/03-统计口径复核.json、04-Phase31-对照组和输入核验.json
++- PaperExample 原始记录：非Wallet回归/
++- 独立样本筛查、版本和构建日志：独立样本/
++- 本阶段代码/文档 diff：06-Phase31代码与文档差异.diff
++
++主要代码为 func/功能/状态反馈序列扩展.py、func/功能/种子验证.py 和两个 Phase31 实验脚本；文档为本报告及 docs/研究总览与最新进展.md。Wallet 原合约和 Harness 未修改。Echidna 曾改写 crytic-export/combined_solc.json；实验副本已保存在 Wallet Echidna 结果目录，跟踪文件已恢复至 Phase31 基线版本。
+
+diff --git a/func/功能/状态反馈序列扩展.py b/func/功能/状态反馈序列扩展.py
+new file mode 100644
+index 0000000..37dcbdc
+--- /dev/null
++++ b/func/功能/状态反馈序列扩展.py
+@@ -0,0 +1,526 @@
++#!/usr/bin/env python3
++"""Budgeted sequence extension driven by ABI, dependency, and execution evidence.
++
++This module does not classify function meaning from function names. It accepts
++property/action evidence from the caller and produces bounded transaction-list
++edits. All proposed sequences still require a fresh Anvil replay.
++"""
++
++from __future__ import annotations
++
++import copy
++import hashlib
++import json
++import random
++import re
++from typing import Any, Iterable
++
++
++ROLE_TOKENS = {"actor", "account", "user", "caller", "owner", "sender",
++               "recipient", "spender", "operator", "index", "participant"}
++_UINT = re.compile(r"^uint([0-9]*)$")
++_INT = re.compile(r"^int([0-9]*)$")
++_BYTES = re.compile(r"^bytes([1-9]|[12][0-9]|3[0-2])$")
++
++
++def _json_key(value: Any) -> str:
++    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
++
++
++def transaction_fingerprint(tx: dict[str, Any]) -> tuple[Any, ...]:
++    return (str(tx.get("function", "")), _json_key(tx.get("arguments", [])),
++            str(tx.get("sender", "")).lower(), str(tx.get("value_wei", "0")),
++            int(tx.get("delay_seconds", 0)), int(tx.get("delay_blocks", 0)))
++
++
++def sequence_fingerprint(sequence: list[dict[str, Any]]) -> str:
++    raw = _json_key([transaction_fingerprint(tx) for tx in sequence]).encode("utf-8")
++    return hashlib.sha256(raw).hexdigest()
++
++
++def _safe_int(value: Any) -> int | None:
++    if isinstance(value, bool):
++        return None
++    try:
++        return int(value)
++    except (TypeError, ValueError):
++        return None
++
++
++def _role_input(item: dict[str, Any]) -> bool:
++    name = str(item.get("name") or "").lower()
++    tokens = set(re.findall(r"[a-z]+", re.sub(r"([a-z])([A-Z])", r"\1 \2", name)))
++    return bool(tokens & ROLE_TOKENS)
++
++
++def _type_default(item: dict[str, Any], senders: list[str],
++                  exemplars: list[tuple[str, Any]]) -> Any | None:
++    kind = str(item.get("type", ""))
++    name = str(item.get("name") or "")
++    role = _role_input(item)
++    for old_name, old_value in exemplars:
++        if old_name.lower() == name.lower() and _value_fits(kind, old_value):
++            return copy.deepcopy(old_value)
++    if kind == "address":
++        return senders[0] if senders else "0x" + "00" * 20
++    if kind == "bool":
++        return False
++    if _UINT.fullmatch(kind) or _INT.fullmatch(kind):
++        return 0 if role else 1
++    match = _BYTES.fullmatch(kind)
++    if match:
++        return "0x" + "00" * int(match.group(1))
++    if kind == "string":
++        return ""
++    return None
++
++
++def _value_fits(kind: str, value: Any) -> bool:
++    if kind == "address":
++        return isinstance(value, str) and re.fullmatch(r"0x[0-9a-fA-F]{40}", value) is not None
++    if kind == "bool":
++        return isinstance(value, bool)
++    if _UINT.fullmatch(kind):
++        number = _safe_int(value)
++        bits = int(kind[4:] or "256")
++        return number is not None and 0 <= number < 2 ** bits
++    if _INT.fullmatch(kind):
++        number = _safe_int(value)
++        bits = int(kind[3:] or "256")
++        return number is not None and -(2 ** (bits - 1)) <= number < 2 ** (bits - 1)
++    match = _BYTES.fullmatch(kind)
++    if match:
++        return isinstance(value, str) and re.fullmatch(
++            r"0x[0-9a-fA-F]{" + str(2 * int(match.group(1))) + r"}", value) is not None
++    return kind == "string" and isinstance(value, str)
++
++
++def build_action_templates(action_inventory: list[dict[str, Any]],
++                           abi_by_signature: dict[str, dict[str, Any]],
++                           base_transactions: list[dict[str, Any]],
++                           senders: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
++    """Create only ABI-valid, evidence-linked templates; payable value is copied from a seed."""
++    payable_values = [int(tx.get("value_wei", 0)) for tx in base_transactions
++                      if int(tx.get("value_wei", 0)) > 0]
++    default_payable_value = min(payable_values) if payable_values else None
++    exemplars = []
++    for tx in base_transactions:
++        abi = abi_by_signature.get(str(tx.get("function", "")), {})
++        for item, value in zip(abi.get("inputs", []), tx.get("arguments", [])):
++            exemplars.append((str(item.get("name") or ""), value))
++    templates: list[dict[str, Any]] = []
++    decisions = []
++    seen = set()
++    for action in action_inventory:
++        signature = str(action.get("abi_signature") or "")
++        abi = abi_by_signature.get(signature)
++        if not signature or not abi or not action.get("seed_compatible", True):
++            decisions.append({"function": signature or action.get("function"),
++                              "decision": "discarded", "reason": "missing or unsupported ABI"})
++            continue
++        if signature in seen:
++            continue
++        seen.add(signature)
++        if action.get("analysis_status") not in {None, "candidate_only", "analyzed", "supported"}:
++            decisions.append({"function": signature, "decision": "discarded",
++                              "reason": "no usable static action evidence"})
++            continue
++        arguments = []
++        unsupported = None
++        for item in abi.get("inputs", []):
++            value = _type_default(item, senders, exemplars)
++            if value is None:
++                unsupported = "ABI argument type has no safe default: " + str(item.get("type"))
++                break
++            arguments.append(value)
++        if unsupported:
++            decisions.append({"function": signature, "decision": "discarded", "reason": unsupported})
++            continue
++        payable = bool(action.get("payable") or abi.get("stateMutability") == "payable")
++        if payable and default_payable_value is None:
++            decisions.append({"function": signature, "decision": "discarded",
++                              "reason": "no prior legal payable value to reuse"})
++            continue
++        tx = {"function": signature, "arguments": arguments,
++              "sender": senders[0] if senders else base_transactions[0].get("sender"),
++              "value_wei": str(default_payable_value if payable else 0),
++              "delay_seconds": 0, "delay_blocks": 0,
++              "expected_outcome": "state_change",
++              "sequence_extension_evidence": {
++                  "matched_states": list(action.get("matched_states", [])),
++                  "read_states": list(action.get("read_states", [])),
++                  "write_states": list(action.get("write_states", [])),
++                  "evidence_origin": "property_action_inventory"}}
++        if not _valid_transaction(tx, abi):
++            decisions.append({"function": signature, "decision": "discarded",
++                              "reason": "local ABI shape validation failed"})
++            continue
++        templates.append(tx)
++        decisions.append({"function": signature, "decision": "template_created",
++                          "reason": "ABI-valid and linked to property action evidence"})
++    return templates, decisions
++
++
++def _valid_transaction(tx: dict[str, Any], abi: dict[str, Any]) -> bool:
++    inputs = abi.get("inputs", [])
++    args = tx.get("arguments", [])
++    return (len(inputs) == len(args) and all(_value_fits(str(item.get("type", "")), value)
++                                             for item, value in zip(inputs, args)) and
++            isinstance(tx.get("sender"), str) and
++            re.fullmatch(r"0x[0-9a-fA-F]{40}", tx["sender"]) is not None and
++            _safe_int(tx.get("value_wei", 0)) is not None and
++            int(tx.get("value_wei", 0)) >= 0)
++
++
++def role_variants(tx: dict[str, Any], abi: dict[str, Any], *,
++                  senders: list[str], values: Iterable[int] = (0, 1, 2)) -> list[dict[str, Any]]:
++    """Enumerate small ABI-valid caller/actor variants from named role inputs."""
++    result = []
++    inputs = abi.get("inputs", [])
++    for index, item in enumerate(inputs):
++        if index >= len(tx.get("arguments", [])) or not _role_input(item):
++            continue
++        kind = str(item.get("type", ""))
++        if not (_UINT.fullmatch(kind) or _INT.fullmatch(kind)):
++            continue
++        for value in values:
++            changed = copy.deepcopy(tx)
++            if value == _safe_int(changed["arguments"][index]):
++                continue
++            changed["arguments"][index] = value
++            if _valid_transaction(changed, abi):
++                result.append(changed)
++    for sender in senders:
++        if sender.lower() == str(tx.get("sender", "")).lower():
++            continue
++        changed = copy.deepcopy(tx)
++        changed["sender"] = sender
++        if _valid_transaction(changed, abi):
++            result.append(changed)
++    return result
++
++
++def trace_addresses(trace: dict[str, Any] | None) -> set[str]:
++    addresses: set[str] = set()
++    if not isinstance(trace, dict):
++        return addresses
++    stack = [trace]
++    while stack:
++        node = stack.pop()
++        for field in ("from", "to"):
++            value = node.get(field)
++            if isinstance(value, str) and value.startswith("0x"):
++                addresses.add(value.lower())
++        stack.extend(item for item in node.get("calls", []) if isinstance(item, dict))
++    return addresses
++
++
++def shared_resource_edges(replay: dict[str, Any]) -> list[dict[str, Any]]:
++    """Find cross-transaction contract targets with observed balance movement."""
++    transactions = replay.get("transactions", [])
++    per_tx = []
++    for row in transactions:
++        changes = {str(item.get("address", "")).lower(): int(item.get("delta_wei", 0))
++                   for item in row.get("balance_changes", [])}
++        targets = trace_addresses(row.get("internal_call_trace"))
++        per_tx.append({"index": row.get("index"), "targets": targets, "changes": changes,
++                       "status": row.get("status")})
++    edges = []
++    for left_index, left in enumerate(per_tx):
++        for right in per_tx[left_index + 1:]:
++            common = (left["targets"] & right["targets"] &
++                      set(left["changes"]) & set(right["changes"]))
++            for address in sorted(common):
++                if left["changes"][address] > 0 and right["changes"][address] < 0:
++                    edges.append({"producer_transaction": left["index"],
++                                  "consumer_transaction": right["index"],
++                                  "resource_address": address,
++                                  "producer_delta_wei": left["changes"][address],
++                                  "consumer_delta_wei": right["changes"][address],
++                                  "evidence": "same traced contract target; observed positive then negative balance delta"})
++    return edges
++
++
++def _getter_map(rows: list[dict[str, Any]]) -> dict[tuple[str, str], int]:
++    values: dict[tuple[str, str], int] = {}
++    for row in rows:
++        if row.get("status") != "observed" or "value" not in row:
++            continue
++        number = _safe_int(row.get("value"))
++        if number is None:
++            continue
++        signature = str(row.get("signature", ""))
++        name = signature.split("(", 1)[0]
++        key = _json_key(row.get("arguments", []))
++        values[(name, key)] = number
++    return values
++
++
++def numeric_violation_distance(property_source: str,
++                               getter_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
++    """Compute normalized distance for a simple comparison that returns false on violation."""
++    pairs = []
++    patterns = [
++        re.compile(r"if\s*\(\s*(?P<a>[A-Za-z_]\w*)\s*\[\s*(?P<idx>[A-Za-z_]\w*)\s*\]\s*(?P<op>>=|>|<=|<)\s*(?P<b>[A-Za-z_]\w*)\s*\[\s*(?P=idx)\s*\]\s*\)\s*(?:\{\s*)?return\s+false", re.I),
++        re.compile(r"return\s+(?P<a>[A-Za-z_]\w*)\s*\[\s*(?P<idx>[A-Za-z_]\w*)\s*\]\s*(?P<op><=|<|>=|>)\s*(?P<b>[A-Za-z_]\w*)\s*\[\s*(?P=idx)\s*\]", re.I),
++    ]
++    for pattern in patterns:
++        pairs.extend(pattern.finditer(property_source))
++    observed = _getter_map(getter_rows)
++    candidates = []
++    for match in pairs:
++        a_name, b_name, operator = match.group("a"), match.group("b"), match.group("op")
++        common_keys = {key for name, key in observed if name == a_name} & {
++            key for name, key in observed if name == b_name}
++        for key in common_keys:
++            a, b = observed[(a_name, key)], observed[(b_name, key)]
++            # `if (condition) return false` means condition itself is the violation.
++            if operator == ">":
++                raw = max(0, b - a + 1)
++            elif operator == ">=":
++                raw = max(0, b - a)
++            elif operator == "<":
++                raw = max(0, a - b + 1)
++            else:  # <=
++                raw = max(0, a - b)
++            scale = max(abs(a), abs(b), 1)
++            candidates.append({"left_getter": a_name, "right_getter": b_name,
++                               "operator": operator, "left_value": a,
++                               "right_value": b, "distance": raw / scale,
++                               "distance_units": raw, "arguments": json.loads(key)})
++    if not candidates:
++        return None
++    return min(candidates, key=lambda item: (item["distance"], item["left_getter"],
++                                             item["right_getter"]))
++
++
++def feedback_vector(replay: dict[str, Any], *, property_source: str = "",
++                    seen_states: set[str] | None = None) -> dict[str, Any]:
++    rows = replay.get("transactions", [])
++    getter_states = []
++    prior = replay.get("initial_predicate_getters", [])
++    getter_states.append(_json_key([(row.get("signature"), row.get("arguments"), row.get("value"))
++                                   for row in prior if row.get("status") == "observed"]))
++    for row in rows:
++        getter_states.append(_json_key([(item.get("signature"), item.get("arguments"), item.get("value"))
++                                        for item in row.get("predicate_getter_values", [])
++                                        if item.get("status") == "observed"]))
++    fingerprints = {hashlib.sha256(item.encode("utf-8")).hexdigest() for item in getter_states}
++    prior_seen = seen_states or set()
++    related_changes = sum(len(row.get("changed_predicate_getters", []))
++                          for row in replay.get("target_property_state", {}).get("trajectory", []))
++    property_value = rows[-1].get("target_property") if rows else next(
++        iter(replay.get("initial_property_values", {}).values()), None)
++    target_state = replay.get("target_property_state", {})
++    final_getters = rows[-1].get("predicate_getter_values", []) if rows else prior
++    distance = numeric_violation_distance(property_source, final_getters)
++    dependent_successors = sum(
++        1 for index, row in enumerate(rows)
++        if row.get("status") == "success" and (row.get("changed_effect_states") or
++                                                 row.get("changed_predicate_getters")))
++    return {"transactions_succeeded": sum(row.get("status") == "success" for row in rows),
++            "transactions_total": len(rows),
++            "replay_complete": replay.get("replay_status") == "executable",
++            "property_related_state_changed": bool(target_state.get("property_related_state_changed")),
++            "changed_predicate_getter_count": related_changes,
++            "new_relevant_state_count": len(fingerprints - prior_seen),
++            "next_step_dependency_evidence_count": dependent_successors,
++            "numeric_target_distance": distance,
++            "counterexample_reached": property_value is False or bool(target_state.get("counterexample_state_established")),
++            "property_value": property_value,
++            "shared_resource_edges": shared_resource_edges(replay),
++            "getter_state_fingerprints": sorted(fingerprints)}
++
++
++def _insert(sequence: list[dict[str, Any]], tx: dict[str, Any], index: int) -> list[dict[str, Any]]:
++    return [*copy.deepcopy(sequence[:index]), copy.deepcopy(tx), *copy.deepcopy(sequence[index:])]
++
++
++def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[dict[str, Any]],
++                       action_evidence: dict[str, dict[str, Any]],
++                       abi_by_signature: dict[str, dict[str, Any]],
++                       *, mode: str, replay: dict[str, Any] | None = None,
++                       target_states: set[str] | None = None,
++                       senders: list[str] | None = None,
++                       max_sequence_length: int = 8,
++                       max_proposals: int = 24,
++                       random_seed: int = 0) -> list[dict[str, Any]]:
++    """Generate one bounded layer of candidates; caller executes and feeds back each result."""
++    if mode not in {"random", "static", "state_feedback"}:
++        raise ValueError(f"unsupported extension mode: {mode}")
++    if len(sequence) >= max_sequence_length:
++        return []
++    senders = list(senders or [])
++    target_states = target_states or set()
++    current = [transaction_fingerprint(tx) for tx in sequence]
++    proposals: list[dict[str, Any]] = []
++    rng = random.Random(random_seed)
++
++    def add(candidate: list[dict[str, Any]], operator: str, reason: str,
++            evidence: Any = None) -> None:
++        if not candidate or len(candidate) > max_sequence_length:
++            return
++        fp = sequence_fingerprint(candidate)
++        if fp in {row["fingerprint"] for row in proposals}:
++            return
++        proposals.append({"sequence": candidate, "fingerprint": fp,
++                          "operator": operator, "proposal_reason": reason,
++                          "evidence": evidence})
++
++    if mode == "random":
++        operations = []
++        for template in action_templates:
++            abi = abi_by_signature.get(str(template.get("function", "")), {})
++            operations.append((template, "random_action"))
++            operations.extend((variant, "random_role_or_sender")
++                              for variant in role_variants(template, abi, senders=senders))
++        rng.shuffle(operations)
++        for template, kind in operations:
++            positions = list(range(1, len(sequence) + 1))
++            rng.shuffle(positions)
++            if positions:
++                position = positions[0]
++                add(_insert(sequence, template, position), kind,
++                    "seeded random insertion of an ABI-valid action")
++            add([*copy.deepcopy(sequence), copy.deepcopy(template)], kind,
++                "seeded random append of an ABI-valid action")
++            if len(proposals) >= max_proposals:
++                break
++        return proposals[:max_proposals]
++
++    # Static and full modes may add a missing action only when static property-action
++    # evidence ties it to a target state read/written by the property.
++    present_functions = {str(tx.get("function", "")) for tx in sequence}
++    for template in action_templates:
++        signature = str(template.get("function", ""))
++        if signature in present_functions:
++            continue
++        evidence = action_evidence.get(signature, {})
++        relevant = set(evidence.get("matched_states", [])) | set(evidence.get("read_states", [])) | set(evidence.get("write_states", []))
++        if target_states and not (relevant & target_states):
++            continue
++        template_fp = transaction_fingerprint(template)
++        if template_fp in current:
++            continue
++        # Do not spend the state-feedback budget enumerating caller variants before
++        # runtime evidence exists. Role expansion is activated below only after a
++        # trace proves that a shared resource can fund a failed dependent operation.
++        variants = [template]
++        for variant in variants:
++            for position in range(1, len(sequence) + 1):
++                add(_insert(sequence, variant, position), "static_dependency_insertion",
++                    "action evidence overlaps a property-relevant state; preserve prior prefix",
++                    {"matched_states": sorted(relevant & target_states), "position": position})
++                if len(proposals) >= max_proposals:
++                    break
++            if len(proposals) >= max_proposals:
++                break
++        if len(proposals) >= max_proposals:
++            break
++
++    if mode == "static" or replay is None:
++        return proposals[:max_proposals]
++
++    # Dynamic failure repair: insert a role-distinct prior producer immediately before
++    # the failed action only when traces prove a common resource address. This uses
++    # actual trace/balance feedback, not names or inferred vulnerability labels.
++    tx_feedback = replay.get("transactions", [])
++    failed = next((row for row in tx_feedback if row.get("status") != "success" or
++                   row.get("execution_class") in {"unexpected_internal_revert", "outer_revert"}), None)
++    if failed is not None:
++        failure_index = max(0, int(failed.get("index", 1)) - 1)
++        failed_targets = trace_addresses(failed.get("internal_call_trace"))
++        for prior_index, prior_row in enumerate(tx_feedback[:failure_index]):
++            prior_tx = sequence[prior_index] if prior_index < len(sequence) else None
++            if not prior_tx or prior_row.get("status") != "success":
++                continue
++            changes = {str(item.get("address", "")).lower(): int(item.get("delta_wei", 0))
++                       for item in prior_row.get("balance_changes", [])}
++            positive_shared = {address for address, delta in changes.items()
++                               if delta > 0 and address in failed_targets}
++            if not positive_shared:
++                continue
++            signature = str(prior_tx.get("function", ""))
++            abi = abi_by_signature.get(signature, {})
++            for role_tx in role_variants(prior_tx, abi, senders=senders):
++                old_roles = [value for item, value in zip(abi.get("inputs", []), prior_tx.get("arguments", []))
++                             if _role_input(item)]
++                new_roles = [value for item, value in zip(abi.get("inputs", []), role_tx.get("arguments", []))
++                             if _role_input(item)]
++                if old_roles == new_roles:
++                    continue
++                candidate = _insert(sequence, role_tx, failure_index)
++                add(candidate, "shared_resource_role_expansion",
++                    "a successful earlier call increased a traced resource used by the failed action; vary a role input before retry",
++                    {"resource_addresses": sorted(positive_shared),
++                     "producer_transaction": prior_index + 1,
++                     "failed_transaction": failure_index + 1,
++                     "old_role_values": old_roles, "new_role_values": new_roles})
++                if len(proposals) >= max_proposals:
++                    return proposals[:max_proposals]
++
++    # Repetition is allowed only when a successful call changed property-related
++    # observations and its trace shows state or shared-resource effects.
++    for index, row in enumerate(tx_feedback):
++        if index >= len(sequence) or row.get("status") != "success":
++            continue
++        if not row.get("changed_predicate_getters") and not row.get("changed_effect_states"):
++            continue
++        has_resource_effect = bool(row.get("balance_changes")) or int(
++            row.get("changed_storage_slot_count") or 0) > 0
++        if not has_resource_effect:
++            continue
++        template = copy.deepcopy(sequence[index])
++        add([*copy.deepcopy(sequence), template], "state_supported_repetition",
++            "repeat a successful property-relevant state transition with observed state/resource effect",
++            {"source_transaction": index + 1,
++             "changed_predicate_getters": row.get("changed_predicate_getters", []),
++             "balance_changes": row.get("balance_changes", [])})
++        if len(proposals) >= max_proposals:
++            break
++    return proposals[:max_proposals]
++
++
++def retain_diverse_prefixes(scored: list[dict[str, Any]], limit: int = 4) -> list[dict[str, Any]]:
++    """Keep up to `limit` prefixes across outcome, role, sequence, and state dimensions."""
++    if limit <= 0:
++        return []
++    remaining = list(scored)
++    kept: list[dict[str, Any]] = []
++    covered: set[str] = set()
++    while remaining and len(kept) < limit:
++        best = None
++        best_key = None
++        for row in remaining:
++            vector = row.get("feedback", {})
++            sequence = row.get("sequence", [])
++            roles = _json_key([tx.get("arguments", []) for tx in sequence])
++            shape = _json_key([tx.get("function") for tx in sequence])
++            states = _json_key(vector.get("getter_state_fingerprints", []))
++            categories = {"counterexample" if vector.get("counterexample_reached") else "property_change" if vector.get("property_related_state_changed") else "no_property_change",
++                          "distance" if vector.get("numeric_target_distance") else "no_distance",
++                          "roles:" + hashlib.sha256(roles.encode()).hexdigest()[:12],
++                          "shape:" + hashlib.sha256(shape.encode()).hexdigest()[:12],
++                          "state:" + hashlib.sha256(states.encode()).hexdigest()[:12]}
++            score = (int(vector.get("counterexample_reached", False)),
++                     int(vector.get("replay_complete", False)),
++                     int(vector.get("property_related_state_changed", False)),
++                     int(vector.get("new_relevant_state_count", 0)),
++                     int(vector.get("next_step_dependency_evidence_count", 0)),
++                     -float((vector.get("numeric_target_distance") or {}).get("distance", 1.0)),
++                     int(vector.get("transactions_succeeded", 0)))
++            diversity = len(categories - covered)
++            key = (score, diversity)
++            if best_key is None or key > best_key:
++                best, best_key = row, key
++                best["_retain_categories"] = categories
++        if best is None:
++            break
++        best["retention_decision"] = "retained_diverse_prefix"
++        kept.append(best)
++        covered |= best.pop("_retain_categories", set())
++        remaining.remove(best)
++    kept_ids = {id(row) for row in kept}
++    for row in remaining:
++        row["retention_decision"] = "discarded_budget_or_lower_feedback_and_lower_diversity"
++    return kept
+
+diff --git a/func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py b/func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py
+new file mode 100644
+index 0000000..dd71203
+--- /dev/null
++++ b/func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py
+@@ -0,0 +1,471 @@
++#!/usr/bin/env python3
++"""Phase31 bounded sequence expansion and paired Wallet mechanism experiment."""
++
++from __future__ import annotations
++
++import argparse
++import copy
++import json
++import shutil
++import sys
++import time
++import uuid
++from pathlib import Path
++from typing import Any
++
++
++ROOT = Path(__file__).resolve().parents[3]
++sys.path.insert(0, str(ROOT / "func" / "功能"))
++sys.path.insert(0, str(ROOT / "deepseek"))
++
++from 属性种子上下文 import PROJECTS, load_project_context, read_json
++from 种子验证 import (AnvilSession, replay_seed, run_echidna, to_echidna_sequence,
++                     write_corpus)
++from 状态反馈序列扩展 import (build_action_templates, feedback_vector,
++                         propose_extensions, retain_diverse_prefixes,
++                         sequence_fingerprint, transaction_fingerprint)
++
++
++RESULT = ROOT / "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119"
++WALLET_RESULT = RESULT / "Wallet机制回归"
++RUN_ROOT = WALLET_RESULT
++EXPANSION_ROOT = WALLET_RESULT
++CONFIG_PATH = ROOT / "func/测试过程/SCFuzzBench公开项目接入/项目配置/Wallet02Refund.json"
++P1_PATH = ROOT / "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/03-P0-P1配对验证结果.json"
++PROPERTY_ID = "8e75f62866f6d582a033"
++MAX_LENGTH = 8
++RETAINED_PREFIXES = 4
++MAX_EXECUTIONS = 24
++SEEDS = [20261125, 20261135, 20261145]
++EXTENSION_MODES = {"random": "A_random", "static": "A_static",
++                   "state_feedback": "E3"}
++
++
++def _write_json(path: Path, value: Any) -> None:
++    path.parent.mkdir(parents=True, exist_ok=True)
++    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n",
++                    encoding="utf-8")
++
++
++def _profile_wallet() -> dict[str, Any]:
++    config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
++    profile = {
++        "report": config["paths"]["analysis_report"],
++        "artifact": config["paths"]["compiled_artifact"],
++        "source_root": config["source"]["root"],
++        "contract": config["harness"]["contract"],
++        "deployment": config["deployment"],
++        "execution": config["execution"],
++        "property": config["property"],
++        "senders": config["actions"]["senders"],
++        "fuzzer_target": str(ROOT / config["compiler"]["target"]),
++        "solc": config["compiler"]["solc"],
++        "solc_version": config["compiler"]["version"],
++        "echidna": {"prefix": config["echidna"]["prefix"],
++                    "workers": config["echidna"]["workers"],
++                    "call_sequence_length": config["echidna"]["call_sequence_length"],
++                    "stop_on_fail": config["echidna"]["stop_on_fail"],
++                    "disable_slither": config["echidna"]["disable_slither"]},
++    }
++    PROJECTS["Wallet02Refund"] = profile
++    return config
++
++
++def _artifact_abi(project: str) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
++    artifact = read_json(PROJECTS[project]["artifact"])
++    abi = {entry["name"] + "(" + ",".join(x["type"] for x in entry.get("inputs", [])) + ")": entry
++           for entry in artifact.get("abi", []) if entry.get("type") == "function"}
++    return abi, artifact
++
++
++def _load_context() -> tuple[dict[str, Any], dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
++    config = _profile_wallet()
++    context = load_project_context("Wallet02Refund", [PROPERTY_ID])
++    prop = context["properties"][0]
++    abi_by_signature, artifact = _artifact_abi("Wallet02Refund")
++    prior = read_json(P1_PATH)
++    candidate_row = next(item for item in prior["candidates"]
++                         if item["name"] == "P1-source-context-planner")
++    transactions = []
++    for item in candidate_row["resolved_transactions"]:
++        transactions.append({key: copy.deepcopy(item[key]) for key in (
++            "function", "arguments", "sender", "value_wei", "delay_seconds",
++            "delay_blocks", "expected_outcome", "data_dependencies") if key in item})
++    candidate = {"project": "Wallet02Refund", "property_id": PROPERTY_ID,
++                 "candidate_id": "phase30b-p1-raw-agent-ab-candidate",
++                 "property": prop["property"], "context": context,
++                 "assumptions": [], "transactions": transactions}
++    source_ref = str(prop.get("property_source", "")).split("#", 1)[0]
++    property_source = ((ROOT / source_ref).read_text(encoding="utf-8", errors="replace")
++                       if source_ref and (ROOT / source_ref).is_file() else "")
++    return config, context, abi_by_signature, {"candidate": candidate,
++                                               "property": prop,
++                                               "artifact": artifact,
++                                               "property_source": property_source,
++                                               "comparison": candidate_row}
++
++
++def _execution_tx(tx: dict[str, Any]) -> dict[str, Any]:
++    return {key: copy.deepcopy(value) for key, value in tx.items()
++            if key in {"function", "arguments", "sender", "value_wei", "delay_seconds",
++                       "delay_blocks", "expected_outcome", "data_dependencies"}}
++
++
++def _execute(project: str, candidate: dict[str, Any], sequence: list[dict[str, Any]], *,
++             runtime_constraints: bool = True) -> dict[str, Any]:
++    return replay_seed(project, candidate, [_execution_tx(tx) for tx in sequence],
++                       runtime_constraints=runtime_constraints)
++
++
++def _apply_one_parameter_repair(project: str, candidate: dict[str, Any],
++                                sequence: list[dict[str, Any]], replay: dict[str, Any]
++                                ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None]:
++    for index, row in enumerate(replay.get("transactions", [])):
++        proposal = row.get("constraint_repair_proposal")
++        if not proposal:
++            continue
++        repaired = copy.deepcopy(sequence)
++        tx_index = int(proposal.get("transaction_index", index + 1)) - 1
++        if not 0 <= tx_index < len(repaired):
++            continue
++        tx = repaired[tx_index]
++        old_args = list(tx.get("arguments", []))
++        updates = proposal.get("argument_updates") or [{
++            "argument_index": proposal["argument_index"],
++            "repaired_value": proposal["repaired_value"]}]
++        applied = []
++        for update in updates:
++            arg = int(update["argument_index"])
++            if 0 <= arg < len(old_args):
++                applied.append({"argument_index": arg, "before": old_args[arg],
++                                "after": update["repaired_value"]})
++                old_args[arg] = update["repaired_value"]
++        if not applied:
++            continue
++        tx["arguments"] = old_args
++        repaired_replay = _execute(project, candidate, repaired, runtime_constraints=False)
++        return repaired, repaired_replay, {"transaction_index": tx_index + 1,
++                                           "updates": applied, "proposal": proposal}
++    return sequence, replay, None
++
++
++def _valid_action_sequence(sequence: list[dict[str, Any]],
++                           abi_by_signature: dict[str, dict[str, Any]]) -> tuple[bool, str | None]:
++    if not sequence or len(sequence) > MAX_LENGTH:
++        return False, "sequence length outside the frozen bound"
++    for tx in sequence:
++        abi = abi_by_signature.get(str(tx.get("function", "")))
++        if abi is None or len(abi.get("inputs", [])) != len(tx.get("arguments", [])):
++            return False, "function signature or argument count does not match ABI"
++        if not isinstance(tx.get("sender"), str) or not str(tx["sender"]).startswith("0x"):
++            return False, "missing sender address"
++    return True, None
++
++
++def _score_node(node: dict[str, Any], seen_states: set[str], property_source: str) -> dict[str, Any]:
++    feedback = feedback_vector(node["replay"], property_source=property_source,
++                               seen_states=seen_states)
++    node["feedback"] = feedback
++    node["sequence"] = node["sequence"]
++    return node
++
++
++def _run_extension(mode: str, base_sequence: list[dict[str, Any]],
++                   action_templates: list[dict[str, Any]], action_evidence: dict[str, dict[str, Any]],
++                   abi_by_signature: dict[str, dict[str, Any]], candidate: dict[str, Any],
++                   target_states: set[str], senders: list[str], property_source: str,
++                   *, random_seed: int = 20261119) -> dict[str, Any]:
++    started = time.monotonic()
++    base_replay = _execute("Wallet02Refund", candidate, base_sequence, runtime_constraints=True)
++    base_sequence, base_replay, base_repair = _apply_one_parameter_repair(
++        "Wallet02Refund", candidate, base_sequence, base_replay)
++    executions = 1  # fresh baseline replay; extension decisions below are separately counted
++    records: list[dict[str, Any]] = [{"candidate_no": 0, "origin": "frozen_base_replay",
++                                     "sequence": base_sequence, "replay": base_replay,
++                                     "parameter_repair": base_repair,
++                                     "feedback": feedback_vector(base_replay,
++                                                                 property_source=property_source)}]
++    frontier = [{"sequence": base_sequence, "replay": base_replay, "depth": 0}]
++    seen_sequences = {sequence_fingerprint(base_sequence)}
++    seen_states: set[str] = set()
++    decisions: list[dict[str, Any]] = []
++    target_candidate: dict[str, Any] | None = None
++    budget_executions = 0
++    iteration = 0
++    while frontier and budget_executions < MAX_EXECUTIONS and target_candidate is None:
++        iteration += 1
++        pool: list[dict[str, Any]] = []
++        for parent in frontier:
++            proposals = propose_extensions(
++                parent["sequence"], action_templates, action_evidence,
++                abi_by_signature, mode=mode, replay=parent["replay"],
++                target_states=target_states, senders=senders,
++                max_sequence_length=MAX_LENGTH,
++                max_proposals=MAX_EXECUTIONS - budget_executions,
++                random_seed=random_seed + iteration + parent["depth"])
++            for proposal in proposals:
++                sequence = proposal["sequence"]
++                fingerprint = proposal["fingerprint"]
++                if fingerprint in seen_sequences:
++                    decisions.append({"iteration": iteration, "operator": proposal["operator"],
++                                      "sequence_fingerprint": fingerprint,
++                                      "decision": "discarded", "reason": "semantic duplicate"})
++                    continue
++                valid, reason = _valid_action_sequence(sequence, abi_by_signature)
++                if not valid:
++                    decisions.append({"iteration": iteration, "operator": proposal["operator"],
++                                      "sequence_fingerprint": fingerprint,
++                                      "decision": "discarded", "reason": reason})
++                    continue
++                # Each candidate is replayed from a fresh deployment and receives at
++                # most one existing local parameter repair; no Agent is called.
++                run_started = time.monotonic()
++                replay = _execute("Wallet02Refund", candidate, sequence, runtime_constraints=True)
++                sequence, replay, repair = _apply_one_parameter_repair(
++                    "Wallet02Refund", candidate, sequence, replay)
++                elapsed = time.monotonic() - run_started
++                seen_sequences.add(fingerprint)
++                budget_executions += 1
++                executions += 1
++                vector = feedback_vector(replay, property_source=property_source,
++                                         seen_states=seen_states)
++                new_states = set(vector["getter_state_fingerprints"])
++                seen_states |= new_states
++                record = {"candidate_no": budget_executions,
++                          "iteration": iteration,
++                          "origin": proposal["operator"],
++                          "proposal_reason": proposal["proposal_reason"],
++                          "proposal_evidence": proposal.get("evidence"),
++                          "sequence_fingerprint": fingerprint,
++                          "sequence": sequence, "replay": replay,
++                          "parameter_repair": repair,
++                          "elapsed_seconds": round(elapsed, 6),
++                          "feedback": vector,
++                          "retention_decision": "pending"}
++                records.append(record)
++                decisions.append({"iteration": iteration,
++                                  "sequence_fingerprint": fingerprint,
++                                  "operator": proposal["operator"],
++                                  "decision": "executed",
++                                  "reason": proposal["proposal_reason"]})
++                if vector["counterexample_reached"] and replay.get("replay_status") == "executable":
++                    target_candidate = record
++                    break
++                if (replay.get("transactions") and
++                        (vector["property_related_state_changed"] or
++                         any(row.get("status") == "success" for row in replay["transactions"]))):
++                    pool.append({"sequence": sequence, "replay": replay,
++                                 "depth": parent["depth"] + 1,
++                                 "feedback": vector, "record": record})
++                if budget_executions >= MAX_EXECUTIONS:
++                    break
++            if target_candidate or budget_executions >= MAX_EXECUTIONS:
++                break
++        if target_candidate:
++            target_candidate["retention_decision"] = "target_reached_stop"
++            break
++        retained = retain_diverse_prefixes(pool, RETAINED_PREFIXES)
++        for node in pool:
++            node["record"]["retention_decision"] = node.get(
++                "retention_decision", "discarded_budget_or_lower_feedback_and_lower_diversity")
++            if node in retained:
++                node["record"]["retention_decision"] = "retained_diverse_prefix"
++        frontier = retained
++    eligible = [row for row in records
++                if row.get("replay", {}).get("replay_status") == "executable" and
++                row.get("feedback", {}).get("property_related_state_changed")]
++    return {"mode": mode, "status": "target_reached" if target_candidate else
++            "valid_related_state_candidate" if eligible else "no_valid_related_state_candidate",
++            "base_candidate_fingerprint": sequence_fingerprint(base_sequence),
++            "base_parameter_repair": base_repair,
++            "candidate_execution_budget": MAX_EXECUTIONS,
++            "candidate_executions": budget_executions,
++            "base_replay_executions": 1,
++            "total_anvil_replays": executions,
++            "elapsed_seconds": round(time.monotonic() - started, 6),
++            "api_calls": 0, "api_tokens": 0, "api_cost_usd": 0,
++            "records": records, "decisions": decisions,
++            "target_candidate": target_candidate,
++            "eligible_candidates": eligible}
++
++
++def _write_seed(project: str, candidate: dict[str, Any], sequence: list[dict[str, Any]],
++                context: dict[str, Any], group: str) -> Path:
++    root = RUN_ROOT / "seed-pack" / group
++    root.mkdir(parents=True, exist_ok=True)
++    seed_id = "seed-" + uuid.uuid4().hex
++    replay = {"replay_status": "executable"}
++    return write_corpus(project, candidate, sequence, context, root,
++                        replay=replay, seed_id=seed_id)
++
++
++def _lcov_lines(root: Path) -> set[tuple[str, int]]:
++    result: set[tuple[str, int]] = set()
++    for path in root.rglob("*.lcov"):
++        current = ""
++        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
++            if line.startswith("SF:"):
++                current = line[3:]
++            elif line.startswith("DA:"):
++                fields = line[3:].split(",")
++                if len(fields) >= 2 and fields[0].isdigit() and int(fields[1]) > 0:
++                    result.add((current, int(fields[0])))
++    return result
++
++
++def _copy_seed_file(source: Path | None, corpus: Path) -> None:
++    if source is None:
++        return
++    target = corpus / "coverage" / source.name
++    target.parent.mkdir(parents=True, exist_ok=True)
++    shutil.copy2(source, target)
++
++
++def run_wallet_echidna(groups: dict[str, dict[str, Any]], candidate: dict[str, Any],
++                       context: dict[str, Any], seeds: list[int] = SEEDS) -> dict[str, Any]:
++    results = []
++    skipped = []
++    for group, payload in groups.items():
++        if payload.get("skip_reason"):
++            skipped.append({"group": group, "reason": payload["skip_reason"]})
++            continue
++        sequence = payload.get("sequence")
++        valid_seed = payload.get("valid_seed", False)
++        seed_path = (_write_seed("Wallet02Refund", candidate, sequence, context, group)
++                     if valid_seed and sequence else None)
++        preparation_seconds = float(payload.get("preparation_seconds", 0))
++        for seed in seeds:
++            for stage, limit in (("seed_only", 0), ("fuzz_500", 500)):
++                corpus = RUN_ROOT / "echidna" / group / f"seed-{seed}" / stage
++                corpus.mkdir(parents=True, exist_ok=True)
++                _copy_seed_file(seed_path, corpus)
++                result = run_echidna(
++                    "Wallet02Refund", corpus,
++                    property_name="echidna_wallet_accounting_respected()",
++                    test_limit=limit, timeout=60, seed=seed,
++                    seq_len=MAX_LENGTH, shrink_limit=1, stop_on_fail=False,
++                    disable_slither=True, sender_pool=PROJECTS["Wallet02Refund"]["senders"],
++                    working_directory=ROOT)
++                result["end_to_end_elapsed_seconds"] = None
++                result["end_to_end_cost_scope"] = (
++                    "seed preparation is a one-time group cost; report it separately from each Echidna repeat")
++                result["seed_preparation_seconds"] = preparation_seconds
++                result["group"] = group
++                result["stage"] = stage
++                result["external_seed_used"] = seed_path is not None
++                result["seed_path"] = str(seed_path.relative_to(ROOT)) if seed_path else None
++                _write_json(corpus / "summary.json", result)
++                results.append(result)
++    coverage = {}
++    for result in results:
++        key = (result["group"], result["seed"])
++        if result["stage"] == "seed_only":
++            coverage[key] = {"seed_only_lines": _lcov_lines(Path(result["full_log_path"]).parent)}
++        else:
++            final_lines = _lcov_lines(Path(result["full_log_path"]).parent)
++            seed_lines = coverage.get(key, {}).get("seed_only_lines", set())
++            coverage[key]["final_lines"] = final_lines
++            coverage[key]["mutation_added_lines"] = final_lines - seed_lines
++    compact_coverage = [{"group": group, "seed": seed,
++                         "seed_only_line_count": len(item.get("seed_only_lines", set())),
++                         "mutation_added_line_count": len(item.get("mutation_added_lines", set())),
++                         "final_line_count": len(item.get("final_lines", set())),
++                         "seed_only_lines": sorted(item.get("seed_only_lines", set())),
++                         "mutation_added_lines": sorted(item.get("mutation_added_lines", set()))}
++                        for (group, seed), item in sorted(coverage.items())]
++    return {"groups": results, "skipped_groups": skipped, "coverage": compact_coverage,
++            "coverage_interpretation": "LCOV line sets are compared within the same group/seed between testLimit=0 replay-only and testLimit=500 campaigns; no counter-based mutation inference is used."}
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--phase", choices=["wallet-extension", "wallet-fuzz"],
++                        default="wallet-extension")
++    parser.add_argument("--max-executions", type=int, default=MAX_EXECUTIONS)
++    parser.add_argument("--mode", choices=["random", "static", "state_feedback", "all"],
++                        default="all")
++    parser.add_argument("--run-tag", default="attempt-02-feedback-priority")
++    parser.add_argument("--expansion-tag", default=None,
++                        help="wallet-fuzz 使用指定目录中的已冻结扩展结果")
++    parser.add_argument("--groups", nargs="+",
++                        choices=["E0", "E1", "E2", "E3", "A_random", "A_static"],
++                        default=None, help="wallet-fuzz 仅运行指定对照组")
++    args = parser.parse_args()
++    if args.max_executions != MAX_EXECUTIONS:
++        raise ValueError("Phase31冻结候选执行上限为24，不接受扩大预算")
++    global RUN_ROOT, EXPANSION_ROOT
++    RUN_ROOT = WALLET_RESULT / args.run_tag
++    EXPANSION_ROOT = WALLET_RESULT / (args.expansion_tag or args.run_tag)
++    RUN_ROOT.mkdir(parents=True, exist_ok=True)
++    config, context, abi_by_signature, loaded = _load_context()
++    candidate = loaded["candidate"]
++    prop = loaded["property"]
++    base = candidate["transactions"]
++    action_templates, template_decisions = build_action_templates(
++        prop["candidate_actions"], abi_by_signature, base, config["actions"]["senders"])
++    action_evidence = {str(row.get("abi_signature")): row
++                       for row in prop["candidate_actions"] if row.get("abi_signature")}
++    target_states = set(prop.get("read_states", [])) | set(prop.get("property_write_states", []))
++    if args.phase == "wallet-extension":
++        modes = list(EXTENSION_MODES) if args.mode == "all" else [args.mode]
++        results = {}
++        for mode in modes:
++            result = _run_extension(mode, base, action_templates, action_evidence,
++                                    abi_by_signature, candidate, target_states,
++                                    config["actions"]["senders"], loaded["property_source"])
++            result["candidate_template_decisions"] = template_decisions
++            results[mode] = result
++            _write_json(RUN_ROOT / f"{EXTENSION_MODES[mode]}-扩展回放.json", result)
++        _write_json(RUN_ROOT / "01-扩展方法汇总.json", {
++            "phase": 31, "input": "Phase30B P1 exact Agent A/B transaction candidate",
++            "manual_oracle_read": False, "manual_oracle_used": False,
++            "base_sequence": base, "action_templates": action_templates,
++            "target_states": sorted(target_states), "max_sequence_length": MAX_LENGTH,
++            "retained_prefixes": RETAINED_PREFIXES,
++            "candidate_execution_limit_per_mode": MAX_EXECUTIONS,
++            "results": results})
++        return
++
++    group_sources = {}
++    base_replay = _execute("Wallet02Refund", candidate, base, runtime_constraints=True)
++    base_replay = _apply_one_parameter_repair("Wallet02Refund", candidate, base, base_replay)[1]
++    group_sources["E1"] = {"sequence": base, "valid_seed": base_replay.get("replay_status") == "executable",
++                            "preparation_seconds": 0, "replay": base_replay}
++    # The frozen Phase30B E1 candidate did not trigger a runtime repair. E2 is therefore
++    # the same paired plan and same concrete arguments; this is explicitly recorded.
++    group_sources["E2"] = {**group_sources["E1"], "parameter_repair": "no repair proposal; identical to E1"}
++    group_sources["E0"] = {"sequence": None, "valid_seed": False, "preparation_seconds": 0}
++    for mode, group in EXTENSION_MODES.items():
++        result_path = EXPANSION_ROOT / f"{group}-扩展回放.json"
++        expansion = read_json(result_path)
++        choice = expansion.get("target_candidate")
++        if choice is None:
++            choice = next((row for row in expansion.get("eligible_candidates", [])
++                           if row.get("origin") != "frozen_base_replay"), None)
++        group_sources[group] = {
++            "sequence": choice.get("sequence") if choice else None,
++            "valid_seed": bool(choice and choice.get("replay", {}).get("replay_status") == "executable" and
++                                choice.get("feedback", {}).get("property_related_state_changed")),
++            "preparation_seconds": expansion.get("elapsed_seconds", 0),
++            "replay": choice.get("replay") if choice else None,
++            "candidate_execution_count": expansion.get("candidate_executions", 0),
++            "automatic_target_reached": bool(expansion.get("target_candidate")),
++            "skip_reason": None if choice else
++                "extension mode produced no Anvil-executable, property-related candidate; retain failure without substituting the base sequence",
++        }
++    if args.groups:
++        requested_groups = set(args.groups)
++        missing_groups = requested_groups - set(group_sources)
++        if missing_groups:
++            raise ValueError(f"requested groups unavailable: {sorted(missing_groups)}")
++        group_sources = {key: value for key, value in group_sources.items()
++                         if key in requested_groups}
++    if not any(payload.get("valid_seed") for group, payload in group_sources.items()
++               if group in {"E1", "E2", "E3", "A_random", "A_static"}):
++        raise RuntimeError("没有合法且产生属性相关状态变化的种子，不启动种子效用组")
++    echidna = run_wallet_echidna(group_sources, candidate, context)
++    _write_json(RUN_ROOT / "02-E0-E3-Echidna对照.json", echidna)
++
++
++if __name__ == "__main__":
++    main()
+
+diff --git a/func/测试过程/SCFuzzBench公开项目接入/Phase31非Wallet回归.py b/func/测试过程/SCFuzzBench公开项目接入/Phase31非Wallet回归.py
+new file mode 100644
+index 0000000..1de8ad5
+--- /dev/null
++++ b/func/测试过程/SCFuzzBench公开项目接入/Phase31非Wallet回归.py
+@@ -0,0 +1,127 @@
++#!/usr/bin/env python3
++"""Isolated regression fixture for the generic bounded extension module.
++
++PaperExample is a non-Wallet, source-available sample. The explicit fixture
++actions in this file are used only to check the extension API and Anvil replay;
++they are not sent to the Wallet planner, agent, Echidna Wallet corpus, or scored
++as automatic discovery evidence.
++"""
++
++from __future__ import annotations
++
++import json
++import subprocess
++import sys
++import time
++from pathlib import Path
++from typing import Any
++
++
++ROOT = Path(__file__).resolve().parents[3]
++sys.path.insert(0, str(ROOT / "func" / "功能"))
++sys.path.insert(0, str(ROOT / "deepseek"))
++
++from 状态反馈序列扩展 import propose_extensions
++from 种子验证 import AnvilSession
++
++
++SOURCE = ROOT / "sol/单合约测试/PaperExample/PaperExample.sol"
++SOLC = Path.home() / ".solc-select/artifacts/solc-0.8.20/solc-0.8.20"
++OUT = ROOT / "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/非Wallet回归"
++SENDER = "0x0000000000000000000000000000000000010000"
++
++
++def _abi_map(abi: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
++    return {entry["name"] + "(" + ",".join(row["type"] for row in entry.get("inputs", [])) + ")": entry
++            for entry in abi if entry.get("type") == "function"}
++
++
++def main() -> None:
++    started = time.monotonic()
++    if not SOLC.is_file():
++        raise FileNotFoundError(SOLC)
++    compilation = subprocess.run([str(SOLC), "--combined-json", "abi,bin", str(SOURCE)],
++                                 check=True, capture_output=True, text=True)
++    compiled = json.loads(compilation.stdout)
++    contract_data = next(value for key, value in compiled["contracts"].items()
++                         if key.endswith(":TEST"))
++    abi = (json.loads(contract_data["abi"]) if isinstance(contract_data["abi"], str)
++           else contract_data["abi"])
++    abi_by_signature = _abi_map(abi)
++    target_signature = "set1(int256)"
++    base = [{"function": "set0(int256)", "arguments": [23], "sender": SENDER,
++             "value_wei": "0", "delay_seconds": 0, "delay_blocks": 0}]
++    template = {"function": target_signature, "arguments": [5], "sender": SENDER,
++                "value_wei": "0", "delay_seconds": 0, "delay_blocks": 0,
++                "sequence_extension_evidence": {"matched_states": ["flag1"],
++                                                 "read_states": ["flag0"],
++                                                 "write_states": ["flag1"],
++                                                 "evidence_origin": "isolated source-review regression fixture"}}
++    evidence = {target_signature: {"matched_states": ["flag1"],
++                                   "read_states": ["flag0"],
++                                   "write_states": ["flag1"]}}
++    proposals = propose_extensions(
++        base, [template], evidence, abi_by_signature, mode="static",
++        target_states={"flag1"}, senders=[SENDER], max_sequence_length=8,
++        max_proposals=24)
++    candidate = next((row for row in proposals
++                      if [tx["function"] for tx in row["sequence"]] ==
++                      ["set0(int256)", "set1(int256)"]), None)
++    if candidate is None:
++        raise AssertionError("generic static extension did not preserve the base prefix")
++
++    trace = []
++    with AnvilSession() as session:
++        web3 = session.web3
++        deployer = session.deployer
++        factory = web3.eth.contract(abi=abi, bytecode="0x" + contract_data["bin"])
++        tx_hash = factory.constructor().transact(
++            {"from": web3.to_checksum_address(deployer), "gas": session.gas_limit,
++             "gasPrice": 0})
++        receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=30)
++        if receipt.status != 1 or not receipt.contractAddress:
++            raise RuntimeError("PaperExample deployment failed")
++        contract = web3.eth.contract(address=receipt.contractAddress, abi=abi)
++        for index, tx in enumerate(candidate["sequence"]):
++            before = {name: bool(getattr(contract.functions, name)().call())
++                      for name in ("flag0", "flag1")}
++            method, _ = tx["function"].split("(", 1)
++            sent = getattr(contract.functions, method)(*tx["arguments"]).transact(
++                {"from": web3.to_checksum_address(tx["sender"]), "value": int(tx["value_wei"]),
++                 "gas": session.max_transaction_gas, "gasPrice": 0})
++            tx_receipt = web3.eth.wait_for_transaction_receipt(sent, timeout=30)
++            after = {name: bool(getattr(contract.functions, name)().call())
++                     for name in ("flag0", "flag1")}
++            prop = bool(contract.functions.echidna_flag().call())
++            trace.append({"index": index + 1, "function": tx["function"],
++                          "arguments": tx["arguments"], "sender": tx["sender"],
++                          "receipt_status": int(tx_receipt.status),
++                          "state_before": before, "state_after": after,
++                          "property_value": prop})
++            if tx_receipt.status != 1:
++                raise RuntimeError(f"transaction {index + 1} failed")
++
++    result = {"phase": 31, "sample": "PaperExample",
++              "fixture_classification": "manual non-Wallet regression fixture; excluded from automatic discovery metrics",
++              "source": str(SOURCE.relative_to(ROOT)),
++              "compiler": str(SOLC), "contract": "TEST",
++              "property": "echidna_flag()", "extension_mode": "static",
++              "source_relation": {"set0": {"writes": ["flag0"]},
++                                  "set1": {"reads": ["flag0"], "writes": ["flag1"]},
++                                  "property": {"reads": ["flag1"]}},
++              "base_sequence": base, "proposal_count": len(proposals),
++              "proposal": candidate, "transactions": trace,
++              "target_counterexample_reached": trace[-1]["property_value"] is False,
++              "elapsed_seconds": round(time.monotonic() - started, 6),
++              "compiler_stderr": compilation.stderr}
++    OUT.mkdir(parents=True, exist_ok=True)
++    (OUT / "PaperExample-通用扩展回归.json").write_text(
++        json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
++    print(json.dumps({key: result[key] for key in
++                      ("sample", "fixture_classification", "proposal_count",
++                       "target_counterexample_reached", "elapsed_seconds")},
++                     ensure_ascii=False))
++
++
++if __name__ == "__main__":
++    main()

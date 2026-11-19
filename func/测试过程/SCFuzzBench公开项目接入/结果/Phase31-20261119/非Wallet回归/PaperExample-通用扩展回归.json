@@ -1,0 +1,129 @@
+{
+  "phase": 31,
+  "sample": "PaperExample",
+  "fixture_classification": "manual non-Wallet regression fixture; excluded from automatic discovery metrics",
+  "source": "sol/单合约测试/PaperExample/PaperExample.sol",
+  "compiler": "/home/skk/.solc-select/artifacts/solc-0.8.20/solc-0.8.20",
+  "contract": "TEST",
+  "property": "echidna_flag()",
+  "extension_mode": "static",
+  "source_relation": {
+    "set0": {
+      "writes": [
+        "flag0"
+      ]
+    },
+    "set1": {
+      "reads": [
+        "flag0"
+      ],
+      "writes": [
+        "flag1"
+      ]
+    },
+    "property": {
+      "reads": [
+        "flag1"
+      ]
+    }
+  },
+  "base_sequence": [
+    {
+      "function": "set0(int256)",
+      "arguments": [
+        23
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    }
+  ],
+  "proposal_count": 1,
+  "proposal": {
+    "sequence": [
+      {
+        "function": "set0(int256)",
+        "arguments": [
+          23
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0
+      },
+      {
+        "function": "set1(int256)",
+        "arguments": [
+          5
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "sequence_extension_evidence": {
+          "matched_states": [
+            "flag1"
+          ],
+          "read_states": [
+            "flag0"
+          ],
+          "write_states": [
+            "flag1"
+          ],
+          "evidence_origin": "isolated source-review regression fixture"
+        }
+      }
+    ],
+    "fingerprint": "b20c6bed39e77afbd91989a11b2d6d853cf56727039e6f5f40f401576db254fd",
+    "operator": "static_dependency_insertion",
+    "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+    "evidence": {
+      "matched_states": [
+        "flag1"
+      ],
+      "position": 1
+    }
+  },
+  "transactions": [
+    {
+      "index": 1,
+      "function": "set0(int256)",
+      "arguments": [
+        23
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "receipt_status": 1,
+      "state_before": {
+        "flag0": false,
+        "flag1": false
+      },
+      "state_after": {
+        "flag0": true,
+        "flag1": false
+      },
+      "property_value": true
+    },
+    {
+      "index": 2,
+      "function": "set1(int256)",
+      "arguments": [
+        5
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "receipt_status": 1,
+      "state_before": {
+        "flag0": true,
+        "flag1": false
+      },
+      "state_after": {
+        "flag0": true,
+        "flag1": true
+      },
+      "property_value": false
+    }
+  ],
+  "target_counterexample_reached": true,
+  "elapsed_seconds": 0.277512,
+  "compiler_stderr": ""
+}

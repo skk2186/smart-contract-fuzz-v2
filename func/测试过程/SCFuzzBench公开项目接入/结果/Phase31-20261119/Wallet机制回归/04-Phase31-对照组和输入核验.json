@@ -1,0 +1,1868 @@
+{
+  "experiment": "Phase31 Wallet same-property seed utility and ablation",
+  "echidna_version": "2.3.2",
+  "test_limits": {
+    "seed_only": 0,
+    "fuzz_500": 500
+  },
+  "seeds": [
+    20261125,
+    20261135,
+    20261145
+  ],
+  "run_counts": {
+    "first_campaign_runs_preserved": 36,
+    "first_campaign_valid_groups": [
+      "E0",
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "first_campaign_invalid_ablation_groups": [
+      "A_random",
+      "A_static"
+    ],
+    "corrected_A_random_runs": 6,
+    "valid_comparison_runs": 30,
+    "A_static_echidna_runs": 0
+  },
+  "extension_summary": {
+    "A_random": {
+      "status": "valid_related_state_candidate",
+      "candidate_executions": 24,
+      "total_anvil_replays": 25,
+      "elapsed_seconds": 15.490852,
+      "api_calls": 0,
+      "api_tokens": 0,
+      "base_fallback_initially_used": true,
+      "generated_eligible_count_excluding_base": 9,
+      "selected_candidate_no": 1,
+      "selected_origin": "random_role_or_sender",
+      "selected_sequence_fingerprint": "ae1af6454f0e866e4c93966eb88503e807b7e9855865e96ac66a449961670593",
+      "selected_sequence": [
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "withdraw(uint8,uint256)",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+            }
+          ]
+        },
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000040000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "sequence_extension_evidence": {
+            "matched_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "read_states": [],
+            "write_states": [],
+            "evidence_origin": "property_action_inventory"
+          }
+        }
+      ],
+      "selected_replay_status": "executable",
+      "selected_counterexample": false,
+      "static_generated_candidate_replays": null
+    },
+    "A_static": {
+      "status": "valid_related_state_candidate",
+      "candidate_executions": 2,
+      "total_anvil_replays": 3,
+      "elapsed_seconds": 2.04316,
+      "api_calls": 0,
+      "api_tokens": 0,
+      "base_fallback_initially_used": true,
+      "generated_eligible_count_excluding_base": 0,
+      "selected_candidate_no": null,
+      "selected_origin": null,
+      "selected_sequence_fingerprint": null,
+      "selected_sequence": null,
+      "selected_replay_status": null,
+      "selected_counterexample": null,
+      "static_generated_candidate_replays": [
+        [
+          1,
+          "replay_failed",
+          "outer_revert"
+        ],
+        [
+          2,
+          "replay_failed",
+          "no_persistent_state_change"
+        ]
+      ]
+    },
+    "E3": {
+      "status": "target_reached",
+      "candidate_executions": 10,
+      "total_anvil_replays": 11,
+      "elapsed_seconds": 8.012526,
+      "api_calls": 0,
+      "api_tokens": 0,
+      "base_fallback_initially_used": false,
+      "generated_eligible_count_excluding_base": 5,
+      "selected_candidate_no": 10,
+      "selected_origin": "shared_resource_role_expansion",
+      "selected_sequence_fingerprint": "e24710d808cfea34ac5438fcdd925b69f5a4b4906833c831a10fa4f3cddcc2f3",
+      "selected_sequence": [
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "refund(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "sequence_extension_evidence": {
+            "matched_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "read_states": [],
+            "write_states": [],
+            "evidence_origin": "property_action_inventory"
+          }
+        },
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            1
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "withdraw(uint8,uint256)",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+            }
+          ]
+        }
+      ],
+      "selected_replay_status": "executable",
+      "selected_counterexample": true,
+      "static_generated_candidate_replays": null
+    }
+  },
+  "corrected_group_inputs": {
+    "initial_run_group_inputs": {
+      "seed_fingerprints": {
+        "E1": "1213c0f87c258d3cc8b56e75a6a6f5ccd2c922609c094308f3ed38184381c153",
+        "E2": "1213c0f87c258d3cc8b56e75a6a6f5ccd2c922609c094308f3ed38184381c153",
+        "A_random": "1213c0f87c258d3cc8b56e75a6a6f5ccd2c922609c094308f3ed38184381c153",
+        "A_static": "1213c0f87c258d3cc8b56e75a6a6f5ccd2c922609c094308f3ed38184381c153"
+      },
+      "A_random_matches_E1": true,
+      "A_static_matches_E1": true,
+      "classification": "initial A_random/A_static Echidna runs are preserved but excluded as ablation evidence because the driver selected frozen_base_replay instead of an extended candidate"
+    },
+    "corrected_A_random": "rerun once from generated non-base Anvil-executable candidate; use corrected-ablation-01",
+    "A_static": "no generated extension was Anvil-executable: insertion before withdrawal reverted for insufficient shared balance; insertion after withdrawal had no persistent state change; no Echidna seed substituted.",
+    "formal_groups_in_valid_comparison": [
+      "E0",
+      "E1",
+      "E2",
+      "E3",
+      "A_random"
+    ],
+    "A_static_group": "failed before seed utility, no valid seed; prior miswired runs retained only as execution history"
+  },
+  "group_aggregate": {
+    "A_random": {
+      "seed_only": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.383667,
+        "mean_lcov_hit_lines": 32,
+        "fuzz_added_lcov_hit_lines": null,
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              4,
+              0
+            ]
+          ],
+          [
+            20261135,
+            [
+              4,
+              0
+            ]
+          ],
+          [
+            20261145,
+            [
+              4,
+              0
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            4
+          ],
+          [
+            20261135,
+            4
+          ],
+          [
+            20261145,
+            4
+          ]
+        ],
+        "property_failures": null
+      },
+      "fuzz_500": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.577667,
+        "mean_lcov_hit_lines": 43,
+        "fuzz_added_lcov_hit_lines": [
+          11,
+          11,
+          11
+        ],
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              504,
+              500
+            ]
+          ],
+          [
+            20261135,
+            [
+              505,
+              500
+            ]
+          ],
+          [
+            20261145,
+            [
+              508,
+              500
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            504
+          ],
+          [
+            20261135,
+            505
+          ],
+          [
+            20261145,
+            508
+          ]
+        ],
+        "property_failures": 0
+      },
+      "one_time_seed_preparation_seconds": 15.490852,
+      "new_agent_calls": 0
+    },
+    "E0": {
+      "seed_only": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.268667,
+        "mean_lcov_hit_lines": 12,
+        "fuzz_added_lcov_hit_lines": null,
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              0,
+              0
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              0
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              0
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            0
+          ],
+          [
+            20261135,
+            0
+          ],
+          [
+            20261145,
+            0
+          ]
+        ],
+        "property_failures": null
+      },
+      "fuzz_500": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.467667,
+        "mean_lcov_hit_lines": 40,
+        "fuzz_added_lcov_hit_lines": [
+          29,
+          26,
+          29
+        ],
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              505,
+              500
+            ]
+          ],
+          [
+            20261135,
+            [
+              505,
+              500
+            ]
+          ],
+          [
+            20261145,
+            [
+              508,
+              500
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            505
+          ],
+          [
+            20261135,
+            505
+          ],
+          [
+            20261145,
+            508
+          ]
+        ],
+        "property_failures": 0
+      },
+      "one_time_seed_preparation_seconds": 0,
+      "new_agent_calls": 0
+    },
+    "E1": {
+      "seed_only": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.332333,
+        "mean_lcov_hit_lines": 32,
+        "fuzz_added_lcov_hit_lines": null,
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              3,
+              0
+            ]
+          ],
+          [
+            20261135,
+            [
+              3,
+              0
+            ]
+          ],
+          [
+            20261145,
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            3
+          ],
+          [
+            20261135,
+            3
+          ],
+          [
+            20261145,
+            3
+          ]
+        ],
+        "property_failures": null
+      },
+      "fuzz_500": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.581667,
+        "mean_lcov_hit_lines": 43,
+        "fuzz_added_lcov_hit_lines": [
+          11,
+          11,
+          11
+        ],
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              507,
+              500
+            ]
+          ],
+          [
+            20261135,
+            [
+              502,
+              500
+            ]
+          ],
+          [
+            20261145,
+            [
+              504,
+              500
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            507
+          ],
+          [
+            20261135,
+            502
+          ],
+          [
+            20261145,
+            504
+          ]
+        ],
+        "property_failures": 0
+      },
+      "one_time_seed_preparation_seconds": 0,
+      "new_agent_calls": 0
+    },
+    "E2": {
+      "seed_only": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.408,
+        "mean_lcov_hit_lines": 32,
+        "fuzz_added_lcov_hit_lines": null,
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              3,
+              0
+            ]
+          ],
+          [
+            20261135,
+            [
+              3,
+              0
+            ]
+          ],
+          [
+            20261145,
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            3
+          ],
+          [
+            20261135,
+            3
+          ],
+          [
+            20261145,
+            3
+          ]
+        ],
+        "property_failures": null
+      },
+      "fuzz_500": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.529,
+        "mean_lcov_hit_lines": 43,
+        "fuzz_added_lcov_hit_lines": [
+          11,
+          11,
+          11
+        ],
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              0,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              507,
+              500
+            ]
+          ],
+          [
+            20261135,
+            [
+              502,
+              500
+            ]
+          ],
+          [
+            20261145,
+            [
+              504,
+              500
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            507
+          ],
+          [
+            20261135,
+            502
+          ],
+          [
+            20261145,
+            504
+          ]
+        ],
+        "property_failures": 0
+      },
+      "one_time_seed_preparation_seconds": 0,
+      "new_agent_calls": 0
+    },
+    "E3": {
+      "seed_only": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.322,
+        "mean_lcov_hit_lines": 41,
+        "fuzz_added_lcov_hit_lines": null,
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              5,
+              0
+            ]
+          ],
+          [
+            20261135,
+            [
+              5,
+              0
+            ]
+          ],
+          [
+            20261145,
+            [
+              5,
+              0
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            5
+          ],
+          [
+            20261135,
+            5
+          ],
+          [
+            20261145,
+            5
+          ]
+        ],
+        "property_failures": null
+      },
+      "fuzz_500": {
+        "runs": 3,
+        "mean_echidna_seconds": 0.311333,
+        "mean_lcov_hit_lines": 41,
+        "fuzz_added_lcov_hit_lines": [
+          0,
+          0,
+          0
+        ],
+        "tests_status_failed_over_total": [
+          [
+            20261125,
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            20261135,
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            20261145,
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "progress_transactions_over_limit": [
+          [
+            20261125,
+            [
+              5,
+              500
+            ]
+          ],
+          [
+            20261135,
+            [
+              5,
+              500
+            ]
+          ],
+          [
+            20261145,
+            [
+              5,
+              500
+            ]
+          ]
+        ],
+        "total_calls": [
+          [
+            20261125,
+            5
+          ],
+          [
+            20261135,
+            5
+          ],
+          [
+            20261145,
+            5
+          ]
+        ],
+        "property_failures": 3
+      },
+      "one_time_seed_preparation_seconds": 8.012526,
+      "new_agent_calls": 0
+    }
+  },
+  "coverage_by_seed": [
+    {
+      "group": "A_random",
+      "seed": 20261125,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "A_random",
+      "seed": 20261135,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "A_random",
+      "seed": 20261145,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "E0",
+      "seed": 20261125,
+      "seed_only_lcov_hit_lines": 12,
+      "fuzz_500_lcov_hit_lines": 41,
+      "fuzz_added_lcov_hit_lines": 29
+    },
+    {
+      "group": "E0",
+      "seed": 20261135,
+      "seed_only_lcov_hit_lines": 12,
+      "fuzz_500_lcov_hit_lines": 38,
+      "fuzz_added_lcov_hit_lines": 26
+    },
+    {
+      "group": "E0",
+      "seed": 20261145,
+      "seed_only_lcov_hit_lines": 12,
+      "fuzz_500_lcov_hit_lines": 41,
+      "fuzz_added_lcov_hit_lines": 29
+    },
+    {
+      "group": "E1",
+      "seed": 20261125,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "E1",
+      "seed": 20261135,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "E1",
+      "seed": 20261145,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "E2",
+      "seed": 20261125,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "E2",
+      "seed": 20261135,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "E2",
+      "seed": 20261145,
+      "seed_only_lcov_hit_lines": 32,
+      "fuzz_500_lcov_hit_lines": 43,
+      "fuzz_added_lcov_hit_lines": 11
+    },
+    {
+      "group": "E3",
+      "seed": 20261125,
+      "seed_only_lcov_hit_lines": 41,
+      "fuzz_500_lcov_hit_lines": 41,
+      "fuzz_added_lcov_hit_lines": 0
+    },
+    {
+      "group": "E3",
+      "seed": 20261135,
+      "seed_only_lcov_hit_lines": 41,
+      "fuzz_500_lcov_hit_lines": 41,
+      "fuzz_added_lcov_hit_lines": 0
+    },
+    {
+      "group": "E3",
+      "seed": 20261145,
+      "seed_only_lcov_hit_lines": 41,
+      "fuzz_500_lcov_hit_lines": 41,
+      "fuzz_added_lcov_hit_lines": 0
+    }
+  ],
+  "runs": [
+    {
+      "group": "E0",
+      "seed": 20261125,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.452,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        505,
+        500
+      ],
+      "total_calls": 505,
+      "loaded_seed_count": 0,
+      "replayed_sequence_count": 0,
+      "lcov_hit_lines": 41,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261125/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261125/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E0",
+      "seed": 20261125,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.26,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        0,
+        0
+      ],
+      "total_calls": 0,
+      "loaded_seed_count": 0,
+      "replayed_sequence_count": 0,
+      "lcov_hit_lines": 12,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261125/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261125/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E0",
+      "seed": 20261135,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.5,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        505,
+        500
+      ],
+      "total_calls": 505,
+      "loaded_seed_count": 0,
+      "replayed_sequence_count": 0,
+      "lcov_hit_lines": 38,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261135/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261135/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E0",
+      "seed": 20261135,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.268,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        0,
+        0
+      ],
+      "total_calls": 0,
+      "loaded_seed_count": 0,
+      "replayed_sequence_count": 0,
+      "lcov_hit_lines": 12,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261135/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261135/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E0",
+      "seed": 20261145,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.451,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        508,
+        500
+      ],
+      "total_calls": 508,
+      "loaded_seed_count": 0,
+      "replayed_sequence_count": 0,
+      "lcov_hit_lines": 41,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261145/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261145/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E0",
+      "seed": 20261145,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.278,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        0,
+        0
+      ],
+      "total_calls": 0,
+      "loaded_seed_count": 0,
+      "replayed_sequence_count": 0,
+      "lcov_hit_lines": 12,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261145/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E0/seed-20261145/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E1",
+      "seed": 20261125,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.551,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        507,
+        500
+      ],
+      "total_calls": 507,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261125/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261125/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E1",
+      "seed": 20261125,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.327,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        3,
+        0
+      ],
+      "total_calls": 3,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261125/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261125/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E1",
+      "seed": 20261135,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.704,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        502,
+        500
+      ],
+      "total_calls": 502,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261135/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261135/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E1",
+      "seed": 20261135,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.408,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        3,
+        0
+      ],
+      "total_calls": 3,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261135/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261135/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E1",
+      "seed": 20261145,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.49,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        504,
+        500
+      ],
+      "total_calls": 504,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261145/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261145/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E1",
+      "seed": 20261145,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.262,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        3,
+        0
+      ],
+      "total_calls": 3,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261145/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E1/seed-20261145/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E2",
+      "seed": 20261125,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.466,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        507,
+        500
+      ],
+      "total_calls": 507,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261125/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261125/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E2",
+      "seed": 20261125,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.284,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        3,
+        0
+      ],
+      "total_calls": 3,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261125/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261125/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E2",
+      "seed": 20261135,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.62,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        502,
+        500
+      ],
+      "total_calls": 502,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261135/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261135/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E2",
+      "seed": 20261135,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.361,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        3,
+        0
+      ],
+      "total_calls": 3,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261135/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261135/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E2",
+      "seed": 20261145,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.501,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        504,
+        500
+      ],
+      "total_calls": 504,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261145/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261145/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E2",
+      "seed": 20261145,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.579,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        3,
+        0
+      ],
+      "total_calls": 3,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261145/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E2/seed-20261145/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E3",
+      "seed": 20261125,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.305,
+      "exit_code": 1,
+      "property_failure_reported": true,
+      "tests_status_failed_over_total": [
+        1,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        5,
+        500
+      ],
+      "total_calls": 5,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 41,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261125/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261125/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E3",
+      "seed": 20261125,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.345,
+      "exit_code": 1,
+      "property_failure_reported": true,
+      "tests_status_failed_over_total": [
+        1,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        5,
+        0
+      ],
+      "total_calls": 5,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 41,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261125/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261125/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E3",
+      "seed": 20261135,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.321,
+      "exit_code": 1,
+      "property_failure_reported": true,
+      "tests_status_failed_over_total": [
+        1,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        5,
+        500
+      ],
+      "total_calls": 5,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 41,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261135/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261135/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E3",
+      "seed": 20261135,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.327,
+      "exit_code": 1,
+      "property_failure_reported": true,
+      "tests_status_failed_over_total": [
+        1,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        5,
+        0
+      ],
+      "total_calls": 5,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 41,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261135/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261135/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E3",
+      "seed": 20261145,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.308,
+      "exit_code": 1,
+      "property_failure_reported": true,
+      "tests_status_failed_over_total": [
+        1,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        5,
+        500
+      ],
+      "total_calls": 5,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 41,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261145/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261145/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": 500,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "E3",
+      "seed": 20261145,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.294,
+      "exit_code": 1,
+      "property_failure_reported": true,
+      "tests_status_failed_over_total": [
+        1,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        5,
+        0
+      ],
+      "total_calls": 5,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 41,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261145/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261145/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": 0,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "A_random",
+      "seed": 20261125,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.619,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        504,
+        500
+      ],
+      "total_calls": 504,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261125/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261125/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": null,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "A_random",
+      "seed": 20261125,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.588,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        4,
+        0
+      ],
+      "total_calls": 4,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261125/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261125/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": null,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "A_random",
+      "seed": 20261135,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.653,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        505,
+        500
+      ],
+      "total_calls": 505,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261135/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261135/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": null,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "A_random",
+      "seed": 20261135,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.275,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        4,
+        0
+      ],
+      "total_calls": 4,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261135/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261135/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": null,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "A_random",
+      "seed": 20261145,
+      "stage": "fuzz_500",
+      "test_limit": 500,
+      "elapsed_seconds": 0.461,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        508,
+        500
+      ],
+      "total_calls": 508,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 43,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261145/fuzz_500/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261145/fuzz_500/echidna.log",
+      "raw_fuzzing_cases_field": null,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    },
+    {
+      "group": "A_random",
+      "seed": 20261145,
+      "stage": "seed_only",
+      "test_limit": 0,
+      "elapsed_seconds": 0.288,
+      "exit_code": 0,
+      "property_failure_reported": false,
+      "tests_status_failed_over_total": [
+        0,
+        1
+      ],
+      "progress_transactions_over_limit": [
+        4,
+        0
+      ],
+      "total_calls": 4,
+      "loaded_seed_count": 1,
+      "replayed_sequence_count": 1,
+      "lcov_hit_lines": 32,
+      "summary_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261145/seed_only/summary.json",
+      "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-corrected-ablation-01/echidna/A_random/seed-20261145/seed_only/echidna.log",
+      "raw_fuzzing_cases_field": null,
+      "actual_fuzz_case_count": null,
+      "actual_fuzz_case_count_note": "Do not infer from text progress denominator; report raw log and LCOV deltas."
+    }
+  ],
+  "cost_context": {
+    "phase31_agent_calls": 0,
+    "phase31_agent_tokens": 0,
+    "common_phase30b_p1_plan_generation": {
+      "api_requests": 2,
+      "tokens": 8465,
+      "seconds": 6.191,
+      "scope": "shared historical cost; Phase31 reuses exact frozen candidate"
+    },
+    "reported_seed_preparation_seconds": {
+      "A_random": 15.490852,
+      "A_static": 2.04316,
+      "E3": 8.012526
+    },
+    "anvil_extension_replays": {
+      "A_random": 25,
+      "A_static": 3,
+      "E3": 11
+    }
+  },
+  "interpretation": {
+    "echidna_tests_status": "tests x/y is property status count, not executed fuzz-case count.",
+    "fuzzing_progress": "progress numerator and denominator retained from raw log; denominator is not actual case count.",
+    "actual_fuzz_cases": "not inferred from status denominator; A_random/E0/E1/E2 reach the configured 500 campaign progress with no property failure; E3 stops at the seed counterexample after 5 total calls.",
+    "coverage": "seed_only lcov versus same group/seed fuzz_500 lcov; delta is reported as post-seed campaign delta.",
+    "mutation": "Sequence replay and mutation_evidence do not establish a new sequence; no claim beyond the lcov delta."
+  },
+  "automatic_seed_count_audit": {
+    "count_scope": "Wallet automatic expansion outputs selected for independent Echidna utility/replay; manual PaperExample fixture excluded",
+    "unique_auto_target_counterexample_sequences": 1,
+    "unique_auto_target_sequence_fingerprint": "e24710d808cfea34ac5438fcdd925b69f5a4b4906833c831a10fa4f3cddcc2f3",
+    "echidna_target_replay_runs": 3,
+    "echidna_target_replay_successes": 3,
+    "unique_selected_non_target_property_related_extension_sequences": 1,
+    "non_target_extension_sequence_fingerprint": "ae1af6454f0e866e4c93966eb88503e807b7e9855865e96ac66a449961670593",
+    "static_extension_eligible_sequences": 0,
+    "E1_E2_distinct_frozen_seed_sequences": 1,
+    "miswired_initial_ablation_runs_excluded": 12,
+    "manual_non_wallet_fixture_counted_as_auto_seed": false
+  }
+}

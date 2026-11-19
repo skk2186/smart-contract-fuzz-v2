@@ -1,0 +1,38 @@
+[2026-11-19 23:58:23.54] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (0.199886248s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol:WalletHarness
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261135/seed_only/reproducers
+Loaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261135/seed_only/coverage
+[2026-11-19 23:58:23.77] [Worker 0] Test echidna_wallet_accounting_respected falsified!
+  Call sequence:
+WalletHarness.deposit(0) Value: 0xde0b6b3a7640000
+WalletHarness.refund(0)
+WalletHarness.deposit(1) Value: 0xde0b6b3a7640000
+WalletHarness.withdraw(0,1000000000000000000)
+
+[2026-11-19 23:58:23.77] [Worker 0] New coverage: 1478 instr, 3 contracts, 1 seqs in corpus
+[2026-11-19 23:58:23.77] [Worker 0] Sequence replayed from corpus file seed-e24df367316147c187ae609299282c2f.txt (1/1)
+[2026-11-19 23:58:23.77]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261135/seed_only/reproducers-unshrunk/5153933086396221819.txt
+[2026-11-19 23:58:23.77]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/Wallet机制回归/echidna-rerun-01/echidna/E3/seed-20261135/seed_only/coverage/5153933086396221819.txt
+[2026-11-19 23:58:23.77] [Worker 0] Test limit reached. Stopping.
+[2026-11-19 23:58:23.77] [status] tests: 1/1, fuzzing: 5/0, values: [], cov: 1478, corpus: 1, gas/s: 0
+echidna_wallet_accounting_respected: failed!💥  
+  Call sequence:
+    WalletHarness.deposit(0) Value: 0xde0b6b3a7640000
+    WalletHarness.refund(0)
+    WalletHarness.deposit(1) Value: 0xde0b6b3a7640000
+    WalletHarness.withdraw(0,1000000000000000000)
+
+Traces: 
+
+
+Unique instructions: 1478
+Unique codehashes: 3
+Corpus size: 1
+Seed: 20261135
+Total calls: 5
+
+[2026-11-19 23:58:23.77] Saving test reproducers... Done! (0.00041617s)
+[2026-11-19 23:58:23.77] Saving corpus... Done! (0.000081363s)
+[2026-11-19 23:58:23.77] Saving foundry reproducers... Done! (0.000497078s)
+[2026-11-19 23:58:23.77] Saving coverage... Done! (0.052430684s)

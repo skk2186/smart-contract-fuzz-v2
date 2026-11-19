@@ -1,0 +1,179 @@
+{
+  "phase": 31,
+  "frozen_before_formal_results": true,
+  "freeze_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/00-Phase31实验方案冻结.json",
+  "freeze_sha256": "3344289a8f408de863b1e754bebf90091f4e98839b75e2b9763879e7c153201b",
+  "selection_rule": "From the Phase27 frozen pool, exclude EulerSwap because it already exists in V2 results, exclude Origin WOETH due to overlap with the previously used OriginDollar project, then order the remaining never-run projects by frozen Solidity source file count and select the four smallest. Preserve the pinned Phase27 commit and its source tree hash.",
+  "properties_rule": "Within each pinned source tree, select at most one existing Echidna Boolean property by lexicographically first full signature among properties statically linked to at least two state-changing harness actions; if none qualifies or the unchanged upstream Harness cannot build/run, record the failure and do not replace the sample.",
+  "candidates": [
+    {
+      "order": 1,
+      "project": "Strata",
+      "repository": "Strata-Money/contracts",
+      "commit": "51ad892ed5a7c73df8b64e5a11c6c5371037b2d6",
+      "solidity_file_count": 46,
+      "tree_sha256": "9115be60010c36c968ec53736f0cce2398474b6dcfac2b904fcfad0c9515160c",
+      "evidence_paths": [
+        "echidna.yaml",
+        "test/recon/CryticTester.sol",
+        "test/recon/Properties.sol",
+        "test/recon/TargetFunctions.sol",
+        "test/recon/Setup.sol"
+      ],
+      "project_directory": "sol/真实项目/Strata",
+      "source_commit_verified": true,
+      "checked_out_commit": "51ad892ed5a7c73df8b64e5a11c6c5371037b2d6",
+      "acquisition_log": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/独立样本/Strata-获取.log",
+      "echidna_yaml_exists": true,
+      "foundry_config_exists": true,
+      "echidna_test_mode": "assertion",
+      "echidna_boolean_property_gate": "no qualifying existing echidna_*() returns(bool) property was identified in the frozen candidate evidence; assertion/Foundry tests only.",
+      "build_probe_log": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/独立样本/Strata-forge-build.log",
+      "build_probe_status": "failed",
+      "build_probe_reason": "Forge reached Solidity compilation but could not resolve node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol; no npm install or source patch was attempted.",
+      "echidna_run_status": "not_run",
+      "formal_eligible": false,
+      "formal_comparison_runs": 0,
+      "superproject_worktree_status": [
+        "?? foundry.lock"
+      ],
+      "submodule_status": [
+        "aaa856e70f2756fd3762bd7665262dba13ff0dd7 lib/chimera (0.1.3-6-gaaa856e)",
+        " 77041d2ce690e692d6e03cc812b57d1ddaa4d505 lib/forge-std (v1.9.7)",
+        " d346d8ed5c1a9f7deebe92fcbaf237b185fda326 lib/properties (v1.0.0-97-gd346d8e)",
+        " 9120629af5b6e8f22c78d596b1e1b00aac47bc5b lib/setup-helpers (9120629)"
+      ]
+    },
+    {
+      "order": 2,
+      "project": "DODO Cross-Chain DEX",
+      "repository": "pyk/dodocc-fuzz",
+      "commit": "0042646b1b541a2b3adb13205cb4b15e054ce05e",
+      "solidity_file_count": 49,
+      "tree_sha256": "8967634912bfed927042500d95f88f57cb975738c22b546e5178b3855fa6c98d",
+      "evidence_paths": [
+        "foundry.toml",
+        "test/fuzzing/Fuzz.sol",
+        "test/fuzzing/properties/ApproveGatewaySend.sol",
+        "test/fuzzing/properties/DepositAndCall.sol",
+        "test/fuzzing/properties/MintAsset.sol"
+      ],
+      "project_directory": "sol/真实项目/DODOCrossChain",
+      "source_commit_verified": true,
+      "checked_out_commit": "0042646b1b541a2b3adb13205cb4b15e054ce05e",
+      "acquisition_log": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/独立样本/DODOCrossChain-获取.log",
+      "echidna_yaml_exists": false,
+      "foundry_config_exists": true,
+      "echidna_test_mode": null,
+      "echidna_boolean_property_gate": "no qualifying existing echidna_*() returns(bool) property was identified in the frozen candidate evidence; assertion/Foundry tests only.",
+      "build_probe_log": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/独立样本/DODOCrossChain-forge-build.log",
+      "build_probe_status": "interrupted_during_nested_submodule_fetch",
+      "build_probe_reason": "Foundry tried to fetch nested openzeppelin-contracts/halmos-cheatcodes dependencies despite --offline; probe was stopped before compilation.",
+      "echidna_run_status": "not_run",
+      "formal_eligible": false,
+      "formal_comparison_runs": 0,
+      "superproject_worktree_status": [
+        "m lib/openzeppelin-contracts-upgradeable"
+      ],
+      "submodule_status": [
+        "77041d2ce690e692d6e03cc812b57d1ddaa4d505 lib/forge-std (v1.9.7)",
+        " 60b305a8f3ff0c7688f02ac470417b6bbf1c4d27 lib/openzeppelin-contracts-upgradeable (v5.3.0)"
+      ]
+    },
+    {
+      "order": 3,
+      "project": "eBTC BSM",
+      "repository": "ebtc-protocol/ebtc-bsm",
+      "commit": "e5935b77a19a1b6036a3a1b44f70ac128fbdf7d9",
+      "solidity_file_count": 59,
+      "tree_sha256": "fec5bce47a0e5e40f0f7cb42b189c55d223561168e3ad971db75f740fafe65fd",
+      "evidence_paths": [
+        "echidna.yaml",
+        "test/recon-core/CryticTester.sol",
+        "test/recon-core/Properties.sol",
+        "test/recon-core/TargetFunctions.sol",
+        "test/recon-core/Setup.sol"
+      ],
+      "project_directory": "sol/真实项目/eBTC_BSM",
+      "source_commit_verified": true,
+      "checked_out_commit": "e5935b77a19a1b6036a3a1b44f70ac128fbdf7d9",
+      "acquisition_log": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/独立样本/eBTC_BSM-获取.log",
+      "echidna_yaml_exists": true,
+      "foundry_config_exists": true,
+      "echidna_test_mode": "assertion",
+      "echidna_boolean_property_gate": "no qualifying existing echidna_*() returns(bool) property was identified in the frozen candidate evidence; assertion/Foundry tests only.",
+      "build_probe_log": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/独立样本/eBTC_BSM-forge-build.log",
+      "build_probe_status": "failed",
+      "build_probe_reason": "Foundry dependency setup stopped because fixed solc 0.8.29 is not installed in the local offline compiler cache.",
+      "echidna_run_status": "not_run",
+      "formal_eligible": false,
+      "formal_comparison_runs": 0,
+      "superproject_worktree_status": [
+        "?? foundry.lock"
+      ],
+      "submodule_status": [
+        "d5cf52bc5bbf75f988f8aada23fd12d0bcf7798a lib/chimera (0.1.3)",
+        " 1eea5bae12ae557d589f9f0f0edae2faa47cb262 lib/forge-std (v1.9.4)",
+        " 69c8def5f222ff96f2b5beff05dfba996368aa79 lib/openzeppelin-contracts (v4.8.0-743-g69c8def5)"
+      ]
+    },
+    {
+      "order": 4,
+      "project": "Very Liquid Vaults",
+      "repository": "rheo-xyz/very-liquid-vaults",
+      "commit": "7ff55811e7f5617488db1a87d91c140260ac0c28",
+      "solidity_file_count": 101,
+      "tree_sha256": "6e7357b5fa27b611b489e8bd2d4ee3805f707bc7aa9fcd278aeee89e6d9ab76b",
+      "evidence_paths": [
+        "echidna.yaml",
+        "test/recon/CryticTester.t.sol",
+        "test/recon/Properties.t.sol",
+        "test/recon/TargetFunctions.t.sol"
+      ],
+      "project_directory": "sol/真实项目/VeryLiquidVaults",
+      "source_commit_verified": true,
+      "checked_out_commit": "7ff55811e7f5617488db1a87d91c140260ac0c28",
+      "acquisition_log": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/独立样本/VeryLiquidVaults-获取.log",
+      "echidna_yaml_exists": true,
+      "foundry_config_exists": true,
+      "echidna_test_mode": "assertion",
+      "echidna_boolean_property_gate": "no qualifying existing echidna_*() returns(bool) property was identified in the frozen candidate evidence; assertion/Foundry tests only.",
+      "build_probe_log": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase31-20261119/独立样本/VeryLiquidVaults-forge-build.log",
+      "build_probe_status": "interrupted_dependency_fetch",
+      "build_probe_reason": "Foundry began downloading a large submodule graph; one dependency fetch reached about 65% (roughly 34 MiB) before the probe was stopped.",
+      "echidna_run_status": "not_run",
+      "formal_eligible": false,
+      "formal_comparison_runs": 0,
+      "superproject_worktree_status": [
+        "M lib/aave-v3-origin",
+        " M lib/chimera",
+        " m lib/console3",
+        " M lib/create2deployer",
+        " M lib/erc4626-tests",
+        " M lib/ercx-tests",
+        " M lib/forge-std",
+        " M lib/morpho-blue",
+        " M lib/openzeppelin-community-contracts"
+      ],
+      "submodule_status": [
+        "+8305565ae342f1773c42cd2e4593f175fe5968a0 lib/aave-v3-origin (v3.6.0-44-g8305565)",
+        "+463c0d4134931de315234be94eb21f1f032ea138 lib/chimera (0.1.3-8-g463c0d4)",
+        " 401bd220c343e885c336c406c4e959088e519acf lib/console3 (heads/main)",
+        "+f18c0853233d53aebd8ed11ea139654ba46a0192 lib/create2deployer (heads/main)",
+        "+3567df5bd925ad75248d9ded10832d7a857caa16 lib/erc4626-tests (heads/main)",
+        "+32ee62cd658e78e7f730aed46da33de70353f884 lib/ercx-tests (heads/main)",
+        "+15b2df92a05d4d2f76a06653872fefb287e0e01c lib/forge-std (v1.17.0-11-g15b2df9)",
+        "+339a885801972740eb27f51da110a4675b839d42 lib/morpho-blue (v1.0.0-422-g339a885)",
+        "+f063d93155ac6232c4bb80de4bd13d220615c821 lib/openzeppelin-community-contracts (heads/master)",
+        " e4f70216d759d8e6a64144a9e1f7bbeed78e7079 lib/openzeppelin-contracts",
+        " 60b305a8f3ff0c7688f02ac470417b6bbf1c4d27 lib/openzeppelin-contracts-upgradeable",
+        " 9b91ad9569cb3064b7e4b252a266c2ee1d8e9c7f lib/properties",
+        " bec514258acb85045a4b8590c5d695f3cc9599be lib/safe-utils",
+        " 0f7abac8f096768817cc7a1d2dcdb01ee8fb278e lib/setup-helpers",
+        " 02872d99d03ade7fa50583720506ed6cabc9c80b lib/vault-v2"
+      ]
+    }
+  ],
+  "result": "No independent sample passed the frozen Echidna Boolean-property/build gate; no replacement was selected and no formal fuzz campaign was run.",
+  "limitations": "The candidate acquisition/build probe caused Foundry to initialize/fetch some submodules despite offline mode; those new source directories and logs are retained. No upstream tracked source file was patched."
+}

@@ -1,0 +1,115 @@
+{
+  "phase": "31",
+  "status": "frozen_before_phase31_execution",
+  "frozen_at_local": "2026-11-19",
+  "base_commit": "82fb576410ea31878a29c4101e0ced38179c63c3",
+  "source_of_prior_method": "Phase30B unchanged Agent A/B candidate and Phase30B-compatible project configuration",
+  "agent_configuration": {
+    "model": "deepseek-flash",
+    "thinking": "disabled",
+    "max_tokens_per_call": 4096,
+    "token_budget": 400000,
+    "wall_budget_seconds": 600,
+    "per_property_max_calls": {"AgentA": 1, "AgentB_initial": 1, "AgentB_feedback_repair": 1},
+    "AgentA_replanning": 0,
+    "new_agents": 0,
+    "wallet_call_policy": "Use the exact frozen Phase30B output, zero additional API calls.",
+    "extension_call_policy": "The bounded extension module is deterministic/local; no model is called for added steps."
+  },
+  "manual_oracle_isolation": {
+    "excluded_from_agent_input": true,
+    "excluded_from_candidate_corpus": true,
+    "excluded_from_extension_templates": true,
+    "excluded_from_echidna_runs": true,
+    "classification": "manual diagnostic oracle only; not an automatic V2 result"
+  },
+  "wallet_mechanism_regression": {
+    "source": "sol/单合约测试/wallet_02_refund_nosub/test/Wallet.sol",
+    "harness": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+    "property_id": "8e75f62866f6d582a033",
+    "property": "WalletHarness.echidna_wallet_accounting_respected()",
+    "source_commit": "230e649123477eff332742a59a1c7cc6dc286cab",
+    "source_and_harness_unchanged": true,
+    "start_candidate": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/02-新规划Anvil结果.json candidate P1-source-context-planner, exact original Agent A/B transaction order",
+    "agent_reuse": "Reuse frozen Phase30B A/B output; no additional model calls or budget increase.",
+    "initial_balance_wei": "100000000000000000000",
+    "max_sequence_length": 8,
+    "modes": {
+      "E1_raw": "Unmodified Phase30B Agent A/B seed.",
+      "E2_parameter_repair": "Same exact plan with the existing runtime parameter repair enabled once; no plan rewrite.",
+      "X_random": "Random legal ABI-level sequence extensions, at most 24 candidate executions.",
+      "X_static": "Extensions supported only by static read/write and role evidence, at most 24 candidate executions.",
+      "E3_state_feedback": "Bounded state-feedback expansion using ABI, dependency, getter, transaction result, trace, and observed resource balance evidence; at most 24 candidate executions."
+    },
+    "extension_budgets": {
+      "max_sequence_length": 8,
+      "retained_prefixes": 4,
+      "candidate_executions_per_property_per_mode": 24,
+      "parameter_repairs_per_candidate": 1,
+      "new_agents": 0,
+      "duplicate_sequence_policy": "Canonical transaction fingerprint; duplicate candidates are retained in the decision log but not executed.",
+      "successful_prefix_policy": "Never discard or rewrite the already successful transaction prefix; insertion may only occur after its earliest dependent prefix boundary and every candidate is replayed from a fresh deployment."
+    },
+    "coverage_groups": {
+      "E0": "Native Echidna, empty external corpus.",
+      "E1": "Raw Agent A/B seed.",
+      "E2": "Agent A/B plus existing parameter repair; paired to the exact E1 plan.",
+      "E3": "Agent A/B plus state-feedback sequence expansion and existing parameter repair.",
+      "A_random": "Random expansion ablation with the same 24-candidate Anvil execution ceiling.",
+      "A_static": "Static-dependency-only expansion ablation with the same 24-candidate Anvil execution ceiling."
+    },
+    "echidna": {
+      "version": "2.3.2",
+      "paired_seeds": [20261125, 20261135, 20261145],
+      "test_limit_per_run": 500,
+      "sequence_length": 8,
+      "workers": 1,
+      "stop_on_fail": false,
+      "disable_slither": true,
+      "timeout_seconds": 60,
+      "repetitions": 3,
+      "seed_only_runs": true,
+      "empty_corpus_runs": true,
+      "coverage_accounting": "Separate seed-only LCOV from subsequent mutation-added coverage by LCOV set difference; retain final LCOV and run logs."
+    },
+    "costs": ["candidate generation time", "Anvil executions", "Agent API calls/tokens/cost", "Echidna runtime", "end-to-end time"],
+    "result_gates": [
+      "A seed counts as target-reaching only if its automatic candidate is fully replayable on Anvil, the original property evaluates false, and the same exact seed is independently replayed by Echidna with a reported property falsification.",
+      "Seed loading, Sequence replayed, mutation counters, transaction success, and tests denominator do not by themselves prove target reach or mutation.",
+      "A legal, executable seed with observed property-related state change and independent Echidna replay may enter seed-utility coverage groups even if it does not falsify the property."
+    ]
+  },
+  "independent_sample_screen": {
+    "sources_reviewed": [
+      "SmartBugs Curated (public dataset; source annotations and vulnerability labels, but no uniform Echidna property harness).",
+      "Crytic Properties (public executable ERC20/ERC721/ERC4626 property suites; requires compatible target implementation/harness).",
+      "Official repositories and benchmark metadata linked by the six named papers; Phase27's previously frozen public-campaign pool is used only as a fixed candidate list."
+    ],
+    "selection_status": "Freeze exactly four projects before any Phase31 compilation, Agent output, Anvil execution, or Echidna outcome; no replacement if a project fails the access gate.",
+    "selection_rule": "From the Phase27 frozen pool, exclude EulerSwap because it already exists in V2 results, exclude Origin WOETH due to overlap with the previously used OriginDollar project, then order the remaining never-run projects by frozen Solidity source file count and select the four smallest. Preserve the pinned Phase27 commit and its source tree hash.",
+    "candidates": [
+      {"order": 1, "project": "Strata", "repository": "Strata-Money/contracts", "commit": "51ad892ed5a7c73df8b64e5a11c6c5371037b2d6", "solidity_file_count": 46, "tree_sha256": "9115be60010c36c968ec53736f0cce2398474b6dcfac2b904fcfad0c9515160c", "evidence_paths": ["echidna.yaml", "test/recon/CryticTester.sol", "test/recon/Properties.sol", "test/recon/TargetFunctions.sol", "test/recon/Setup.sol"]},
+      {"order": 2, "project": "DODO Cross-Chain DEX", "repository": "pyk/dodocc-fuzz", "commit": "0042646b1b541a2b3adb13205cb4b15e054ce05e", "solidity_file_count": 49, "tree_sha256": "8967634912bfed927042500d95f88f57cb975738c22b546e5178b3855fa6c98d", "evidence_paths": ["foundry.toml", "test/fuzzing/Fuzz.sol", "test/fuzzing/properties/ApproveGatewaySend.sol", "test/fuzzing/properties/DepositAndCall.sol", "test/fuzzing/properties/MintAsset.sol"]},
+      {"order": 3, "project": "eBTC BSM", "repository": "ebtc-protocol/ebtc-bsm", "commit": "e5935b77a19a1b6036a3a1b44f70ac128fbdf7d9", "solidity_file_count": 59, "tree_sha256": "fec5bce47a0e5e40f0f7cb42b189c55d223561168e3ad971db75f740fafe65fd", "evidence_paths": ["echidna.yaml", "test/recon-core/CryticTester.sol", "test/recon-core/Properties.sol", "test/recon-core/TargetFunctions.sol", "test/recon-core/Setup.sol"]},
+      {"order": 4, "project": "Very Liquid Vaults", "repository": "rheo-xyz/very-liquid-vaults", "commit": "7ff55811e7f5617488db1a87d91c140260ac0c28", "solidity_file_count": 101, "tree_sha256": "6e7357b5fa27b611b489e8bd2d4ee3805f707bc7aa9fcd278aeee89e6d9ab76b", "evidence_paths": ["echidna.yaml", "test/recon/CryticTester.t.sol", "test/recon/Properties.t.sol", "test/recon/TargetFunctions.t.sol"]}
+    ],
+    "property_selection": "Within each pinned source tree, select at most one existing Echidna Boolean property by lexicographically first full signature among properties statically linked to at least two state-changing harness actions; if none qualifies or the unchanged upstream Harness cannot build/run, record the failure and do not replace the sample.",
+    "qualification_before_fuzzing": [
+      "Exact pinned upstream commit, source tree hash, and source paths recorded.",
+      "Existing upstream Harness/property is used without editing original business logic or the upstream Harness.",
+      "Property has at least two state-changing actions with a source-level/Slither dependency relation.",
+      "A valid fixed compiler/toolchain path exists without source patching.",
+      "No sample from Phase10-30 already used in V2 development, debugging, or benchmark runs."
+    ],
+    "formal_extension_experiment": "Start only for samples passing the above fixed gate. For each passing sample, preserve the same E0/E1/E2/E3 and random/static ablation configuration, 3 paired seeds x 500 tests, and the exact model/call budget above. Candidate access/build failures remain in the summary."
+  },
+  "paper_review_scope": [
+    "SMARTIAN ASE 2021",
+    "ConFuzzius EuroS&P 2021",
+    "IR-Fuzz IEEE TIFS 2023",
+    "MuFuzz ICDE 2024",
+    "Towards Effective Guidance of Smart Contract Fuzz Testing Based on Static Analysis, Electronics 2025",
+    "EchoFuzz ICSE 2026 / arXiv:2609.14475"
+  ],
+  "no_commit_or_push": true
+}
