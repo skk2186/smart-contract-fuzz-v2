@@ -1,0 +1,318 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+    "contract": "WalletHarness",
+    "project_root": "/tmp",
+    "detected_framework": "user_selected",
+    "compile_options": [
+      "compile-force-framework=solc"
+    ],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "Wallet",
+      "source": "sol/单合约测试/wallet_02_refund_nosub/test/Wallet.sol#14-46"
+    },
+    {
+      "name": "WalletUser",
+      "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#5-25"
+    },
+    {
+      "name": "WalletHarness",
+      "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#27-68"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "WalletHarness",
+      "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#27-68"
+    }
+  ],
+  "properties": [
+    {
+      "property": "WalletHarness.echidna_wallet_accounting_respected()",
+      "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#60-67",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "8e75f62866f6d582a033",
+      "analysis_contract": "WalletHarness",
+      "analysis_contract_source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#27-68",
+      "read_states": [
+        "WalletHarness.ACCOUNT_COUNT",
+        "WalletHarness.cumulativeDeposits",
+        "WalletHarness.cumulativePayout"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "WalletHarness.echidna_wallet_accounting_respected()",
+          "states": [
+            "WalletHarness.ACCOUNT_COUNT"
+          ],
+          "expression": "i < ACCOUNT_COUNT",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#61"
+        },
+        {
+          "function": "WalletHarness.echidna_wallet_accounting_respected()",
+          "states": [
+            "WalletHarness.cumulativeDeposits",
+            "WalletHarness.cumulativePayout"
+          ],
+          "expression": "cumulativePayout[i] > cumulativeDeposits[i]",
+          "index_accesses": [
+            {
+              "base": "cumulativePayout",
+              "key": "i",
+              "reference": "REF_29"
+            },
+            {
+              "base": "cumulativeDeposits",
+              "key": "i",
+              "reference": "REF_30"
+            }
+          ],
+          "source_index_accesses": [
+            "cumulativeDeposits[i]",
+            "cumulativePayout[i]"
+          ],
+          "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#62"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "WalletHarness.deposit(uint8)",
+          "payable": true,
+          "environment_reads": [
+            "msg.value"
+          ],
+          "matched_states": [
+            "WalletHarness.cumulativeDeposits"
+          ],
+          "effect_ids": [
+            "e2809041364a823f"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "WalletHarness.refund(uint8)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "WalletHarness.cumulativePayout"
+          ],
+          "effect_ids": [
+            "14a6dfb2aaa64a26"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "WalletHarness.withdraw(uint8,uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "WalletHarness.cumulativePayout"
+          ],
+          "effect_ids": [
+            "55d9fe16302b571e"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "14a6dfb2aaa64a26",
+        "55d9fe16302b571e",
+        "e2809041364a823f"
+      ],
+      "evidence_summary": {
+        "candidate_links": 3,
+        "links_with_write_site": 3,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [],
+      "unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选",
+        "候选调用链含外部调用；静态输出未证明其返回值或副作用"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "14a6dfb2aaa64a26": {
+      "state": "WalletHarness.cumulativePayout",
+      "writer": "WalletHarness.refund(uint8)",
+      "expression": "cumulativePayout[actor] += address(accounts[actor]).balance - balanceBefore",
+      "index_accesses": [
+        {
+          "base": "cumulativePayout",
+          "key": "actor",
+          "reference": "REF_27"
+        },
+        {
+          "base": "accounts",
+          "key": "actor",
+          "reference": "REF_28"
+        }
+      ],
+      "source_index_accesses": [
+        "accounts[actor]",
+        "cumulativePayout[actor]"
+      ],
+      "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#57",
+      "call_path": [
+        {
+          "function": "WalletHarness.refund(uint8)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WalletHarness.refund(uint8)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "WalletHarness.refund(uint8)",
+          "call": "HIGH_LEVEL_CALL, dest:REF_25(WalletUser), function:refund, arguments:[]  ",
+          "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#56"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "14a6dfb2aaa64a26"
+    },
+    "55d9fe16302b571e": {
+      "state": "WalletHarness.cumulativePayout",
+      "writer": "WalletHarness.withdraw(uint8,uint256)",
+      "expression": "cumulativePayout[actor] += address(accounts[actor]).balance - balanceBefore",
+      "index_accesses": [
+        {
+          "base": "cumulativePayout",
+          "key": "actor",
+          "reference": "REF_22"
+        },
+        {
+          "base": "accounts",
+          "key": "actor",
+          "reference": "REF_23"
+        }
+      ],
+      "source_index_accesses": [
+        "accounts[actor]",
+        "cumulativePayout[actor]"
+      ],
+      "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#50",
+      "call_path": [
+        {
+          "function": "WalletHarness.withdraw(uint8,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WalletHarness.withdraw(uint8,uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "WalletHarness.withdraw(uint8,uint256)",
+          "call": "HIGH_LEVEL_CALL, dest:REF_20(WalletUser), function:withdraw, arguments:['amount']  ",
+          "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#49"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "55d9fe16302b571e"
+    },
+    "e2809041364a823f": {
+      "state": "WalletHarness.cumulativeDeposits",
+      "writer": "WalletHarness.deposit(uint8)",
+      "expression": "cumulativeDeposits[actor] += msg.value",
+      "index_accesses": [
+        {
+          "base": "cumulativeDeposits",
+          "key": "actor",
+          "reference": "REF_18"
+        }
+      ],
+      "source_index_accesses": [
+        "cumulativeDeposits[actor]"
+      ],
+      "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#43",
+      "call_path": [
+        {
+          "function": "WalletHarness.deposit(uint8)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WalletHarness.deposit(uint8)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "WalletHarness.deposit(uint8)",
+          "call": "HIGH_LEVEL_CALL, dest:REF_15(WalletUser), function:deposit, arguments:[] value:msg.value ",
+          "source": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol#42"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "e2809041364a823f"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

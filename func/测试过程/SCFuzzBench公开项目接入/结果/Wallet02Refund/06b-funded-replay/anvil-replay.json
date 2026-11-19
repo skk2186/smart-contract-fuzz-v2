@@ -1,0 +1,607 @@
+{
+  "schema_version": 1,
+  "project": "Wallet02Refund",
+  "candidate_result_source": "/home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/06-agent-v2/逐属性Agent种子流程.json",
+  "property_id": "8e75f62866f6d582a033",
+  "property": "WalletHarness.echidna_wallet_accounting_respected()",
+  "funding_environment": {
+    "initial_balance_wei": "100000000000000000000",
+    "reason": "Uniform correction after documented insufficient-funds RPC errors; property and transactions unchanged."
+  },
+  "seeds": {
+    "raw": {
+      "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+      "transactions": [
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "refund(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same_uint8_account_index"
+            }
+          ]
+        }
+      ],
+      "replay": {
+        "project": "Wallet02Refund",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_wallet_accounting_respected()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [],
+        "target_property_state": {
+          "property": "echidna_wallet_accounting_respected()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "no_observed_property_related_state_change",
+          "target_property_state_established": false,
+          "counterexample_state_established": false,
+          "property_related_state_changed": false,
+          "first_established_transaction_index": null,
+          "first_property_related_change_transaction_index": null,
+          "first_counterexample_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": [],
+              "changed_predicate_getters": []
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "12:     function deposit() public payable {\n13:         wallet.deposit.value(msg.value)();\n14:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "08e0f911f9317c7f94daabff363be98e288779be402a6b432345f119b3dc1015",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 90117,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xebe41b730000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0xd0e30db0",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0xd0e30db0",
+                      "calls": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 2,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          },
+          {
+            "index": 2,
+            "function": "refund(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "20:     function refund() public {\n21:         wallet.refund();\n22:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "8f792a907f337a49d23879448f2a7faa4407b2a0a209c342250c433a7791aae2",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 63712,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x04e799bd0000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0x590e1ae3",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0x590e1ae3",
+                      "calls": [
+                        {
+                          "type": "CALL",
+                          "from": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                          "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                          "input": "0x",
+                          "calls": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 1,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "refund(uint8)",
+            "arguments": [
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "account",
+                "relation": "same_uint8_account_index"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "repaired": {
+      "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+      "transactions": [
+        {
+          "index": 1,
+          "function": "deposit(uint8)",
+          "abi_signature": "deposit(uint8)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0
+          ],
+          "value_wei": "1000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": []
+        },
+        {
+          "index": 2,
+          "function": "refund(uint8)",
+          "abi_signature": "refund(uint8)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same_uint8_account_index"
+            }
+          ]
+        }
+      ],
+      "replay": {
+        "project": "Wallet02Refund",
+        "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+        "deployment_status": "success",
+        "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+        "replay_status": "executable",
+        "target_property_violation": null,
+        "initial_property_values": {
+          "echidna_wallet_accounting_respected()": true
+        },
+        "initial_property_errors": {},
+        "initial_property_violations": [],
+        "initial_predicate_getters": [],
+        "target_property_state": {
+          "property": "echidna_wallet_accounting_respected()",
+          "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+          "status": "no_observed_property_related_state_change",
+          "target_property_state_established": false,
+          "counterexample_state_established": false,
+          "property_related_state_changed": false,
+          "first_established_transaction_index": null,
+          "first_property_related_change_transaction_index": null,
+          "first_counterexample_transaction_index": null,
+          "trajectory": [
+            {
+              "transaction_index": 0,
+              "value": true,
+              "predicate_getters": [],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 1,
+              "value": true,
+              "predicate_getters": [],
+              "changed_predicate_getters": []
+            },
+            {
+              "transaction_index": 2,
+              "value": true,
+              "predicate_getters": [],
+              "changed_predicate_getters": []
+            }
+          ]
+        },
+        "environment": {
+          "chain_id": 1,
+          "initial_timestamp": 1524785992,
+          "initial_block_number": 4370000,
+          "deployment_timestamp": 1524785992,
+          "deployment_block_number": 4370000,
+          "deployer": "0x0000000000000000000000000000000000030000",
+          "property_sender": "0x0000000000000000000000000000000000010000",
+          "sender_pool": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            "0x0000000000000000000000000000000000030000",
+            "0x0000000000000000000000000000000000040000",
+            "0x0000000000000000000000000000000000050000"
+          ],
+          "gas_price_wei": 0,
+          "evm_revision": "shanghai",
+          "gas_limit_per_transaction": 12500000,
+          "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+        },
+        "transactions": [
+          {
+            "index": 1,
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "12:     function deposit() public payable {\n13:         wallet.deposit.value(msg.value)();\n14:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "cd71c29064955f5f4a376d5821037278463b6ff7b32f2ad5ca90a7feea98f2e6",
+            "block_number": 4370001,
+            "status": "success",
+            "gas_used": 90117,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xebe41b730000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0xd0e30db0",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0xd0e30db0",
+                      "calls": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 2,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativeDeposits"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          },
+          {
+            "index": 2,
+            "function": "refund(uint8)",
+            "arguments": [
+              0
+            ],
+            "argument_bindings": [],
+            "slither_preconditions": [],
+            "slither_source_excerpt": "20:     function refund() public {\n21:         wallet.refund();\n22:     }",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "tx_hash": "8f792a907f337a49d23879448f2a7faa4407b2a0a209c342250c433a7791aae2",
+            "block_number": 4370002,
+            "status": "success",
+            "gas_used": 63712,
+            "execution_class": "state_established",
+            "expected_outcome": "state_change",
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x04e799bd0000000000000000000000000000000000000000000000000000000000000000",
+              "calls": [
+                {
+                  "type": "CALL",
+                  "from": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                  "input": "0x590e1ae3",
+                  "calls": [
+                    {
+                      "type": "CALL",
+                      "from": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                      "to": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                      "input": "0x590e1ae3",
+                      "calls": [
+                        {
+                          "type": "CALL",
+                          "from": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+                          "to": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+                          "input": "0x",
+                          "calls": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "changed_storage_slot_count": 1,
+            "trace_error": null,
+            "events": [],
+            "observed_view_state_changed": false,
+            "view_state_changes": [],
+            "observed_view_count": 1,
+            "tracked_contract_count": 1,
+            "tracked_contract_types": [
+              "Harness"
+            ],
+            "observed_effect_status": "unknown",
+            "expected_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "observed_effect_states": [],
+            "changed_effect_states": [],
+            "unobserved_effect_states": [
+              "WalletHarness.cumulativePayout"
+            ],
+            "execution_effect_error": null,
+            "state_fingerprint_before": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "state_fingerprint_after": "9342636994dac88f6ed35cf8244cc67641254189108285fabe84783035c8345e",
+            "target_property": true,
+            "property_error": null,
+            "predicate_getter_values": [],
+            "runtime_constraint_observations": [],
+            "constraint_repair_proposal": null,
+            "all_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "all_property_errors": {},
+            "other_property_violations_during_prevalidation": []
+          }
+        ],
+        "resolved_transactions": [
+          {
+            "index": 1,
+            "function": "deposit(uint8)",
+            "abi_signature": "deposit(uint8)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              0
+            ],
+            "value_wei": "1000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": []
+          },
+          {
+            "index": 2,
+            "function": "refund(uint8)",
+            "abi_signature": "refund(uint8)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              0
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "account",
+                "relation": "same_uint8_account_index"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

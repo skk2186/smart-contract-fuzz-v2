@@ -1,8 +1,18 @@
 {
   "schema_version": 1,
   "phase": "30A",
-  "frozen_at": "2026-11-19T16:43:46+08:00",
-  "status": "frozen_before_native_preflight",
+  "frozen_at": "2026-11-19T17:56:17+08:00",
+  "status": "property_frozen_revision_2_before_any_test_run_with_post_freeze_environment_amendment",
+  "freeze_revision": 2,
+  "revision_history": [
+    {
+      "revision": 1,
+      "frozen_at": "2026-11-19T16:43:46+08:00",
+      "property_semantic": "For the single WalletHarness account, cumulative ETH received through successful withdraw/refund calls must never exceed cumulative ETH deposited through the harness deposit action.",
+      "superseded_before_any_compile_or_test": true,
+      "reason": "A single synthetic Wallet caller could not exercise the account-specific ledger invariant under shared contract liquidity. This harness-scope issue was identified during semantic review before any compile, native property run, static analysis, Agent generation, or V2 result."
+    }
+  ],
   "sample": {
     "repository": "https://github.com/smartbugs/smartbugs-curated",
     "branch_at_selection": "main",
@@ -13,9 +23,11 @@
     "execution_source": "sol/单合约测试/wallet_02_refund_nosub/test/Wallet.sol",
     "execution_source_sha256": "f0dd1f1a9e3c5b6744f4af9444be18557816f2a36d9a3abf240f57e61bc32725",
     "harness": "sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
-    "harness_sha256": "7d3d40f89dc14d46ad636ff481effaf644b95b5845a290bba3dec66af1165d0",
+    "harness_sha256": "af7769e5ca9bf0c5961f2d1c200eb2111e674b682b38b51d6f62c5e0d0dceb02",
     "compiler_version": "0.4.24",
-    "vulnerability_status": "publicly known; engineering pilot only; not an unknown-vulnerability or formal independent held-out sample"
+    "vulnerability_status": "publicly known; engineering pilot only; not an unknown-vulnerability or formal independent held-out sample",
+    "local_original_source": "sol/单合约测试/wallet_02_refund_nosub/上游/wallet_02_refund_nosub.sol",
+    "local_original_source_sha256": "3bf849eea5a234dcf2755aa526f934b3edfa560ee7eac3d70385887e3bc6ff79"
   },
   "license": {
     "contract": "MIT License",
@@ -35,21 +47,22 @@
       "https://scs.owasp.org/sctop10/SC02-BusinessLogicVulnerabilities/"
     ],
     "source_access_date": "2026-11-19",
-    "semantic": "For the WalletHarness account, cumulative ETH received through successful withdraw/refund calls must never exceed cumulative ETH deposited through the harness deposit action.",
-    "predicate": "cumulativePayout <= cumulativeDeposits",
-    "target_state": "cumulativePayout > cumulativeDeposits",
+    "semantic": "For each of five isolated synthetic Wallet accounts, cumulative ETH received through successful withdraw/refund calls must never exceed cumulative ETH deposited through the harness deposit action for that same account.",
+    "predicate": "for every actor i in [0,4], cumulativePayout[i] <= cumulativeDeposits[i]",
+    "target_state": "there exists an actor i in [0,4] such that cumulativePayout[i] > cumulativeDeposits[i]",
     "formalization_note": "This invariant operationalizes the independent standard's business-logic, economic-accounting, and path-dependent-state guidance; it is not quoted as a verbatim normative requirement.",
     "preconditions": [
-      "The harness is the only caller of the Wallet instance, so it is the single ledger account under test.",
-      "Deposits are forwarded to Wallet and counted only after the Wallet call succeeds.",
-      "Withdrawals/refunds are counted by the actual ETH balance increase of the harness after successful calls.",
+      "The harness mediates all calls to Wallet through five isolated WalletUser proxies; each proxy is a distinct Wallet ledger account.",
+      "The account argument selects one of the five actors modulo five; deposits are counted only after the Wallet call succeeds.",
+      "Withdrawals/refunds are counted by the selected proxy's actual ETH balance increase after successful calls.",
       "The Echidna property is evaluated after each completed transaction sequence."
     ],
     "limitations": [
       "Owner-only migrateTo is outside the per-user deposit/withdraw/refund accounting property and is not exposed as a harness action.",
       "Forced ETH and transfers outside the harness actions are outside the measured ledger.",
       "The selected sample has a public known vulnerability annotation and is only an engineering-flow pilot.",
-      "A refund has no ABI parameters; withdraw(amount) reads Wallet's private mapping, so parameter-repair applicability must be observed rather than assumed."
+      "A refund has no ABI parameters in Wallet; the harness actor selector only chooses the calling ledger account, while withdraw(amount) still reads Wallet's private mapping.",
+      "Five synthetic accounts form a bounded test population; results do not establish behavior for arbitrary deployment sizes."
     ]
   },
   "leakage_controls": {
@@ -64,6 +77,7 @@
     "agent_a_candidates": 1,
     "max_sequence_length": 8,
     "agent_a_planning_retries": 0,
+    "agent_b_schema_repairs": 0,
     "agent_b_execution_feedback_repairs": 1,
     "agent_a_execution_replans": 0,
     "token_budget": 400000,
@@ -90,7 +104,11 @@
     "test_limit_per_run": 500,
     "timeout_seconds": 60,
     "repeats": 3,
-    "paired_echidna_seeds": [20261125, 20261135, 20261145],
+    "paired_echidna_seeds": [
+      20261125,
+      20261135,
+      20261145
+    ],
     "sequence_length": 8,
     "workers": 1,
     "stop_on_fail": false,
@@ -107,5 +125,20 @@
   "medusa": {
     "status": "optional_after_echidna_only"
   },
-  "property_frozen_before_results": true
+  "property_frozen_before_results": true,
+  "post_freeze_environment_amendments": [
+    {
+      "amendment": 1,
+      "recorded_at": "2026-11-19T18:16:01+08:00",
+      "reason": "首轮 Agent 候选 Anvil 执行返回 Insufficient funds for gas * price + value。旧配置仅给账户 4294967295 wei；原始 deposit 值为 1000000000000000000 wei，单次执行反馈修复后的值为 1000000000000000 wei，二者仍高于余额。",
+      "prior_profile_snapshot": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/06-agent-v2/Wallet02Refund-profile-run1.json",
+      "prior_profile_sha256": "219dd2346b0fdb04ec510f3c1d85fa4f8ac8d58f362a9426850855673e6c580c",
+      "prior_initial_balance_wei": "4294967295",
+      "updated_profile": "func/测试过程/SCFuzzBench公开项目接入/项目配置/Wallet02Refund.json",
+      "updated_profile_sha256": "89f7639a5b823f4259150ef029e61ae0aedb4e0b6caa1a0556bc09262d9d729c",
+      "updated_initial_balance_wei": "100000000000000000000",
+      "scope": "仅调整 Anvil 与 Echidna 的统一账户初始余额；Harness、冻结属性、输入序列、Agent 输出与预算不变。恢复回放及任何后续运行统一使用该值。",
+      "leakage_control": "调整依据是本次 RPC 资金不足错误，不使用漏洞位置、攻击交易或人工预置交易参数。"
+    }
+  ]
 }

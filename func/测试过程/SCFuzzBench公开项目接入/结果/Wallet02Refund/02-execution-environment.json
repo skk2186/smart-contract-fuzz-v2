@@ -23,6 +23,34 @@
   },
   "local_tooling": "The repository has Linux Foundry tools under .tools/foundry/bin, but WSL could not be started to execute them.",
   "shell_network": "git ls-remote to GitHub failed because configured proxy 127.0.0.1:7890 was unavailable. GitHub connector/browser access succeeded for the pinned commit, source bytes, README, and licenses.",
-  "blocked_before": "Compiler, Anvil, Echidna, Slither, Agent A/B, and fuzzing runs.",
-  "results_generated": false
+  "blocked_before": "Initial restricted command runner invocation returned Wsl/E_ACCESSDENIED. After the user confirmed the Ubuntu-20.04 WSL instance was already started from PowerShell, the local WSL command session became available and the Phase30A workflow continued.",
+  "results_generated": true,
+  "recovery": {
+    "status": "available_and_used",
+    "observed_at": "2026-11-19T18:25:35+08:00",
+    "user_context": "User confirmed WSL was healthy and had been started from PowerShell.",
+    "distribution": "Ubuntu-20.04",
+    "tools": {
+      "echidna": "2.3.2",
+      "forge": "1.9.0-dev",
+      "anvil": "1.9.0-dev",
+      "slither": "0.11.6",
+      "crytic_compile": "0.4.2",
+      "solc": "0.4.24+commit.e67f0147.Linux.g++"
+    },
+    "direct_original_source_compile": "success; warning only for deprecated this.balance access in migrateTo",
+    "native_echidna_preflight": "success; property passing",
+    "slither_property_analysis": "complete; three candidate actions",
+    "harness_compile": "success; Solidity 0.4.24",
+    "anvil_candidate_replay": "raw and repaired sequences executable after neutral funding correction",
+    "echidna_seed_replay": "both sequences loaded and replayed; property passing; no test cases beyond corpus replay were executed",
+    "funding_correction": {
+      "before_wei": "4294967295",
+      "after_wei": "100000000000000000000",
+      "prior_profile_snapshot": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/06-agent-v2/Wallet02Refund-profile-run1.json",
+      "prior_profile_sha256": "219dd2346b0fdb04ec510f3c1d85fa4f8ac8d58f362a9426850855673e6c580c",
+      "updated_profile_sha256": "89f7639a5b823f4259150ef029e61ae0aedb4e0b6caa1a0556bc09262d9d729c"
+    },
+    "comparative_experiment": "not run because neither candidate reached the frozen target state"
+  }
 }

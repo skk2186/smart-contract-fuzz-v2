@@ -1,0 +1,585 @@
+{
+  "schema_version": 2,
+  "experiment_id": "1c266292fac44249bd72aa4b559e3104",
+  "project": "Wallet02Refund",
+  "property_ids": [
+    "8e75f62866f6d582a033"
+  ],
+  "property_count": 1,
+  "property_results": [
+    {
+      "property_id": "8e75f62866f6d582a033",
+      "property": "WalletHarness.echidna_wallet_accounting_respected()",
+      "dependency_status": "statically_supported_with_limits",
+      "seed_compatible_action_count": 3,
+      "slither_action_count": 3,
+      "abi_fallback_action_count": 0,
+      "action_inventory_source": "slither_dependency_candidates",
+      "deployment_state": {
+        "status": "observed",
+        "deployment_block": 4370000,
+        "view_values": {
+          "0xa647ff3c36cfab592509e13860ab8c4f28781a66:echidna_wallet_accounting_respected()": true
+        },
+        "view_count": 1,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "role_addresses": [],
+        "guard_predicate_probes": [],
+        "initial_properties": {
+          "echidna_wallet_accounting_respected()": true
+        },
+        "limitations": "private state is not read directly; constructor and Slither evidence remain static inference"
+      },
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000"
+      ],
+      "candidate_results": [
+        {
+          "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+          "plan": [
+            {
+              "function": "deposit(uint8)",
+              "rationale": "先通过 payable 存款增加 cumulativeDeposits[actor]，为后续 refund 的 payout 记账建立可比较的存款基数；部署时该映射未初始化，需由候选前序满足。"
+            },
+            {
+              "function": "refund(uint8)",
+              "rationale": "在已有存款后调用 refund，触发 cumulativePayout[actor] 累加，检验 payout 是否可能超过 cumulativeDeposits，从而尝试违反 echidna_wallet_accounting_respected 的 cumulativePayout[i] > cumulativeDeposits[i] 条件。"
+            }
+          ],
+          "status": "replay_failed",
+          "seed_class": "echidna_only_diagnostic_candidate",
+          "seed_id": null,
+          "corpus_file": null,
+          "concrete_seed": {
+            "property_id": "8e75f62866f6d582a033",
+            "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+            "transactions": [
+              {
+                "index": 1,
+                "function": "deposit(uint8)",
+                "abi_signature": "deposit(uint8)",
+                "sender": "0x0000000000000000000000000000000000010000",
+                "arguments": [
+                  0
+                ],
+                "value_wei": "1000000000000000",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change",
+                "data_dependencies": []
+              },
+              {
+                "index": 2,
+                "function": "refund(uint8)",
+                "abi_signature": "refund(uint8)",
+                "sender": "0x0000000000000000000000000000000000010000",
+                "arguments": [
+                  0
+                ],
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change",
+                "data_dependencies": [
+                  {
+                    "from_transaction": 1,
+                    "field": "account",
+                    "relation": "same_uint8_account_index"
+                  }
+                ]
+              }
+            ],
+            "assumptions": [
+              "deposit(uint8) 的 ABI 声明为 uint8 account，但源码摘录显示 deposit() 无参数且 payable；按 ABI 顺序提供 account=0，并假设 harness 内部以该 account 索引映射 cumulativeDeposits[actor]。",
+              "refund(uint8) 复用与 deposit 相同的 account=0，假设同一 actor 索引对应同一账户，使 cumulativePayout[0] 与 cumulativeDeposits[0] 可比较。",
+              "deposit 发送 0.001 ETH（1000000000000000 wei）作为存款基数；refund 的 payout 记账依赖 wallet.refund() 实际向 accounts[0] 转账，若 wallet 无余额或 refund 无副作用则可能不产生 payout 增量。",
+              "sender 使用 sender_pool 中第一个地址，且与 property_sender 相同；假设该地址在 harness 中映射到 accounts[0] 或至少 deposit/refund 的 actor 索引一致。",
+              "未使用事件引用对象，因为本序列后续参数不依赖前序交易产生的事件字段；account 索引为静态常量 0。",
+              "previous_verifier_feedback 显示第 1 笔 deposit 为 rpc_error，可能因 payable 交易 value 或 ABI 参数不匹配；本次按 ABI 提供 uint8 参数并设置非零 value，若仍失败需检查 harness 是否接受该 value 或 account 索引越界。"
+            ],
+            "execution_feedback": "执行反馈分类：execution_failure。检查失败交易的守卫和状态读写；若缺少前序状态则重新规划，否则修正具体参数。 不要声称已验证。证据：{\"replay_status\": \"replay_failed\", \"deployment_status\": \"success\", \"initial_property_violations\": [], \"failed_transactions\": [{\"index\": 1, \"function\": \"deposit(uint8)\", \"status\": \"rpc_error\", \"execution_class\": null, \"expected_outcome\": null, \"internal_errors\": null, \"dependency_errors\": null, \"prior_events\": null, \"argument_bindings\": null, \"execution_effect_error\": null}], \"property_errors\": [null]}"
+          },
+          "raw_concrete_seed": {
+            "property_id": "8e75f62866f6d582a033",
+            "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+            "transactions": [
+              {
+                "function": "deposit(uint8)",
+                "arguments": [
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "1000000000000000000",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change"
+              },
+              {
+                "function": "refund(uint8)",
+                "arguments": [
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "0",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change",
+                "data_dependencies": [
+                  {
+                    "from_transaction": 1,
+                    "field": "account",
+                    "relation": "same_uint8_account_index"
+                  }
+                ]
+              }
+            ],
+            "assumptions": [
+              "deposit(uint8) 的 ABI 参数 account 在源码摘录中未直接使用（deposit() 无参转发），但按 ABI 顺序必须提供；选择 0 作为账户索引，并假设 harness 内部以 msg.sender 或 account 索引记账。",
+              "refund(uint8) 复用与 deposit 相同的 account=0，假设同一账户索引对应同一 actor 的 cumulativeDeposits/cumulativePayout 记账槽位。",
+              "deposit 的 value_wei 设为 1e18，用于建立非零 cumulativeDeposits 基数；源码未限制金额，假设该值可被接受。",
+              "refund 的 cumulativePayout 增量依赖 address(accounts[actor]).balance - balanceBefore，静态无法确认 refund 是否实际向该账户转账或余额差是否为正；若为 0 则不会违反属性。",
+              "sender 使用 sender_pool 中第一个地址，并假设该地址在 harness 的 accounts 映射中可被 refund 路径访问。",
+              "未使用事件引用对象，因为本序列后续参数不依赖前序交易产生的事件字段。"
+            ],
+            "execution_feedback": null
+          },
+          "raw_replay": {
+            "project": "Wallet02Refund",
+            "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "deployment_status": "success",
+            "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+            "replay_status": "replay_failed",
+            "target_property_violation": null,
+            "initial_property_values": {
+              "echidna_wallet_accounting_respected()": true
+            },
+            "initial_property_errors": {},
+            "initial_property_violations": [],
+            "initial_predicate_getters": [],
+            "target_property_state": {
+              "property": "echidna_wallet_accounting_respected()",
+              "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+              "status": "property_state_unobservable",
+              "target_property_state_established": false,
+              "counterexample_state_established": false,
+              "property_related_state_changed": false,
+              "first_established_transaction_index": null,
+              "first_property_related_change_transaction_index": null,
+              "first_counterexample_transaction_index": null,
+              "trajectory": [
+                {
+                  "transaction_index": 0,
+                  "value": true,
+                  "predicate_getters": [],
+                  "changed_predicate_getters": []
+                },
+                {
+                  "transaction_index": 1,
+                  "value": null,
+                  "predicate_getters": [],
+                  "changed_predicate_getters": []
+                }
+              ]
+            },
+            "environment": {
+              "chain_id": 1,
+              "initial_timestamp": 1524785992,
+              "initial_block_number": 4370000,
+              "deployment_timestamp": 1524785992,
+              "deployment_block_number": 4370000,
+              "deployer": "0x0000000000000000000000000000000000030000",
+              "property_sender": "0x0000000000000000000000000000000000010000",
+              "sender_pool": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000",
+                "0x0000000000000000000000000000000000030000",
+                "0x0000000000000000000000000000000000040000",
+                "0x0000000000000000000000000000000000050000"
+              ],
+              "gas_price_wei": 0,
+              "evm_revision": "shanghai",
+              "gas_limit_per_transaction": 12500000,
+              "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+            },
+            "transactions": [
+              {
+                "index": 1,
+                "function": "deposit(uint8)",
+                "sender": "0x0000000000000000000000000000000000010000",
+                "status": "rpc_error",
+                "error": "{'code': -32003, 'message': 'Insufficient funds for gas * price + value'}"
+              }
+            ],
+            "resolved_transactions": [
+              {
+                "function": "deposit(uint8)",
+                "arguments": [
+                  0
+                ],
+                "sender": "0x0000000000000000000000000000000000010000",
+                "value_wei": "1000000000000000000",
+                "delay_seconds": 0,
+                "delay_blocks": 0,
+                "expected_outcome": "state_change"
+              }
+            ],
+            "attempt": 1,
+            "elapsed_seconds": 0.071,
+            "elapsed_from_run_start_seconds": 6.072
+          },
+          "agent_b": {
+            "logical_calls": 2,
+            "failed_logical_calls": 0,
+            "events": [
+              {
+                "tag": "AgentB_Wallet02Refund_8e75f62866f6-01-seq_deposit_then_refund_try1",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 2089,
+                  "prompt_cache_hit_tokens": 384,
+                  "prompt_cache_miss_tokens": 1705,
+                  "completion_tokens": 441,
+                  "total_tokens": 2530,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000521502",
+                    "peak": "0.001043004"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 2.882,
+                "attempt": 1,
+                "prompt_utf8_bytes": 7629,
+                "invalid_record_count": null
+              },
+              {
+                "tag": "AgentB_Wallet02Refund_8e75f62866f6-01-seq_deposit_then_refund_try2",
+                "ok": true,
+                "error_kind": null,
+                "error": null,
+                "usage": {
+                  "prompt_tokens": 2247,
+                  "prompt_cache_hit_tokens": 2048,
+                  "prompt_cache_miss_tokens": 199,
+                  "completion_tokens": 546,
+                  "total_tokens": 2793,
+                  "estimated_cost_usd": {
+                    "offpeak": "0.000363594",
+                    "peak": "0.000727188"
+                  },
+                  "pricing_date": "2026-11-13",
+                  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+                  "cost_is_estimate": true
+                },
+                "elapsed_seconds": 3.354,
+                "attempt": 1,
+                "prompt_utf8_bytes": 8255,
+                "invalid_record_count": null
+              }
+            ]
+          },
+          "replay_attempts": [
+            {
+              "project": "Wallet02Refund",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+              "replay_status": "replay_failed",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_wallet_accounting_respected()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "initial_predicate_getters": [],
+              "target_property_state": {
+                "property": "echidna_wallet_accounting_respected()",
+                "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+                "status": "property_state_unobservable",
+                "target_property_state_established": false,
+                "counterexample_state_established": false,
+                "property_related_state_changed": false,
+                "first_established_transaction_index": null,
+                "first_property_related_change_transaction_index": null,
+                "first_counterexample_transaction_index": null,
+                "trajectory": [
+                  {
+                    "transaction_index": 0,
+                    "value": true,
+                    "predicate_getters": [],
+                    "changed_predicate_getters": []
+                  },
+                  {
+                    "transaction_index": 1,
+                    "value": null,
+                    "predicate_getters": [],
+                    "changed_predicate_getters": []
+                  }
+                ]
+              },
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "deposit(uint8)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "status": "rpc_error",
+                  "error": "{'code': -32003, 'message': 'Insufficient funds for gas * price + value'}"
+                }
+              ],
+              "resolved_transactions": [
+                {
+                  "function": "deposit(uint8)",
+                  "arguments": [
+                    0
+                  ],
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "value_wei": "1000000000000000000",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change"
+                }
+              ],
+              "attempt": 1,
+              "elapsed_seconds": 0.071,
+              "elapsed_from_run_start_seconds": 6.072
+            },
+            {
+              "project": "Wallet02Refund",
+              "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "deployment_status": "success",
+              "candidate_id": "8e75f62866f6-01-seq_deposit_then_refund",
+              "replay_status": "replay_failed",
+              "target_property_violation": null,
+              "initial_property_values": {
+                "echidna_wallet_accounting_respected()": true
+              },
+              "initial_property_errors": {},
+              "initial_property_violations": [],
+              "initial_predicate_getters": [],
+              "target_property_state": {
+                "property": "echidna_wallet_accounting_respected()",
+                "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+                "status": "property_state_unobservable",
+                "target_property_state_established": false,
+                "counterexample_state_established": false,
+                "property_related_state_changed": false,
+                "first_established_transaction_index": null,
+                "first_property_related_change_transaction_index": null,
+                "first_counterexample_transaction_index": null,
+                "trajectory": [
+                  {
+                    "transaction_index": 0,
+                    "value": true,
+                    "predicate_getters": [],
+                    "changed_predicate_getters": []
+                  },
+                  {
+                    "transaction_index": 1,
+                    "value": null,
+                    "predicate_getters": [],
+                    "changed_predicate_getters": []
+                  }
+                ]
+              },
+              "environment": {
+                "chain_id": 1,
+                "initial_timestamp": 1524785992,
+                "initial_block_number": 4370000,
+                "deployment_timestamp": 1524785992,
+                "deployment_block_number": 4370000,
+                "deployer": "0x0000000000000000000000000000000000030000",
+                "property_sender": "0x0000000000000000000000000000000000010000",
+                "sender_pool": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000",
+                  "0x0000000000000000000000000000000000030000",
+                  "0x0000000000000000000000000000000000040000",
+                  "0x0000000000000000000000000000000000050000"
+                ],
+                "gas_price_wei": 0,
+                "evm_revision": "shanghai",
+                "gas_limit_per_transaction": 12500000,
+                "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+              },
+              "transactions": [
+                {
+                  "index": 1,
+                  "function": "deposit(uint8)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "status": "rpc_error",
+                  "error": "{'code': -32003, 'message': 'Insufficient funds for gas * price + value'}"
+                }
+              ],
+              "resolved_transactions": [
+                {
+                  "index": 1,
+                  "function": "deposit(uint8)",
+                  "abi_signature": "deposit(uint8)",
+                  "sender": "0x0000000000000000000000000000000000010000",
+                  "arguments": [
+                    0
+                  ],
+                  "value_wei": "1000000000000000",
+                  "delay_seconds": 0,
+                  "delay_blocks": 0,
+                  "expected_outcome": "state_change",
+                  "data_dependencies": []
+                }
+              ],
+              "attempt": 2,
+              "elapsed_seconds": 0.069,
+              "elapsed_from_run_start_seconds": 9.496
+            }
+          ],
+          "runtime_constraint_repairs": [],
+          "failure_class": "execution_failure",
+          "planned_target_path_reached": false,
+          "error": null,
+          "elapsed_seconds": 6.378
+        }
+      ],
+      "status": "no_valid_evm_seed",
+      "agent_a": {
+        "logical_calls": 1,
+        "failed_logical_calls": 0,
+        "events": [
+          {
+            "tag": "AgentA_Wallet02Refund_8e75f62866f6d582a033_plan1",
+            "ok": true,
+            "error_kind": null,
+            "error": null,
+            "usage": {
+              "prompt_tokens": 2692,
+              "prompt_cache_hit_tokens": 512,
+              "prompt_cache_miss_tokens": 2180,
+              "completion_tokens": 339,
+              "total_tokens": 3031,
+              "estimated_cost_usd": {
+                "offpeak": "0.000531936",
+                "peak": "0.001063872"
+              },
+              "pricing_date": "2026-11-13",
+              "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+              "cost_is_estimate": true
+            },
+            "elapsed_seconds": 2.925,
+            "attempt": 1,
+            "prompt_utf8_bytes": 10004,
+            "invalid_record_count": 0
+          }
+        ]
+      },
+      "planning": {
+        "status": "planned",
+        "plans": [
+          {
+            "property_sequences": [
+              {
+                "property_id": "8e75f62866f6d582a033",
+                "candidate_id": "seq_deposit_then_refund",
+                "steps": [
+                  {
+                    "function": "deposit(uint8)",
+                    "rationale": "先通过 payable 存款增加 cumulativeDeposits[actor]，为后续 refund 的 payout 记账建立可比较的存款基数；部署时该映射未初始化，需由候选前序满足。"
+                  },
+                  {
+                    "function": "refund(uint8)",
+                    "rationale": "在已有存款后调用 refund，触发 cumulativePayout[actor] 累加，检验 payout 是否可能超过 cumulativeDeposits，从而尝试违反 echidna_wallet_accounting_respected 的 cumulativePayout[i] > cumulativeDeposits[i] 条件。"
+                  }
+                ]
+              }
+            ],
+            "shared_prefixes": [],
+            "assumptions": [
+              "deposit(uint8) 的 account 参数与 refund(uint8) 的 account 参数需指向同一索引，才能让同一 cumulativeDeposits/cumulativePayout 槽位参与属性比较；参数具体化不在本规划职责内。",
+              "refund 的 payout 记账依赖 wallet.refund() 实际向 accounts[actor] 转账并改变其余额；静态证据未证明该外部调用一定成功或产生非零差额。",
+              "部署时 echidna_wallet_accounting_respected() 已为 true，且 cumulativeDeposits/cumulativePayout 初始为零；本序列不重复初始化部署状态。",
+              "sender_pool 中无 owner/admin 角色地址，且候选动作未显示权限守卫，故按普通账户发送交易。"
+            ],
+            "shared_prefixes_ignored": true,
+            "applied_shared_prefixes": [],
+            "invalid_records": [],
+            "canonicalized_signatures": [],
+            "recovery_summary": {
+              "valid_candidate_count": 1,
+              "invalid_record_count": 0,
+              "applied_shared_prefix_count": 0
+            }
+          }
+        ],
+        "fixed_prefix_transactions": []
+      },
+      "valid_evm_seed_count": 0,
+      "elapsed_seconds": 9.361
+    }
+  ],
+  "echidna": [],
+  "method": "independent_property_planning_without_grouping_or_shared_prefixes",
+  "prompt_policy": {
+    "agent_a_calls_per_property": true,
+    "shared_prefixes_enabled": false,
+    "manual_paths": false,
+    "manual_parameter_templates": false,
+    "agent_b_responsibilities": [
+      "ABI 参数",
+      "发送者",
+      "跨交易数据依赖"
+    ],
+    "planning_repairs_per_property": 0,
+    "execution_feedback_repairs_per_candidate": 1,
+    "execution_replans_per_property": 0,
+    "runtime_constraint_repair_enabled": true,
+    "maximum_observed_constraint_repairs_per_candidate": 1
+  },
+  "budgets": {
+    "echidna_test_limit_per_property": 500,
+    "echidna_timeout_seconds": 60,
+    "agent_a_execution_replans_per_property": 0,
+    "token_budget": 400000,
+    "wall_budget_seconds": 600
+  },
+  "api_usage": {
+    "request_attempts": 3,
+    "failed_request_attempts": 0,
+    "unmetered_attempts": 0,
+    "prompt_tokens": 7028,
+    "completion_tokens": 1326,
+    "total_tokens": 8354,
+    "estimated_cost_usd_offpeak": "0.001417032",
+    "estimated_cost_usd_peak": "0.002834064",
+    "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+    "log_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/06-agent-v2/API调用.jsonl"
+  },
+  "token_budget_accounting_upper_bound": 8354,
+  "total_elapsed_seconds": 9.499,
+  "anvil_start_error": null
+}
