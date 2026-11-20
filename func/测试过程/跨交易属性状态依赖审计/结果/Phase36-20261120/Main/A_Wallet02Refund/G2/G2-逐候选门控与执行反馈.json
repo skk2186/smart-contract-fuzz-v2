@@ -1,0 +1,1780 @@
+[
+  {
+    "proposal_no": 1,
+    "iteration": 1,
+    "operator": "static_dependency_insertion",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "348097b34d97bc3b631c307d1b6d71c83c8c03ea5b5fee6f4ce708579ed62f68",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "candidate is an insertion/role/resource variation or an unclassified type; preserve expansion",
+    "evidence": {
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WalletHarness.cumulativePayout"
+        ],
+        "position": 1
+      }
+    },
+    "gate_elapsed_seconds": 2.9850052669644356e-06,
+    "candidate_replay_status": "replay_failed",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "reverted",
+        "execution_class": "outer_revert",
+        "target_property": null,
+        "changed_predicate_getters": [],
+        "property_error": "tx_revert: ContractLogicError: ('execution reverted', '0x')"
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": null
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": null,
+      "property_related_state_changed": true,
+      "replay_status": "replay_failed",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 2,
+    "iteration": 1,
+    "operator": "static_dependency_insertion",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "1fbbd3c1dc9e19e25e208b5650d5bdab3c9280cc667f3e53d00b58f7cf94e217",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      },
+      {
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "candidate is an insertion/role/resource variation or an unclassified type; preserve expansion",
+    "evidence": {
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WalletHarness.cumulativePayout"
+        ],
+        "position": 2
+      }
+    },
+    "gate_elapsed_seconds": 3.7239951780065894e-06,
+    "candidate_replay_status": "replay_failed",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "no_persistent_state_change",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": true
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "replay_failed",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 3,
+    "iteration": 1,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "0ffc9e4b33e858dbf9147e12053dc92e70a38e787ff233a75be75b1afba408ab",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      },
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "balance_changes": [
+          {
+            "address": "0x0000000000000000000000000000000000010000",
+            "before_wei": 100000000000000000000,
+            "after_wei": 99000000000000000000,
+            "delta_wei": -1000000000000000000
+          },
+          {
+            "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "before_wei": 0,
+            "after_wei": 1000000000000000000,
+            "delta_wei": 1000000000000000000
+          }
+        ]
+      }
+    },
+    "gate_elapsed_seconds": 0.00012319500092417002,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 1000000000000000000,
+            "after": 2000000000000000000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": true
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 4,
+    "iteration": 1,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "e2d6c19ef52faeef39104b393764b697023d2ce6a92464942fea04ecd7b6e003",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "balance_changes": [
+          {
+            "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+            "before_wei": 0,
+            "after_wei": 1000000000000000000,
+            "delta_wei": 1000000000000000000
+          },
+          {
+            "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "before_wei": 1000000000000000000,
+            "after_wei": 0,
+            "delta_wei": -1000000000000000000
+          }
+        ]
+      }
+    },
+    "gate_elapsed_seconds": 3.1239003874361515e-05,
+    "candidate_replay_status": "replay_failed",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "reverted",
+        "execution_class": "outer_revert",
+        "target_property": null,
+        "changed_predicate_getters": [],
+        "property_error": "tx_revert: ContractLogicError: ('execution reverted', '0x')"
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": null
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": null,
+      "property_related_state_changed": true,
+      "replay_status": "replay_failed",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 5,
+    "iteration": 2,
+    "operator": "static_dependency_insertion",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "7cf172ad3a4431e362d8bc6450b6d6595cef1b4ef6be8a057a4f12b18c0a2fa0",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      },
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "candidate is an insertion/role/resource variation or an unclassified type; preserve expansion",
+    "evidence": {
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WalletHarness.cumulativePayout"
+        ],
+        "position": 1
+      }
+    },
+    "gate_elapsed_seconds": 2.044995198957622e-06,
+    "candidate_replay_status": "replay_failed",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "reverted",
+        "execution_class": "outer_revert",
+        "target_property": null,
+        "changed_predicate_getters": [],
+        "property_error": "tx_revert: ContractLogicError: ('execution reverted', '0x')"
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": null
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": null,
+      "property_related_state_changed": true,
+      "replay_status": "replay_failed",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 6,
+    "iteration": 2,
+    "operator": "static_dependency_insertion",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "00c6ceb30b3222ce9ee91d0aa517b076b7128feb6e8651c0e4f67da6f9c162c2",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      },
+      {
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "candidate is an insertion/role/resource variation or an unclassified type; preserve expansion",
+    "evidence": {
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WalletHarness.cumulativePayout"
+        ],
+        "position": 2
+      }
+    },
+    "gate_elapsed_seconds": 3.531997208483517e-06,
+    "candidate_replay_status": "replay_failed",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "no_persistent_state_change",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 1000000000000000000,
+            "after": 2000000000000000000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": true
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "replay_failed",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 7,
+    "iteration": 2,
+    "operator": "static_dependency_insertion",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "611f7286da0c5b3b4de080f50498784ac07be2bd79dcccc88e884b63185f0e71",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      },
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "candidate is an insertion/role/resource variation or an unclassified type; preserve expansion",
+    "evidence": {
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WalletHarness.cumulativePayout"
+        ],
+        "position": 3
+      }
+    },
+    "gate_elapsed_seconds": 4.132998583372682e-06,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 1000000000000000000,
+            "after": 2000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 1000000000000000000,
+            "after": 2000000000000000000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": true
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 8,
+    "iteration": 2,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "4ff997adb4a76594a3367286ff8a18129cd51e2530b053164d9ef0710193ec0c",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      },
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "balance_changes": [
+          {
+            "address": "0x0000000000000000000000000000000000010000",
+            "before_wei": 100000000000000000000,
+            "after_wei": 99000000000000000000,
+            "delta_wei": -1000000000000000000
+          },
+          {
+            "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "before_wei": 0,
+            "after_wei": 1000000000000000000,
+            "delta_wei": 1000000000000000000
+          }
+        ]
+      }
+    },
+    "gate_elapsed_seconds": 3.760600520763546e-05,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 1000000000000000000,
+            "after": 2000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 2000000000000000000,
+            "after": 3000000000000000000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": true
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 9,
+    "iteration": 2,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "e6ff59897a18e8ac563650488965543df9b07ae430f7a28bc68d27b0565bb5bb",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      },
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "balance_changes": [
+          {
+            "address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+            "before_wei": 0,
+            "after_wei": 1000000000000000000,
+            "delta_wei": 1000000000000000000
+          },
+          {
+            "address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+            "before_wei": 1000000000000000000,
+            "after_wei": 0,
+            "delta_wei": -1000000000000000000
+          }
+        ]
+      }
+    },
+    "gate_elapsed_seconds": 2.998999843839556e-05,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 1000000000000000000,
+            "after": 2000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 1000000000000000000,
+            "after": 2000000000000000000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": false,
+      "goal_state_values": {
+        "target_property": true
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 10,
+    "iteration": 2,
+    "operator": "shared_resource_role_expansion",
+    "decision": "unknown",
+    "action": "extend",
+    "sequence_fingerprint": "e24710d808cfea34ac5438fcdd925b69f5a4b4906833c831a10fa4f3cddcc2f3",
+    "candidate_sequence": [
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "deposit(uint8)",
+        "arguments": [
+          1
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "1000000000000000000",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "account",
+            "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+          }
+        ]
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+    "evidence": {
+      "replay_status": "replay_failed"
+    },
+    "gate_elapsed_seconds": 1.382002665195614e-06,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "deposit(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "refund(uint8)",
+        "arguments": [
+          0
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "deposit(uint8)",
+        "arguments": [
+          1
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativeDeposits(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              1
+            ],
+            "before": 0,
+            "after": 1000000000000000000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "withdraw(uint8,uint256)",
+        "arguments": [
+          0,
+          1000000000000000000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": false,
+        "changed_predicate_getters": [
+          {
+            "signature": "cumulativePayout(uint8)",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [
+              0
+            ],
+            "before": 1000000000000000000,
+            "after": 2000000000000000000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "wallet_counterexample",
+      "reached": true,
+      "goal_state_values": {
+        "target_property": false
+      },
+      "reason": "预先定义的关键持久状态全部成立",
+      "property_value": false,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": {
+      "transaction_index": 4,
+      "property": "echidna_wallet_accounting_respected()"
+    }
+  }
+]

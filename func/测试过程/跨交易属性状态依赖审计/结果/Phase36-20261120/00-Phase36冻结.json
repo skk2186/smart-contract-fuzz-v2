@@ -1,0 +1,381 @@
+{
+  "schema_version": 1,
+  "phase": "Phase36",
+  "created_before_g0_g1_g2_execution_utc": "2026-11-20T13:22:24.566615+00:00",
+  "head": "963afe101d4c0ef02db5af6ea21b138f49e29c73",
+  "remote_main_head": "963afe101d4c0ef02db5af6ea21b138f49e29c73",
+  "baseline_phase35_freeze_sha256": "1c27ee3908737df6525064f5def007db7d56b288a6677af7e266cf2f623ec187",
+  "algorithm_files_sha256": {
+    "func/功能/状态反馈序列扩展.py": "f2e2552d4eeb49d58343a2b41a940e2764ba8c4e617235785d1d2d3d2f91f197",
+    "func/功能/属性分析适配器.py": "471364b2deea55ea3dead8a8c2084de49251186a6366e364a86b0fd842b8965f",
+    "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+    "func/功能/种子验证.py": "4e9ba0142bba7051f423455cce39c59d590670e20b8dd65e55e8ed483260514d",
+    "deepseek/AgentA.py": "0c4c58668a17b43739202cea21d1337b9b66008b6e8885bb48bddf29b3ab0511",
+    "deepseek/AgentB.py": "f5815d057899558b4d6db36636e22a857bbf0011af2fb36c3177195c8a4f2f86"
+  },
+  "phase36_files_sha256": {
+    "gate": "6dea151d0b4148ed57375fb1822e79333adee145524c2c029d4eba0f80d9079a",
+    "driver": "b95abdadec28a82de202f990016de2a16f601be18d13626211d39501d1d4e2fe"
+  },
+  "algorithm_parameters": {
+    "max_sequence_length": 8,
+    "candidate_execution_budget": 24,
+    "retained_prefixes": 4,
+    "extension_random_seed_base": 20261120,
+    "account_config_source": "Phase35 frozen configuration",
+    "model_calls": 0,
+    "AgentA_B_prompts_modified": false,
+    "echidna_fuzz_campaign": false
+  },
+  "arms": {
+    "G0": "对相同 E2 序列进行一次干净 Anvil 基线回放，不生成 E3 候选",
+    "G1": "原始 Phase32 state_feedback E3，不改规则，预算 24",
+    "G2": "相同 propose_extensions 与回放接口，Anvil 前运行 Phase36 门控；未知默认执行"
+  },
+  "tasks": {
+    "A_Wallet02Refund": {
+      "project": "Wallet02Refund",
+      "property_id": "8e75f62866f6d582a033",
+      "sequence": [
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "withdraw(uint8,uint256)",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+            }
+          ]
+        }
+      ],
+      "sequence_sha256": "d06c0ff8a2766343c0854086a8a706ab6940a73624677c460827f2043dba41bb",
+      "source_hashes": {
+        "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/03-P0-P1配对验证结果.json": "9e532a2b5b1a562758fa4a8eac6a650e132d8db51939f1dfb7828d870b371cbb",
+        "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/diagnostic-oracle/manual-oracle-result.json": "2b62477197bdb34f7d068fcecefaf4fdea062a691f08f664480257a87ae9a529",
+        "func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py": "9e8c3dc5ad293cd60b427f760306ab13de36dbd5b5f104fde6066c2709083460"
+      },
+      "input_source": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/04-Anvil对照/A_Wallet02Refund/E2-参数修复.json",
+      "input_source_sha256": "a29549ce62a10e23a080580915ff4d8bc7bd2777eace41d71db7bdd3bf2fc975",
+      "agent_calls_this_phase": 0
+    },
+    "BWorkflow": {
+      "project": "AuditBWorkflow",
+      "property_id": "b1f382e929f9df6e9ab5",
+      "sequence": [
+        {
+          "function": "createTask()",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "configureTask(uint256)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            100
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "executeTask(uint256)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            100
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 2,
+              "field": "maxAmount",
+              "relation": "executeTask.amount 复用 configureTask.maxAmount 的值，以满足 amount<=executionLimit 守卫"
+            }
+          ]
+        }
+      ],
+      "sequence_sha256": "a56e75a2e8bfa7c66d7863fc55e6d03b8b929f17d2cdc2fee7154e76c29c74c7",
+      "source_hashes": {
+        "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol": "90cc2d4975cfc8783bf2fadbbbd66ec151f69f6911d54627a9a2f8a1892051ab",
+        "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/BWorkflow/属性分析.json": "3d534f96069aae27a7c0abd030c022aa86026f1f17fb97849ae2e1b0ab9e7d69",
+        "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/BWorkflow/编译产物.json": "b36723f739b95ce12ea30402beb7dfa3f4bd1d334891305cb6f71860d06fae1a"
+      },
+      "input_source": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/04-Anvil对照/BWorkflow/E2-参数修复.json",
+      "input_source_sha256": "1f1f48cbef36349854e7ba48cf0660f8ae7f54247c8f025d9d440c8eb8226432",
+      "agent_calls_this_phase": 0
+    },
+    "CMsgSender": {
+      "project": "AuditCMsgSender",
+      "property_id": "816fc4e3bd3bfee42661",
+      "sequence": [
+        {
+          "function": "fundCredit()",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [],
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "authorizeOperator(address)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "executeFor(address,uint256)",
+          "sender": "0x0000000000000000000000000000000000020000",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            1000000000000000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "sender",
+              "relation": "owner 参数复用第 1 笔交易的 sender，即 TARGET_OWNER，确保 depositedCredit/availableCredit 与 executedFor 索引同一账户"
+            },
+            {
+              "from_transaction": 2,
+              "field": "arguments[0]",
+              "relation": "executeFor 的 msg.sender 复用第 2 笔交易 authorizeOperator 的 operator 参数，即 TARGET_OPERATOR，满足 authorizedOperator[owner]==msg.sender"
+            }
+          ]
+        }
+      ],
+      "sequence_sha256": "c1bf960b478921cd2858bd6b38d587e73def93faf22cf7588685c7f56bcd1489",
+      "source_hashes": {
+        "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol": "890649c0542240317ca1d36559ef2570f49b650bf5fced7cd690a45457c392fe",
+        "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/CMsgSender/属性分析.json": "c7e200af15595d5a5b00c0716616c6ba11fad9b43fc335374bbf2d65c5367ea1",
+        "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/CMsgSender/编译产物.json": "9c03533d2bf4a0332b05ccb144b1b503123edc534c3d4a18260626aade2e5b5f"
+      },
+      "input_source": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/04-Anvil对照/CMsgSender/E2-参数修复.json",
+      "input_source_sha256": "5412d37b71afe455fc0a57a219ddcaf28a9739a5bf6a34fe5cb57048f49f91a3",
+      "agent_calls_this_phase": 0
+    },
+    "DAllowance": {
+      "project": "AuditDAllowance",
+      "property_id": "c4adf1a248a169bde10e",
+      "sequence": [
+        {
+          "function": "mint(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            1000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "approve(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000",
+            500
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "transferFrom(address,address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            500
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "recipient",
+              "used_as": "owner"
+            },
+            {
+              "from_transaction": 2,
+              "field": "spender",
+              "used_as": "recipient"
+            }
+          ]
+        }
+      ],
+      "sequence_sha256": "7e60f17a8049a00d0a9bf2e817fdd7c476569f65f7d2aa90b144921c51296726",
+      "source_hashes": {
+        "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol": "b09492daf44997f0b4e6930bf48a92766ae7d627a358ceb3ce3248849153a2c8",
+        "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/DAllowance/属性分析.json": "d828b320fed4dbdfe1b4495b53f9382f4dddec16b48ee8953d30d6d969f02fcf",
+        "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/DAllowance/编译产物.json": "916209dfb075c509aca66ea0885cd1989c31c6feabd54b46f29f81de44e44cf7"
+      },
+      "input_source": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/04-Anvil对照/DAllowance/E2-参数修复.json",
+      "input_source_sha256": "380c3ffef316adca7ecfc5338b5004a3ef96521813e037d267e9b0752122525f",
+      "agent_calls_this_phase": 0
+    },
+    "E_PigfoxRWASupplySum": {
+      "project": "Phase32PigfoxRWADemo",
+      "property_id": "2e998090c7de1e70f195",
+      "sequence": [
+        {
+          "function": "mintToHolder(uint256,uint256)",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": []
+        }
+      ],
+      "sequence_sha256": "256718054631e91260d90c6e07bc583979ce34ad916d14c9f08e054aa5965a5d",
+      "source_hashes": {
+        "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/CompatibilityHarness/Properties.sol": "2dc2440816d6e21ddd5980a750d448acd58686fc7c97bb28a53c786055599eb6",
+        "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/CompatibilityHarness/native-solc-source-manifest.json": "35e9e27ca3ab1dfe8b4df4efe5ac89a29d744c6591405a95dc6dd1e8704be7ee"
+      },
+      "input_source": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/04-Anvil对照/E_PigfoxRWASupplySum/E2-参数修复.json",
+      "input_source_sha256": "644f0825d018d9b8637f0d40fb31884f0ffcf037d6ae8437924ff6e7ec7e5505",
+      "agent_calls_this_phase": 0
+    }
+  },
+  "missing_prerequisite_safety_inputs": {
+    "BWorkflow": {
+      "deleted_function": "configureTask(uint256)",
+      "sequence": [
+        {
+          "function": "createTask()",
+          "arguments": [],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0"
+        },
+        {
+          "function": "executeTask(uint256)",
+          "arguments": [
+            3
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0"
+        }
+      ],
+      "sequence_sha256": "8fec5295a941a5e0bf6ef37b08bace8c5595e94a810aa51a065cfde32f61488b",
+      "input_isolation": "仅此删减后序列进入 G1/G2；完整 Oracle 序列不进入正式算法输入"
+    },
+    "CMsgSender": {
+      "deleted_function": "authorizeOperator(address)",
+      "sequence": [
+        {
+          "function": "fundCredit()",
+          "arguments": [],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000"
+        },
+        {
+          "function": "executeFor(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            1
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0"
+        }
+      ],
+      "sequence_sha256": "841646dbfa8e3ba3e3a6714ca91e444399d4d29c68f5f72abf03d5583e56535b",
+      "input_isolation": "仅此删减后序列进入 G1/G2；完整 Oracle 序列不进入正式算法输入"
+    },
+    "DAllowance": {
+      "deleted_function": "approve(address,uint256)",
+      "sequence": [
+        {
+          "function": "mint(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            10
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0"
+        },
+        {
+          "function": "transferFrom(address,address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000030000",
+            4
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0"
+        }
+      ],
+      "sequence_sha256": "8d8a9c5e6f874ad6274b73a61f8c1013131f8983901e77914888fb2c2f0e1bf3",
+      "input_isolation": "仅此删减后序列进入 G1/G2；完整 Oracle 序列不进入正式算法输入"
+    }
+  },
+  "oracle_handling": {
+    "oracle_plan_sha256": "bb0c588292268412c7492afdb56dfd1fdedce495300831d2e3529d8b689dfd32",
+    "used_only_to_construct_three_deleted-step_sequences": true,
+    "formal_main_task_sequences_source": "frozen E2 outputs only",
+    "full_oracle_sequence_passed_to_gate_or_E3": false
+  },
+  "comparison": {
+    "same_frozen_e2_input": true,
+    "separate_clean_anvil_sessions_for_G0_G1_G2": true,
+    "candidate_replay_counter_excludes_base_replay": true,
+    "gate_overhead_included_in_G2_total_elapsed": true
+  },
+  "prior_phase35_candidate_counts_reference_only": {
+    "Wallet": 10,
+    "BWorkflow": 24,
+    "CMsgSender": 0,
+    "DAllowance": 5,
+    "Pigfox": 7
+  },
+  "remote_main_verified_before_experiment": {
+    "source": "GitHub REST API: GET /repos/skk2186/smart-contract-fuzz-v2/commits/main",
+    "sha": "963afe101d4c0ef02db5af6ea21b138f49e29c73",
+    "verified_utc": "2026-11-20T13:23:41.169320+00:00",
+    "note": "Phase35 原冻结文件中的远程 HEAD 为旧值 dded14f；Phase36 开始前重新核验并更正为当前 main。"
+  }
+}

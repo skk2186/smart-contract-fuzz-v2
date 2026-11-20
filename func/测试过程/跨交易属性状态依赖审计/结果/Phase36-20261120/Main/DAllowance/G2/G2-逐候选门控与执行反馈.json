@@ -1,0 +1,1297 @@
+[
+  {
+    "proposal_no": 1,
+    "iteration": 1,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "1e2d96dbdff16f5238228d291807fdf81e6cb86ca623e5d000e41e031a62e3c6",
+    "candidate_sequence": [
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "recipient",
+            "used_as": "owner"
+          },
+          {
+            "from_transaction": 2,
+            "field": "spender",
+            "used_as": "recipient"
+          }
+        ]
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "balance_changes": []
+      }
+    },
+    "gate_elapsed_seconds": 2.719299664022401e-05,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1000,
+            "after": 2000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "delegated_spend",
+      "reached": false,
+      "goal_state_values": {
+        "owner_balance": 0,
+        "spender_balance": 0,
+        "allowance": 0,
+        "total_granted": 0,
+        "delegated_spent": 0,
+        "total_supply": 2000
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 2,
+    "iteration": 2,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "32c205d1351024f7ad25df5becaa90f4060099f6bdf4a06c8e35671a54c13aa1",
+    "candidate_sequence": [
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "recipient",
+            "used_as": "owner"
+          },
+          {
+            "from_transaction": 2,
+            "field": "spender",
+            "used_as": "recipient"
+          }
+        ]
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "balance_changes": []
+      }
+    },
+    "gate_elapsed_seconds": 2.1669999114237726e-05,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1000,
+            "after": 2000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 5,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2000,
+            "after": 3000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "delegated_spend",
+      "reached": false,
+      "goal_state_values": {
+        "owner_balance": 0,
+        "spender_balance": 0,
+        "allowance": 0,
+        "total_granted": 0,
+        "delegated_spent": 0,
+        "total_supply": 3000
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 3,
+    "iteration": 3,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "6abed94257faa0914e8fe24f0225fa714701dc8a7b9fc3c31be60a2b9839a146",
+    "candidate_sequence": [
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "recipient",
+            "used_as": "owner"
+          },
+          {
+            "from_transaction": 2,
+            "field": "spender",
+            "used_as": "recipient"
+          }
+        ]
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "balance_changes": []
+      }
+    },
+    "gate_elapsed_seconds": 3.963000199291855e-05,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1000,
+            "after": 2000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 5,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2000,
+            "after": 3000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 6,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 3000,
+            "after": 4000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "delegated_spend",
+      "reached": false,
+      "goal_state_values": {
+        "owner_balance": 0,
+        "spender_balance": 0,
+        "allowance": 0,
+        "total_granted": 0,
+        "delegated_spent": 0,
+        "total_supply": 4000
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 4,
+    "iteration": 4,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "3caad33155a960be290c394fe79651a2c8f4a2607d051bade42dbb2150690804",
+    "candidate_sequence": [
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "recipient",
+            "used_as": "owner"
+          },
+          {
+            "from_transaction": 2,
+            "field": "spender",
+            "used_as": "recipient"
+          }
+        ]
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "balance_changes": []
+      }
+    },
+    "gate_elapsed_seconds": 2.606899943202734e-05,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1000,
+            "after": 2000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 5,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2000,
+            "after": 3000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 6,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 3000,
+            "after": 4000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 7,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 4000,
+            "after": 5000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "delegated_spend",
+      "reached": false,
+      "goal_state_values": {
+        "owner_balance": 0,
+        "spender_balance": 0,
+        "allowance": 0,
+        "total_granted": 0,
+        "delegated_spent": 0,
+        "total_supply": 5000
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  },
+  {
+    "proposal_no": 5,
+    "iteration": 5,
+    "operator": "state_supported_repetition",
+    "decision": "extend",
+    "action": "extend",
+    "sequence_fingerprint": "6a94a85be78aa302f74b1bedbcbe91defb14e0913f021c318389c9fe5f819744",
+    "candidate_sequence": [
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "recipient",
+            "used_as": "owner"
+          },
+          {
+            "from_transaction": 2,
+            "field": "spender",
+            "used_as": "recipient"
+          }
+        ]
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      }
+    ],
+    "candidate_sequence_reconstructed_from_logged_parent_and_source_transaction": false,
+    "reconstructed_fingerprint_matches": null,
+    "decision_reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
+    "evidence": {
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "balance_changes": []
+      }
+    },
+    "gate_elapsed_seconds": 2.8281996492296457e-05,
+    "candidate_replay_status": "executable",
+    "transactions": [
+      {
+        "index": 1,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 2,
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 3,
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [],
+        "property_error": null
+      },
+      {
+        "index": 4,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1000,
+            "after": 2000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 5,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2000,
+            "after": 3000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 6,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 3000,
+            "after": 4000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 7,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 4000,
+            "after": 5000
+          }
+        ],
+        "property_error": null
+      },
+      {
+        "index": 8,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "status": "success",
+        "execution_class": "state_established",
+        "target_property": true,
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 5000,
+            "after": 6000
+          }
+        ],
+        "property_error": null
+      }
+    ],
+    "target_state_observation": {
+      "goal_kind": "delegated_spend",
+      "reached": false,
+      "goal_state_values": {
+        "owner_balance": 0,
+        "spender_balance": 0,
+        "allowance": 0,
+        "total_granted": 0,
+        "delegated_spent": 0,
+        "total_supply": 6000
+      },
+      "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+      "property_value": true,
+      "property_related_state_changed": true,
+      "replay_status": "executable",
+      "getter_observation_incomplete": false
+    },
+    "target_related_state_changed": true,
+    "property_counterexample": null
+  }
+]
