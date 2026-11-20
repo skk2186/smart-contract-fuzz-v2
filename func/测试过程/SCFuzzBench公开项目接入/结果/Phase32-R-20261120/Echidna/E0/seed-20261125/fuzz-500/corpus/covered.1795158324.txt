@@ -1,0 +1,1491 @@
+/tmp/phase32-r-native-copy-20261120/pipeline/PigfoxProperties.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity >=0.8.0;
+  3 |     | 
+  4 |     | /// @title PigfoxProperties — the shared property-harness contract for the estate.
+  5 |     | /// @notice Every pigfox contract repo has exactly one `test/Properties.sol`
+  6 |     | ///         holding a contract `Properties is PigfoxProperties`. Foundry, Echidna
+  7 |     | ///         and Medusa all drive THAT contract, so an invariant can never hold in
+  8 |     | ///         one engine and quietly rot in another.
+  9 |     | ///
+ 10 |     | /// @dev    WHY THIS BASE EXISTS AT ALL.
+ 11 |     | ///         A property harness has a failure mode worse than a failing property:
+ 12 |     | ///         a property that stops being *registered*. A rename, a stale
+ 13 |     | ///         `crytic-export/`, artifacts left behind by `forge coverage`, a
+ 14 |     | ///         `testPrefixes` mismatch — any of these makes a fuzzer walk a smaller
+ 15 |     | ///         property set and report a green run. It has happened in this estate:
+ 16 |     | ///         a stale artifact once shrank a five-property set to four and the job
+ 17 |     | ///         passed. Green on four is not green.
+ 18 |     | ///
+ 19 |     | ///         So the count is declared in Solidity, and three independent things
+ 20 |     | ///         must agree with it before a build passes:
+ 21 |     | ///
+ 22 |     | ///           1. `pigfoxPropertyCount()` — this declaration, in the source.
+ 23 |     | ///           2. The static count of `function echidna_` declarations in
+ 24 |     | ///              `test/Properties.sol`, checked by
+ 25 |     | ///              `scripts/property-count.sh --source`.
+ 26 |     | ///           3. What Echidna and Medusa each actually REGISTERED at runtime,
+ 27 |     | ///              checked by `scripts/property-count.sh --engine`.
+ 28 |     | ///
+ 29 |     | ///         Two of those can be wrong together only if someone edits the source
+ 30 |     | ///         and the declaration in the same breath, which is a deliberate act with
+ 31 |     | ///         a diff attached. That is the point.
+ 32 |     | ///
+ 33 |     | /// @dev    NO DEPENDENCIES, DELIBERATELY. This file imports nothing — not
+ 34 |     | ///         forge-std, not OpenZeppelin. It is vendored into consuming repos as a
+ 35 |     | ///         git submodule under `lib/`, and a base contract that dragged in a
+ 36 |     | ///         second copy of forge-std would create exactly the duplicate-artifact
+ 37 |     | ///         confusion the count guard exists to catch.
+ 38 |     | ///
+ 39 |     | /// @dev    The pragma is a floating `>=0.8.0` rather than a pin. Consuming repos
+ 40 |     | ///         pin their own exact `solc` in `foundry.toml`; that pin is the control.
+ 41 |     | ///         Pinning here too would mean this file blocks a repo from moving
+ 42 |     | ///         compiler versions independently, for no safety gain.
+ 43 |     | abstract contract PigfoxProperties {
+ 44 |     |     /// @notice How many `echidna_*` predicates this harness declares.
+ 45 |     |     /// @dev    Override with a literal, not a computed expression. The whole
+ 46 |     |     ///         value of this number is that it is an independent statement of
+ 47 |     |     ///         intent — deriving it from anything the harness already knows
+ 48 |     |     ///         would make it agree with a broken harness automatically.
+ 49 |     |     ///
+ 50 |     |     ///         `pure` and prefixed `pigfox`, not `echidna_`, so no fuzzer ever
+ 51 |     |     ///         mistakes the declaration for one of the properties it counts.
+ 52 |     |     /// @return The number of `echidna_*` predicates in this contract.
+ 53 |     |     function pigfoxPropertyCount() public pure virtual returns (uint256);
+ 54 |     | 
+ 55 |     |     /// @notice A one-line statement of what this harness is proving.
+ 56 |     |     /// @dev    Read into the CI log by the pipeline so a run says what it
+ 57 |     |     ///         covered rather than only how many things it covered. Override it;
+ 58 |     |     ///         the default is deliberately useless so an unoverridden harness
+ 59 |     |     ///         reads as unfinished rather than as fine.
+ 60 |     |     /// @return A short human-readable description of the harness.
+ 61 |     |     function pigfoxHarnessDescription() public pure virtual returns (string memory) {
+ 62 |     |         return "UNDESCRIBED HARNESS";
+ 63 |     |     }
+ 64 |     | }
+ 65 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/AssetRegistry.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity 0.8.28;
+   3 |     | 
+   4 |     | import {Roles} from "./Roles.sol";
+   5 |     | import {IAssetRegistry} from "./interfaces/IAssetRegistry.sol";
+   6 |     | 
+   7 |     | /// @title AssetRegistry
+   8 |     | /// @notice Registrar-only attestation of the off-chain real-world assets that
+   9 |     | ///         back the token. Each asset records a document hash, a metadata URI,
+  10 |     | ///         and a lifecycle status. Ids are assigned sequentially from zero, so
+  11 |     | ///         `assetCount` doubles as a cheap total for window-driven pagination.
+  12 | *   | contract AssetRegistry is Roles, IAssetRegistry {
+  13 |     |     /*//////////////////////////////////////////////////////////////
+  14 |     |                                   TYPES
+  15 |     |     //////////////////////////////////////////////////////////////*/
+  16 |     | 
+  17 |     |     /// @notice Lifecycle status of a registered asset.
+  18 |     |     /// @dev `None` is the zero value and means "not registered".
+  19 |     |     enum Status {
+  20 |     |         None,
+  21 |     |         Active,
+  22 |     |         Suspended,
+  23 |     |         Redeemed
+  24 |     |     }
+  25 |     | 
+  26 |     |     /// @notice On-chain record attesting to an off-chain asset.
+  27 |     |     struct Asset {
+  28 |     |         bytes32 docHash;
+  29 |     |         string uri;
+  30 |     |         Status status;
+  31 |     |         bool exists;
+  32 |     |     }
+  33 |     | 
+  34 |     |     /*//////////////////////////////////////////////////////////////
+  35 |     |                                  ERRORS
+  36 |     |     //////////////////////////////////////////////////////////////*/
+  37 |     | 
+  38 |     |     /// @notice No asset is registered under this id.
+  39 |     |     error UnknownAsset(uint256 assetId);
+  40 |     |     /// @notice A status update tried to set the zero (`None`) status.
+  41 |     |     error InvalidStatus();
+  42 |     | 
+  43 |     |     /*//////////////////////////////////////////////////////////////
+  44 |     |                                  EVENTS
+  45 |     |     //////////////////////////////////////////////////////////////*/
+  46 |     | 
+  47 |     |     /// @notice Emitted when a new asset is registered.
+  48 |     |     /// @param assetId The sequential id assigned to the asset; ids are never reused.
+  49 |     |     /// @param docHash Hash of the off-chain document backing the asset. The document itself
+  50 |     |     ///        stays off chain; only its hash is attested, so the record proves which
+  51 |     |     ///        document was meant without publishing its contents.
+  52 |     |     /// @param uri Where that document can be fetched.
+  53 |     |     event AssetRegistered(uint256 indexed assetId, bytes32 docHash, string uri);
+  54 |     |     /// @notice Emitted when an asset's status changes.
+  55 |     |     /// @param assetId The asset whose lifecycle state changed.
+  56 |     |     /// @param previousStatus The status before the change, emitted so the log alone is a
+  57 |     |     ///        complete lifecycle history without replaying prior events.
+  58 |     |     /// @param newStatus The status after the change. Never `None`, which is reserved for
+  59 |     |     ///        "no such asset".
+  60 |     |     event AssetStatusUpdated(uint256 indexed assetId, Status previousStatus, Status newStatus);
+  61 |     | 
+  62 |     |     /*//////////////////////////////////////////////////////////////
+  63 |     |                                  STORAGE
+  64 |     |     //////////////////////////////////////////////////////////////*/
+  65 |     | 
+  66 |     |     mapping(uint256 assetId => Asset asset) private _assets;
+  67 |     |     /// @notice Number of assets registered; also the id the next registration
+  68 |     |     ///         will use. Enables O(perPage) pagination over the asset list.
+  69 | *   |     uint256 public assetCount;
+  70 |     | 
+  71 |     |     /// @notice Deploys an empty asset registry.
+  72 |     |     /// @param initialOwner The deployer; owner and first (registrar) agent.
+  73 | *   |     constructor(address initialOwner) Roles(initialOwner) {}
+  74 |     | 
+  75 |     |     /*//////////////////////////////////////////////////////////////
+  76 |     |                                 REGISTRAR
+  77 |     |     //////////////////////////////////////////////////////////////*/
+  78 |     | 
+  79 |     |     /// @notice Register a new asset with `docHash` and metadata `uri`. Starts Active.
+  80 |     |     /// @param docHash Hash of the backing document. Not validated against zero: this
+  81 |     |     ///        registry attests what the registrar supplied and does not pretend to judge
+  82 |     |     ///        whether the document exists.
+  83 |     |     /// @param uri Where the document can be fetched.
+  84 |     |     /// @return assetId The sequential id assigned to the new asset.
+  85 | *   |     function registerAsset(bytes32 docHash, string calldata uri)
+  86 |     |         external
+  87 |     |         onlyAgent
+  88 | *   |         returns (uint256 assetId)
+  89 |     |     {
+  90 | *   |         assetId = assetCount;
+  91 | *   |         _assets[assetId] = Asset({docHash: docHash, uri: uri, status: Status.Active, exists: true});
+  92 | *   |         assetCount = assetId + 1;
+  93 | *   |         emit AssetRegistered(assetId, docHash, uri);
+  94 |     |     }
+  95 |     | 
+  96 |     |     /// @notice Change the status of a registered asset. Cannot set `None`.
+  97 |     |     /// @param assetId The asset to update. Reverts with `UnknownAsset` if never registered.
+  98 |     |     /// @param newStatus The status to move to. `None` is rejected because it is the zero
+  99 |     |     ///        value meaning "no such asset" — allowing it would let a registrar erase an
+ 100 |     |     ///        asset's existence rather than mark it inactive.
+ 101 | *   |     function setAssetStatus(uint256 assetId, Status newStatus) external onlyAgent {
+ 102 | *   |         Asset storage a = _assets[assetId];
+ 103 | *   |         if (!a.exists) revert UnknownAsset(assetId);
+ 104 | *   |         if (newStatus == Status.None) revert InvalidStatus();
+ 105 | *   |         Status previous = a.status;
+ 106 | *   |         a.status = newStatus;
+ 107 | *   |         emit AssetStatusUpdated(assetId, previous, newStatus);
+ 108 |     |     }
+ 109 |     | 
+ 110 |     |     /*//////////////////////////////////////////////////////////////
+ 111 |     |                                   VIEWS
+ 112 |     |     //////////////////////////////////////////////////////////////*/
+ 113 |     | 
+ 114 |     |     /// @notice The full record for `assetId`. Reverts if unknown.
+ 115 |     |     /// @param assetId The asset to read.
+ 116 |     |     /// @return The document hash, metadata URI, status and existence flag. Reverts rather
+ 117 |     |     ///         than returning a zeroed struct, so an unknown id cannot be read as a real
+ 118 |     |     ///         asset with an empty document.
+ 119 | *   |     function getAsset(uint256 assetId) external view returns (Asset memory) {
+ 120 | *   |         Asset storage a = _assets[assetId];
+ 121 | *   |         if (!a.exists) revert UnknownAsset(assetId);
+ 122 | *   |         return a;
+ 123 |     |     }
+ 124 |     | 
+ 125 |     |     /// @notice True when `assetId` exists and its status is Active.
+ 126 |     |     /// @param assetId The asset to test.
+ 127 |     |     /// @return True only when the asset both exists and is Active. An unknown id returns
+ 128 |     |     ///         false rather than reverting, because redemption asks this as a yes/no
+ 129 |     |     ///         eligibility question, not as a lookup.
+ 130 | *   |     function isActive(uint256 assetId) external view override returns (bool) {
+ 131 | *   |         Asset storage a = _assets[assetId];
+ 132 | *   |         return a.exists && a.status == Status.Active;
+ 133 |     |     }
+ 134 |     | }
+ 135 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/IdentityRegistry.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity 0.8.28;
+   3 |     | 
+   4 |     | import {Roles} from "./Roles.sol";
+   5 |     | import {IRWAToken} from "./interfaces/IRWAToken.sol";
+   6 |     | import {IIdentityRegistry} from "./interfaces/IIdentityRegistry.sol";
+   7 |     | 
+   8 |     | /// @title IdentityRegistry
+   9 |     | /// @notice KYC whitelist for the RWA token. Agents register and remove
+  10 |     | ///         verified identities; the token consults {isVerified} on every mint
+  11 |     | ///         and transfer.
+  12 |     | /// @dev A bound token (see {setToken}) makes the security invariant
+  13 |     | ///      "a non-verified address can never hold a non-zero balance" hold even
+  14 |     | ///      across de-verification: an identity that currently holds tokens cannot
+  15 |     | ///      be removed. Acquisition is already gated by the token's mint/transfer
+  16 |     | ///      hooks, so the only remaining escape — de-verifying a live holder — is
+  17 |     | ///      closed here.
+  18 | *   | contract IdentityRegistry is Roles, IIdentityRegistry {
+  19 |     |     /*//////////////////////////////////////////////////////////////
+  20 |     |                                  ERRORS
+  21 |     |     //////////////////////////////////////////////////////////////*/
+  22 |     | 
+  23 |     |     /// @notice The identity is already verified.
+  24 |     |     error AlreadyVerified(address account);
+  25 |     |     /// @notice The identity is not currently verified.
+  26 |     |     error NotVerifiedIdentity(address account);
+  27 |     |     /// @notice The identity still holds tokens and so cannot be removed.
+  28 |     |     error HolderHasBalance(address account, uint256 balance);
+  29 |     |     /// @notice The bound token has already been set and is immutable thereafter.
+  30 |     |     error TokenAlreadySet();
+  31 |     | 
+  32 |     |     /*//////////////////////////////////////////////////////////////
+  33 |     |                                  EVENTS
+  34 |     |     //////////////////////////////////////////////////////////////*/
+  35 |     | 
+  36 |     |     /// @notice Emitted when `account` becomes a verified identity.
+  37 |     |     /// @param account The address added to the whitelist.
+  38 |     |     event IdentityRegistered(address indexed account);
+  39 |     |     /// @notice Emitted when `account` is removed from the whitelist.
+  40 |     |     /// @param account The address removed. It necessarily held a zero balance at this
+  41 |     |     ///        point, because `removeIdentity` refuses to strip a holder.
+  42 |     |     event IdentityRemoved(address indexed account);
+  43 |     |     /// @notice Emitted once when the bound token is configured.
+  44 |     |     /// @param token The token whose balances now guard de-verification. Emitted at most
+  45 |     |     ///        once in this contract's lifetime — `setToken` is one-shot.
+  46 |     |     event TokenSet(address indexed token);
+  47 |     | 
+  48 |     |     /*//////////////////////////////////////////////////////////////
+  49 |     |                                  STORAGE
+  50 |     |     //////////////////////////////////////////////////////////////*/
+  51 |     | 
+  52 |     |     mapping(address account => bool verified) private _verified;
+  53 |     |     /// @notice The token whose balances gate de-verification. Set once, post-deploy.
+  54 |     |     IRWAToken public token;
+  55 |     | 
+  56 |     |     /// @notice Deploys the whitelist with no token bound and nobody verified.
+  57 |     |     /// @param initialOwner The deployer; owner and first agent.
+  58 | *   |     constructor(address initialOwner) Roles(initialOwner) {}
+  59 |     | 
+  60 |     |     /*//////////////////////////////////////////////////////////////
+  61 |     |                                  WIRING
+  62 |     |     //////////////////////////////////////////////////////////////*/
+  63 |     | 
+  64 |     |     /// @notice Bind the token whose balances guard de-verification. One-shot:
+  65 |     |     ///         reverts once set, so the guard cannot later be disabled.
+  66 |     |     /// @param token_ The RWA token to bind. Rejected if zero, and rejected outright if a
+  67 |     |     ///        token is already bound: re-pointing it would let an owner swap in a token
+  68 |     |     ///        with no balances and then de-verify a holder who still owns the real one,
+  69 |     |     ///        which is precisely the invariant this binding exists to protect.
+  70 | *   |     function setToken(address token_) external onlyOwner {
+  71 | *   |         if (token_ == address(0)) revert ZeroAddress();
+  72 | *   |         if (address(token) != address(0)) revert TokenAlreadySet();
+  73 | *   |         token = IRWAToken(token_);
+  74 | *   |         emit TokenSet(token_);
+  75 |     |     }
+  76 |     | 
+  77 |     |     /*//////////////////////////////////////////////////////////////
+  78 |     |                                 WHITELIST
+  79 |     |     //////////////////////////////////////////////////////////////*/
+  80 |     | 
+  81 |     |     /// @notice Add `account` to the KYC whitelist.
+  82 |     |     /// @param account The address to verify. Rejected if zero, and rejected if already
+  83 |     |     ///        verified — a redundant re-registration is treated as a mistake worth
+  84 |     |     ///        surfacing rather than a silent no-op.
+  85 | *   |     function registerIdentity(address account) external onlyAgent {
+  86 | *   |         if (account == address(0)) revert ZeroAddress();
+  87 | *   |         if (_verified[account]) revert AlreadyVerified(account);
+  88 | *   |         _verified[account] = true;
+  89 | *   |         emit IdentityRegistered(account);
+  90 |     |     }
+  91 |     | 
+  92 |     |     /// @notice Remove `account` from the KYC whitelist.
+  93 |     |     /// @dev Reverts if a token is bound and `account` still holds a balance,
+  94 |     |     ///      preserving the non-verified-cannot-hold invariant.
+  95 |     |     /// @param account The address to de-verify. Reverts with `HolderHasBalance` if a token
+  96 |     |     ///        is bound and the account still holds one, so de-verification can never
+  97 |     |     ///        strand tokens in an address that is no longer allowed to move them.
+  98 |     |     function removeIdentity(address account) external onlyAgent {
+  99 |     |         if (!_verified[account]) revert NotVerifiedIdentity(account);
+ 100 |     |         if (address(token) != address(0)) {
+ 101 |     |             uint256 bal = token.balanceOf(account);
+ 102 |     |             if (bal > 0) revert HolderHasBalance(account, bal);
+ 103 |     |         }
+ 104 |     |         _verified[account] = false;
+ 105 |     |         emit IdentityRemoved(account);
+ 106 |     |     }
+ 107 |     | 
+ 108 |     |     /*//////////////////////////////////////////////////////////////
+ 109 |     |                                   VIEWS
+ 110 |     |     //////////////////////////////////////////////////////////////*/
+ 111 |     | 
+ 112 |     |     /// @notice True when `account` is a KYC-verified identity permitted to hold
+ 113 |     |     ///         and transact the token. Consulted by the token on every mint and
+ 114 |     |     ///         transfer.
+ 115 |     |     /// @param account The address to test.
+ 116 |     |     /// @return True while the address is whitelisted. A plain list membership test — unlike
+ 117 |     |     ///         zk-kyc-pass's registry there is no expiry, so verification persists until an
+ 118 |     |     ///         agent removes it.
+ 119 | *   |     function isVerified(address account) external view override returns (bool) {
+ 120 | *   |         return _verified[account];
+ 121 |     |     }
+ 122 |     | }
+ 123 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/PriceOracle.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity 0.8.28;
+  3 |     | 
+  4 |     | import {Roles} from "./Roles.sol";
+  5 |     | 
+  6 |     | /// @title PriceOracle
+  7 |     | /// @notice A mock push oracle for the asset's per-token price. An updater agent
+  8 |     | ///         pushes a new price; every push stamps `updatedAt` with the block
+  9 |     | ///         timestamp so consumers can reason about staleness.
+ 10 |     | /// @dev `updatedAt` is monotonically non-decreasing: it is only ever assigned
+ 11 |     | ///      `block.timestamp`, which never moves backwards between transactions.
+ 12 | *   | contract PriceOracle is Roles {
+ 13 |     |     /*//////////////////////////////////////////////////////////////
+ 14 |     |                                  ERRORS
+ 15 |     |     //////////////////////////////////////////////////////////////*/
+ 16 |     | 
+ 17 |     |     /// @notice No price has been pushed yet, so the query is undefined.
+ 18 |     |     error NoPrice();
+ 19 |     | 
+ 20 |     |     /*//////////////////////////////////////////////////////////////
+ 21 |     |                                  EVENTS
+ 22 |     |     //////////////////////////////////////////////////////////////*/
+ 23 |     | 
+ 24 |     |     /// @notice Emitted on every price push.
+ 25 |     |     /// @param price The pushed price, in the oracle's own unit.
+ 26 |     |     /// @param updatedAt The block timestamp stamped onto the push. Emitted on every call,
+ 27 |     |     ///        including one that pushes an unchanged price, so a consumer can distinguish
+ 28 |     |     ///        "the price is still this" from "nobody has updated it".
+ 29 |     |     event PriceUpdated(uint256 price, uint256 updatedAt);
+ 30 |     | 
+ 31 |     |     /*//////////////////////////////////////////////////////////////
+ 32 |     |                                  STORAGE
+ 33 |     |     //////////////////////////////////////////////////////////////*/
+ 34 |     | 
+ 35 |     |     /// @notice Latest pushed price, in the oracle's own unit (e.g. USD cents per token).
+ 36 |     |     uint256 public price;
+ 37 |     |     /// @notice Block timestamp of the latest push. Zero until the first update.
+ 38 | *   |     uint256 public updatedAt;
+ 39 |     | 
+ 40 |     |     /// @notice Deploys the oracle with no price yet published.
+ 41 |     |     /// @param initialOwner The deployer; owner and first (updater) agent.
+ 42 | *   |     constructor(address initialOwner) Roles(initialOwner) {}
+ 43 |     | 
+ 44 |     |     /*//////////////////////////////////////////////////////////////
+ 45 |     |                                  UPDATER
+ 46 |     |     //////////////////////////////////////////////////////////////*/
+ 47 |     | 
+ 48 |     |     /// @notice Push a new price. Stamps `updatedAt` with the current block time.
+ 49 |     |     /// @param newPrice The price to publish. Zero is accepted deliberately: this is a mock
+ 50 |     |     ///        push oracle, and rejecting zero would make "the asset is worthless" the one
+ 51 |     |     ///        state it could not report.
+ 52 | *   |     function setPrice(uint256 newPrice) external onlyAgent {
+ 53 | *   |         price = newPrice;
+ 54 | *   |         updatedAt = block.timestamp;
+ 55 | *   |         emit PriceUpdated(newPrice, block.timestamp);
+ 56 |     |     }
+ 57 |     | 
+ 58 |     |     /*//////////////////////////////////////////////////////////////
+ 59 |     |                                   VIEWS
+ 60 |     |     //////////////////////////////////////////////////////////////*/
+ 61 |     | 
+ 62 |     |     /// @notice The latest price and the timestamp it was pushed. Reverts if
+ 63 |     |     ///         no price has ever been set.
+ 64 |     |     /// @return currentPrice The latest pushed price.
+ 65 |     |     /// @return at The timestamp it was pushed, so the caller can judge staleness itself
+ 66 |     |     ///         rather than trusting the oracle's own verdict.
+ 67 |     |     function latestPrice() external view returns (uint256 currentPrice, uint256 at) {
+ 68 |     |         if (updatedAt == 0) revert NoPrice();
+ 69 |     |         return (price, updatedAt);
+ 70 |     |     }
+ 71 |     | 
+ 72 |     |     /// @notice True when the latest price is older than `maxAge` seconds.
+ 73 |     |     /// @dev Reverts if no price has ever been pushed; staleness is undefined then.
+ 74 |     |     /// @param maxAge The oldest age in seconds still considered fresh. Compared with a
+ 75 |     |     ///        strict `>`, so a price exactly `maxAge` old is still fresh.
+ 76 |     |     /// @return True when the latest push is older than `maxAge`.
+ 77 |     |     function isStale(uint256 maxAge) external view returns (bool) {
+ 78 |     |         if (updatedAt == 0) revert NoPrice();
+ 79 |     |         return block.timestamp - updatedAt > maxAge;
+ 80 |     |     }
+ 81 |     | }
+ 82 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/RWAToken.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity 0.8.28;
+   3 |     | 
+   4 |     | import {Roles} from "./Roles.sol";
+   5 |     | import {IIdentityRegistry} from "./interfaces/IIdentityRegistry.sol";
+   6 |     | import {IRWAToken} from "./interfaces/IRWAToken.sol";
+   7 |     | 
+   8 |     | /// @title RWAToken
+   9 |     | /// @notice A fractional ERC-20 representing shares of a real-world asset, with
+  10 |     | ///         ERC-3643-style compliance hooks: every acquisition of tokens is
+  11 |     | ///         gated on KYC verification. Minting requires the recipient to be
+  12 |     | ///         verified; transfers require BOTH parties to be verified.
+  13 |     | /// @dev Hand-rolled minimal ERC-20 (no external token library vendored). The
+  14 |     | ///      compliance checks live in {mint} and {_transfer}; burns (redemption)
+  15 |     | ///      are restricted to the configured {redeemer} and are exempt from the
+  16 |     | ///      verification hooks because they only ever reduce a balance.
+  17 | *   | contract RWAToken is Roles, IRWAToken {
+  18 |     |     /*//////////////////////////////////////////////////////////////
+  19 |     |                                  ERRORS
+  20 |     |     //////////////////////////////////////////////////////////////*/
+  21 |     | 
+  22 |     |     /// @notice The sender of a transfer is not KYC-verified.
+  23 |     |     error SenderNotVerified(address account);
+  24 |     |     /// @notice The recipient of a mint or transfer is not KYC-verified.
+  25 |     |     error RecipientNotVerified(address account);
+  26 |     |     /// @notice `account` holds fewer tokens than the operation requires.
+  27 |     |     error InsufficientBalance(address account, uint256 balance, uint256 needed);
+  28 |     |     /// @notice `spender` has less allowance from `owner` than the operation requires.
+  29 |     |     error InsufficientAllowance(address owner, address spender, uint256 allowance, uint256 needed);
+  30 |     |     /// @notice Only the configured redeemer may burn tokens.
+  31 |     |     error NotRedeemer(address caller);
+  32 |     | 
+  33 |     |     /*//////////////////////////////////////////////////////////////
+  34 |     |                                  EVENTS
+  35 |     |     //////////////////////////////////////////////////////////////*/
+  36 |     | 
+  37 |     |     /// @notice ERC-20 transfer event (mint = from zero, burn = to zero).
+  38 |     |     /// @param from The sender; zero when the transfer is a mint.
+  39 |     |     /// @param to The recipient; zero when the transfer is a burn.
+  40 |     |     /// @param value The amount moved. NOT indexed, because ERC-20 fixes this signature —
+  41 |     |     ///        indexing it would change the topic layout and break every standard consumer.
+  42 |     |     event Transfer(address indexed from, address indexed to, uint256 value);
+  43 |     |     /// @notice ERC-20 approval event.
+  44 |     |     /// @param owner The account whose tokens may now be pulled.
+  45 |     |     /// @param spender The account permitted to pull them.
+  46 |     |     /// @param value The new allowance, which replaces any previous one rather than adding to it.
+  47 |     |     event Approval(address indexed owner, address indexed spender, uint256 value);
+  48 |     |     /// @notice Emitted when the redeemer (the Redemption contract) is configured.
+  49 |     |     /// @param redeemer The only address that may call `burnFrom`. Re-emitted on every
+  50 |     |     ///        change, so the log shows which contract held burn authority at any block.
+  51 |     |     event RedeemerSet(address indexed redeemer);
+  52 |     | 
+  53 |     |     /*//////////////////////////////////////////////////////////////
+  54 |     |                                 METADATA
+  55 |     |     //////////////////////////////////////////////////////////////*/
+  56 |     | 
+  57 |     |     /// @notice ERC-20 token name.
+  58 | *   |     string public name;
+  59 |     |     /// @notice ERC-20 token symbol.
+  60 |     |     string public symbol;
+  61 |     |     /// @notice ERC-20 decimals. Fixed at 18 for fractional shares.
+  62 |     |     uint8 public constant decimals = 18;
+  63 |     | 
+  64 |     |     /*//////////////////////////////////////////////////////////////
+  65 |     |                                  STORAGE
+  66 |     |     //////////////////////////////////////////////////////////////*/
+  67 |     | 
+  68 |     |     /// @notice Total tokens in existence. Equals the sum of all balances.
+  69 | *   |     uint256 public totalSupply;
+  70 |     |     mapping(address account => uint256 balance) private _balances;
+  71 |     |     mapping(address owner => mapping(address spender => uint256 amount)) private _allowances;
+  72 |     | 
+  73 |     |     /// @notice The KYC whitelist consulted on every mint and transfer.
+  74 |     |     IIdentityRegistry public immutable identityRegistry;
+  75 |     |     /// @notice The Redemption contract permitted to burn tokens. Zero until set.
+  76 |     |     address public redeemer;
+  77 |     | 
+  78 |     |     /// @notice Binds the token to its KYC whitelist and sets the deployer as owner.
+  79 |     |     /// @dev `identityRegistry_` is stored as an `immutable`: the compliance gate holders
+  80 |     |     ///      are judged against is fixed for the life of the token, so it cannot be swapped
+  81 |     |     ///      for a permissive one after balances exist.
+  82 |     |     /// @param name_ ERC-20 name.
+  83 |     |     /// @param symbol_ ERC-20 symbol.
+  84 |     |     /// @param identityRegistry_ The KYC whitelist address (non-zero).
+  85 |     |     /// @param initialOwner The deployer; owner and first (mint) agent.
+  86 | *   |     constructor(string memory name_, string memory symbol_, address identityRegistry_, address initialOwner)
+  87 | *   |         Roles(initialOwner)
+  88 |     |     {
+  89 | *   |         if (identityRegistry_ == address(0)) revert ZeroAddress();
+  90 | *   |         name = name_;
+  91 | *   |         symbol = symbol_;
+  92 | *   |         identityRegistry = IIdentityRegistry(identityRegistry_);
+  93 |     |     }
+  94 |     | 
+  95 |     |     /*//////////////////////////////////////////////////////////////
+  96 |     |                                   VIEWS
+  97 |     |     //////////////////////////////////////////////////////////////*/
+  98 |     | 
+  99 |     |     /// @notice The token balance of `account`.
+ 100 |     |     /// @param account The address to read.
+ 101 |     |     /// @return The balance. Unaffected by verification status: losing verification blocks
+ 102 |     |     ///         future movement, it never confiscates a balance.
+ 103 | *   |     function balanceOf(address account) external view override returns (uint256) {
+ 104 | *   |         return _balances[account];
+ 105 |     |     }
+ 106 |     | 
+ 107 |     |     /// @notice The remaining tokens `spender` may pull from `holder`.
+ 108 |     |     /// @param holder The account whose tokens would be pulled.
+ 109 |     |     /// @param spender The account permitted to pull them.
+ 110 |     |     /// @return The remaining allowance. An allowance is not a promise the transfer will
+ 111 |     |     ///         succeed — both parties must still be verified when it is spent.
+ 112 |     |     function allowance(address holder, address spender) external view returns (uint256) {
+ 113 |     |         return _allowances[holder][spender];
+ 114 |     |     }
+ 115 |     | 
+ 116 |     |     /*//////////////////////////////////////////////////////////////
+ 117 |     |                                  WIRING
+ 118 |     |     //////////////////////////////////////////////////////////////*/
+ 119 |     | 
+ 120 |     |     /// @notice Configure the redeemer (the Redemption contract) permitted to burn.
+ 121 |     |     /// @param redeemer_ The address granted burn authority. Rejected if zero. Owner-only
+ 122 |     |     ///        and deliberately re-settable, unlike the identity registry: the redemption
+ 123 |     |     ///        contract is replaceable operational wiring, whereas the compliance gate is
+ 124 |     |     ///        the token's guarantee and is fixed at construction.
+ 125 | *   |     function setRedeemer(address redeemer_) external onlyOwner {
+ 126 | *   |         if (redeemer_ == address(0)) revert ZeroAddress();
+ 127 | *   |         redeemer = redeemer_;
+ 128 | *   |         emit RedeemerSet(redeemer_);
+ 129 |     |     }
+ 130 |     | 
+ 131 |     |     /*//////////////////////////////////////////////////////////////
+ 132 |     |                              MINT (COMPLIANT)
+ 133 |     |     //////////////////////////////////////////////////////////////*/
+ 134 |     | 
+ 135 |     |     /// @notice Mint `amount` tokens to `to`. The recipient must be KYC-verified.
+ 136 |     |     /// @param to The recipient. Must be whitelisted at this moment, checked against the
+ 137 |     |     ///        registry rather than any cached list.
+ 138 |     |     /// @param amount The quantity to create, added to `totalSupply`.
+ 139 | *   |     function mint(address to, uint256 amount) external onlyAgent {
+ 140 | *   |         if (to == address(0)) revert ZeroAddress();
+ 141 | *   |         if (!identityRegistry.isVerified(to)) revert RecipientNotVerified(to);
+ 142 | *   |         totalSupply += amount;
+ 143 | *   |         _balances[to] += amount;
+ 144 | *   |         emit Transfer(address(0), to, amount);
+ 145 |     |     }
+ 146 |     | 
+ 147 |     |     /*//////////////////////////////////////////////////////////////
+ 148 |     |                                ERC-20 WRITES
+ 149 |     |     //////////////////////////////////////////////////////////////*/
+ 150 |     | 
+ 151 |     |     /// @notice Approve `spender` to pull up to `amount` of the caller's tokens.
+ 152 |     |     /// @param spender The account permitted to pull. Rejected if zero.
+ 153 |     |     /// @param amount The new allowance, replacing any previous value outright.
+ 154 |     |     /// @return Always true. The bool exists because ERC-20 specifies it; failures revert.
+ 155 | *   |     function approve(address spender, uint256 amount) external returns (bool) {
+ 156 |     |         if (spender == address(0)) revert ZeroAddress();
+ 157 |     |         _allowances[msg.sender][spender] = amount;
+ 158 |     |         emit Approval(msg.sender, spender, amount);
+ 159 |     |         return true;
+ 160 |     |     }
+ 161 |     | 
+ 162 |     |     /// @notice Transfer `amount` tokens to `to`. Both parties must be verified.
+ 163 |     |     /// @param to The recipient, which must be whitelisted at this moment.
+ 164 |     |     /// @param amount The quantity to move.
+ 165 |     |     /// @return Always true; a non-compliant or underfunded transfer reverts rather than
+ 166 |     |     ///         returning false, so a caller cannot mistake refusal for success. This
+ 167 |     |     ///         reverting transfer is the demo's compliance showcase.
+ 168 | *   |     function transfer(address to, uint256 amount) external returns (bool) {
+ 169 | *   |         _transfer(msg.sender, to, amount);
+ 170 | *   |         return true;
+ 171 |     |     }
+ 172 |     | 
+ 173 |     |     /// @notice Transfer `amount` from `from` to `to` using the caller's allowance.
+ 174 |     |     ///         Both `from` and `to` must be verified.
+ 175 |     |     /// @param from The account whose tokens move; its verification is re-checked here, so
+ 176 |     |     ///        an allowance granted while verified is unusable once it is removed.
+ 177 |     |     /// @param to The recipient, which must also be verified.
+ 178 |     |     /// @param amount The quantity to move, also deducted from the caller's allowance.
+ 179 |     |     /// @return Always true; refusals revert.
+ 180 |     |     function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+ 181 |     |         _spendAllowance(from, msg.sender, amount);
+ 182 |     |         _transfer(from, to, amount);
+ 183 |     |         return true;
+ 184 |     |     }
+ 185 |     | 
+ 186 |     |     /*//////////////////////////////////////////////////////////////
+ 187 |     |                              BURN (REDEMPTION)
+ 188 |     |     //////////////////////////////////////////////////////////////*/
+ 189 |     | 
+ 190 |     |     /// @notice Burn `amount` tokens held by `from`. Restricted to the redeemer.
+ 191 |     |     /// @dev Exempt from the verification hooks: a burn only reduces a balance and
+ 192 |     |     ///      can never create a holding for a non-verified address.
+ 193 |     |     /// @param from The holder whose tokens are destroyed. Deliberately NOT required to be
+ 194 |     |     ///        verified: a holder who lost verification must still be able to redeem out,
+ 195 |     |     ///        and blocking that would strand their tokens permanently.
+ 196 |     |     /// @param amount The quantity to burn, also deducted from `totalSupply`.
+ 197 | *   |     function burnFrom(address from, uint256 amount) external override {
+ 198 | *   |         if (msg.sender != redeemer) revert NotRedeemer(msg.sender);
+ 199 | *   |         uint256 bal = _balances[from];
+ 200 | *   |         if (bal < amount) revert InsufficientBalance(from, bal, amount);
+ 201 |     |         unchecked {
+ 202 | *   |             _balances[from] = bal - amount;
+ 203 | *   |             totalSupply -= amount;
+ 204 |     |         }
+ 205 | *   |         emit Transfer(from, address(0), amount);
+ 206 |     |     }
+ 207 |     | 
+ 208 |     |     /*//////////////////////////////////////////////////////////////
+ 209 |     |                                 INTERNALS
+ 210 |     |     //////////////////////////////////////////////////////////////*/
+ 211 |     | 
+ 212 |     |     /// @dev Shared transfer path enforcing the both-parties-verified hook.
+ 213 | *   |     function _transfer(address from, address to, uint256 amount) internal {
+ 214 | *   |         if (to == address(0)) revert ZeroAddress();
+ 215 | *   |         if (!identityRegistry.isVerified(from)) revert SenderNotVerified(from);
+ 216 | *   |         if (!identityRegistry.isVerified(to)) revert RecipientNotVerified(to);
+ 217 | *   |         uint256 bal = _balances[from];
+ 218 | *   |         if (bal < amount) revert InsufficientBalance(from, bal, amount);
+ 219 |     |         unchecked {
+ 220 | *   |             _balances[from] = bal - amount;
+ 221 | *   |             _balances[to] += amount;
+ 222 |     |         }
+ 223 | *   |         emit Transfer(from, to, amount);
+ 224 |     |     }
+ 225 |     | 
+ 226 |     |     /// @dev Deduct `amount` from the (`holder`,`spender`) allowance. An allowance
+ 227 |     |     ///      of `type(uint256).max` is treated as infinite and never decremented.
+ 228 |     |     function _spendAllowance(address holder, address spender, uint256 amount) internal {
+ 229 |     |         uint256 current = _allowances[holder][spender];
+ 230 |     |         if (current != type(uint256).max) {
+ 231 |     |             if (current < amount) revert InsufficientAllowance(holder, spender, current, amount);
+ 232 |     |             unchecked {
+ 233 |     |                 _allowances[holder][spender] = current - amount;
+ 234 |     |             }
+ 235 |     |         }
+ 236 |     |     }
+ 237 |     | }
+ 238 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/Redemption.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity 0.8.28;
+   3 |     | 
+   4 |     | import {Roles} from "./Roles.sol";
+   5 |     | import {IRWAToken} from "./interfaces/IRWAToken.sol";
+   6 |     | import {IAssetRegistry} from "./interfaces/IAssetRegistry.sol";
+   7 |     | 
+   8 |     | /// @title Redemption
+   9 |     | /// @notice Lets a holder burn tokens against a registered, active asset in
+  10 |     | ///         exchange for an off-chain settlement. A request records who redeemed
+  11 |     | ///         how much of which asset; an admin agent later marks it settled once
+  12 |     | ///         the off-chain leg completes. Requests are sequential from zero, so
+  13 |     | ///         `requestCount` is a cheap total for window-driven pagination.
+  14 | *   | contract Redemption is Roles {
+  15 |     |     /*//////////////////////////////////////////////////////////////
+  16 |     |                                  ERRORS
+  17 |     |     //////////////////////////////////////////////////////////////*/
+  18 |     | 
+  19 |     |     /// @notice The asset is not registered or not currently active.
+  20 |     |     error AssetNotActive(uint256 assetId);
+  21 |     |     /// @notice A redemption for zero tokens was requested.
+  22 |     |     error ZeroAmount();
+  23 |     |     /// @notice No request exists under this id.
+  24 |     |     error UnknownRequest(uint256 requestId);
+  25 |     |     /// @notice The request was already settled.
+  26 |     |     error AlreadySettled(uint256 requestId);
+  27 |     | 
+  28 |     |     /*//////////////////////////////////////////////////////////////
+  29 |     |                                  EVENTS
+  30 |     |     //////////////////////////////////////////////////////////////*/
+  31 |     | 
+  32 |     |     /// @notice Emitted when a holder burns tokens to request redemption.
+  33 |     |     /// @param requestId The sequential id assigned to the request; ids are never reused.
+  34 |     |     /// @param holder The redeeming account. Always `msg.sender` — there is no path by
+  35 |     |     ///        which one account can redeem another's holding.
+  36 |     |     /// @param assetId The asset redeemed against, which was Active at this moment.
+  37 |     |     /// @param amount The tokens burned. Emitted BEFORE the burn under strict CEI; if the
+  38 |     |     ///        burn reverts the whole call reverts and this event is never observed.
+  39 |     |     event RedemptionRequested(
+  40 |     |         uint256 indexed requestId, address indexed holder, uint256 indexed assetId, uint256 amount
+  41 |     |     );
+  42 |     |     /// @notice Emitted when an admin settles a redemption request.
+  43 |     |     /// @param requestId The request marked settled. Settlement is the on-chain record that
+  44 |     |     ///        the off-chain leg completed; it moves no tokens, because the tokens were
+  45 |     |     ///        already burned when the request was made.
+  46 |     |     event RedemptionSettled(uint256 indexed requestId);
+  47 |     | 
+  48 |     |     /*//////////////////////////////////////////////////////////////
+  49 |     |                                   TYPES
+  50 |     |     //////////////////////////////////////////////////////////////*/
+  51 |     | 
+  52 |     |     /// @notice A recorded redemption request.
+  53 |     |     struct Request {
+  54 |     |         address holder;
+  55 |     |         uint256 assetId;
+  56 |     |         uint256 amount;
+  57 |     |         bool settled;
+  58 |     |         bool exists;
+  59 |     |     }
+  60 |     | 
+  61 |     |     /*//////////////////////////////////////////////////////////////
+  62 |     |                                  STORAGE
+  63 |     |     //////////////////////////////////////////////////////////////*/
+  64 |     | 
+  65 |     |     /// @notice The token burned on redemption.
+  66 |     |     IRWAToken public immutable token;
+  67 |     |     /// @notice The registry consulted to confirm an asset is active.
+  68 |     |     IAssetRegistry public immutable assetRegistry;
+  69 |     | 
+  70 |     |     mapping(uint256 requestId => Request request) private _requests;
+  71 |     |     /// @notice Number of redemption requests recorded; also the next request id.
+  72 | *   |     uint256 public requestCount;
+  73 |     | 
+  74 |     |     /// @notice Binds redemption to the token it burns and the registry it checks.
+  75 |     |     /// @dev Both are stored as `immutable`, so the token whose supply this contract can
+  76 |     |     ///      destroy is fixed at deployment and cannot later be pointed at another.
+  77 |     |     /// @param token_ The RWA token address (non-zero).
+  78 |     |     /// @param assetRegistry_ The asset registry address (non-zero).
+  79 |     |     /// @param initialOwner The deployer; owner and first (admin) agent.
+  80 | *   |     constructor(address token_, address assetRegistry_, address initialOwner) Roles(initialOwner) {
+  81 | *   |         if (token_ == address(0) || assetRegistry_ == address(0)) revert ZeroAddress();
+  82 | *   |         token = IRWAToken(token_);
+  83 | *   |         assetRegistry = IAssetRegistry(assetRegistry_);
+  84 |     |     }
+  85 |     | 
+  86 |     |     /*//////////////////////////////////////////////////////////////
+  87 |     |                                 REDEEM
+  88 |     |     //////////////////////////////////////////////////////////////*/
+  89 |     | 
+  90 |     |     /// @notice Burn `amount` of the caller's tokens against active `assetId` and
+  91 |     |     ///         record a redemption request.
+  92 |     |     /// @param assetId The asset to redeem against. Must be registered and Active; an
+  93 |     |     ///        unknown or inactive id reverts before any token is burned.
+  94 |     |     /// @param amount The tokens to burn. Zero is rejected, so a request always corresponds
+  95 |     |     ///        to a real burn.
+  96 |     |     /// @return requestId The sequential id assigned to the new request.
+  97 | *   |     function requestRedemption(uint256 assetId, uint256 amount) external returns (uint256 requestId) {
+  98 |     |         // Checks.
+  99 | *   |         if (amount == 0) revert ZeroAmount();
+ 100 | *   |         if (!assetRegistry.isActive(assetId)) revert AssetNotActive(assetId);
+ 101 |     | 
+ 102 |     |         // Effects: record the request before the external burn (strict CEI). If
+ 103 |     |         // the burn reverts (caller lacks the balance) the whole call reverts and
+ 104 |     |         // this write is rolled back, so state can never diverge from the token.
+ 105 | *   |         requestId = requestCount;
+ 106 | *   |         _requests[requestId] =
+ 107 | *   |             Request({holder: msg.sender, assetId: assetId, amount: amount, settled: false, exists: true});
+ 108 | *   |         requestCount = requestId + 1;
+ 109 | *   |         emit RedemptionRequested(requestId, msg.sender, assetId, amount);
+ 110 |     | 
+ 111 |     |         // Interaction: burn the caller's own tokens against the asset. Only the
+ 112 |     |         // caller's holding can be redeemed because `holder` is msg.sender.
+ 113 | *   |         token.burnFrom(msg.sender, amount);
+ 114 |     |     }
+ 115 |     | 
+ 116 |     |     /*//////////////////////////////////////////////////////////////
+ 117 |     |                                 SETTLE
+ 118 |     |     //////////////////////////////////////////////////////////////*/
+ 119 |     | 
+ 120 |     |     /// @notice Mark a redemption request settled once the off-chain leg completes.
+ 121 |     |     /// @param requestId The request to settle. Reverts if unknown, and reverts if already
+ 122 |     |     ///        settled — settlement is one-way, so a second call cannot quietly re-open or
+ 123 |     |     ///        double-record a completed redemption.
+ 124 | *   |     function settleRedemption(uint256 requestId) external onlyAgent {
+ 125 | *   |         Request storage r = _requests[requestId];
+ 126 | *   |         if (!r.exists) revert UnknownRequest(requestId);
+ 127 | *   |         if (r.settled) revert AlreadySettled(requestId);
+ 128 | *   |         r.settled = true;
+ 129 | *   |         emit RedemptionSettled(requestId);
+ 130 |     |     }
+ 131 |     | 
+ 132 |     |     /*//////////////////////////////////////////////////////////////
+ 133 |     |                                   VIEWS
+ 134 |     |     //////////////////////////////////////////////////////////////*/
+ 135 |     | 
+ 136 |     |     /// @notice The full record for `requestId`. Reverts if unknown.
+ 137 |     |     /// @param requestId The request to read.
+ 138 |     |     /// @return The holder, asset, amount and settlement flag. Reverts rather than
+ 139 |     |     ///         returning a zeroed struct, so an unknown id cannot read as an unsettled
+ 140 |     |     ///         request for zero tokens.
+ 141 | *   |     function getRequest(uint256 requestId) external view returns (Request memory) {
+ 142 | *   |         Request storage r = _requests[requestId];
+ 143 | *   |         if (!r.exists) revert UnknownRequest(requestId);
+ 144 | *   |         return r;
+ 145 |     |     }
+ 146 |     | }
+ 147 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/Roles.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity 0.8.28;
+   3 |     | 
+   4 |     | /// @title Roles
+   5 |     | /// @notice Minimal two-tier access control shared by every contract in the RWA
+   6 |     | ///         tokenization demo: a single `owner` (governance) and a set of
+   7 |     | ///         `agents` (operational actors). This mirrors the owner/agent split of
+   8 |     | ///         ERC-3643 (T-REX) without vendoring the full suite.
+   9 |     | /// @dev The deployer is set as BOTH owner and the first agent in the
+  10 |     | ///      constructor, so a freshly deployed contract is immediately operable by
+  11 |     | ///      the deployer alone — which is exactly how this demo is wired: every
+  12 |     | ///      privileged role resolves to the single deployer address.
+  13 |     | abstract contract Roles {
+  14 |     |     /*//////////////////////////////////////////////////////////////
+  15 |     |                                  ERRORS
+  16 |     |     //////////////////////////////////////////////////////////////*/
+  17 |     | 
+  18 |     |     /// @notice The caller is not the owner.
+  19 |     |     error NotOwner(address caller);
+  20 |     |     /// @notice The caller does not hold the agent role.
+  21 |     |     error NotAgent(address caller);
+  22 |     |     /// @notice A zero address was supplied where a real account is required.
+  23 |     |     error ZeroAddress();
+  24 |     | 
+  25 |     |     /*//////////////////////////////////////////////////////////////
+  26 |     |                                  EVENTS
+  27 |     |     //////////////////////////////////////////////////////////////*/
+  28 |     | 
+  29 |     |     /// @notice Emitted when ownership moves from `previousOwner` to `newOwner`.
+  30 |     |     /// @param previousOwner The outgoing owner. Zero on the constructor's emission, which
+  31 |     |     ///        is what makes the deploy transaction itself the auditable origin of ownership.
+  32 |     |     /// @param newOwner The incoming owner.
+  33 |     |     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+  34 |     |     /// @notice Emitted when `account` is granted (`enabled=true`) or revoked the agent role.
+  35 |     |     /// @param account The account whose agent role changed.
+  36 |     |     /// @param enabled True when the role was granted, false when revoked. Emitted on every
+  37 |     |     ///        call, including a no-op re-grant, so the event log is a complete history of
+  38 |     |     ///        intent rather than only of changes.
+  39 |     |     event AgentSet(address indexed account, bool enabled);
+  40 |     | 
+  41 |     |     /*//////////////////////////////////////////////////////////////
+  42 |     |                                  STORAGE
+  43 |     |     //////////////////////////////////////////////////////////////*/
+  44 |     | 
+  45 |     |     /// @notice The governance account. May transfer ownership and manage agents.
+  46 | *   |     address public owner;
+  47 |     |     /// @notice Operational actors permitted to take agent-gated actions.
+  48 |     |     mapping(address account => bool isAgent) public agents;
+  49 |     | 
+  50 |     |     /*//////////////////////////////////////////////////////////////
+  51 |     |                                 MODIFIERS
+  52 |     |     //////////////////////////////////////////////////////////////*/
+  53 |     | 
+  54 |     |     modifier onlyOwner() {
+  55 | *   |         if (msg.sender != owner) revert NotOwner(msg.sender);
+  56 |     |         _;
+  57 |     |     }
+  58 |     | 
+  59 |     |     modifier onlyAgent() {
+  60 | *   |         if (!agents[msg.sender]) revert NotAgent(msg.sender);
+  61 |     |         _;
+  62 |     |     }
+  63 |     | 
+  64 |     |     /*//////////////////////////////////////////////////////////////
+  65 |     |                                CONSTRUCTOR
+  66 |     |     //////////////////////////////////////////////////////////////*/
+  67 |     | 
+  68 |     |     /// @notice Sets the deploying governance account as owner and first agent.
+  69 |     |     /// @param initialOwner The account that becomes owner and the first agent. Rejected if
+  70 |     |     ///        zero: a contract with no owner could never grant an agent, so the whole
+  71 |     |     ///        agent-gated surface would be permanently unreachable.
+  72 | *   |     constructor(address initialOwner) {
+  73 | *   |         if (initialOwner == address(0)) revert ZeroAddress();
+  74 | *   |         owner = initialOwner;
+  75 | *   |         agents[initialOwner] = true;
+  76 | *   |         emit OwnershipTransferred(address(0), initialOwner);
+  77 | *   |         emit AgentSet(initialOwner, true);
+  78 |     |     }
+  79 |     | 
+  80 |     |     /*//////////////////////////////////////////////////////////////
+  81 |     |                                GOVERNANCE
+  82 |     |     //////////////////////////////////////////////////////////////*/
+  83 |     | 
+  84 |     |     /// @notice Transfer ownership to `newOwner`.
+  85 |     |     /// @dev The new owner is NOT granted an agent role automatically; manage
+  86 |     |     ///      that separately with {setAgent} if the new owner should also operate.
+  87 |     |     /// @param newOwner The account to hand governance to. Rejected if zero — this contract
+  88 |     |     ///        has no renounce path, so a zero transfer would be an irreversible mistake
+  89 |     |     ///        rather than a deliberate abdication.
+  90 |     |     function transferOwnership(address newOwner) external onlyOwner {
+  91 |     |         if (newOwner == address(0)) revert ZeroAddress();
+  92 |     |         emit OwnershipTransferred(owner, newOwner);
+  93 |     |         owner = newOwner;
+  94 |     |     }
+  95 |     | 
+  96 |     |     /// @notice Grant (`enabled=true`) or revoke the agent role for `account`.
+  97 |     |     /// @param account The account to grant or revoke. Rejected if zero, so the agent
+  98 |     |     ///        mapping can never record a role against the null address.
+  99 |     |     /// @param enabled True to grant, false to revoke. Owner-only, and separate from
+ 100 |     |     ///        ownership: an agent operates, an owner governs.
+ 101 |     |     function setAgent(address account, bool enabled) external onlyOwner {
+ 102 |     |         if (account == address(0)) revert ZeroAddress();
+ 103 |     |         agents[account] = enabled;
+ 104 |     |         emit AgentSet(account, enabled);
+ 105 |     |     }
+ 106 |     | }
+ 107 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/interfaces/IAssetRegistry.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity 0.8.28;
+  3 |     | 
+  4 |     | /// @title IAssetRegistry
+  5 |     | /// @notice The single method redemption needs from the asset registry: whether
+  6 |     | ///         an asset id is registered and currently active for redemption.
+  7 |     | interface IAssetRegistry {
+  8 |     |     /// @notice True when `assetId` exists and its status is Active.
+  9 |     |     /// @param assetId The asset to test.
+ 10 |     |     /// @return True only when the asset exists AND is Active — an unknown id answers
+ 11 |     |     ///         false, so redemption cannot proceed against an asset that was never
+ 12 |     |     ///         registered.
+ 13 |     |     function isActive(uint256 assetId) external view returns (bool);
+ 14 |     | }
+ 15 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/interfaces/IIdentityRegistry.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity 0.8.28;
+  3 |     | 
+  4 |     | /// @title IIdentityRegistry
+  5 |     | /// @notice The single method the token needs from the KYC whitelist: a yes/no
+  6 |     | ///         verification check on an address.
+  7 |     | interface IIdentityRegistry {
+  8 |     |     /// @notice True when `account` is a KYC-verified identity permitted to hold
+  9 |     |     ///         and transact the token.
+ 10 |     |     /// @param account The address to test.
+ 11 |     |     /// @return True while whitelisted. Consulted fresh on every mint and transfer rather
+ 12 |     |     ///         than cached, so a removal takes effect on the very next movement.
+ 13 |     |     function isVerified(address account) external view returns (bool);
+ 14 |     | }
+ 15 |     | 
+
+/tmp/phase32-r-native-copy-20261120/src/interfaces/IRWAToken.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity 0.8.28;
+  3 |     | 
+  4 |     | /// @title IRWAToken
+  5 |     | /// @notice The subset of the token surface that sibling contracts depend on:
+  6 |     | ///         the identity registry reads balances to guard de-verification, and
+  7 |     | ///         the redemption contract burns tokens against a registered asset.
+  8 |     | interface IRWAToken {
+  9 |     |     /// @notice The token balance of `account`.
+ 10 |     |     /// @param account The address to read.
+ 11 |     |     /// @return The balance. Read by the identity registry to refuse de-verifying a holder.
+ 12 |     |     function balanceOf(address account) external view returns (uint256);
+ 13 |     | 
+ 14 |     |     /// @notice Burn `amount` tokens held by `from`. Restricted to the token's
+ 15 |     |     ///         configured redeemer.
+ 16 |     |     /// @param from The holder whose tokens are destroyed.
+ 17 |     |     /// @param amount The quantity to burn, also deducted from total supply.
+ 18 |     |     function burnFrom(address from, uint256 amount) external;
+ 19 |     | }
+ 20 |     | 
+
+/tmp/phase32-r-native-copy-20261120/test/Actor.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | pragma solidity 0.8.28;
+  3 |     | 
+  4 |     | /// @title Actor — a callable stand-in for a token holder.
+  5 |     | /// @notice Echidna and Medusa have no cheatcodes, so a harness that needs a call
+  6 |     | ///         to arrive from a specific `msg.sender` cannot prank one: it has to own
+  7 |     | ///         a contract at that address and call through it. That is all this is.
+  8 |     | ///
+  9 |     | /// @dev    It matters here specifically because `Redemption.requestRedemption`
+ 10 |     | ///         records `msg.sender` as the holder and burns that account's tokens.
+ 11 |     | ///         Without distinct actors every redemption in a campaign would be the
+ 12 |     | ///         harness redeeming from itself, and the ledger invariants would only
+ 13 |     | ///         ever see one holder — which is exactly the shape of a bug they are
+ 14 |     | ///         meant to catch.
+ 15 | *   | contract Actor {
+ 16 |     |     /// @notice Forwards `data` to `target` and reports whether it succeeded.
+ 17 |     |     /// @dev Returns the outcome rather than bubbling the revert. The harness
+ 18 |     |     ///      compares outcomes against what it expected; a bubbled revert would
+ 19 |     |     ///      abort the fuzzer's transaction instead, which turns an interesting
+ 20 |     |     ///      state into a discarded one.
+ 21 | *   |     function call(address target, bytes calldata data) external returns (bool ok, bytes memory ret) {
+ 22 |     |         // solhint-disable-next-line avoid-low-level-calls
+ 23 | *   |         (ok, ret) = target.call(data);
+ 24 |     |     }
+ 25 |     | }
+ 26 |     | 
+
+/tmp/phase32-r-native-copy-20261120/test/Properties.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | pragma solidity 0.8.28;
+   3 |     | 
+   4 |     | import {PigfoxProperties} from "pipeline/PigfoxProperties.sol";
+   5 |     | 
+   6 |     | import {AssetRegistry} from "../src/AssetRegistry.sol";
+   7 |     | import {IdentityRegistry} from "../src/IdentityRegistry.sol";
+   8 |     | import {PriceOracle} from "../src/PriceOracle.sol";
+   9 |     | import {Redemption} from "../src/Redemption.sol";
+  10 |     | import {RWAToken} from "../src/RWAToken.sol";
+  11 |     | 
+  12 |     | import {Actor} from "./Actor.sol";
+  13 |     | 
+  14 |     | /// @title Properties — the RWA system's invariants, in one place.
+  15 |     | /// @notice A single property harness driven by all three engines: Foundry's
+  16 |     | ///         invariant runner (via {InvariantsTest}), Echidna and Medusa. It
+  17 |     | ///         deploys the whole system, holds the owner and agent roles, and exposes
+  18 |     | ///         action functions the fuzzers call plus the `echidna_*` predicates.
+  19 |     | ///
+  20 |     | /// @dev    THE HARNESS COVERS ALL FIVE CONTRACTS, not three. An earlier version
+  21 |     | ///         fuzzed the token, the identity registry and the oracle, and left
+  22 |     | ///         `AssetRegistry` and `Redemption` to unit tests alone — which meant the
+  23 |     | ///         redemption ledger, the part of this system that actually destroys
+  24 |     | ///         value, had no invariant on it at all.
+  25 |     | ///
+  26 |     | /// @dev    WHY THERE ARE ACTOR CONTRACTS.
+  27 |     | ///         `Redemption.requestRedemption` records `msg.sender` as the holder and
+  28 |     | ///         burns that account's tokens. Neither fuzzer has cheatcodes, so the
+  29 |     | ///         only way to have a redemption arrive from someone other than the
+  30 |     | ///         harness is to own a contract at that address and call through it.
+  31 |     | ///         Four actors mean the ledger invariants see four distinct holders
+  32 |     | ///         instead of one, which is the difference between testing the ledger and
+  33 |     | ///         testing one row of it.
+  34 |     | ///
+  35 |     | /// @dev    WHY THE LEDGER CHECKS ARE EAGER.
+  36 |     | ///         A predicate that walks every request is quadratic over a campaign —
+  37 |     | ///         the fuzzer evaluates predicates after every single call — and it
+  38 |     | ///         spends the budget re-reading old state instead of reaching new state.
+  39 |     | ///         So each entry point verifies its own effect IMMEDIATELY and trips a
+  40 |     | ///         sticky flag, and additionally re-verifies ONE older request
+  41 |     | ///         round-robin. Predicates then read the flags in O(1). The comparison
+  42 |     | ///         happens at the moment of divergence, on the input that caused it.
+  43 |     | ///
+  44 |     | /// @dev    `PHANTOM` is deliberately never KYC-verified: no action can ever give
+  45 |     | ///         it a balance, which is the transfer-hook invariant made concrete.
+  46 | *   | contract Properties is PigfoxProperties {
+  47 |     |     AssetRegistry internal immutable ASSETS;
+  48 |     |     IdentityRegistry internal immutable IDENTITY;
+  49 |     |     PriceOracle internal immutable ORACLE;
+  50 |     |     Redemption internal immutable REDEMPTION;
+  51 |     |     RWAToken public immutable TOKEN;
+  52 |     | 
+  53 | *   |     uint256 internal constant NUM_HOLDERS = 4;
+  54 |     |     /// @notice The one address that is never KYC-verified.
+  55 | *   |     address internal constant PHANTOM = address(0xBAD);
+  56 |     | 
+  57 |     |     Actor[NUM_HOLDERS] internal actors;
+  58 |     |     address[NUM_HOLDERS] public holders;
+  59 |     |     mapping(address => bool) internal isHolder;
+  60 |     | 
+  61 |     |     // --- ghost state ---------------------------------------------------------
+  62 |     |     // Counts prove the run was not inert; the totals are what the conservation
+  63 |     |     // invariant is stated against.
+  64 |     | 
+  65 |     |     uint256 internal ghostMints;
+  66 |     |     uint256 internal ghostTransfers;
+  67 |     |     uint256 internal ghostBurns;
+  68 |     |     uint256 internal ghostMintedTotal;
+  69 |     |     uint256 internal ghostBurnedTotal;
+  70 |     |     uint256 internal ghostRedeemedTotal;
+  71 |     |     uint256 internal ghostSettlements;
+  72 |     |     uint256 internal lastOracleStamp;
+  73 |     | 
+  74 |     |     /// @dev Round-robin cursor for re-verifying an older redemption request.
+  75 |     |     uint256 internal requestCursor;
+  76 |     | 
+  77 |     |     /// @dev What the harness believes each request holds, recorded at the moment
+  78 |     |     ///      it was created. Compared against the contract's own record later —
+  79 |     |     ///      asking the contract what it should say would let a bug agree with
+  80 |     |     ///      itself.
+  81 |     |     mapping(uint256 => address) internal expectedHolder;
+  82 |     |     mapping(uint256 => uint256) internal expectedAmount;
+  83 |     |     mapping(uint256 => uint256) internal expectedAsset;
+  84 |     |     mapping(uint256 => bool) internal expectedSettled;
+  85 |     | 
+  86 |     |     // --- sticky flags --------------------------------------------------------
+  87 |     | 
+  88 |     |     /// @notice Set if the redemption ledger ever disagreed with what the harness
+  89 |     |     ///         asked for, or if ids stopped being sequential and gapless.
+  90 |     |     bool public ledgerInconsistent;
+  91 |     | 
+  92 |     |     /// @notice Set if a redemption ever SUCCEEDED against an asset that was not
+  93 |     |     ///         Active at the moment of the call. This is the access-control claim
+  94 |     |     ///         the redemption path rests on.
+  95 |     |     bool public inactiveAssetRedeemed;
+  96 |     | 
+  97 |     |     /// @notice Set if the asset registry ever reported an id below `assetCount`
+  98 |     |     ///         as unknown, or an asset's status as the zero value after
+  99 |     |     ///         registration.
+ 100 |     |     bool public assetRegistryInconsistent;
+ 101 |     | 
+ 102 | *   |     constructor() {
+ 103 | *   |         IDENTITY = new IdentityRegistry(address(this));
+ 104 | *   |         TOKEN = new RWAToken("RWA Property", "RWAP", address(IDENTITY), address(this));
+ 105 | *   |         ORACLE = new PriceOracle(address(this));
+ 106 | *   |         ASSETS = new AssetRegistry(address(this));
+ 107 | *   |         REDEMPTION = new Redemption(address(TOKEN), address(ASSETS), address(this));
+ 108 |     | 
+ 109 | *   |         IDENTITY.setToken(address(TOKEN));
+ 110 |     | 
+ 111 |     |         // The Redemption contract is the ONLY redeemer, which is the production
+ 112 |     |         // wiring. Burns therefore reach the token exclusively through a recorded
+ 113 |     |         // redemption request — there is no side door for the harness to burn
+ 114 |     |         // through, so `ghostBurnedTotal` and the ledger cannot drift apart by
+ 115 |     |         // construction rather than by promise.
+ 116 | *   |         TOKEN.setRedeemer(address(REDEMPTION));
+ 117 |     | 
+ 118 |     |         // The harness itself must be verified to hold and distribute tokens.
+ 119 | *   |         IDENTITY.registerIdentity(address(this));
+ 120 | *   |         for (uint256 i = 0; i < NUM_HOLDERS; i++) {
+ 121 | *   |             Actor a = new Actor();
+ 122 | *   |             actors[i] = a;
+ 123 | *   |             holders[i] = address(a);
+ 124 | *   |             isHolder[address(a)] = true;
+ 125 | *   |             IDENTITY.registerIdentity(address(a));
+ 126 |     |         }
+ 127 |     |         // PHANTOM is intentionally NOT registered.
+ 128 |     |     }
+ 129 |     | 
+ 130 |     |     /*//////////////////////////////////////////////////////////////
+ 131 |     |                               DECLARATION
+ 132 |     |     //////////////////////////////////////////////////////////////*/
+ 133 |     | 
+ 134 |     |     /// @inheritdoc PigfoxProperties
+ 135 |     |     function pigfoxPropertyCount() public pure override returns (uint256) {
+ 136 |     |         return 6;
+ 137 |     |     }
+ 138 |     | 
+ 139 |     |     /// @inheritdoc PigfoxProperties
+ 140 |     |     function pigfoxHarnessDescription() public pure override returns (string memory) {
+ 141 |     |         return "supply conservation, KYC gating, oracle monotonicity, and a gapless redemption ledger";
+ 142 |     |     }
+ 143 |     | 
+ 144 |     |     /*//////////////////////////////////////////////////////////////
+ 145 |     |                                 ACTIONS
+ 146 |     |     //////////////////////////////////////////////////////////////*/
+ 147 |     | 
+ 148 |     |     /// @notice Mint bounded tokens to the harness (a verified holder).
+ 149 | *   |     function mintToSelf(uint256 amount) public {
+ 150 | *   |         amount = _bound(amount);
+ 151 | *   |         TOKEN.mint(address(this), amount);
+ 152 | *   |         ghostMints++;
+ 153 | *   |         ghostMintedTotal += amount;
+ 154 | *   |         _afterCall();
+ 155 |     |     }
+ 156 |     | 
+ 157 |     |     /// @notice Mint bounded tokens directly to a verified holder.
+ 158 | *   |     function mintToHolder(uint256 who, uint256 amount) public {
+ 159 | *   |         amount = _bound(amount);
+ 160 | *   |         TOKEN.mint(holders[who % NUM_HOLDERS], amount);
+ 161 | *   |         ghostMints++;
+ 162 | *   |         ghostMintedTotal += amount;
+ 163 | *   |         _afterCall();
+ 164 |     |     }
+ 165 |     | 
+ 166 |     |     /// @notice Move tokens from the harness to a verified holder.
+ 167 | *   |     function distribute(uint256 who, uint256 amount) public {
+ 168 | *   |         uint256 bal = TOKEN.balanceOf(address(this));
+ 169 | *   |         if (bal == 0) return;
+ 170 | *   |         amount = amount % (bal + 1);
+ 171 | *   |         TOKEN.transfer(holders[who % NUM_HOLDERS], amount);
+ 172 | *   |         ghostTransfers++;
+ 173 | *   |         _afterCall();
+ 174 |     |     }
+ 175 |     | 
+ 176 |     |     /// @notice Attempt to mint to the never-verified PHANTOM. Must always revert.
+ 177 | *   |     function tryMintPhantom(uint256 amount) public {
+ 178 | *   |         amount = _bound(amount);
+ 179 | *   |         try TOKEN.mint(PHANTOM, amount) {
+ 180 |     |             // A successful mint to PHANTOM would break the transfer-hook
+ 181 |     |             // invariant, and `echidna_unverified_never_holds` would catch it a
+ 182 |     |             // moment later. Failing here as well makes the counterexample name
+ 183 |     |             // the call that did it.
+ 184 |     |             revert("phantom mint succeeded");
+ 185 |     |         } catch {
+ 186 |     |             // expected
+ 187 |     |         }
+ 188 | *   |         _afterCall();
+ 189 |     |     }
+ 190 |     | 
+ 191 |     |     /// @notice Push a bounded price; records the stamp for the monotonic check.
+ 192 | *   |     function pushPrice(uint256 p) public {
+ 193 | *   |         ORACLE.setPrice(p % 1_000_000);
+ 194 | *   |         lastOracleStamp = ORACLE.updatedAt();
+ 195 | *   |         _afterCall();
+ 196 |     |     }
+ 197 |     | 
+ 198 |     |     /// @notice Register a new asset. Starts Active.
+ 199 | *   |     function registerAsset(uint256 seed) public {
+ 200 | *   |         uint256 idBefore = ASSETS.assetCount();
+ 201 | *   |         uint256 id = ASSETS.registerAsset(keccak256(abi.encode("doc", seed)), "ipfs://property");
+ 202 |     | 
+ 203 | *   |         if (id != idBefore || ASSETS.assetCount() != idBefore + 1) assetRegistryInconsistent = true;
+ 204 | *   |         if (!ASSETS.isActive(id)) assetRegistryInconsistent = true;
+ 205 |     | 
+ 206 | *   |         _afterCall();
+ 207 |     |     }
+ 208 |     | 
+ 209 |     |     /// @notice Move a registered asset through its lifecycle. Reaching the
+ 210 |     |     ///         non-Active statuses is what makes the "a redemption needs an active
+ 211 |     |     ///         asset" property testable at all.
+ 212 | *   |     function setAssetStatus(uint256 which, uint256 status) public {
+ 213 | *   |         uint256 count = ASSETS.assetCount();
+ 214 | *   |         if (count == 0) return;
+ 215 | *   |         uint256 id = which % count;
+ 216 |     | 
+ 217 |     |         // 1..3 — Active, Suspended, Redeemed. Zero (`None`) is rejected by the
+ 218 |     |         // contract by design and is exercised by the unit tests, not here.
+ 219 | *   |         AssetRegistry.Status s = AssetRegistry.Status(1 + (status % 3));
+ 220 | *   |         ASSETS.setAssetStatus(id, s);
+ 221 |     | 
+ 222 | *   |         if (ASSETS.getAsset(id).status != s) assetRegistryInconsistent = true;
+ 223 | *   |         if (ASSETS.isActive(id) != (s == AssetRegistry.Status.Active)) assetRegistryInconsistent = true;
+ 224 |     | 
+ 225 | *   |         _afterCall();
+ 226 |     |     }
+ 227 |     | 
+ 228 |     |     /// @notice A holder redeems against an arbitrary asset, active or not.
+ 229 |     |     /// @dev    This is the entry point that tests the GUARD: `assetId` is chosen
+ 230 |     |     ///         without regard to status, so the fuzzer regularly attempts a
+ 231 |     |     ///         redemption against a Suspended or Redeemed asset and the call must
+ 232 |     |     ///         be refused. {redeemFromActiveAsset} is the one that reliably drives
+ 233 |     |     ///         the ledger. Splitting them is deliberate — a single entry point
+ 234 |     |     ///         that picked an active asset would never test the refusal, and one
+ 235 |     |     ///         that picked at random left whole campaigns with zero successful
+ 236 |     |     ///         redemptions, which is how three of the six predicates ended up
+ 237 |     |     ///         vacuously true.
+ 238 | *   |     function redeem(uint256 who, uint256 which, uint256 amount) public {
+ 239 | *   |         uint256 assetCount = _ensureAnAssetExists();
+ 240 | *   |         uint256 index = who % NUM_HOLDERS;
+ 241 | *   |         _redeemAgainst(index, which % assetCount, amount);
+ 242 |     |     }
+ 243 |     | 
+ 244 |     |     /// @notice A holder redeems against an asset that IS Active.
+ 245 |     |     /// @dev    Guarantees the redemption ledger is actually exercised. Without it
+ 246 |     |     ///         a sequence has to land `registerAsset`, `mintToHolder` and `redeem`
+ 247 |     |     ///         in the right order, against an asset nothing has since suspended,
+ 248 |     |     ///         before a single request exists — and most sequences never do.
+ 249 | *   |     function redeemFromActiveAsset(uint256 who, uint256 amount) public {
+ 250 | *   |         uint256 assetId = _anActiveAsset();
+ 251 | *   |         _redeemAgainst(who % NUM_HOLDERS, assetId, amount);
+ 252 |     |     }
+ 253 |     | 
+ 254 |     |     /// @dev The shared redemption path. The outcome is compared against what the
+ 255 |     |     ///      harness independently expected: it knows the balance and whether the
+ 256 |     |     ///      asset was active, so it knows whether the call ought to have
+ 257 |     |     ///      succeeded.
+ 258 | *   |     function _redeemAgainst(uint256 index, uint256 assetId, uint256 amount) internal {
+ 259 | *   |         address holder = holders[index];
+ 260 |     | 
+ 261 | *   |         uint256 bal = _ensureHolderHasTokens(holder, amount);
+ 262 | *   |         amount = 1 + (amount % bal); // 1..bal — zero is rejected by design
+ 263 |     | 
+ 264 | *   |         bool wasActive = ASSETS.isActive(assetId);
+ 265 | *   |         uint256 idBefore = REDEMPTION.requestCount();
+ 266 | *   |         uint256 supplyBefore = TOKEN.totalSupply();
+ 267 |     | 
+ 268 | *   |         (bool ok,) = actors[index]
+ 269 | *   |         .call(address(REDEMPTION), abi.encodeCall(Redemption.requestRedemption, (assetId, amount)));
+ 270 |     | 
+ 271 | *   |         if (ok && !wasActive) {
+ 272 |     |             // The claim the whole redemption path rests on: value is only ever
+ 273 |     |             // destroyed against an asset the registrar has marked Active.
+ 274 |     |             inactiveAssetRedeemed = true;
+ 275 |     |         }
+ 276 |     | 
+ 277 | *   |         if (!ok) {
+ 278 |     |             // A redemption the harness expected to succeed did not. Nothing about
+ 279 |     |             // this call could legitimately fail: the asset was active, the holder
+ 280 |     |             // held the balance, and the amount is non-zero.
+ 281 | *   |             if (wasActive) ledgerInconsistent = true;
+ 282 | *   |             _afterCall();
+ 283 | *   |             return;
+ 284 |     |         }
+ 285 |     | 
+ 286 | *   |         ghostBurns++;
+ 287 | *   |         ghostBurnedTotal += amount;
+ 288 | *   |         ghostRedeemedTotal += amount;
+ 289 |     | 
+ 290 | *   |         expectedHolder[idBefore] = holder;
+ 291 | *   |         expectedAmount[idBefore] = amount;
+ 292 | *   |         expectedAsset[idBefore] = assetId;
+ 293 | *   |         expectedSettled[idBefore] = false;
+ 294 |     | 
+ 295 | *   |         if (REDEMPTION.requestCount() != idBefore + 1) ledgerInconsistent = true;
+ 296 | *   |         if (TOKEN.totalSupply() != supplyBefore - amount) ledgerInconsistent = true;
+ 297 | *   |         _verifyRequest(idBefore);
+ 298 | *   |         _verifyNoRequestBeyondTheCount();
+ 299 |     | 
+ 300 |     |         _afterCall();
+ 301 |     |     }
+ 302 |     | 
+ 303 |     |     /// @notice An agent settles a recorded redemption request.
+ 304 |     |     /// @dev    Creates one first if none exists, for the same reason
+ 305 |     |     ///         {redeemFromActiveAsset} exists: a `settle` scheduled before any
+ 306 |     |     ///         redemption in its sequence would otherwise return without touching
+ 307 |     |     ///         anything, and whole campaigns would never settle at all.
+ 308 | *   |     function settle(uint256 which) public {
+ 309 | *   |         if (REDEMPTION.requestCount() == 0) {
+ 310 | *   |             _redeemAgainst(which % NUM_HOLDERS, _anActiveAsset(), which);
+ 311 |     |         }
+ 312 | *   |         uint256 count = REDEMPTION.requestCount();
+ 313 | *   |         if (count == 0) return; // the bootstrap redemption was refused; nothing to settle
+ 314 | *   |         uint256 id = which % count;
+ 315 |     | 
+ 316 | *   |         if (expectedSettled[id]) {
+ 317 |     |             // Already settled: the contract must refuse. A second settlement
+ 318 |     |             // succeeding would mean the off-chain leg could be claimed twice.
+ 319 | *   |             try REDEMPTION.settleRedemption(id) {
+ 320 |     |                 ledgerInconsistent = true;
+ 321 |     |             } catch {
+ 322 |     |                 // expected
+ 323 |     |             }
+ 324 |     |         } else {
+ 325 | *   |             REDEMPTION.settleRedemption(id);
+ 326 | *   |             expectedSettled[id] = true;
+ 327 | *   |             ghostSettlements++;
+ 328 |     |         }
+ 329 |     | 
+ 330 | *   |         _verifyRequest(id);
+ 331 |     |         _afterCall();
+ 332 |     |     }
+ 333 |     | 
+ 334 |     |     /*//////////////////////////////////////////////////////////////
+ 335 |     |                               PROPERTIES
+ 336 |     |     //////////////////////////////////////////////////////////////*/
+ 337 |     | 
+ 338 |     |     /// @notice totalSupply always equals the sum of every account's balance.
+ 339 |     |     function echidna_supply_equals_sum_of_balances() public view returns (bool) {
+ 340 |     |         uint256 sum = TOKEN.balanceOf(address(this)) + TOKEN.balanceOf(PHANTOM);
+ 341 |     |         for (uint256 i = 0; i < NUM_HOLDERS; i++) {
+ 342 |     |             sum += TOKEN.balanceOf(holders[i]);
+ 343 |     |         }
+ 344 |     |         return sum == TOKEN.totalSupply();
+ 345 |     |     }
+ 346 |     | 
+ 347 |     |     /// @notice The never-verified PHANTOM can never hold a non-zero balance.
+ 348 |     |     function echidna_unverified_never_holds() public view returns (bool) {
+ 349 |     |         return TOKEN.balanceOf(PHANTOM) == 0;
+ 350 |     |     }
+ 351 |     | 
+ 352 |     |     /// @notice The oracle timestamp never moves backwards.
+ 353 |     |     function echidna_oracle_stamp_monotonic() public view returns (bool) {
+ 354 |     |         return ORACLE.updatedAt() >= lastOracleStamp;
+ 355 |     |     }
+ 356 |     | 
+ 357 |     |     /// @notice Everything minted, minus everything burned, is the supply.
+ 358 |     |     /// @dev    Stated against the harness's OWN running totals rather than
+ 359 |     |     ///         against anything the token reports, so a token that mis-accounts a
+ 360 |     |     ///         mint or a burn cannot satisfy this by being consistently wrong.
+ 361 |     |     ///         Burns reach the token only through `Redemption`, so this also
+ 362 |     |     ///         closes the redemption path.
+ 363 |     |     function echidna_supply_conserved() public view returns (bool) {
+ 364 |     |         return ghostMintedTotal - ghostBurnedTotal == TOKEN.totalSupply();
+ 365 |     |     }
+ 366 |     | 
+ 367 |     |     /// @notice The redemption ledger is gapless, sequential, records exactly what
+ 368 |     |     ///         was asked of it, and never settles the same request twice.
+ 369 |     |     function echidna_redemption_ledger_consistent() public view returns (bool) {
+ 370 |     |         return !ledgerInconsistent;
+ 371 |     |     }
+ 372 |     | 
+ 373 |     |     /// @notice Value is only ever destroyed against an Active asset.
+ 374 |     |     function echidna_redemption_requires_active_asset() public view returns (bool) {
+ 375 |     |         return !inactiveAssetRedeemed && !assetRegistryInconsistent;
+ 376 |     |     }
+ 377 |     | 
+ 378 |     |     /*//////////////////////////////////////////////////////////////
+ 379 |     |                             NON-INERTNESS VIEWS
+ 380 |     |     //////////////////////////////////////////////////////////////*/
+ 381 |     | 
+ 382 |     |     /// @notice Number of mints the fuzzer has driven; used by the non-inertness guard.
+ 383 |     |     function ghostMintsView() external view returns (uint256) {
+ 384 |     |         return ghostMints;
+ 385 |     |     }
+ 386 |     | 
+ 387 |     |     /// @notice Number of transfers the fuzzer has driven.
+ 388 |     |     function ghostTransfersView() external view returns (uint256) {
+ 389 |     |         return ghostTransfers;
+ 390 |     |     }
+ 391 |     | 
+ 392 |     |     /// @notice Number of burns the fuzzer has driven, all of them redemptions.
+ 393 |     |     function ghostBurnsView() external view returns (uint256) {
+ 394 |     |         return ghostBurns;
+ 395 |     |     }
+ 396 |     | 
+ 397 |     |     /// @notice Number of redemption requests settled.
+ 398 |     |     function ghostSettlementsView() external view returns (uint256) {
+ 399 |     |         return ghostSettlements;
+ 400 |     |     }
+ 401 |     | 
+ 402 |     |     /// @notice Total amount redeemed across every request.
+ 403 |     |     function ghostRedeemedTotalView() external view returns (uint256) {
+ 404 |     |         return ghostRedeemedTotal;
+ 405 |     |     }
+ 406 |     | 
+ 407 |     |     /*//////////////////////////////////////////////////////////////
+ 408 |     |                                 HELPERS
+ 409 |     |     //////////////////////////////////////////////////////////////*/
+ 410 |     | 
+ 411 |     |     /// @dev Registers an asset if none exists, and returns the count.
+ 412 |     |     ///      Bootstrapping preconditions in the harness rather than waiting for the
+ 413 |     |     ///      fuzzer to stumble into the right order is what keeps the budget on the
+ 414 |     |     ///      ledger instead of on setup. Every bootstrap write is accounted for in
+ 415 |     |     ///      the ghost totals exactly as a fuzzer-driven one would be, so nothing
+ 416 |     |     ///      here can make an invariant true by hiding a mutation from it.
+ 417 | *   |     function _ensureAnAssetExists() internal returns (uint256 count) {
+ 418 | *   |         count = ASSETS.assetCount();
+ 419 | *   |         if (count == 0) {
+ 420 | *   |             ASSETS.registerAsset(keccak256("bootstrap-asset"), "ipfs://bootstrap");
+ 421 | *   |             count = 1;
+ 422 |     |         }
+ 423 |     |     }
+ 424 |     | 
+ 425 |     |     /// @dev Returns an Active asset id, making one Active if none is.
+ 426 | *   |     function _anActiveAsset() internal returns (uint256) {
+ 427 | *   |         uint256 count = _ensureAnAssetExists();
+ 428 | *   |         for (uint256 i = 0; i < count; i++) {
+ 429 | *   |             if (ASSETS.isActive(i)) return i;
+ 430 |     |         }
+ 431 |     |         // Everything has been suspended or redeemed. Reactivating asset zero is a
+ 432 |     |         // legitimate registrar action, and the alternative — returning early — is
+ 433 |     |         // how a campaign quietly stops testing the ledger.
+ 434 | *   |         ASSETS.setAssetStatus(0, AssetRegistry.Status.Active);
+ 435 | *   |         return 0;
+ 436 |     |     }
+ 437 |     | 
+ 438 |     |     /// @dev Ensures `holder` has something to redeem, and returns the balance.
+ 439 | *   |     function _ensureHolderHasTokens(address holder, uint256 seed) internal returns (uint256 bal) {
+ 440 | *   |         bal = TOKEN.balanceOf(holder);
+ 441 | *   |         if (bal == 0) {
+ 442 | *   |             uint256 amount = 1 + _bound(seed);
+ 443 | *   |             TOKEN.mint(holder, amount);
+ 444 | *   |             ghostMints++;
+ 445 | *   |             ghostMintedTotal += amount;
+ 446 | *   |             bal = amount;
+ 447 |     |         }
+ 448 |     |     }
+ 449 |     | 
+ 450 |     |     /// @dev Runs after every action: re-verify ONE older request, round-robin.
+ 451 |     |     ///      O(1) per call, and over a campaign it re-reads every request many
+ 452 |     |     ///      times, interleaved with writes — which is what would catch a later
+ 453 |     |     ///      call corrupting an earlier record. Walking the whole ledger in a
+ 454 |     |     ///      predicate would do the same job quadratically.
+ 455 | *   |     function _afterCall() internal {
+ 456 | *   |         uint256 count = REDEMPTION.requestCount();
+ 457 | *   |         if (count == 0) return;
+ 458 | *   |         _verifyRequest(requestCursor % count);
+ 459 | *   |         requestCursor++;
+ 460 |     |     }
+ 461 |     | 
+ 462 |     |     /// @dev Compares the contract's record against what the harness recorded when
+ 463 |     |     ///      the request was made.
+ 464 | *   |     function _verifyRequest(uint256 id) internal {
+ 465 | *   |         try REDEMPTION.getRequest(id) returns (Redemption.Request memory r) {
+ 466 | *   |             if (
+ 467 | *   |                 !r.exists || r.holder != expectedHolder[id] || r.amount != expectedAmount[id]
+ 468 | *   |                     || r.assetId != expectedAsset[id] || r.settled != expectedSettled[id]
+ 469 | *   |                     || !isHolder[r.holder] || r.amount == 0
+ 470 |     |             ) {
+ 471 |     |                 ledgerInconsistent = true;
+ 472 |     |             }
+ 473 |     |         } catch {
+ 474 |     |             // Every id below `requestCount` must exist. A revert here is a gap.
+ 475 |     |             ledgerInconsistent = true;
+ 476 |     |         }
+ 477 |     |     }
+ 478 |     | 
+ 479 |     |     /// @dev `requestCount` is also the next id, so nothing may exist at it yet.
+ 480 |     |     ///      Ids that ran ahead of the counter would break pagination silently.
+ 481 | *   |     function _verifyNoRequestBeyondTheCount() internal {
+ 482 | *   |         try REDEMPTION.getRequest(REDEMPTION.requestCount()) returns (Redemption.Request memory) {
+ 483 |     |             ledgerInconsistent = true;
+ 484 |     |         } catch {
+ 485 |     |             // expected
+ 486 |     |         }
+ 487 |     |     }
+ 488 |     | 
+ 489 | *   |     function _bound(uint256 amount) internal pure returns (uint256) {
+ 490 |     |         // Keep amounts in a range that can never overflow uint256 supply.
+ 491 | *   |         return amount % (1_000_000 ether);
+ 492 |     |     }
+ 493 |     | }
+ 494 |     | 
+

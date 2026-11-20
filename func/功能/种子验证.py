@@ -593,6 +593,26 @@ def _resolve_property_argument(expression: str, abi_type: str, declarations: str
         if cast:
             value = _resolve_property_argument(cast.group(1), abi_type, declarations,
                                                property_sender, contract, seen)
+        elif contract is not None and re.fullmatch(
+                r"[A-Za-z_][A-Za-z0-9_]*\s*\[\s*[^\]]+\s*\]", expression):
+            access = re.fullmatch(
+                r"(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*\[\s*(?P<index>[^\]]+)\s*\]",
+                expression)
+            assert access is not None
+            name, index_expression = access.group("name"), access.group("index").strip()
+            getters = [item for item in contract.abi
+                       if item.get("type") == "function" and item.get("name") == name and
+                       len(item.get("inputs", [])) == 1 and
+                       item.get("stateMutability") in {"view", "pure"}]
+            if len(getters) != 1:
+                raise ValueError("索引属性参数没有唯一匹配的公开 view getter")
+            getter = getters[0]
+            index_type = getter["inputs"][0]["type"]
+            index = _resolve_property_argument(index_expression, index_type, declarations,
+                                               property_sender, contract, seen)
+            signature = name + "(" + index_type + ")"
+            value = contract.get_function_by_signature(signature)(index).call(
+                {"from": _checksum(property_sender)})
         elif re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", expression):
             if expression in seen:
                 raise ValueError("循环常量引用")
@@ -643,12 +663,17 @@ def _resolve_property_argument(expression: str, abi_type: str, declarations: str
 
 def _property_getter_specs(property_context: dict[str, Any], contract,
                            contract_abis: dict[str, Any], *,
+                           project: str | None = None,
                            property_sender: str = PROPERTY_SENDER) -> list[dict[str, Any]]:
     """解析属性直接调用及有界索引状态的公开 view getter 观察点。"""
     reference = property_context.get("property_source", "")
-    source_path = ROOT / str(reference).split("#", 1)[0]
+    source_reference = str(reference).split("#", 1)[0]
+    source_path = ROOT / source_reference
+    if not source_path.is_file() and project in PROJECTS:
+        source_path = ROOT / PROJECTS[project].get("source_root", "") / source_reference
     if not source_path.is_file():
-        return []
+        return [{"status": "unresolved", "reason":
+                 f"属性源码引用无法在仓库根目录或项目源码目录解析：{source_reference}"}]
     source = source_path.read_text(encoding="utf-8", errors="replace")
     line_match = re.search(r"#(\d+)", str(reference))
     if line_match:
@@ -671,59 +696,9 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
                    for row in specs):
             specs.append(spec)
 
-    for receiver, name, arguments in _property_calls(predicate):
-        if name == target_name:
-            continue
-        target_type = None
-        if receiver:
-            receiver_getter = next((item for item in abi
-                                    if item.get("name") == receiver and not item.get("inputs")
-                                    and item.get("stateMutability") in {"view", "pure"}
-                                    and any(output.get("type") == "address"
-                                            for output in item.get("outputs", []))), None)
-            if receiver_getter is None:
-                continue
-            internal_type = next((output.get("internalType", "")
-                                  for output in receiver_getter.get("outputs", [])
-                                  if output.get("type") == "address"), "")
-            target_type = internal_type.replace("contract ", "").strip() or None
-            target_abi = contract_abis.get(target_type) if target_type else None
-            if not isinstance(target_abi, list):
-                continue
-        else:
-            target_abi = abi
-        matches = [entry for entry in target_abi if entry.get("type") == "function" and
-                   entry.get("name") == name and
-                   entry.get("stateMutability") in {"view", "pure"} and
-                   len(entry.get("inputs", [])) == len(arguments)]
-        if not matches:
-            continue
-        resolved = None
-        errors = []
-        for entry in matches:
-            try:
-                values = [_resolve_property_argument(expression, parameter["type"],
-                                                     declarations, property_sender,
-                                                     contract)
-                          for expression, parameter in zip(arguments, entry.get("inputs", []))]
-                resolved = {"signature": entry["name"] + "(" +
-                            ",".join(item["type"] for item in entry.get("inputs", [])) + ")",
-                            "expressions": arguments, "arguments": values,
-                            "receiver": receiver,
-                            "receiver_getter": receiver + "()" if receiver else None,
-                            "receiver_type": target_type}
-                break
-            except (ValueError, TypeError) as exc:
-                errors.append(str(exc))
-        if resolved:
-            add_spec(resolved)
-        else:
-            add_spec({"function": name, "expressions": arguments,
-                      "status": "unresolved", "reason": errors[0] if errors else "ABI 未匹配"})
-
-    # Public mapping/array getters are functions with one ABI index argument. Resolve
-    # statically bounded for-loop indices so per-transaction feedback observes the
-    # actual operands of quantified predicates rather than only the final bool.
+    # Resolve statically bounded loops before resolving call arguments. This lets
+    # calls such as TOKEN.balanceOf(holders[i]) expand into one getter read per
+    # public array element instead of silently disappearing as unsupported.
     loop_ranges: dict[str, list[int] | None] = {}
     loop_pattern = re.compile(
         r"\bfor\s*\(\s*(?:u?int(?:[0-9]+)?)\s+(?P<name>[A-Za-z_]\w*)\s*=\s*"
@@ -742,6 +717,100 @@ def _property_getter_specs(property_context: dict[str, Any], contract,
         except (ValueError, TypeError):
             loop_ranges[variable] = None
 
+    def expand_arguments(arguments: list[str]) -> list[list[str]]:
+        variants: list[list[str]] = [[]]
+        for expression in arguments:
+            variables = [name for name in loop_ranges
+                         if re.search(r"\b" + re.escape(name) + r"\b", expression)]
+            options = [expression]
+            for variable in variables:
+                values = loop_ranges[variable]
+                if values is None:
+                    raise ValueError("属性参数引用了无法静态界定的循环变量")
+                options = [re.sub(r"\b" + re.escape(variable) + r"\b", str(value), option)
+                           for option in options for value in values]
+                if len(options) > 256:
+                    raise ValueError("属性参数循环展开超过 256 个有界值")
+            variants = [prefix + [option] for prefix in variants for option in options]
+            if len(variants) > 256:
+                raise ValueError("属性参数组合展开超过 256 个有界值")
+        return variants
+
+    for receiver, name, arguments in _property_calls(predicate):
+        if name == target_name:
+            continue
+        target_type = None
+        if receiver:
+            receiver_getter = next((item for item in abi
+                                    if item.get("name") == receiver and not item.get("inputs")
+                                    and item.get("stateMutability") in {"view", "pure"}
+                                    and any(output.get("type") == "address"
+                                            for output in item.get("outputs", []))), None)
+            if receiver_getter is None:
+                add_spec({"function": name, "expressions": arguments,
+                          "receiver": receiver, "status": "unresolved",
+                          "reason": f"跨合约引用 {receiver} 未通过 Harness 公共 ABI 暴露地址"})
+                continue
+            internal_type = next((output.get("internalType", "")
+                                  for output in receiver_getter.get("outputs", [])
+                                  if output.get("type") == "address"), "")
+            target_type = internal_type.replace("contract ", "").strip() or None
+            target_abi = contract_abis.get(target_type) if target_type else None
+            if not isinstance(target_abi, list):
+                add_spec({"function": name, "expressions": arguments,
+                          "receiver": receiver, "receiver_type": target_type,
+                          "status": "unresolved",
+                          "reason": f"缺少 {target_type or receiver} 的合约 ABI"})
+                continue
+        else:
+            target_abi = abi
+        matches = [entry for entry in target_abi if entry.get("type") == "function" and
+                   entry.get("name") == name and
+                   entry.get("stateMutability") in {"view", "pure"} and
+                   len(entry.get("inputs", [])) == len(arguments)]
+        if not matches:
+            if receiver:
+                add_spec({"function": name, "expressions": arguments,
+                          "receiver": receiver, "receiver_type": target_type,
+                          "status": "unresolved",
+                          "reason": "跨合约公开 ABI 中没有唯一匹配的 view getter"})
+            continue
+        try:
+            argument_variants = expand_arguments(arguments)
+        except (ValueError, TypeError) as exc:
+            add_spec({"function": name, "expressions": arguments,
+                      "receiver": receiver, "receiver_type": target_type,
+                      "status": "unresolved", "reason": str(exc)})
+            continue
+        resolved_count = 0
+        errors = []
+        for entry in matches:
+            signature = entry["name"] + "(" + ",".join(
+                item["type"] for item in entry.get("inputs", [])) + ")"
+            for argument_set in argument_variants:
+                try:
+                    values = [_resolve_property_argument(expression, parameter["type"],
+                                                         declarations, property_sender,
+                                                         contract)
+                              for expression, parameter in zip(argument_set, entry.get("inputs", []))]
+                    add_spec({"signature": signature, "expressions": argument_set,
+                              "source_expressions": arguments, "arguments": values,
+                              "receiver": receiver,
+                              "receiver_getter": receiver + "()" if receiver else None,
+                              "receiver_type": target_type,
+                              "loop_expansion": argument_set != arguments})
+                    resolved_count += 1
+                except (ValueError, TypeError) as exc:
+                    errors.append(str(exc))
+        if resolved_count == 0:
+            add_spec({"function": name, "expressions": arguments,
+                      "receiver": receiver, "receiver_type": target_type,
+                      "status": "unresolved",
+                      "reason": errors[0] if errors else "ABI 参数未匹配"})
+
+    # Public mapping/array getters are functions with one ABI index argument. Resolve
+    # statically bounded for-loop indices so per-transaction feedback observes the
+    # actual operands of quantified predicates rather than only the final bool.
     mapping_pattern = re.compile(r"\b(?P<name>[A-Za-z_]\w*)\s*\[\s*(?P<index>[^\]]+)\s*\]")
     for access in mapping_pattern.finditer(predicate):
         name, index_expression = access.group("name"), access.group("index").strip()
@@ -860,12 +929,17 @@ def _target_property_state(property_signature: str,
             first_change = row
 
     first_false = next((item for item in trajectory if item.get("value") is False), None)
+    getter_observation_incomplete = any(
+        getter.get("status") in {"unresolved", "call_error"}
+        for row in trajectory for getter in row.get("predicate_getters", []))
     observed_values = [item.get("value") for item in trajectory
                        if isinstance(item.get("value"), bool)]
     if first_false:
         status = "counterexample_state_established"
     elif first_change:
         status = "property_related_state_changed_property_holds"
+    elif getter_observation_incomplete:
+        status = "property_state_unobservable"
     elif observed_values and len(observed_values) == len(trajectory):
         status = "no_observed_property_related_state_change"
     else:
@@ -1106,6 +1180,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             assertion_trigger and assertion_trigger.get("seed_compatible") else None)
         predicate_getter_specs = _property_getter_specs(
             property_context, contract, contract_abis,
+            project=project,
             property_sender=session.property_sender)
         property_signatures = [entry["name"] + "()" for entry in contract.abi
                                if entry.get("type") == "function" and not entry.get("inputs")

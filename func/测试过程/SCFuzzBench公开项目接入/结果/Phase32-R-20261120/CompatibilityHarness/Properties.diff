@@ -1,0 +1,19 @@
+--- upstream/test/Properties.sol
++++ Phase32-R/CompatibilityHarness/Properties.sol
+@@ -48,14 +48,14 @@
+     IdentityRegistry internal immutable IDENTITY;
+     PriceOracle internal immutable ORACLE;
+     Redemption internal immutable REDEMPTION;
+-    RWAToken internal immutable TOKEN;
++    RWAToken public immutable TOKEN;
+ 
+     uint256 internal constant NUM_HOLDERS = 4;
+     /// @notice The one address that is never KYC-verified.
+     address internal constant PHANTOM = address(0xBAD);
+ 
+     Actor[NUM_HOLDERS] internal actors;
+-    address[NUM_HOLDERS] internal holders;
++    address[NUM_HOLDERS] public holders;
+     mapping(address => bool) internal isHolder;
+ 
+     // --- ghost state ---------------------------------------------------------
