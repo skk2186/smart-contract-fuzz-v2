@@ -43,17 +43,29 @@ def function_matches_selector(function: Any, selector: str) -> bool:
 
 
 def assertion_sites(function: Any) -> list[dict[str, str]]:
-    """从 SlithIR 保留函数体中直接可见的 Solidity assert 调用。"""
-    sites = []
-    for node in getattr(function, "nodes", []):
-        for ir in getattr(node, "irs", []):
-            if not isinstance(ir, SolidityCall):
-                continue
-            call_name = str(getattr(getattr(ir, "function", None), "name", ""))
-            rendered = str(ir)
-            if call_name == "assert" or "SOLIDITY_CALL assert(" in rendered:
-                sites.append({"call": rendered, "source": location(node)})
-    return sites
+    """沿源码内可解析的内部/库调用查找目标函数可达的 Solidity assert。"""
+    sites: dict[tuple[str, str], dict[str, str]] = {}
+    pending = [(function, 0, [])]
+    visited: set[Any] = set()
+    while pending:
+        current, depth, call_chain = pending.pop()
+        if current in visited:
+            continue
+        visited.add(current)
+        for node in getattr(current, "nodes", []):
+            for ir in getattr(node, "irs", []):
+                if isinstance(ir, SolidityCall):
+                    call_name = str(getattr(getattr(ir, "function", None), "name", ""))
+                    rendered = str(ir)
+                    if call_name == "assert" or "SOLIDITY_CALL assert(" in rendered:
+                        site = {"call": rendered, "source": location(node),
+                                "reachable_through": " -> ".join(call_chain)}
+                        sites[(site["call"], site["source"])] = site
+                elif (depth < 32 and isinstance(ir, (InternalCall, LibraryCall))
+                      and isinstance(ir.function, Function)):
+                    pending.append((ir.function, depth + 1,
+                                    call_chain + [name(ir.function)]))
+    return sorted(sites.values(), key=lambda item: (item["source"], item["call"]))
 
 
 def location(item: Any) -> str:

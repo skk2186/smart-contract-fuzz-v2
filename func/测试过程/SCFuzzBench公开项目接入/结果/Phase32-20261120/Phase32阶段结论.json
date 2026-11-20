@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "phase": "Phase32",
+  "status": "stopped_at_engine_compatibility_gate",
+  "baseline_commit": "3eb48e4e7eca917c645305935227f15f28a38d80",
+  "frozen_at": "2026-11-20",
+  "qualification": {
+    "candidate_task_count": 13,
+    "compile_and_echidna_smoke_pass_count": 13,
+    "selected_task_count": 4,
+    "selected_independent_project_count": 2,
+    "formal_selection_preceded_agent_runs": true,
+    "selected_task_ids": [
+      "rwa-supply-sum",
+      "rwa-redemption-ledger",
+      "vault-share-solvency",
+      "vault-total-supply"
+    ],
+    "initial_anvil_deployments_passed": 4,
+    "initial_target_properties_passed": 4
+  },
+  "property_mode_probes": {
+    "echidna_version": "2.3.2",
+    "boolean_property": "passed; 3 boolean tool self-tests loaded; no counterexample in 30 tests",
+    "assertion": "passed; selected assertion falsified; ordinary revert and AssertionFailed control passed",
+    "foundry": "passed; testShrinking counterexample found; IS_TEST harness requirement recorded",
+    "multi_assert_scope": "a top-level assertion test can be selected; multiple assertion sites within one function are not individually locatable",
+    "target_assertion_adapter": "source-call-chain analysis and Panic(0x01) classification added; no independent Anvil/Echidna target-counterexample agreement observed",
+    "raw_logs": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-20261120/属性模式探针/"
+  },
+  "agent_api_usage": {
+    "request_attempts": 8,
+    "failed_request_attempts": 1,
+    "prompt_tokens": 129184,
+    "completion_tokens": 3758,
+    "total_tokens": 132942,
+    "estimated_cost_usd_offpeak": "0.020748048",
+    "estimated_cost_usd_peak": "0.041496096",
+    "total_elapsed_seconds": 51.471,
+    "cost_is_estimated_not_billed": true
+  },
+  "agent_seed_outcomes": {
+    "selected_tasks": 4,
+    "unique_anvil_replayable_agent_candidates": 1,
+    "eligible_property_related_state_seeds": 0,
+    "anvil_target_counterexamples": 0,
+    "rwa_supply_sum": "mintToHolder(0, 1e18) replayed, but no property-related getter was observed; excluded by the frozen entry gate",
+    "rwa_redemption_ledger": "no valid EVM seed; Agent B candidate identifier mismatch",
+    "vault_share_solvency": "replay failed on first vault_deposit; empty revert, no state change",
+    "vault_total_supply": "replay failed on first vault_deposit; empty revert, no state change"
+  },
+  "sequence_expansion": {
+    "max_sequence_length": 8,
+    "retained_prefixes": 4,
+    "candidate_execution_limit_per_property_per_mode": 24,
+    "candidate_executions": 88,
+    "total_anvil_replays_including_base_replays": 97,
+    "api_calls": 0,
+    "api_tokens": 0,
+    "elapsed_seconds_sum": 72.13986,
+    "valid_related_state_candidates": 0,
+    "target_counterexamples": 0,
+    "per_task_modes": {
+      "rwa-supply-sum": {
+        "R": 24,
+        "S": 0,
+        "E3": 0
+      },
+      "vault-share-solvency": {
+        "R": 24,
+        "S": 8,
+        "E3": 8
+      },
+      "vault-total-supply": {
+        "R": 24,
+        "S": 0,
+        "E3": 0
+      },
+      "rwa-redemption-ledger": "no valid base EVM seed; expansion not run"
+    }
+  },
+  "echidna_formal_comparison": {
+    "groups": [
+      "E0",
+      "E1",
+      "E2",
+      "E3",
+      "R",
+      "S"
+    ],
+    "random_seeds": [
+      20261125,
+      20261135,
+      20261145
+    ],
+    "test_limit": 500,
+    "workers": 1,
+    "sequence_length": 8,
+    "formal_invocations_after_cwd_correction": 30,
+    "invocations_exited_before_fuzzing": 30,
+    "fuzzing_transactions": 0,
+    "valid_500_test_runs": 0,
+    "valid_seed_only_runs": 0,
+    "loaded_seed_count": 0,
+    "coverage_and_lcov_comparison_available": false,
+    "stop_reason": "Echidna 2.3.2 / CryticCompile 0.3.11 could not resolve Foundry-generated foundry-pp DeployHelper sources; after materializing those sources in an isolated clone, harness deployment failed on unsupported HEVM deployCode(string,bytes) cheatcode",
+    "raw_attempts": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-20261120/Tasks-EchidnaCwdFixed/ and Diagnostics/"
+  },
+  "qualification_smokes_not_formal_results": {
+    "rwa": {
+      "test_limit": 40,
+      "fuzzing_calls": 45,
+      "unique_instructions": 8990,
+      "properties_loaded_and_passing": 6,
+      "counterexample": false
+    },
+    "vault": {
+      "test_limit": 40,
+      "fuzzing_calls": 45,
+      "unique_instructions": 8651,
+      "assertion_properties_loaded": 2,
+      "target_assertions_reached": false,
+      "counterexample": false
+    }
+  },
+  "paper_evidence": {
+    "independent_projects_completed_end_to_end": 0,
+    "independent_positive_effectiveness_evidence": false,
+    "mechanism_only_evidence": [
+      "generic assertion call-chain identification now discovers both CryticAsserts.lte assertion sites",
+      "Phase31 Wallet target regression unchanged before/after adapter: 10 extension candidates, 11 Anvil replays, same four-call sequence"
+    ],
+    "recommend_expand_to_20_30_tasks": false
+  }
+}

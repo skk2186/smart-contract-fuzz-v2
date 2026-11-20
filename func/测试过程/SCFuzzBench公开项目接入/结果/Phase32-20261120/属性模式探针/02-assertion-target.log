@@ -1,0 +1,31 @@
+[2026-11-20 10:28:58.88] Compiling `sol/单合约测试/Phase32属性模式探针/ModeProbe.sol`... Done! (0.327370229s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/Phase32属性模式探针/ModeProbe.sol:AssertionModeProbe
+[2026-11-20 10:28:59.21] Running slither on `sol/单合约测试/Phase32属性模式探针/ModeProbe.sol`... Done! (0.484205337s)
+[2026-11-20 10:28:59.71] [Worker 0] Test incrementAndCheck() falsified!
+  Call sequence:
+AssertionModeProbe.incrementAndCheck() from: 0x0000000000000000000000000000000000010000 Time delay: 3 seconds Block delay: 4
+AssertionModeProbe.incrementAndCheck() from: 0x0000000000000000000000000000000000020000 Time delay: 521319 seconds Block delay: 5022
+
+[2026-11-20 10:28:59.71] [Worker 0] New coverage: 76 instr, 1 contracts, 1 seqs in corpus
+[2026-11-20 10:29:00.18] [Worker 0] Test limit reached. Stopping.
+[2026-11-20 10:29:00.18] [status] tests: 1/4, fuzzing: 30/30, values: [], cov: 76, corpus: 1, gas/s: 0
+incrementAndCheck(): failed!💥  
+  Call sequence:
+    AssertionModeProbe.incrementAndCheck()
+    AssertionModeProbe.incrementAndCheck()
+
+Traces: 
+
+counter(): passing
+ordinaryRevert(): passing
+AssertionFailed(..): passing
+
+Unique instructions: 76
+Unique codehashes: 1
+Corpus size: 1
+Seed: 1976974391907113083
+Total calls: 30
+
+WARNING: assertion at file: sol/单合约测试/Phase32属性模式探针/ModeProbe.sol starting at line: 60 was never reached
+WARNING: assertion at file: sol/单合约测试/Phase32属性模式探针/ModeProbe.sol starting at line: 44 was never reached
+WARNING: assertion at file: sol/单合约测试/Phase32属性模式探针/ModeProbe.sol starting at line: 48 was never reached

@@ -1,0 +1,68 @@
+{
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "deployBlock": 44880606,
+  "explorer": "https://sepolia.basescan.org",
+  "deployer": "0xb6c3a56CA2f99e3F5d7d16ad968df9f71cCC184D",
+  "contracts": {
+    "IdentityRegistry": "0x11078533fb01015e52b1eaCD90d7BaE90B29f109",
+    "AssetRegistry": "0x354718130d926f7cA148dc4935A7d946d4EA0c62",
+    "PriceOracle": "0xc787B126Dd60311eECf9501aFC3d7AdC2F348bBf",
+    "RWAToken": "0xc01B935b7D62904E18C14f041E2611B582d1bf93",
+    "Redemption": "0xE41053aE6038E404dA764F96796288f9990Fe881"
+  },
+  "parties": {
+    "deployer": "0xb6c3a56CA2f99e3F5d7d16ad968df9f71cCC184D",
+    "investorA": "0xe2DA56b0f99bAfBC6c8E2c92f647F1F5ffBcc03E",
+    "investorB": "0xfEe552A091c20B9aeC72dC681b0D3Da750C46eEb"
+  },
+  "token": {
+    "name": "Acme Tower Fractions",
+    "symbol": "ACME",
+    "decimals": 18
+  },
+  "seed": {
+    "assetsRegistered": 12,
+    "oraclePriceCents": 105,
+    "mintedToInvestorA": "10000000000000000000000"
+  },
+  "narrativeTx": {
+    "mintToInvestorA": {
+      "hash": "0x88f95a926e87133470961d28fb520b4397e1c307acfeed96b987dabd7c657e45",
+      "note": "Mint 10,000 ACME to KYC-verified Investor A",
+      "status": "success"
+    },
+    "transferInvestorAToDeployer": {
+      "hash": "0xa412731e07de33ae42c1374f2ee1b35980994398a4afe8ae557a354f074e646d",
+      "note": "Investor A -> deployer, 1,000 ACME: both parties verified",
+      "status": "success"
+    },
+    "transferInvestorAToInvestorB": {
+      "hash": "0x25ec03b4a75f9044d32486898092135862fd02925e814e2f291cd948f97791bc",
+      "note": "Investor A -> Investor B, 500 ACME: REVERTS, recipient not KYC-verified (RecipientNotVerified hook). The showcase compliance-block.",
+      "status": "reverted"
+    },
+    "redemptionByInvestorA": {
+      "hash": "0xf037dddfee855d94191e878a2f02d3ad3e329e772608f41cc7667c57ac678878",
+      "note": "Investor A redeems 2,000 ACME against asset 0 (burned); request id 0 recorded, pending settlement",
+      "status": "success"
+    }
+  },
+  "deployTx": {
+    "IdentityRegistry": "0x2b8f02218865d3896ff8bd50570a8004cdea344b504728ac040c01d653ae6dce",
+    "AssetRegistry": "0xb810dda0dab10a89e21316bd3b7ffd1d1fd02dd648a59f4f7f24325efe541891",
+    "PriceOracle": "0xf6b2b258cfdff9e697a51cff1925d287541d9b98fd4713f7b20c6a2030f655b0",
+    "RWAToken": "0x673c898c5e815d7a86557b5a4c4729b9639b08dd944f4b26b7a59556b6aaf7d1",
+    "Redemption": "0xaa8f6a3c757609c059fd63721265ae7fa8436f83ecfa3fcab6f7c542dc1950b3"
+  },
+  "supersedes": {
+    "//": "PF-S123 natspec changed src/, so PF-S124 redeployed all five and re-verified. The previous generation stays on chain with its own history; the source that produced it is tagged verified-onchain-2026-07-31.",
+    "contracts": {
+      "IdentityRegistry": "0xF34D21a506777BB65c31955D90940453C990597D",
+      "AssetRegistry": "0xCF6B60AD5C71c39270a17953277Da6419Dde4c96",
+      "PriceOracle": "0x0c61ecA41912a9B8d805c2AB55fCb5E461861fbF",
+      "RWAToken": "0xb2D5BF6993d78793EFeb875E854602269D84626D",
+      "Redemption": "0x5b6A9e4424Ccf10c6420CE9135E6D1e3e43ED250"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+# TEMPLATE — copy to the consuming repo's root as echidna.yaml and tune the
+# marked values. This is not consumed directly: Echidna resolves corpusDir
+# relative to the working directory, so a shared config living under lib/ would
+# scatter corpora into the submodule.
+#
+# What is NOT tunable is everything below the line marked REQUIRED. Those
+# settings are what makes an Echidna run mean the same thing in every repo, and
+# scripts/property-count.sh is what notices when a run stops meaning it.
+#
+# Run:  echidna . --contract Properties --config echidna.yaml
+#
+# WARNING: artifacts must come from a fresh `forge build`. `forge coverage`
+# overwrites out/ with instrumented artifacts that crytic-compile consumes
+# without complaint, silently registering fewer properties than the source has.
+# Always `rm -rf crytic-export && forge build --force` first.
+
+# --- tune per repo ---------------------------------------------------------
+
+# Endow the harness at construction if it needs to fund actors. Set to 0 for a
+# harness that moves no value.
+balanceContract: 1000000000000000000000
+
+# Whether Echidna's own sender set may call contracts other than the harness.
+# `false` when the harness routes every party through its own Actor forwarders,
+# which is the convention here.
+allContracts: false
+
+corpusDir: echidna-corpus
+
+# --- REQUIRED — do not diverge ---------------------------------------------
+
+# Assert against the boolean echidna_* predicates rather than Solidity asserts.
+testMode: property
+
+testLimit: 100000
+
+# seqLen MUST match foundry.toml's invariant depth, so all three engines walk
+# sequences of the same length and a bug found by one is reachable by the rest.
+seqLen: 64
+
+shrinkLimit: 5000
+
+# Deterministic runs, so a CI failure is reproducible locally.
+seed: 20240718
+
+# Fail loudly rather than reporting a pass when the harness cannot be deployed.
+stopOnFail: true
+
+# Reuse the artifacts `forge build` already produced. Without this,
+# crytic-compile tries to download its own solc, which needs network access and a
+# GitHub API budget CI should not depend on.
+cryticArgs: ["--foundry-ignore-compile"]

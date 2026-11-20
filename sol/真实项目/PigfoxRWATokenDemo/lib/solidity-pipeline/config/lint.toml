@@ -1,0 +1,51 @@
+# CANONICAL forge lint configuration for the pigfox estate.
+#
+# Copy this block VERBATIM into each consuming repo's foundry.toml.
+# scripts/lint-config-check.sh verifies the copies still agree with this file,
+# and CI runs it, so a repo cannot quietly drift to its own rules.
+#
+# WHY A COPY AND NOT A CONSUMED CONFIG. Slither takes --config-file and Solhint
+# takes -c, so both are consumed straight from this submodule and exist in exactly
+# one place. `forge lint` has neither: it reads the [lint] table of the foundry.toml
+# belonging to the tree being linted, full stop. So this is the same deliberate copy
+# as config/echidna.yaml and config/medusa.json, for the same reason, and it gets
+# the same treatment — a check that fails when the copies disagree.
+#
+# INVOKE IT BARE. `forge lint` with an explicit PATH argument OVERRIDES the `ignore`
+# setting (documented in `forge lint --help`), so `forge lint src/` would lint the
+# generated verifiers this config exists to skip. The gate runs `forge lint` with no
+# path and lets `ignore` do the scoping.
+#
+# Every exclusion is argued in docs/forge-lint-rules.md. A rule turned off that is
+# not written down there does not exist.
+[lint]
+# Scoped to src/, mirroring filter_paths in slither.config.json and the src/-only
+# scope of .solhint.json. test/ and script/ are not the artifact under test, and a
+# naming linter and Foundry disagree by construction there: Foundry discovers tests
+# by the test/testFuzz/invariant_ prefixes and pipeline law REQUIRES echidna_*
+# predicates, so mixed-case-function and mixed-case-variable can only be satisfied
+# by breaking test discovery. Scoping removes them without a suppression.
+#
+# The pattern needs the /*.sol suffix: a bare "test/**" does NOT match, which is
+# silent — it leaves the findings in place while reading as if it had scoped them.
+#
+# A repo holding a snarkjs-generated verifier appends "src/Verifier.sol" to this
+# list; that addition is expected by lint-config-check.sh. Nothing else may be added.
+ignore = ["test/**/*.sol", "script/**/*.sol"]
+
+exclude_lints = [
+    # ERC-20 fixes `decimals` in lower case. Renaming it to DECIMALS changes the
+    # public getter and breaks every ERC-20 consumer. Same argument already recorded
+    # for Slither's naming-convention and Solhint's const-name-snakecase.
+    "screaming-snake-case-const",
+    # Wants SCREAMING_SNAKE_CASE for immutables, which would rename the registry
+    # handles — token, identityRegistry, assetRegistry. Those read most naturally in
+    # mixedCase and mirror the ERC-3643 naming the RWA demo follows deliberately.
+    "screaming-snake-case-immutable",
+    # Suggests wrapping a modifier's body in an internal function to save code size.
+    # Roles.onlyOwner and Roles.onlyAgent are two lines each, every contract in the
+    # estate is far under the 24,576-byte limit (the largest, EscrowUpgradeable, is
+    # 7,299), and the indirection would hide the access check from the site that
+    # applies it. A code-size optimisation with no code-size problem to solve.
+    "unwrapped-modifier-logic",
+]

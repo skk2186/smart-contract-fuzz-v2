@@ -1,0 +1,58 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.28"
+optimizer = true
+optimizer_runs = 200
+
+# crytic-compile (Echidna, Medusa, Slither) consumes these Foundry artifacts via
+# --foundry-ignore-compile, so the fuzzer/analyzer never needs its own solc download.
+build_info = true
+extra_output = ["storageLayout"]
+
+remappings = [
+    "forge-std/=lib/forge-std/src/",
+    # PIGFOX SOLIDITY PIPELINE v1, vendored as a submodule. The shared property
+    # base lives here; the gate scripts alongside it are what CI runs, so a local
+    # run and a CI run are the same bytes.
+    "pipeline/=lib/solidity-pipeline/src/",
+]
+
+[profile.default.fuzz]
+runs = 512
+
+[profile.default.invariant]
+runs = 256
+# depth intentionally matches seqLen in echidna.yaml and callSequenceLength in
+# medusa.json, so all three engines walk sequences of the same length.
+depth = 64
+fail_on_revert = true
+
+[profile.ci.fuzz]
+runs = 1024
+
+[profile.ci.invariant]
+runs = 512
+depth = 96
+
+[fmt]
+line_length = 110
+tab_width = 4
+bracket_spacing = false
+int_types = "long"
+
+# --- forge lint ------------------------------------------------------------
+# CANONICAL BLOCK. Copied verbatim from lib/solidity-pipeline/config/lint.toml
+# and held in agreement with it by scripts/lint-config-check.sh, which CI runs.
+# `forge lint` has no --config-file, so unlike Slither and Solhint this cannot be
+# consumed from the submodule; it is the same deliberate copy as echidna.yaml and
+# medusa.json, for the same reason, with the same check keeping the copies honest.
+# Every exclusion's reasoning is in lib/solidity-pipeline/docs/forge-lint-rules.md.
+[lint]
+ignore = ["test/**/*.sol", "script/**/*.sol"]
+exclude_lints = [
+    "screaming-snake-case-const",
+    "screaming-snake-case-immutable",
+    "unwrapped-modifier-logic",
+]

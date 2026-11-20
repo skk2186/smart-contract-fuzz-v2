@@ -273,7 +273,35 @@ def _trace_effects(session: AnvilSession, tx_hash: Any) -> dict[str, Any]:
     return {"internal_errors": errors, "internal_call_trace": call_tree,
             "changed_storage_slot_count": slots,
             "balance_changes": balance_changes,
-            "top_level_trace_error": call.get("error")}
+            "top_level_trace_error": call.get("error"),
+            "top_level_output": call.get("output")}
+
+
+def _call_assertion_target(session: AnvilSession, contract: Any,
+                           signature: str) -> dict[str, Any]:
+    """在当前状态只读执行选定 assertion 函数，并识别 Solidity assert 的 Panic(0x01)。"""
+    function = contract.get_function_by_signature(signature)()
+    transaction = {"from": _checksum(session.property_sender),
+                   "to": contract.address,
+                   "data": function._encode_transaction_data(),
+                   "gas": hex(session.max_transaction_gas),
+                   "gasPrice": "0x0"}
+    response = session.web3.provider.make_request("eth_call", [transaction, "latest"])
+    if "result" in response:
+        return {"status": "passed", "result": True}
+    error = response.get("error") or {}
+    data = error.get("data")
+    if isinstance(data, dict):
+        data = data.get("data") or data.get("result")
+    if not isinstance(data, str):
+        data = None
+    reason = _decode_revert_reason(data)
+    if reason == "Panic(0x1)":
+        return {"status": "target_assertion_failed", "result": False,
+                "revert_reason": reason, "revert_data": data}
+    return {"status": "assertion_call_error", "result": None,
+            "revert_reason": reason,
+            "error": str(error)[:500], "revert_data": data}
 
 
 def _resolve_event_arguments(tx: dict[str, Any], action: dict[str, Any],
@@ -1070,6 +1098,12 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             property_signature += "()"
         property_context = next((item for item in candidate.get("context", {}).get("properties", [])
                                  if item.get("property_id") == candidate.get("property_id")), {})
+        assertion_trigger = (candidate.get("assertion_trigger") or
+                              property_context.get("assertion_trigger"))
+        assertion_signature = (
+            assertion_trigger.get("abi_signature")
+            if property_context.get("property_kind") == "assertion_test" and
+            assertion_trigger and assertion_trigger.get("seed_compatible") else None)
         predicate_getter_specs = _property_getter_specs(
             property_context, contract, contract_abis,
             property_sender=session.property_sender)
@@ -1087,6 +1121,12 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             except Exception as exc:
                 initial_property_values[tested_property] = None
                 initial_property_errors[tested_property] = f"{type(exc).__name__}: {str(exc)[:200]}"
+        if assertion_signature:
+            assertion_initial = _call_assertion_target(session, contract, assertion_signature)
+            initial_property_values[property_signature] = assertion_initial.get("result")
+            if assertion_initial["status"] == "assertion_call_error":
+                initial_property_errors[property_signature] = json.dumps(
+                    assertion_initial, ensure_ascii=False)
         initial_predicate_getters = _observe_property_getters(
             session.web3, contract, contract_abis, predicate_getter_specs,
             property_sender=session.property_sender)
@@ -1151,7 +1191,8 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             except Exception as exc:
                 trace = {"internal_errors": [], "changed_storage_slot_count": None,
                          "balance_changes": [],
-                         "trace_error": f"{type(exc).__name__}: {str(exc)[:300]}"}
+                         "trace_error": f"{type(exc).__name__}: {str(exc)[:300]}",
+                         "top_level_output": None}
                 events = []
                 valid = False
             # 只有没有内部回滚的交易事件才可作为后续对象绑定/状态查询的来源。
@@ -1165,6 +1206,9 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             prop_error = None
             property_values: dict[str, bool | None] = {}
             property_errors: dict[str, str] = {}
+            target_assertion_failure = bool(
+                assertion_signature == signature and receipt.status != 1 and
+                _decode_revert_reason(trace.get("top_level_output")) == "Panic(0x1)")
             if receipt.status == 1:
                 for tested_property in property_signatures:
                     try:
@@ -1174,14 +1218,30 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                     except Exception as exc:
                         property_values[tested_property] = None
                         property_errors[tested_property] = f"{type(exc).__name__}: {str(exc)[:200]}"
+                if assertion_signature:
+                    assertion_result = ("target_assertion_failed" if target_assertion_failure else
+                                        _call_assertion_target(session, contract, assertion_signature))
+                    if isinstance(assertion_result, dict):
+                        property_values[property_signature] = assertion_result.get("result")
+                        if assertion_result["status"] == "assertion_call_error":
+                            property_errors[property_signature] = json.dumps(
+                                assertion_result, ensure_ascii=False)
+                    else:
+                        property_values[property_signature] = False
+                        property_errors[property_signature] = "Panic(0x1): selected target assertion failed"
                 prop_result = property_values.get(property_signature)
                 prop_error = property_errors.get(property_signature)
                 predicate_getter_values = _observe_property_getters(
                     session.web3, contract, contract_abis, predicate_getter_specs,
                     property_sender=session.property_sender)
             else:
+                if target_assertion_failure:
+                    property_values[property_signature] = False
+                    property_errors[property_signature] = "Panic(0x1): selected target assertion failed"
+                    prop_result = False
+                    prop_error = property_errors[property_signature]
                 predicate_getter_values = []
-            if receipt.status != 1:
+            if receipt.status != 1 and not target_assertion_failure:
                 valid = False
                 try:
                     session.web3.eth.call(rpc_tx)
@@ -1189,19 +1249,22 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                     prop_error = f"tx_revert: {type(exc).__name__}: {str(exc)[:300]}"
             expected_outcome = tx.get("expected_outcome")
             internal_revert = bool(trace["internal_errors"])
-            if internal_revert and expected_outcome != "rejection":
+            if internal_revert and expected_outcome != "rejection" and not target_assertion_failure:
                 valid = False
-            if expected_outcome == "rejection" and not internal_revert:
+            if expected_outcome == "rejection" and not internal_revert and not target_assertion_failure:
                 valid = False
-            if expected_outcome == "state_change" and trace["changed_storage_slot_count"] == 0:
+            if (expected_outcome == "state_change" and trace["changed_storage_slot_count"] == 0
+                    and not target_assertion_failure):
                 valid = False
             if (receipt.status == 1 and not internal_revert and
-                    effect["status"] == "not_observed"):
+                    effect["status"] == "not_observed" and
+                    signature != assertion_signature):
                 # The target function has Slither-backed writes whose public getter
                 # is observed, but none changed. This catches wrappers that swallow
                 # an internal revert while returning success to the outer caller.
                 valid = False
-            execution_class = ("trace_unavailable" if trace.get("trace_error") else
+            execution_class = ("target_assertion_failure" if target_assertion_failure else
+                               "trace_unavailable" if trace.get("trace_error") else
                                "outer_revert" if receipt.status != 1 else
                                "expected_rejection" if internal_revert and expected_outcome == "rejection" else
                                "unexpected_internal_revert" if internal_revert else
@@ -1265,6 +1328,11 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "state_fingerprint_before": last_state["fingerprint"],
                 "state_fingerprint_after": state_after["fingerprint"],
                 "target_property": prop_result,
+                "assertion_check": (property_values.get(property_signature)
+                                    if assertion_signature else None),
+                "assertion_failure_scope": (
+                    "selected_target_function" if target_assertion_failure else
+                    "not_target_assertion" if assertion_signature and receipt.status != 1 else None),
                 "property_error": prop_error,
                 "predicate_getter_values": predicate_getter_values,
                 "runtime_constraint_observations": runtime_observations,
@@ -1274,7 +1342,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
                 "other_property_violations_during_prevalidation": other_violations,
             })
             last_state = state_after
-            if receipt.status != 1:
+            if receipt.status != 1 and not target_assertion_failure:
                 break
         session.rpc("evm_revert", [deployment_snapshot])
         deployment_snapshot = None
@@ -1292,6 +1360,7 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
         return {"project": project, "contract_address": contract.address,
                 "deployment_status": "success" if deploy_receipt.status == 1 else "failed",
                 "candidate_id": candidate["candidate_id"],
+                "target_property_test_mode": "assertion" if assertion_signature else "boolean_property",
                 "replay_status": "executable" if valid else "replay_failed",
                 "target_property_violation": violation,
                 "initial_property_values": initial_property_values,
@@ -1486,7 +1555,13 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
     echidna_config.write_text("\n".join(config_lines), encoding="utf-8")
     crytic_args = ("--foundry-compile-all " if spec.get("foundry") else "") + \
         f"--config-file {compiler_config.resolve()}"
-    command = [ECHIDNA_BIN, spec["target"], "--contract", spec["contract"],
+    command_target = spec["target"]
+    if spec.get("foundry") and working_directory is not None:
+        # CryticCompile/Fuzz runs for Foundry projects from the project root.
+        # Keep the target relative (`.`) as Foundry smoke runs do; an absolute
+        # path makes CryticCompile mis-resolve generated `foundry-pp` units.
+        command_target = "."
+    command = [ECHIDNA_BIN, command_target, "--contract", spec["contract"],
                "--crytic-args", crytic_args,
                "--config", str(echidna_config.resolve()),
                "--test-limit", str(test_limit), "--seq-len", str(seq_len),
@@ -1519,7 +1594,14 @@ def run_echidna(project: str, corpus_root: Path, *, property_name: str,
         environment["FOUNDRY_OUT"] = str(build_root / "out")
         environment["FOUNDRY_CACHE_PATH"] = str(build_root / "cache")
     try:
-        run_cwd = ROOT if working_directory is None else Path(working_directory).resolve()
+        if working_directory is not None:
+            run_cwd = Path(working_directory).resolve()
+        elif spec.get("foundry") and conf.get("source_root"):
+            # Foundry projects with generated or relative import units must be
+            # compiled from their project root, as Foundry smoke invocations do.
+            run_cwd = (ROOT / conf["source_root"]).resolve()
+        else:
+            run_cwd = ROOT
         if not run_cwd.is_dir():
             raise FileNotFoundError(f"Echidna 工作目录不存在：{run_cwd}")
         result = subprocess.run(command, cwd=run_cwd, text=True, stdout=subprocess.PIPE,

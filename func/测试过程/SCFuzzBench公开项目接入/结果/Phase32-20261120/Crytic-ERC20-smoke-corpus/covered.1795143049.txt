@@ -1,0 +1,2731 @@
+/tmp/codex-phase32-properties-retry/contracts/ERC20/internal/properties/ERC20BasicProperties.sol
+   1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+   2 |     | pragma solidity ^0.8.13;
+   3 |     | 
+   4 |     | import "../util/ERC20TestBase.sol";
+   5 |     | 
+   6 |     | abstract contract CryticERC20BasicProperties is CryticERC20Base {
+   7 |     |     constructor() {}
+   8 |     | 
+   9 |     |     ////////////////////////////////////////
+  10 |     |     // Properties
+  11 |     | 
+  12 |     |     // Total supply should change only by means of mint or burn
+  13 | *   |     function test_ERC20_constantSupply() public virtual {
+  14 | *r  |         require(!isMintableOrBurnable);
+  15 |     |         assertEq(initialSupply, totalSupply(), "Token supply was modified");
+  16 |     |     }
+  17 |     | 
+  18 |     |     // User balance must not exceed total supply
+  19 |     |     function test_ERC20_userBalanceNotHigherThanSupply() public {
+  20 |     |         assertLte(
+  21 |     |             balanceOf(msg.sender),
+  22 |     |             totalSupply(),
+  23 |     |             "User balance higher than total supply"
+  24 |     |         );
+  25 |     |     }
+  26 |     | 
+  27 |     |     // Sum of users balance must not exceed total supply
+  28 |     |     function test_ERC20_usersBalancesNotHigherThanSupply() public {
+  29 |     |         uint256 balance = balanceOf(USER1) +
+  30 |     |             balanceOf(USER2) +
+  31 |     |             balanceOf(USER3);
+  32 |     |         assertLte(
+  33 |     |             balance,
+  34 |     |             totalSupply(),
+  35 |     |             "Sum of user balances higher than total supply"
+  36 |     |         );
+  37 |     |     }
+  38 |     | 
+  39 |     |     // Address zero should have zero balance
+  40 | *   |     function test_ERC20_zeroAddressBalance() public {
+  41 | *   |         assertEq(
+  42 | *   |             balanceOf(address(0)),
+  43 | *   |             0,
+  44 |     |             "Address zero balance not equal to zero"
+  45 |     |         );
+  46 |     |     }
+  47 |     | 
+  48 |     |     // Transfers to zero address should not be allowed
+  49 |     |     function test_ERC20_transferToZeroAddress() public {
+  50 |     |         uint256 balance = balanceOf(address(this));
+  51 |     |         require(balance > 0);
+  52 |     | 
+  53 |     |         bool r = transfer(address(0), balance);
+  54 |     |         assertWithMsg(r == false, "Successful transfer to address zero");
+  55 |     |     }
+  56 |     | 
+  57 |     |     // Transfers to zero address should not be allowed
+  58 |     |     function test_ERC20_transferFromToZeroAddress(uint256 value) public {
+  59 |     |         uint256 balance_sender = balanceOf(msg.sender);
+  60 |     |         uint256 current_allowance = allowance(msg.sender, address(this));
+  61 |     |         require(balance_sender > 0 && current_allowance > 0);
+  62 |     |         uint256 maxValue = balance_sender >= current_allowance
+  63 |     |             ? current_allowance
+  64 |     |             : balance_sender;
+  65 |     | 
+  66 |     |         bool r = transferFrom(msg.sender, address(0), value % (maxValue + 1));
+  67 |     |         assertWithMsg(r == false, "Successful transferFrom to address zero");
+  68 |     |     }
+  69 |     | 
+  70 |     |     // Self transfers should not break accounting
+  71 | *   |     function test_ERC20_selfTransferFrom(uint256 value) public {
+  72 | *   |         uint256 balance_sender = balanceOf(msg.sender);
+  73 | *   |         uint256 current_allowance = allowance(msg.sender, address(this));
+  74 | *r  |         require(balance_sender > 0 && current_allowance > 0);
+  75 |     |         uint256 maxValue = balance_sender >= current_allowance
+  76 |     |             ? current_allowance
+  77 |     |             : balance_sender;
+  78 |     | 
+  79 |     |         bool r = transferFrom(msg.sender, msg.sender, value % (maxValue + 1));
+  80 |     |         assertWithMsg(r == true, "Failed self transferFrom");
+  81 |     |         assertEq(
+  82 |     |             balance_sender,
+  83 |     |             balanceOf(msg.sender),
+  84 |     |             "Self transferFrom breaks accounting"
+  85 |     |         );
+  86 |     |     }
+  87 |     | 
+  88 |     |     // Self transfers should not break accounting
+  89 | *   |     function test_ERC20_selfTransfer(uint256 value) public {
+  90 | *   |         uint256 balance_sender = balanceOf(address(this));
+  91 | *r  |         require(balance_sender > 0);
+  92 |     | 
+  93 |     |         bool r = this.transfer(address(this), value % (balance_sender + 1));
+  94 |     |         assertWithMsg(r == true, "Failed self transfer");
+  95 |     |         assertEq(
+  96 |     |             balance_sender,
+  97 |     |             balanceOf(address(this)),
+  98 |     |             "Self transfer breaks accounting"
+  99 |     |         );
+ 100 |     |     }
+ 101 |     | 
+ 102 |     |     // Transfers for more than available balance should not be allowed
+ 103 | *   |     function test_ERC20_transferFromMoreThanBalance(address target) public {
+ 104 | *   |         uint256 balance_sender = balanceOf(msg.sender);
+ 105 | *   |         uint256 balance_receiver = balanceOf(target);
+ 106 | *   |         uint256 current_allowance = allowance(msg.sender, address(this));
+ 107 | *r  |         require(balance_sender > 0 && current_allowance > balance_sender);
+ 108 |     | 
+ 109 |     |         bool r = transferFrom(msg.sender, target, balance_sender + 1);
+ 110 |     |         assertWithMsg(
+ 111 |     |             r == false,
+ 112 |     |             "Successful transferFrom for more than account balance"
+ 113 |     |         );
+ 114 |     |         assertEq(
+ 115 |     |             balanceOf(msg.sender),
+ 116 |     |             balance_sender,
+ 117 |     |             "TransferFrom for more than balance modified source balance"
+ 118 |     |         );
+ 119 |     |         assertEq(
+ 120 |     |             balanceOf(target),
+ 121 |     |             balance_receiver,
+ 122 |     |             "TransferFrom for more than balance modified target balance"
+ 123 |     |         );
+ 124 |     |     }
+ 125 |     | 
+ 126 |     |     // Transfers for more than available balance should not be allowed
+ 127 |     |     function test_ERC20_transferMoreThanBalance(address target) public {
+ 128 |     |         uint256 balance_sender = balanceOf(address(this));
+ 129 |     |         uint256 balance_receiver = balanceOf(target);
+ 130 |     |         require(balance_sender > 0);
+ 131 |     | 
+ 132 |     |         bool r = this.transfer(target, balance_sender + 1);
+ 133 |     |         assertWithMsg(
+ 134 |     |             r == false,
+ 135 |     |             "Successful transfer for more than account balance"
+ 136 |     |         );
+ 137 |     |         assertEq(
+ 138 |     |             balanceOf(address(this)),
+ 139 |     |             balance_sender,
+ 140 |     |             "Transfer for more than balance modified source balance"
+ 141 |     |         );
+ 142 |     |         assertEq(
+ 143 |     |             balanceOf(target),
+ 144 |     |             balance_receiver,
+ 145 |     |             "Transfer for more than balance modified target balance"
+ 146 |     |         );
+ 147 |     |     }
+ 148 |     | 
+ 149 |     |     // Zero amount transfers should not break accounting
+ 150 |     |     function test_ERC20_transferZeroAmount(address target) public {
+ 151 |     |         uint256 balance_sender = balanceOf(address(this));
+ 152 |     |         uint256 balance_receiver = balanceOf(target);
+ 153 |     |         require(balance_sender > 0);
+ 154 |     | 
+ 155 |     |         bool r = transfer(target, 0);
+ 156 |     |         assertWithMsg(r == true, "Zero amount transfer failed");
+ 157 |     |         assertEq(
+ 158 |     |             balanceOf(address(this)),
+ 159 |     |             balance_sender,
+ 160 |     |             "Zero amount transfer modified source balance"
+ 161 |     |         );
+ 162 |     |         assertEq(
+ 163 |     |             balanceOf(target),
+ 164 |     |             balance_receiver,
+ 165 |     |             "Zero amount transfer modified target balance"
+ 166 |     |         );
+ 167 |     |     }
+ 168 |     | 
+ 169 |     |     // Zero amount transfers should not break accounting
+ 170 | *   |     function test_ERC20_transferFromZeroAmount(address target) public {
+ 171 | *   |         uint256 balance_sender = balanceOf(msg.sender);
+ 172 | *   |         uint256 balance_receiver = balanceOf(target);
+ 173 | *   |         uint256 current_allowance = allowance(msg.sender, address(this));
+ 174 | *r  |         require(balance_sender > 0 && current_allowance > 0);
+ 175 |     | 
+ 176 |     |         bool r = transferFrom(msg.sender, target, 0);
+ 177 |     |         assertWithMsg(r == true, "Zero amount transferFrom failed");
+ 178 |     |         assertEq(
+ 179 |     |             balanceOf(msg.sender),
+ 180 |     |             balance_sender,
+ 181 |     |             "Zero amount transferFrom modified source balance"
+ 182 |     |         );
+ 183 |     |         assertEq(
+ 184 |     |             balanceOf(target),
+ 185 |     |             balance_receiver,
+ 186 |     |             "Zero amount transferFrom modified target balance"
+ 187 |     |         );
+ 188 |     |     }
+ 189 |     | 
+ 190 |     |     // Transfers should update accounting correctly
+ 191 |     |     function test_ERC20_transfer(address target, uint256 amount) public {
+ 192 |     |         require(target != address(this));
+ 193 |     |         uint256 balance_sender = balanceOf(address(this));
+ 194 |     |         uint256 balance_receiver = balanceOf(target);
+ 195 |     |         require(balance_sender > 2);
+ 196 |     |         uint256 transfer_value = (amount % balance_sender) + 1;
+ 197 |     | 
+ 198 |     |         bool r = this.transfer(target, transfer_value);
+ 199 |     |         assertWithMsg(r == true, "transfer failed");
+ 200 |     |         assertEq(
+ 201 |     |             balanceOf(address(this)),
+ 202 |     |             balance_sender - transfer_value,
+ 203 |     |             "Wrong source balance after transfer"
+ 204 |     |         );
+ 205 |     |         assertEq(
+ 206 |     |             balanceOf(target),
+ 207 |     |             balance_receiver + transfer_value,
+ 208 |     |             "Wrong target balance after transfer"
+ 209 |     |         );
+ 210 |     |     }
+ 211 |     | 
+ 212 |     |     // Transfers should update accounting correctly
+ 213 |     |     function test_ERC20_transferFrom(address target, uint256 amount) public {
+ 214 |     |         require(target != address(this));
+ 215 |     |         require(target != msg.sender);
+ 216 |     |         uint256 balance_sender = balanceOf(msg.sender);
+ 217 |     |         uint256 balance_receiver = balanceOf(target);
+ 218 |     |         uint256 current_allowance = allowance(msg.sender, address(this));
+ 219 |     |         require(balance_sender > 2 && current_allowance > balance_sender);
+ 220 |     |         uint256 transfer_value = (amount % balance_sender) + 1;
+ 221 |     | 
+ 222 |     |         bool r = transferFrom(msg.sender, target, transfer_value);
+ 223 |     |         assertWithMsg(r == true, "transferFrom failed");
+ 224 |     |         assertEq(
+ 225 |     |             balanceOf(msg.sender),
+ 226 |     |             balance_sender - transfer_value,
+ 227 |     |             "Wrong source balance after transferFrom"
+ 228 |     |         );
+ 229 |     |         assertEq(
+ 230 |     |             balanceOf(target),
+ 231 |     |             balance_receiver + transfer_value,
+ 232 |     |             "Wrong target balance after transferFrom"
+ 233 |     |         );
+ 234 |     |     }
+ 235 |     | 
+ 236 |     |     // Approve should set correct allowances
+ 237 | *   |     function test_ERC20_setAllowance(address target, uint256 amount) public {
+ 238 | *   |         bool r = this.approve(target, amount);
+ 239 | *   |         assertWithMsg(r == true, "Failed to set allowance via approve");
+ 240 | *   |         assertEq(
+ 241 | *   |             allowance(address(this), target),
+ 242 | *   |             amount,
+ 243 |     |             "Allowance not set correctly"
+ 244 |     |         );
+ 245 |     |     }
+ 246 |     | 
+ 247 |     |     // Approve should set correct allowances
+ 248 | *   |     function test_ERC20_setAllowanceTwice(
+ 249 |     |         address target,
+ 250 |     |         uint256 amount
+ 251 | *   |     ) public {
+ 252 | *   |         bool r = this.approve(target, amount);
+ 253 | *   |         assertWithMsg(r == true, "Failed to set allowance via approve");
+ 254 | *   |         assertEq(
+ 255 | *   |             allowance(address(this), target),
+ 256 | *   |             amount,
+ 257 |     |             "Allowance not set correctly"
+ 258 |     |         );
+ 259 |     | 
+ 260 | *   |         r = this.approve(target, amount / 2);
+ 261 | *   |         assertWithMsg(r == true, "Failed to set allowance via approve");
+ 262 | *   |         assertEq(
+ 263 | *   |             allowance(address(this), target),
+ 264 | *   |             amount / 2,
+ 265 |     |             "Allowance not set correctly"
+ 266 |     |         );
+ 267 |     |     }
+ 268 |     | 
+ 269 |     |     // TransferFrom should decrease allowance
+ 270 | *   |     function test_ERC20_spendAllowanceAfterTransfer(
+ 271 |     |         address target,
+ 272 |     |         uint256 amount
+ 273 |     |     ) public {
+ 274 | *   |         require(target != address(this) && target != address(0));
+ 275 | *   |         require(target != msg.sender);
+ 276 | *   |         uint256 balance_sender = balanceOf(msg.sender);
+ 277 | *   |         uint256 current_allowance = allowance(msg.sender, address(this));
+ 278 | *r  |         require(balance_sender > 0 && current_allowance > balance_sender);
+ 279 |     |         uint256 transfer_value = (amount % balance_sender) + 1;
+ 280 |     | 
+ 281 |     |         bool r = this.transferFrom(msg.sender, target, transfer_value);
+ 282 |     |         assertWithMsg(r == true, "transferFrom failed");
+ 283 |     | 
+ 284 |     |         // Some implementations take an allowance of 2**256-1 as infinite, and therefore don't update
+ 285 |     |         if (current_allowance != type(uint256).max) {
+ 286 |     |             assertEq(
+ 287 |     |                 allowance(msg.sender, address(this)),
+ 288 |     |                 current_allowance - transfer_value,
+ 289 |     |                 "Allowance not updated correctly"
+ 290 |     |             );
+ 291 |     |         }
+ 292 |     |     }
+ 293 |     | }
+ 294 |     | 
+
+/tmp/codex-phase32-properties-retry/contracts/ERC20/internal/util/ERC20TestBase.sol
+  1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+  2 |     | pragma solidity ^0.8.0;
+  3 |     | 
+  4 |     | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+  5 |     | import "../../../util/PropertiesConstants.sol";
+  6 |     | import "../../../util/PropertiesAsserts.sol";
+  7 |     | 
+  8 |     | abstract contract CryticERC20Base is
+  9 |     |     ERC20,
+ 10 |     |     PropertiesAsserts,
+ 11 |     |     PropertiesConstants
+ 12 |     | {
+ 13 |     |     // Initial supply after deploying
+ 14 |     |     uint256 initialSupply;
+ 15 |     | 
+ 16 |     |     // Is the contract allowed to change its total supply?
+ 17 |     |     bool isMintableOrBurnable;
+ 18 |     | 
+ 19 |     |     constructor() {}
+ 20 |     | }
+ 21 |     | 
+
+/tmp/codex-phase32-properties-retry/contracts/util/PropertiesAsserts.sol
+   1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+   2 |     | pragma solidity ^0.8.0;
+   3 |     | 
+   4 |     | abstract contract PropertiesAsserts {
+   5 |     |     event LogUint256(string, uint256);
+   6 |     |     event LogAddress(string, address);
+   7 |     |     event LogString(string);
+   8 |     | 
+   9 |     |     event AssertFail(string);
+  10 |     |     event AssertEqFail(string);
+  11 |     |     event AssertNeqFail(string);
+  12 |     |     event AssertGteFail(string);
+  13 |     |     event AssertGtFail(string);
+  14 |     |     event AssertLteFail(string);
+  15 |     |     event AssertLtFail(string);
+  16 |     | 
+  17 | *   |     function assertWithMsg(bool b, string memory reason) internal {
+  18 | *   |         if (!b) {
+  19 |     |             emit AssertFail(reason);
+  20 |     |             assert(false);
+  21 |     |         }
+  22 |     |     }
+  23 |     | 
+  24 |     |     /// @notice asserts that a is equal to b. Violations are logged using reason.
+  25 | *   |     function assertEq(uint256 a, uint256 b, string memory reason) internal {
+  26 | *   |         if (a != b) {
+  27 |     |             string memory aStr = PropertiesLibString.toString(a);
+  28 |     |             string memory bStr = PropertiesLibString.toString(b);
+  29 |     |             bytes memory assertMsg = abi.encodePacked(
+  30 |     |                 "Invalid: ",
+  31 |     |                 aStr,
+  32 |     |                 "!=",
+  33 |     |                 bStr,
+  34 |     |                 ", reason: ",
+  35 |     |                 reason
+  36 |     |             );
+  37 |     |             emit AssertEqFail(string(assertMsg));
+  38 |     |             assert(false);
+  39 |     |         }
+  40 |     |     }
+  41 |     | 
+  42 |     |     /// @notice int256 version of assertEq
+  43 |     |     function assertEq(int256 a, int256 b, string memory reason) internal {
+  44 |     |         if (a != b) {
+  45 |     |             string memory aStr = PropertiesLibString.toString(a);
+  46 |     |             string memory bStr = PropertiesLibString.toString(b);
+  47 |     |             bytes memory assertMsg = abi.encodePacked(
+  48 |     |                 "Invalid: ",
+  49 |     |                 aStr,
+  50 |     |                 "!=",
+  51 |     |                 bStr,
+  52 |     |                 ", reason: ",
+  53 |     |                 reason
+  54 |     |             );
+  55 |     |             emit AssertEqFail(string(assertMsg));
+  56 |     |             assert(false);
+  57 |     |         }
+  58 |     |     }
+  59 |     | 
+  60 |     |     /// @notice asserts that a is not equal to b. Violations are logged using reason.
+  61 |     |     function assertNeq(uint256 a, uint256 b, string memory reason) internal {
+  62 |     |         if (a == b) {
+  63 |     |             string memory aStr = PropertiesLibString.toString(a);
+  64 |     |             string memory bStr = PropertiesLibString.toString(b);
+  65 |     |             bytes memory assertMsg = abi.encodePacked(
+  66 |     |                 "Invalid: ",
+  67 |     |                 aStr,
+  68 |     |                 "==",
+  69 |     |                 bStr,
+  70 |     |                 ", reason: ",
+  71 |     |                 reason
+  72 |     |             );
+  73 |     |             emit AssertNeqFail(string(assertMsg));
+  74 |     |             assert(false);
+  75 |     |         }
+  76 |     |     }
+  77 |     | 
+  78 |     |     /// @notice int256 version of assertNeq
+  79 |     |     function assertNeq(int256 a, int256 b, string memory reason) internal {
+  80 |     |         if (a == b) {
+  81 |     |             string memory aStr = PropertiesLibString.toString(a);
+  82 |     |             string memory bStr = PropertiesLibString.toString(b);
+  83 |     |             bytes memory assertMsg = abi.encodePacked(
+  84 |     |                 "Invalid: ",
+  85 |     |                 aStr,
+  86 |     |                 "==",
+  87 |     |                 bStr,
+  88 |     |                 ", reason: ",
+  89 |     |                 reason
+  90 |     |             );
+  91 |     |             emit AssertNeqFail(string(assertMsg));
+  92 |     |             assert(false);
+  93 |     |         }
+  94 |     |     }
+  95 |     | 
+  96 |     |     /// @notice asserts that a is greater than or equal to b. Violations are logged using reason.
+  97 |     |     function assertGte(uint256 a, uint256 b, string memory reason) internal {
+  98 |     |         if (!(a >= b)) {
+  99 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 100 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 101 |     |             bytes memory assertMsg = abi.encodePacked(
+ 102 |     |                 "Invalid: ",
+ 103 |     |                 aStr,
+ 104 |     |                 "<",
+ 105 |     |                 bStr,
+ 106 |     |                 " failed, reason: ",
+ 107 |     |                 reason
+ 108 |     |             );
+ 109 |     |             emit AssertGteFail(string(assertMsg));
+ 110 |     |             assert(false);
+ 111 |     |         }
+ 112 |     |     }
+ 113 |     | 
+ 114 |     |     /// @notice int256 version of assertGte
+ 115 |     |     function assertGte(int256 a, int256 b, string memory reason) internal {
+ 116 |     |         if (!(a >= b)) {
+ 117 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 118 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 119 |     |             bytes memory assertMsg = abi.encodePacked(
+ 120 |     |                 "Invalid: ",
+ 121 |     |                 aStr,
+ 122 |     |                 "<",
+ 123 |     |                 bStr,
+ 124 |     |                 " failed, reason: ",
+ 125 |     |                 reason
+ 126 |     |             );
+ 127 |     |             emit AssertGteFail(string(assertMsg));
+ 128 |     |             assert(false);
+ 129 |     |         }
+ 130 |     |     }
+ 131 |     | 
+ 132 |     |     /// @notice asserts that a is greater than b. Violations are logged using reason.
+ 133 |     |     function assertGt(uint256 a, uint256 b, string memory reason) internal {
+ 134 |     |         if (!(a > b)) {
+ 135 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 136 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 137 |     |             bytes memory assertMsg = abi.encodePacked(
+ 138 |     |                 "Invalid: ",
+ 139 |     |                 aStr,
+ 140 |     |                 "<=",
+ 141 |     |                 bStr,
+ 142 |     |                 " failed, reason: ",
+ 143 |     |                 reason
+ 144 |     |             );
+ 145 |     |             emit AssertGtFail(string(assertMsg));
+ 146 |     |             assert(false);
+ 147 |     |         }
+ 148 |     |     }
+ 149 |     | 
+ 150 |     |     /// @notice int256 version of assertGt
+ 151 |     |     function assertGt(int256 a, int256 b, string memory reason) internal {
+ 152 |     |         if (!(a > b)) {
+ 153 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 154 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 155 |     |             bytes memory assertMsg = abi.encodePacked(
+ 156 |     |                 "Invalid: ",
+ 157 |     |                 aStr,
+ 158 |     |                 "<=",
+ 159 |     |                 bStr,
+ 160 |     |                 " failed, reason: ",
+ 161 |     |                 reason
+ 162 |     |             );
+ 163 |     |             emit AssertGtFail(string(assertMsg));
+ 164 |     |             assert(false);
+ 165 |     |         }
+ 166 |     |     }
+ 167 |     | 
+ 168 |     |     /// @notice asserts that a is less than or equal to b. Violations are logged using reason.
+ 169 |     |     function assertLte(uint256 a, uint256 b, string memory reason) internal {
+ 170 |     |         if (!(a <= b)) {
+ 171 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 172 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 173 |     |             bytes memory assertMsg = abi.encodePacked(
+ 174 |     |                 "Invalid: ",
+ 175 |     |                 aStr,
+ 176 |     |                 ">",
+ 177 |     |                 bStr,
+ 178 |     |                 " failed, reason: ",
+ 179 |     |                 reason
+ 180 |     |             );
+ 181 |     |             emit AssertLteFail(string(assertMsg));
+ 182 |     |             assert(false);
+ 183 |     |         }
+ 184 |     |     }
+ 185 |     | 
+ 186 |     |     /// @notice int256 version of assertLte
+ 187 |     |     function assertLte(int256 a, int256 b, string memory reason) internal {
+ 188 |     |         if (!(a <= b)) {
+ 189 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 190 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 191 |     |             bytes memory assertMsg = abi.encodePacked(
+ 192 |     |                 "Invalid: ",
+ 193 |     |                 aStr,
+ 194 |     |                 ">",
+ 195 |     |                 bStr,
+ 196 |     |                 " failed, reason: ",
+ 197 |     |                 reason
+ 198 |     |             );
+ 199 |     |             emit AssertLteFail(string(assertMsg));
+ 200 |     |             assert(false);
+ 201 |     |         }
+ 202 |     |     }
+ 203 |     | 
+ 204 |     |     /// @notice asserts that a is less than b. Violations are logged using reason.
+ 205 |     |     function assertLt(uint256 a, uint256 b, string memory reason) internal {
+ 206 |     |         if (!(a < b)) {
+ 207 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 208 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 209 |     |             bytes memory assertMsg = abi.encodePacked(
+ 210 |     |                 "Invalid: ",
+ 211 |     |                 aStr,
+ 212 |     |                 ">=",
+ 213 |     |                 bStr,
+ 214 |     |                 " failed, reason: ",
+ 215 |     |                 reason
+ 216 |     |             );
+ 217 |     |             emit AssertLtFail(string(assertMsg));
+ 218 |     |             assert(false);
+ 219 |     |         }
+ 220 |     |     }
+ 221 |     | 
+ 222 |     |     /// @notice int256 version of assertLt
+ 223 |     |     function assertLt(int256 a, int256 b, string memory reason) internal {
+ 224 |     |         if (!(a < b)) {
+ 225 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 226 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 227 |     |             bytes memory assertMsg = abi.encodePacked(
+ 228 |     |                 "Invalid: ",
+ 229 |     |                 aStr,
+ 230 |     |                 ">=",
+ 231 |     |                 bStr,
+ 232 |     |                 " failed, reason: ",
+ 233 |     |                 reason
+ 234 |     |             );
+ 235 |     |             emit AssertLtFail(string(assertMsg));
+ 236 |     |             assert(false);
+ 237 |     |         }
+ 238 |     |     }
+ 239 |     | 
+ 240 |     |     /// @notice Clamps value to be between low and high, both inclusive
+ 241 |     |     function clampBetween(
+ 242 |     |         uint256 value,
+ 243 |     |         uint256 low,
+ 244 |     |         uint256 high
+ 245 |     |     ) internal returns (uint256) {
+ 246 |     |         if (value < low || value > high) {
+ 247 |     |             uint ans = low + (value % (high - low + 1));
+ 248 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 249 |     |             string memory ansStr = PropertiesLibString.toString(ans);
+ 250 |     |             bytes memory message = abi.encodePacked(
+ 251 |     |                 "Clamping value ",
+ 252 |     |                 valueStr,
+ 253 |     |                 " to ",
+ 254 |     |                 ansStr
+ 255 |     |             );
+ 256 |     |             emit LogString(string(message));
+ 257 |     |             return ans;
+ 258 |     |         }
+ 259 |     |         return value;
+ 260 |     |     }
+ 261 |     | 
+ 262 |     |     /// @notice int256 version of clampBetween
+ 263 |     |     function clampBetween(
+ 264 |     |         int256 value,
+ 265 |     |         int256 low,
+ 266 |     |         int256 high
+ 267 |     |     ) internal returns (int256) {
+ 268 |     |         if (value < low || value > high) {
+ 269 |     |             int range = high - low + 1;
+ 270 |     |             int clamped = (value - low) % (range);
+ 271 |     |             if (clamped < 0) clamped += range;
+ 272 |     |             int ans = low + clamped;
+ 273 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 274 |     |             string memory ansStr = PropertiesLibString.toString(ans);
+ 275 |     |             bytes memory message = abi.encodePacked(
+ 276 |     |                 "Clamping value ",
+ 277 |     |                 valueStr,
+ 278 |     |                 " to ",
+ 279 |     |                 ansStr
+ 280 |     |             );
+ 281 |     |             emit LogString(string(message));
+ 282 |     |             return ans;
+ 283 |     |         }
+ 284 |     |         return value;
+ 285 |     |     }
+ 286 |     | 
+ 287 |     |     /// @notice clamps a to be less than b
+ 288 |     |     function clampLt(uint256 a, uint256 b) internal returns (uint256) {
+ 289 |     |         if (!(a < b)) {
+ 290 |     |             assertNeq(
+ 291 |     |                 b,
+ 292 |     |                 0,
+ 293 |     |                 "clampLt cannot clamp value a to be less than zero. Check your inputs/assumptions."
+ 294 |     |             );
+ 295 |     |             uint256 value = a % b;
+ 296 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 297 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 298 |     |             bytes memory message = abi.encodePacked(
+ 299 |     |                 "Clamping value ",
+ 300 |     |                 aStr,
+ 301 |     |                 " to ",
+ 302 |     |                 valueStr
+ 303 |     |             );
+ 304 |     |             emit LogString(string(message));
+ 305 |     |             return value;
+ 306 |     |         }
+ 307 |     |         return a;
+ 308 |     |     }
+ 309 |     | 
+ 310 |     |     /// @notice int256 version of clampLt
+ 311 |     |     function clampLt(int256 a, int256 b) internal returns (int256) {
+ 312 |     |         if (!(a < b)) {
+ 313 |     |             int256 value = b - 1;
+ 314 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 315 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 316 |     |             bytes memory message = abi.encodePacked(
+ 317 |     |                 "Clamping value ",
+ 318 |     |                 aStr,
+ 319 |     |                 " to ",
+ 320 |     |                 valueStr
+ 321 |     |             );
+ 322 |     |             emit LogString(string(message));
+ 323 |     |             return value;
+ 324 |     |         }
+ 325 |     |         return a;
+ 326 |     |     }
+ 327 |     | 
+ 328 |     |     /// @notice clamps a to be less than or equal to b
+ 329 |     |     function clampLte(uint256 a, uint256 b) internal returns (uint256) {
+ 330 |     |         if (!(a <= b)) {
+ 331 |     |             uint256 value = a % (b + 1);
+ 332 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 333 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 334 |     |             bytes memory message = abi.encodePacked(
+ 335 |     |                 "Clamping value ",
+ 336 |     |                 aStr,
+ 337 |     |                 " to ",
+ 338 |     |                 valueStr
+ 339 |     |             );
+ 340 |     |             emit LogString(string(message));
+ 341 |     |             return value;
+ 342 |     |         }
+ 343 |     |         return a;
+ 344 |     |     }
+ 345 |     | 
+ 346 |     |     /// @notice int256 version of clampLte
+ 347 |     |     function clampLte(int256 a, int256 b) internal returns (int256) {
+ 348 |     |         if (!(a <= b)) {
+ 349 |     |             int256 value = b;
+ 350 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 351 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 352 |     |             bytes memory message = abi.encodePacked(
+ 353 |     |                 "Clamping value ",
+ 354 |     |                 aStr,
+ 355 |     |                 " to ",
+ 356 |     |                 valueStr
+ 357 |     |             );
+ 358 |     |             emit LogString(string(message));
+ 359 |     |             return value;
+ 360 |     |         }
+ 361 |     |         return a;
+ 362 |     |     }
+ 363 |     | 
+ 364 |     |     /// @notice clamps a to be greater than b
+ 365 |     |     function clampGt(uint256 a, uint256 b) internal returns (uint256) {
+ 366 |     |         if (!(a > b)) {
+ 367 |     |             assertNeq(
+ 368 |     |                 b,
+ 369 |     |                 type(uint256).max,
+ 370 |     |                 "clampGt cannot clamp value a to be larger than uint256.max. Check your inputs/assumptions."
+ 371 |     |             );
+ 372 |     |             uint256 value = b + 1;
+ 373 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 374 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 375 |     |             bytes memory message = abi.encodePacked(
+ 376 |     |                 "Clamping value ",
+ 377 |     |                 aStr,
+ 378 |     |                 " to ",
+ 379 |     |                 valueStr
+ 380 |     |             );
+ 381 |     |             emit LogString(string(message));
+ 382 |     |             return value;
+ 383 |     |         } else {
+ 384 |     |             return a;
+ 385 |     |         }
+ 386 |     |     }
+ 387 |     | 
+ 388 |     |     /// @notice int256 version of clampGt
+ 389 |     |     function clampGt(int256 a, int256 b) internal returns (int256) {
+ 390 |     |         if (!(a > b)) {
+ 391 |     |             int256 value = b + 1;
+ 392 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 393 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 394 |     |             bytes memory message = abi.encodePacked(
+ 395 |     |                 "Clamping value ",
+ 396 |     |                 aStr,
+ 397 |     |                 " to ",
+ 398 |     |                 valueStr
+ 399 |     |             );
+ 400 |     |             emit LogString(string(message));
+ 401 |     |             return value;
+ 402 |     |         } else {
+ 403 |     |             return a;
+ 404 |     |         }
+ 405 |     |     }
+ 406 |     | 
+ 407 |     |     /// @notice clamps a to be greater than or equal to b
+ 408 |     |     function clampGte(uint256 a, uint256 b) internal returns (uint256) {
+ 409 |     |         if (!(a > b)) {
+ 410 |     |             uint256 value = b;
+ 411 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 412 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 413 |     |             bytes memory message = abi.encodePacked(
+ 414 |     |                 "Clamping value ",
+ 415 |     |                 aStr,
+ 416 |     |                 " to ",
+ 417 |     |                 valueStr
+ 418 |     |             );
+ 419 |     |             emit LogString(string(message));
+ 420 |     |             return value;
+ 421 |     |         }
+ 422 |     |         return a;
+ 423 |     |     }
+ 424 |     | 
+ 425 |     |     /// @notice int256 version of clampGte
+ 426 |     |     function clampGte(int256 a, int256 b) internal returns (int256) {
+ 427 |     |         if (!(a > b)) {
+ 428 |     |             int256 value = b;
+ 429 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 430 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 431 |     |             bytes memory message = abi.encodePacked(
+ 432 |     |                 "Clamping value ",
+ 433 |     |                 aStr,
+ 434 |     |                 " to ",
+ 435 |     |                 valueStr
+ 436 |     |             );
+ 437 |     |             emit LogString(string(message));
+ 438 |     |             return value;
+ 439 |     |         }
+ 440 |     |         return a;
+ 441 |     |     }
+ 442 |     | }
+ 443 |     | 
+ 444 |     | /// @notice Efficient library for creating string representations of integers.
+ 445 |     | /// @author Solmate (https://github.com/transmissions11/solmate/blob/main/src/utils/LibString.sol)
+ 446 |     | /// @author Modified from Solady (https://github.com/Vectorized/solady/blob/main/src/utils/LibString.sol)
+ 447 |     | /// @dev Name of the library is modified to prevent collisions with contract-under-test uses of LibString
+ 448 |     | library PropertiesLibString {
+ 449 |     |     function toString(int256 value) internal pure returns (string memory str) {
+ 450 |     |         uint256 absValue = value >= 0 ? uint256(value) : uint256(-value);
+ 451 |     |         str = toString(absValue);
+ 452 |     | 
+ 453 |     |         if (value < 0) {
+ 454 |     |             str = string(abi.encodePacked("-", str));
+ 455 |     |         }
+ 456 |     |     }
+ 457 |     | 
+ 458 |     |     function toString(uint256 value) internal pure returns (string memory str) {
+ 459 |     |         /// @solidity memory-safe-assembly
+ 460 |     |         assembly {
+ 461 |     |             // The maximum value of a uint256 contains 78 digits (1 byte per digit), but we allocate 160 bytes
+ 462 |     |             // to keep the free memory pointer word aligned. We'll need 1 word for the length, 1 word for the
+ 463 |     |             // trailing zeros padding, and 3 other words for a max of 78 digits. In total: 5 * 32 = 160 bytes.
+ 464 |     |             let newFreeMemoryPointer := add(mload(0x40), 160)
+ 465 |     | 
+ 466 |     |             // Update the free memory pointer to avoid overriding our string.
+ 467 |     |             mstore(0x40, newFreeMemoryPointer)
+ 468 |     | 
+ 469 |     |             // Assign str to the end of the zone of newly allocated memory.
+ 470 |     |             str := sub(newFreeMemoryPointer, 32)
+ 471 |     | 
+ 472 |     |             // Clean the last word of memory it may not be overwritten.
+ 473 |     |             mstore(str, 0)
+ 474 |     | 
+ 475 |     |             // Cache the end of the memory to calculate the length later.
+ 476 |     |             let end := str
+ 477 |     | 
+ 478 |     |             // We write the string from rightmost digit to leftmost digit.
+ 479 |     |             // The following is essentially a do-while loop that also handles the zero case.
+ 480 |     |             // prettier-ignore
+ 481 |     |             for { let temp := value } 1 {} {
+ 482 |     |                 // Move the pointer 1 byte to the left.
+ 483 |     |                 str := sub(str, 1)
+ 484 |     | 
+ 485 |     |                 // Write the character to the pointer.
+ 486 |     |                 // The ASCII index of the '0' character is 48.
+ 487 |     |                 mstore8(str, add(48, mod(temp, 10)))
+ 488 |     | 
+ 489 |     |                 // Keep dividing temp until zero.
+ 490 |     |                 temp := div(temp, 10)
+ 491 |     | 
+ 492 |     |                  // prettier-ignore
+ 493 |     |                 if iszero(temp) { break }
+ 494 |     |             }
+ 495 |     | 
+ 496 |     |             // Compute and cache the final total length of the string.
+ 497 |     |             let length := sub(end, str)
+ 498 |     | 
+ 499 |     |             // Move the pointer 32 bytes leftwards to make room for the length.
+ 500 |     |             str := sub(str, 32)
+ 501 |     | 
+ 502 |     |             // Store the string's length at the start of memory allocated for our string.
+ 503 |     |             mstore(str, length)
+ 504 |     |         }
+ 505 |     |     }
+ 506 |     | 
+ 507 |     |     function toString(address value) internal pure returns (string memory str) {
+ 508 |     |         bytes memory s = new bytes(40);
+ 509 |     |         for (uint i = 0; i < 20; i++) {
+ 510 |     |             bytes1 b = bytes1(
+ 511 |     |                 uint8(uint(uint160(value)) / (2 ** (8 * (19 - i))))
+ 512 |     |             );
+ 513 |     |             bytes1 hi = bytes1(uint8(b) / 16);
+ 514 |     |             bytes1 lo = bytes1(uint8(b) - 16 * uint8(hi));
+ 515 |     |             s[2 * i] = char(hi);
+ 516 |     |             s[2 * i + 1] = char(lo);
+ 517 |     |         }
+ 518 |     |         return string(s);
+ 519 |     |     }
+ 520 |     | 
+ 521 |     |     function char(bytes1 b) internal pure returns (bytes1 c) {
+ 522 |     |         if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
+ 523 |     |         else return bytes1(uint8(b) + 0x57);
+ 524 |     |     }
+ 525 |     | }
+ 526 |     | 
+
+/tmp/codex-phase32-properties-retry/contracts/util/PropertiesConstants.sol
+  1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+  2 |     | pragma solidity ^0.8.0;
+  3 |     | 
+  4 |     | abstract contract PropertiesConstants {
+  5 |     |     // Constant echidna addresses
+  6 | *   |     address constant USER1 = address(0x10000);
+  7 | *   |     address constant USER2 = address(0x20000);
+  8 | *   |     address constant USER3 = address(0x30000);
+  9 | *   |     uint256 constant INITIAL_BALANCE = 1000e18;
+ 10 |     | }
+ 11 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/access/Ownable.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v4.7.0) (access/Ownable.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | import "../utils/Context.sol";
+  7 |     | 
+  8 |     | /**
+  9 |     |  * @dev Contract module which provides a basic access control mechanism, where
+ 10 |     |  * there is an account (an owner) that can be granted exclusive access to
+ 11 |     |  * specific functions.
+ 12 |     |  *
+ 13 |     |  * By default, the owner account will be the one that deploys the contract. This
+ 14 |     |  * can later be changed with {transferOwnership}.
+ 15 |     |  *
+ 16 |     |  * This module is used through inheritance. It will make available the modifier
+ 17 |     |  * `onlyOwner`, which can be applied to your functions to restrict their use to
+ 18 |     |  * the owner.
+ 19 |     |  */
+ 20 |     | abstract contract Ownable is Context {
+ 21 |     |     address private _owner;
+ 22 |     | 
+ 23 |     |     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+ 24 |     | 
+ 25 |     |     /**
+ 26 |     |      * @dev Initializes the contract setting the deployer as the initial owner.
+ 27 |     |      */
+ 28 |     |     constructor() {
+ 29 | *   |         _transferOwnership(_msgSender());
+ 30 |     |     }
+ 31 |     | 
+ 32 |     |     /**
+ 33 |     |      * @dev Throws if called by any account other than the owner.
+ 34 |     |      */
+ 35 |     |     modifier onlyOwner() {
+ 36 | *   |         _checkOwner();
+ 37 |     |         _;
+ 38 |     |     }
+ 39 |     | 
+ 40 |     |     /**
+ 41 |     |      * @dev Returns the address of the current owner.
+ 42 |     |      */
+ 43 | *   |     function owner() public view virtual returns (address) {
+ 44 | *   |         return _owner;
+ 45 |     |     }
+ 46 |     | 
+ 47 |     |     /**
+ 48 |     |      * @dev Throws if the sender is not the owner.
+ 49 |     |      */
+ 50 | *   |     function _checkOwner() internal view virtual {
+ 51 | *r  |         require(owner() == _msgSender(), "Ownable: caller is not the owner");
+ 52 |     |     }
+ 53 |     | 
+ 54 |     |     /**
+ 55 |     |      * @dev Leaves the contract without owner. It will not be possible to call
+ 56 |     |      * `onlyOwner` functions anymore. Can only be called by the current owner.
+ 57 |     |      *
+ 58 |     |      * NOTE: Renouncing ownership will leave the contract without an owner,
+ 59 |     |      * thereby removing any functionality that is only available to the owner.
+ 60 |     |      */
+ 61 |     |     function renounceOwnership() public virtual onlyOwner {
+ 62 |     |         _transferOwnership(address(0));
+ 63 |     |     }
+ 64 |     | 
+ 65 |     |     /**
+ 66 |     |      * @dev Transfers ownership of the contract to a new account (`newOwner`).
+ 67 |     |      * Can only be called by the current owner.
+ 68 |     |      */
+ 69 | *   |     function transferOwnership(address newOwner) public virtual onlyOwner {
+ 70 |     |         require(newOwner != address(0), "Ownable: new owner is the zero address");
+ 71 |     |         _transferOwnership(newOwner);
+ 72 |     |     }
+ 73 |     | 
+ 74 |     |     /**
+ 75 |     |      * @dev Transfers ownership of the contract to a new account (`newOwner`).
+ 76 |     |      * Internal function without access restriction.
+ 77 |     |      */
+ 78 | *   |     function _transferOwnership(address newOwner) internal virtual {
+ 79 | *   |         address oldOwner = _owner;
+ 80 | *   |         _owner = newOwner;
+ 81 | *   |         emit OwnershipTransferred(oldOwner, newOwner);
+ 82 |     |     }
+ 83 |     | }
+ 84 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/security/Pausable.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v4.7.0) (security/Pausable.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.0;
+   5 |     | 
+   6 |     | import "../utils/Context.sol";
+   7 |     | 
+   8 |     | /**
+   9 |     |  * @dev Contract module which allows children to implement an emergency stop
+  10 |     |  * mechanism that can be triggered by an authorized account.
+  11 |     |  *
+  12 |     |  * This module is used through inheritance. It will make available the
+  13 |     |  * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
+  14 |     |  * the functions of your contract. Note that they will not be pausable by
+  15 |     |  * simply including this module, only once the modifiers are put in place.
+  16 |     |  */
+  17 |     | abstract contract Pausable is Context {
+  18 |     |     /**
+  19 |     |      * @dev Emitted when the pause is triggered by `account`.
+  20 |     |      */
+  21 |     |     event Paused(address account);
+  22 |     | 
+  23 |     |     /**
+  24 |     |      * @dev Emitted when the pause is lifted by `account`.
+  25 |     |      */
+  26 |     |     event Unpaused(address account);
+  27 |     | 
+  28 |     |     bool private _paused;
+  29 |     | 
+  30 |     |     /**
+  31 |     |      * @dev Initializes the contract in unpaused state.
+  32 |     |      */
+  33 |     |     constructor() {
+  34 | *   |         _paused = false;
+  35 |     |     }
+  36 |     | 
+  37 |     |     /**
+  38 |     |      * @dev Modifier to make a function callable only when the contract is not paused.
+  39 |     |      *
+  40 |     |      * Requirements:
+  41 |     |      *
+  42 |     |      * - The contract must not be paused.
+  43 |     |      */
+  44 |     |     modifier whenNotPaused() {
+  45 |     |         _requireNotPaused();
+  46 |     |         _;
+  47 |     |     }
+  48 |     | 
+  49 |     |     /**
+  50 |     |      * @dev Modifier to make a function callable only when the contract is paused.
+  51 |     |      *
+  52 |     |      * Requirements:
+  53 |     |      *
+  54 |     |      * - The contract must be paused.
+  55 |     |      */
+  56 |     |     modifier whenPaused() {
+  57 |     |         _requirePaused();
+  58 |     |         _;
+  59 |     |     }
+  60 |     | 
+  61 |     |     /**
+  62 |     |      * @dev Returns true if the contract is paused, and false otherwise.
+  63 |     |      */
+  64 |     |     function paused() public view virtual returns (bool) {
+  65 |     |         return _paused;
+  66 |     |     }
+  67 |     | 
+  68 |     |     /**
+  69 |     |      * @dev Throws if the contract is paused.
+  70 |     |      */
+  71 |     |     function _requireNotPaused() internal view virtual {
+  72 |     |         require(!paused(), "Pausable: paused");
+  73 |     |     }
+  74 |     | 
+  75 |     |     /**
+  76 |     |      * @dev Throws if the contract is not paused.
+  77 |     |      */
+  78 |     |     function _requirePaused() internal view virtual {
+  79 |     |         require(paused(), "Pausable: not paused");
+  80 |     |     }
+  81 |     | 
+  82 |     |     /**
+  83 |     |      * @dev Triggers stopped state.
+  84 |     |      *
+  85 |     |      * Requirements:
+  86 |     |      *
+  87 |     |      * - The contract must not be paused.
+  88 |     |      */
+  89 |     |     function _pause() internal virtual whenNotPaused {
+  90 |     |         _paused = true;
+  91 |     |         emit Paused(_msgSender());
+  92 |     |     }
+  93 |     | 
+  94 |     |     /**
+  95 |     |      * @dev Returns to normal state.
+  96 |     |      *
+  97 |     |      * Requirements:
+  98 |     |      *
+  99 |     |      * - The contract must be paused.
+ 100 |     |      */
+ 101 |     |     function _unpause() internal virtual whenPaused {
+ 102 |     |         _paused = false;
+ 103 |     |         emit Unpaused(_msgSender());
+ 104 |     |     }
+ 105 |     | }
+ 106 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v4.8.0) (token/ERC20/ERC20.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.0;
+   5 |     | 
+   6 |     | import "./IERC20.sol";
+   7 |     | import "./extensions/IERC20Metadata.sol";
+   8 |     | import "../../utils/Context.sol";
+   9 |     | 
+  10 |     | /**
+  11 |     |  * @dev Implementation of the {IERC20} interface.
+  12 |     |  *
+  13 |     |  * This implementation is agnostic to the way tokens are created. This means
+  14 |     |  * that a supply mechanism has to be added in a derived contract using {_mint}.
+  15 |     |  * For a generic mechanism see {ERC20PresetMinterPauser}.
+  16 |     |  *
+  17 |     |  * TIP: For a detailed writeup see our guide
+  18 |     |  * https://forum.openzeppelin.com/t/how-to-implement-erc20-supply-mechanisms/226[How
+  19 |     |  * to implement supply mechanisms].
+  20 |     |  *
+  21 |     |  * The default value of {decimals} is 18. To change this, you should override
+  22 |     |  * this function so it returns a different value.
+  23 |     |  *
+  24 |     |  * We have followed general OpenZeppelin Contracts guidelines: functions revert
+  25 |     |  * instead returning `false` on failure. This behavior is nonetheless
+  26 |     |  * conventional and does not conflict with the expectations of ERC20
+  27 |     |  * applications.
+  28 |     |  *
+  29 |     |  * Additionally, an {Approval} event is emitted on calls to {transferFrom}.
+  30 |     |  * This allows applications to reconstruct the allowance for all accounts just
+  31 |     |  * by listening to said events. Other implementations of the EIP may not emit
+  32 |     |  * these events, as it isn't required by the specification.
+  33 |     |  *
+  34 |     |  * Finally, the non-standard {decreaseAllowance} and {increaseAllowance}
+  35 |     |  * functions have been added to mitigate the well-known issues around setting
+  36 |     |  * allowances. See {IERC20-approve}.
+  37 |     |  */
+  38 |     | contract ERC20 is Context, IERC20, IERC20Metadata {
+  39 |     |     mapping(address => uint256) private _balances;
+  40 |     | 
+  41 |     |     mapping(address => mapping(address => uint256)) private _allowances;
+  42 |     | 
+  43 |     |     uint256 private _totalSupply;
+  44 |     | 
+  45 |     |     string private _name;
+  46 |     |     string private _symbol;
+  47 |     | 
+  48 |     |     /**
+  49 |     |      * @dev Sets the values for {name} and {symbol}.
+  50 |     |      *
+  51 |     |      * All two of these values are immutable: they can only be set once during
+  52 |     |      * construction.
+  53 |     |      */
+  54 | *   |     constructor(string memory name_, string memory symbol_) {
+  55 | *   |         _name = name_;
+  56 | *   |         _symbol = symbol_;
+  57 |     |     }
+  58 |     | 
+  59 |     |     /**
+  60 |     |      * @dev Returns the name of the token.
+  61 |     |      */
+  62 |     |     function name() public view virtual override returns (string memory) {
+  63 |     |         return _name;
+  64 |     |     }
+  65 |     | 
+  66 |     |     /**
+  67 |     |      * @dev Returns the symbol of the token, usually a shorter version of the
+  68 |     |      * name.
+  69 |     |      */
+  70 |     |     function symbol() public view virtual override returns (string memory) {
+  71 |     |         return _symbol;
+  72 |     |     }
+  73 |     | 
+  74 |     |     /**
+  75 |     |      * @dev Returns the number of decimals used to get its user representation.
+  76 |     |      * For example, if `decimals` equals `2`, a balance of `505` tokens should
+  77 |     |      * be displayed to a user as `5.05` (`505 / 10 ** 2`).
+  78 |     |      *
+  79 |     |      * Tokens usually opt for a value of 18, imitating the relationship between
+  80 |     |      * Ether and Wei. This is the default value returned by this function, unless
+  81 |     |      * it's overridden.
+  82 |     |      *
+  83 |     |      * NOTE: This information is only used for _display_ purposes: it in
+  84 |     |      * no way affects any of the arithmetic of the contract, including
+  85 |     |      * {IERC20-balanceOf} and {IERC20-transfer}.
+  86 |     |      */
+  87 |     |     function decimals() public view virtual override returns (uint8) {
+  88 |     |         return 18;
+  89 |     |     }
+  90 |     | 
+  91 |     |     /**
+  92 |     |      * @dev See {IERC20-totalSupply}.
+  93 |     |      */
+  94 | *   |     function totalSupply() public view virtual override returns (uint256) {
+  95 | *   |         return _totalSupply;
+  96 |     |     }
+  97 |     | 
+  98 |     |     /**
+  99 |     |      * @dev See {IERC20-balanceOf}.
+ 100 |     |      */
+ 101 | *   |     function balanceOf(address account) public view virtual override returns (uint256) {
+ 102 | *   |         return _balances[account];
+ 103 |     |     }
+ 104 |     | 
+ 105 |     |     /**
+ 106 |     |      * @dev See {IERC20-transfer}.
+ 107 |     |      *
+ 108 |     |      * Requirements:
+ 109 |     |      *
+ 110 |     |      * - `to` cannot be the zero address.
+ 111 |     |      * - the caller must have a balance of at least `amount`.
+ 112 |     |      */
+ 113 | *   |     function transfer(address to, uint256 amount) public virtual override returns (bool) {
+ 114 | *   |         address owner = _msgSender();
+ 115 | *   |         _transfer(owner, to, amount);
+ 116 |     |         return true;
+ 117 |     |     }
+ 118 |     | 
+ 119 |     |     /**
+ 120 |     |      * @dev See {IERC20-allowance}.
+ 121 |     |      */
+ 122 | *   |     function allowance(address owner, address spender) public view virtual override returns (uint256) {
+ 123 | *   |         return _allowances[owner][spender];
+ 124 |     |     }
+ 125 |     | 
+ 126 |     |     /**
+ 127 |     |      * @dev See {IERC20-approve}.
+ 128 |     |      *
+ 129 |     |      * NOTE: If `amount` is the maximum `uint256`, the allowance is not updated on
+ 130 |     |      * `transferFrom`. This is semantically equivalent to an infinite approval.
+ 131 |     |      *
+ 132 |     |      * Requirements:
+ 133 |     |      *
+ 134 |     |      * - `spender` cannot be the zero address.
+ 135 |     |      */
+ 136 | *   |     function approve(address spender, uint256 amount) public virtual override returns (bool) {
+ 137 | *   |         address owner = _msgSender();
+ 138 | *   |         _approve(owner, spender, amount);
+ 139 | *   |         return true;
+ 140 |     |     }
+ 141 |     | 
+ 142 |     |     /**
+ 143 |     |      * @dev See {IERC20-transferFrom}.
+ 144 |     |      *
+ 145 |     |      * Emits an {Approval} event indicating the updated allowance. This is not
+ 146 |     |      * required by the EIP. See the note at the beginning of {ERC20}.
+ 147 |     |      *
+ 148 |     |      * NOTE: Does not update the allowance if the current allowance
+ 149 |     |      * is the maximum `uint256`.
+ 150 |     |      *
+ 151 |     |      * Requirements:
+ 152 |     |      *
+ 153 |     |      * - `from` and `to` cannot be the zero address.
+ 154 |     |      * - `from` must have a balance of at least `amount`.
+ 155 |     |      * - the caller must have allowance for ``from``'s tokens of at least
+ 156 |     |      * `amount`.
+ 157 |     |      */
+ 158 | *   |     function transferFrom(address from, address to, uint256 amount) public virtual override returns (bool) {
+ 159 | *   |         address spender = _msgSender();
+ 160 | *   |         _spendAllowance(from, spender, amount);
+ 161 |     |         _transfer(from, to, amount);
+ 162 |     |         return true;
+ 163 |     |     }
+ 164 |     | 
+ 165 |     |     /**
+ 166 |     |      * @dev Atomically increases the allowance granted to `spender` by the caller.
+ 167 |     |      *
+ 168 |     |      * This is an alternative to {approve} that can be used as a mitigation for
+ 169 |     |      * problems described in {IERC20-approve}.
+ 170 |     |      *
+ 171 |     |      * Emits an {Approval} event indicating the updated allowance.
+ 172 |     |      *
+ 173 |     |      * Requirements:
+ 174 |     |      *
+ 175 |     |      * - `spender` cannot be the zero address.
+ 176 |     |      */
+ 177 | *   |     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
+ 178 | *   |         address owner = _msgSender();
+ 179 | *   |         _approve(owner, spender, allowance(owner, spender) + addedValue);
+ 180 | *   |         return true;
+ 181 |     |     }
+ 182 |     | 
+ 183 |     |     /**
+ 184 |     |      * @dev Atomically decreases the allowance granted to `spender` by the caller.
+ 185 |     |      *
+ 186 |     |      * This is an alternative to {approve} that can be used as a mitigation for
+ 187 |     |      * problems described in {IERC20-approve}.
+ 188 |     |      *
+ 189 |     |      * Emits an {Approval} event indicating the updated allowance.
+ 190 |     |      *
+ 191 |     |      * Requirements:
+ 192 |     |      *
+ 193 |     |      * - `spender` cannot be the zero address.
+ 194 |     |      * - `spender` must have allowance for the caller of at least
+ 195 |     |      * `subtractedValue`.
+ 196 |     |      */
+ 197 |     |     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
+ 198 |     |         address owner = _msgSender();
+ 199 |     |         uint256 currentAllowance = allowance(owner, spender);
+ 200 |     |         require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
+ 201 |     |         unchecked {
+ 202 |     |             _approve(owner, spender, currentAllowance - subtractedValue);
+ 203 |     |         }
+ 204 |     | 
+ 205 |     |         return true;
+ 206 |     |     }
+ 207 |     | 
+ 208 |     |     /**
+ 209 |     |      * @dev Moves `amount` of tokens from `from` to `to`.
+ 210 |     |      *
+ 211 |     |      * This internal function is equivalent to {transfer}, and can be used to
+ 212 |     |      * e.g. implement automatic token fees, slashing mechanisms, etc.
+ 213 |     |      *
+ 214 |     |      * Emits a {Transfer} event.
+ 215 |     |      *
+ 216 |     |      * Requirements:
+ 217 |     |      *
+ 218 |     |      * - `from` cannot be the zero address.
+ 219 |     |      * - `to` cannot be the zero address.
+ 220 |     |      * - `from` must have a balance of at least `amount`.
+ 221 |     |      */
+ 222 | *   |     function _transfer(address from, address to, uint256 amount) internal virtual {
+ 223 | *   |         require(from != address(0), "ERC20: transfer from the zero address");
+ 224 | *r  |         require(to != address(0), "ERC20: transfer to the zero address");
+ 225 |     | 
+ 226 | *   |         _beforeTokenTransfer(from, to, amount);
+ 227 |     | 
+ 228 | *   |         uint256 fromBalance = _balances[from];
+ 229 | *r  |         require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+ 230 |     |         unchecked {
+ 231 |     |             _balances[from] = fromBalance - amount;
+ 232 |     |             // Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by
+ 233 |     |             // decrementing then incrementing.
+ 234 |     |             _balances[to] += amount;
+ 235 |     |         }
+ 236 |     | 
+ 237 |     |         emit Transfer(from, to, amount);
+ 238 |     | 
+ 239 |     |         _afterTokenTransfer(from, to, amount);
+ 240 |     |     }
+ 241 |     | 
+ 242 |     |     /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+ 243 |     |      * the total supply.
+ 244 |     |      *
+ 245 |     |      * Emits a {Transfer} event with `from` set to the zero address.
+ 246 |     |      *
+ 247 |     |      * Requirements:
+ 248 |     |      *
+ 249 |     |      * - `account` cannot be the zero address.
+ 250 |     |      */
+ 251 | *   |     function _mint(address account, uint256 amount) internal virtual {
+ 252 | *   |         require(account != address(0), "ERC20: mint to the zero address");
+ 253 |     | 
+ 254 | *   |         _beforeTokenTransfer(address(0), account, amount);
+ 255 |     | 
+ 256 | *   |         _totalSupply += amount;
+ 257 |     |         unchecked {
+ 258 |     |             // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
+ 259 | *   |             _balances[account] += amount;
+ 260 |     |         }
+ 261 | *   |         emit Transfer(address(0), account, amount);
+ 262 |     | 
+ 263 | *   |         _afterTokenTransfer(address(0), account, amount);
+ 264 |     |     }
+ 265 |     | 
+ 266 |     |     /**
+ 267 |     |      * @dev Destroys `amount` tokens from `account`, reducing the
+ 268 |     |      * total supply.
+ 269 |     |      *
+ 270 |     |      * Emits a {Transfer} event with `to` set to the zero address.
+ 271 |     |      *
+ 272 |     |      * Requirements:
+ 273 |     |      *
+ 274 |     |      * - `account` cannot be the zero address.
+ 275 |     |      * - `account` must have at least `amount` tokens.
+ 276 |     |      */
+ 277 | *   |     function _burn(address account, uint256 amount) internal virtual {
+ 278 | *   |         require(account != address(0), "ERC20: burn from the zero address");
+ 279 |     | 
+ 280 | *   |         _beforeTokenTransfer(account, address(0), amount);
+ 281 |     | 
+ 282 | *   |         uint256 accountBalance = _balances[account];
+ 283 | *   |         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+ 284 |     |         unchecked {
+ 285 | *   |             _balances[account] = accountBalance - amount;
+ 286 |     |             // Overflow not possible: amount <= accountBalance <= totalSupply.
+ 287 | *   |             _totalSupply -= amount;
+ 288 |     |         }
+ 289 |     | 
+ 290 | *   |         emit Transfer(account, address(0), amount);
+ 291 |     | 
+ 292 | *   |         _afterTokenTransfer(account, address(0), amount);
+ 293 |     |     }
+ 294 |     | 
+ 295 |     |     /**
+ 296 |     |      * @dev Sets `amount` as the allowance of `spender` over the `owner` s tokens.
+ 297 |     |      *
+ 298 |     |      * This internal function is equivalent to `approve`, and can be used to
+ 299 |     |      * e.g. set automatic allowances for certain subsystems, etc.
+ 300 |     |      *
+ 301 |     |      * Emits an {Approval} event.
+ 302 |     |      *
+ 303 |     |      * Requirements:
+ 304 |     |      *
+ 305 |     |      * - `owner` cannot be the zero address.
+ 306 |     |      * - `spender` cannot be the zero address.
+ 307 |     |      */
+ 308 | *   |     function _approve(address owner, address spender, uint256 amount) internal virtual {
+ 309 | *   |         require(owner != address(0), "ERC20: approve from the zero address");
+ 310 | *r  |         require(spender != address(0), "ERC20: approve to the zero address");
+ 311 |     | 
+ 312 | *   |         _allowances[owner][spender] = amount;
+ 313 | *   |         emit Approval(owner, spender, amount);
+ 314 |     |     }
+ 315 |     | 
+ 316 |     |     /**
+ 317 |     |      * @dev Updates `owner` s allowance for `spender` based on spent `amount`.
+ 318 |     |      *
+ 319 |     |      * Does not update the allowance amount in case of infinite allowance.
+ 320 |     |      * Revert if not enough allowance is available.
+ 321 |     |      *
+ 322 |     |      * Might emit an {Approval} event.
+ 323 |     |      */
+ 324 | *   |     function _spendAllowance(address owner, address spender, uint256 amount) internal virtual {
+ 325 | *   |         uint256 currentAllowance = allowance(owner, spender);
+ 326 | *   |         if (currentAllowance != type(uint256).max) {
+ 327 | *r  |             require(currentAllowance >= amount, "ERC20: insufficient allowance");
+ 328 |     |             unchecked {
+ 329 | *   |                 _approve(owner, spender, currentAllowance - amount);
+ 330 |     |             }
+ 331 |     |         }
+ 332 |     |     }
+ 333 |     | 
+ 334 |     |     /**
+ 335 |     |      * @dev Hook that is called before any transfer of tokens. This includes
+ 336 |     |      * minting and burning.
+ 337 |     |      *
+ 338 |     |      * Calling conditions:
+ 339 |     |      *
+ 340 |     |      * - when `from` and `to` are both non-zero, `amount` of ``from``'s tokens
+ 341 |     |      * will be transferred to `to`.
+ 342 |     |      * - when `from` is zero, `amount` tokens will be minted for `to`.
+ 343 |     |      * - when `to` is zero, `amount` of ``from``'s tokens will be burned.
+ 344 |     |      * - `from` and `to` are never both zero.
+ 345 |     |      *
+ 346 |     |      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+ 347 |     |      */
+ 348 | *   |     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual {}
+ 349 |     | 
+ 350 |     |     /**
+ 351 |     |      * @dev Hook that is called after any transfer of tokens. This includes
+ 352 |     |      * minting and burning.
+ 353 |     |      *
+ 354 |     |      * Calling conditions:
+ 355 |     |      *
+ 356 |     |      * - when `from` and `to` are both non-zero, `amount` of ``from``'s tokens
+ 357 |     |      * has been transferred to `to`.
+ 358 |     |      * - when `from` is zero, `amount` tokens have been minted for `to`.
+ 359 |     |      * - when `to` is zero, `amount` of ``from``'s tokens have been burned.
+ 360 |     |      * - `from` and `to` are never both zero.
+ 361 |     |      *
+ 362 |     |      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+ 363 |     |      */
+ 364 | *   |     function _afterTokenTransfer(address from, address to, uint256 amount) internal virtual {}
+ 365 |     | }
+ 366 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Interface of the ERC20 standard as defined in the EIP.
+  8 |     |  */
+  9 |     | interface IERC20 {
+ 10 |     |     /**
+ 11 |     |      * @dev Emitted when `value` tokens are moved from one account (`from`) to
+ 12 |     |      * another (`to`).
+ 13 |     |      *
+ 14 |     |      * Note that `value` may be zero.
+ 15 |     |      */
+ 16 |     |     event Transfer(address indexed from, address indexed to, uint256 value);
+ 17 |     | 
+ 18 |     |     /**
+ 19 |     |      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+ 20 |     |      * a call to {approve}. `value` is the new allowance.
+ 21 |     |      */
+ 22 |     |     event Approval(address indexed owner, address indexed spender, uint256 value);
+ 23 |     | 
+ 24 |     |     /**
+ 25 |     |      * @dev Returns the amount of tokens in existence.
+ 26 |     |      */
+ 27 |     |     function totalSupply() external view returns (uint256);
+ 28 |     | 
+ 29 |     |     /**
+ 30 |     |      * @dev Returns the amount of tokens owned by `account`.
+ 31 |     |      */
+ 32 |     |     function balanceOf(address account) external view returns (uint256);
+ 33 |     | 
+ 34 |     |     /**
+ 35 |     |      * @dev Moves `amount` tokens from the caller's account to `to`.
+ 36 |     |      *
+ 37 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 38 |     |      *
+ 39 |     |      * Emits a {Transfer} event.
+ 40 |     |      */
+ 41 |     |     function transfer(address to, uint256 amount) external returns (bool);
+ 42 |     | 
+ 43 |     |     /**
+ 44 |     |      * @dev Returns the remaining number of tokens that `spender` will be
+ 45 |     |      * allowed to spend on behalf of `owner` through {transferFrom}. This is
+ 46 |     |      * zero by default.
+ 47 |     |      *
+ 48 |     |      * This value changes when {approve} or {transferFrom} are called.
+ 49 |     |      */
+ 50 |     |     function allowance(address owner, address spender) external view returns (uint256);
+ 51 |     | 
+ 52 |     |     /**
+ 53 |     |      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+ 54 |     |      *
+ 55 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 56 |     |      *
+ 57 |     |      * IMPORTANT: Beware that changing an allowance with this method brings the risk
+ 58 |     |      * that someone may use both the old and the new allowance by unfortunate
+ 59 |     |      * transaction ordering. One possible solution to mitigate this race
+ 60 |     |      * condition is to first reduce the spender's allowance to 0 and set the
+ 61 |     |      * desired value afterwards:
+ 62 |     |      * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+ 63 |     |      *
+ 64 |     |      * Emits an {Approval} event.
+ 65 |     |      */
+ 66 |     |     function approve(address spender, uint256 amount) external returns (bool);
+ 67 |     | 
+ 68 |     |     /**
+ 69 |     |      * @dev Moves `amount` tokens from `from` to `to` using the
+ 70 |     |      * allowance mechanism. `amount` is then deducted from the caller's
+ 71 |     |      * allowance.
+ 72 |     |      *
+ 73 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 74 |     |      *
+ 75 |     |      * Emits a {Transfer} event.
+ 76 |     |      */
+ 77 |     |     function transferFrom(address from, address to, uint256 amount) external returns (bool);
+ 78 |     | }
+ 79 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/token/ERC20/extensions/ERC20Burnable.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v4.5.0) (token/ERC20/extensions/ERC20Burnable.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | import "../ERC20.sol";
+  7 |     | import "../../../utils/Context.sol";
+  8 |     | 
+  9 |     | /**
+ 10 |     |  * @dev Extension of {ERC20} that allows token holders to destroy both their own
+ 11 |     |  * tokens and those that they have an allowance for, in a way that can be
+ 12 |     |  * recognized off-chain (via event analysis).
+ 13 |     |  */
+ 14 |     | abstract contract ERC20Burnable is Context, ERC20 {
+ 15 |     |     /**
+ 16 |     |      * @dev Destroys `amount` tokens from the caller.
+ 17 |     |      *
+ 18 |     |      * See {ERC20-_burn}.
+ 19 |     |      */
+ 20 | *   |     function burn(uint256 amount) public virtual {
+ 21 | *   |         _burn(_msgSender(), amount);
+ 22 |     |     }
+ 23 |     | 
+ 24 |     |     /**
+ 25 |     |      * @dev Destroys `amount` tokens from `account`, deducting from the caller's
+ 26 |     |      * allowance.
+ 27 |     |      *
+ 28 |     |      * See {ERC20-_burn} and {ERC20-allowance}.
+ 29 |     |      *
+ 30 |     |      * Requirements:
+ 31 |     |      *
+ 32 |     |      * - the caller must have allowance for ``accounts``'s tokens of at least
+ 33 |     |      * `amount`.
+ 34 |     |      */
+ 35 | *   |     function burnFrom(address account, uint256 amount) public virtual {
+ 36 | *   |         _spendAllowance(account, _msgSender(), amount);
+ 37 | *   |         _burn(account, amount);
+ 38 |     |     }
+ 39 |     | }
+ 40 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts v4.4.1 (token/ERC20/extensions/IERC20Metadata.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | import "../IERC20.sol";
+  7 |     | 
+  8 |     | /**
+  9 |     |  * @dev Interface for the optional metadata functions from the ERC20 standard.
+ 10 |     |  *
+ 11 |     |  * _Available since v4.1._
+ 12 |     |  */
+ 13 |     | interface IERC20Metadata is IERC20 {
+ 14 |     |     /**
+ 15 |     |      * @dev Returns the name of the token.
+ 16 |     |      */
+ 17 |     |     function name() external view returns (string memory);
+ 18 |     | 
+ 19 |     |     /**
+ 20 |     |      * @dev Returns the symbol of the token.
+ 21 |     |      */
+ 22 |     |     function symbol() external view returns (string memory);
+ 23 |     | 
+ 24 |     |     /**
+ 25 |     |      * @dev Returns the decimals places of the token.
+ 26 |     |      */
+ 27 |     |     function decimals() external view returns (uint8);
+ 28 |     | }
+ 29 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/utils/Context.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Provides information about the current execution context, including the
+  8 |     |  * sender of the transaction and its data. While these are generally available
+  9 |     |  * via msg.sender and msg.data, they should not be accessed in such a direct
+ 10 |     |  * manner, since when dealing with meta-transactions the account sending and
+ 11 |     |  * paying for execution may not be the actual sender (as far as an application
+ 12 |     |  * is concerned).
+ 13 |     |  *
+ 14 |     |  * This contract is only required for intermediate, library-like contracts.
+ 15 |     |  */
+ 16 |     | abstract contract Context {
+ 17 | *   |     function _msgSender() internal view virtual returns (address) {
+ 18 | *   |         return msg.sender;
+ 19 |     |     }
+ 20 |     | 
+ 21 |     |     function _msgData() internal view virtual returns (bytes calldata) {
+ 22 |     |         return msg.data;
+ 23 |     |     }
+ 24 |     | }
+ 25 |     | 
+
+/tmp/codex-phase32-properties-retry/contracts/ERC20/internal/util/ERC20TestBase.sol
+  1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+  2 |     | pragma solidity ^0.8.0;
+  3 |     | 
+  4 |     | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+  5 |     | import "../../../util/PropertiesConstants.sol";
+  6 |     | import "../../../util/PropertiesAsserts.sol";
+  7 |     | 
+  8 |     | abstract contract CryticERC20Base is
+  9 |     |     ERC20,
+ 10 |     |     PropertiesAsserts,
+ 11 |     |     PropertiesConstants
+ 12 |     | {
+ 13 |     |     // Initial supply after deploying
+ 14 |     |     uint256 initialSupply;
+ 15 |     | 
+ 16 |     |     // Is the contract allowed to change its total supply?
+ 17 |     |     bool isMintableOrBurnable;
+ 18 |     | 
+ 19 |     |     constructor() {}
+ 20 |     | }
+ 21 |     | 
+
+/tmp/codex-phase32-properties-retry/contracts/util/PropertiesAsserts.sol
+   1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+   2 |     | pragma solidity ^0.8.0;
+   3 |     | 
+   4 |     | abstract contract PropertiesAsserts {
+   5 |     |     event LogUint256(string, uint256);
+   6 |     |     event LogAddress(string, address);
+   7 |     |     event LogString(string);
+   8 |     | 
+   9 |     |     event AssertFail(string);
+  10 |     |     event AssertEqFail(string);
+  11 |     |     event AssertNeqFail(string);
+  12 |     |     event AssertGteFail(string);
+  13 |     |     event AssertGtFail(string);
+  14 |     |     event AssertLteFail(string);
+  15 |     |     event AssertLtFail(string);
+  16 |     | 
+  17 | *   |     function assertWithMsg(bool b, string memory reason) internal {
+  18 | *   |         if (!b) {
+  19 |     |             emit AssertFail(reason);
+  20 |     |             assert(false);
+  21 |     |         }
+  22 |     |     }
+  23 |     | 
+  24 |     |     /// @notice asserts that a is equal to b. Violations are logged using reason.
+  25 | *   |     function assertEq(uint256 a, uint256 b, string memory reason) internal {
+  26 | *   |         if (a != b) {
+  27 |     |             string memory aStr = PropertiesLibString.toString(a);
+  28 |     |             string memory bStr = PropertiesLibString.toString(b);
+  29 |     |             bytes memory assertMsg = abi.encodePacked(
+  30 |     |                 "Invalid: ",
+  31 |     |                 aStr,
+  32 |     |                 "!=",
+  33 |     |                 bStr,
+  34 |     |                 ", reason: ",
+  35 |     |                 reason
+  36 |     |             );
+  37 |     |             emit AssertEqFail(string(assertMsg));
+  38 |     |             assert(false);
+  39 |     |         }
+  40 |     |     }
+  41 |     | 
+  42 |     |     /// @notice int256 version of assertEq
+  43 |     |     function assertEq(int256 a, int256 b, string memory reason) internal {
+  44 |     |         if (a != b) {
+  45 |     |             string memory aStr = PropertiesLibString.toString(a);
+  46 |     |             string memory bStr = PropertiesLibString.toString(b);
+  47 |     |             bytes memory assertMsg = abi.encodePacked(
+  48 |     |                 "Invalid: ",
+  49 |     |                 aStr,
+  50 |     |                 "!=",
+  51 |     |                 bStr,
+  52 |     |                 ", reason: ",
+  53 |     |                 reason
+  54 |     |             );
+  55 |     |             emit AssertEqFail(string(assertMsg));
+  56 |     |             assert(false);
+  57 |     |         }
+  58 |     |     }
+  59 |     | 
+  60 |     |     /// @notice asserts that a is not equal to b. Violations are logged using reason.
+  61 |     |     function assertNeq(uint256 a, uint256 b, string memory reason) internal {
+  62 |     |         if (a == b) {
+  63 |     |             string memory aStr = PropertiesLibString.toString(a);
+  64 |     |             string memory bStr = PropertiesLibString.toString(b);
+  65 |     |             bytes memory assertMsg = abi.encodePacked(
+  66 |     |                 "Invalid: ",
+  67 |     |                 aStr,
+  68 |     |                 "==",
+  69 |     |                 bStr,
+  70 |     |                 ", reason: ",
+  71 |     |                 reason
+  72 |     |             );
+  73 |     |             emit AssertNeqFail(string(assertMsg));
+  74 |     |             assert(false);
+  75 |     |         }
+  76 |     |     }
+  77 |     | 
+  78 |     |     /// @notice int256 version of assertNeq
+  79 |     |     function assertNeq(int256 a, int256 b, string memory reason) internal {
+  80 |     |         if (a == b) {
+  81 |     |             string memory aStr = PropertiesLibString.toString(a);
+  82 |     |             string memory bStr = PropertiesLibString.toString(b);
+  83 |     |             bytes memory assertMsg = abi.encodePacked(
+  84 |     |                 "Invalid: ",
+  85 |     |                 aStr,
+  86 |     |                 "==",
+  87 |     |                 bStr,
+  88 |     |                 ", reason: ",
+  89 |     |                 reason
+  90 |     |             );
+  91 |     |             emit AssertNeqFail(string(assertMsg));
+  92 |     |             assert(false);
+  93 |     |         }
+  94 |     |     }
+  95 |     | 
+  96 |     |     /// @notice asserts that a is greater than or equal to b. Violations are logged using reason.
+  97 |     |     function assertGte(uint256 a, uint256 b, string memory reason) internal {
+  98 |     |         if (!(a >= b)) {
+  99 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 100 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 101 |     |             bytes memory assertMsg = abi.encodePacked(
+ 102 |     |                 "Invalid: ",
+ 103 |     |                 aStr,
+ 104 |     |                 "<",
+ 105 |     |                 bStr,
+ 106 |     |                 " failed, reason: ",
+ 107 |     |                 reason
+ 108 |     |             );
+ 109 |     |             emit AssertGteFail(string(assertMsg));
+ 110 |     |             assert(false);
+ 111 |     |         }
+ 112 |     |     }
+ 113 |     | 
+ 114 |     |     /// @notice int256 version of assertGte
+ 115 |     |     function assertGte(int256 a, int256 b, string memory reason) internal {
+ 116 |     |         if (!(a >= b)) {
+ 117 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 118 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 119 |     |             bytes memory assertMsg = abi.encodePacked(
+ 120 |     |                 "Invalid: ",
+ 121 |     |                 aStr,
+ 122 |     |                 "<",
+ 123 |     |                 bStr,
+ 124 |     |                 " failed, reason: ",
+ 125 |     |                 reason
+ 126 |     |             );
+ 127 |     |             emit AssertGteFail(string(assertMsg));
+ 128 |     |             assert(false);
+ 129 |     |         }
+ 130 |     |     }
+ 131 |     | 
+ 132 |     |     /// @notice asserts that a is greater than b. Violations are logged using reason.
+ 133 |     |     function assertGt(uint256 a, uint256 b, string memory reason) internal {
+ 134 |     |         if (!(a > b)) {
+ 135 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 136 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 137 |     |             bytes memory assertMsg = abi.encodePacked(
+ 138 |     |                 "Invalid: ",
+ 139 |     |                 aStr,
+ 140 |     |                 "<=",
+ 141 |     |                 bStr,
+ 142 |     |                 " failed, reason: ",
+ 143 |     |                 reason
+ 144 |     |             );
+ 145 |     |             emit AssertGtFail(string(assertMsg));
+ 146 |     |             assert(false);
+ 147 |     |         }
+ 148 |     |     }
+ 149 |     | 
+ 150 |     |     /// @notice int256 version of assertGt
+ 151 |     |     function assertGt(int256 a, int256 b, string memory reason) internal {
+ 152 |     |         if (!(a > b)) {
+ 153 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 154 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 155 |     |             bytes memory assertMsg = abi.encodePacked(
+ 156 |     |                 "Invalid: ",
+ 157 |     |                 aStr,
+ 158 |     |                 "<=",
+ 159 |     |                 bStr,
+ 160 |     |                 " failed, reason: ",
+ 161 |     |                 reason
+ 162 |     |             );
+ 163 |     |             emit AssertGtFail(string(assertMsg));
+ 164 |     |             assert(false);
+ 165 |     |         }
+ 166 |     |     }
+ 167 |     | 
+ 168 |     |     /// @notice asserts that a is less than or equal to b. Violations are logged using reason.
+ 169 |     |     function assertLte(uint256 a, uint256 b, string memory reason) internal {
+ 170 |     |         if (!(a <= b)) {
+ 171 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 172 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 173 |     |             bytes memory assertMsg = abi.encodePacked(
+ 174 |     |                 "Invalid: ",
+ 175 |     |                 aStr,
+ 176 |     |                 ">",
+ 177 |     |                 bStr,
+ 178 |     |                 " failed, reason: ",
+ 179 |     |                 reason
+ 180 |     |             );
+ 181 |     |             emit AssertLteFail(string(assertMsg));
+ 182 |     |             assert(false);
+ 183 |     |         }
+ 184 |     |     }
+ 185 |     | 
+ 186 |     |     /// @notice int256 version of assertLte
+ 187 |     |     function assertLte(int256 a, int256 b, string memory reason) internal {
+ 188 |     |         if (!(a <= b)) {
+ 189 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 190 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 191 |     |             bytes memory assertMsg = abi.encodePacked(
+ 192 |     |                 "Invalid: ",
+ 193 |     |                 aStr,
+ 194 |     |                 ">",
+ 195 |     |                 bStr,
+ 196 |     |                 " failed, reason: ",
+ 197 |     |                 reason
+ 198 |     |             );
+ 199 |     |             emit AssertLteFail(string(assertMsg));
+ 200 |     |             assert(false);
+ 201 |     |         }
+ 202 |     |     }
+ 203 |     | 
+ 204 |     |     /// @notice asserts that a is less than b. Violations are logged using reason.
+ 205 |     |     function assertLt(uint256 a, uint256 b, string memory reason) internal {
+ 206 |     |         if (!(a < b)) {
+ 207 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 208 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 209 |     |             bytes memory assertMsg = abi.encodePacked(
+ 210 |     |                 "Invalid: ",
+ 211 |     |                 aStr,
+ 212 |     |                 ">=",
+ 213 |     |                 bStr,
+ 214 |     |                 " failed, reason: ",
+ 215 |     |                 reason
+ 216 |     |             );
+ 217 |     |             emit AssertLtFail(string(assertMsg));
+ 218 |     |             assert(false);
+ 219 |     |         }
+ 220 |     |     }
+ 221 |     | 
+ 222 |     |     /// @notice int256 version of assertLt
+ 223 |     |     function assertLt(int256 a, int256 b, string memory reason) internal {
+ 224 |     |         if (!(a < b)) {
+ 225 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 226 |     |             string memory bStr = PropertiesLibString.toString(b);
+ 227 |     |             bytes memory assertMsg = abi.encodePacked(
+ 228 |     |                 "Invalid: ",
+ 229 |     |                 aStr,
+ 230 |     |                 ">=",
+ 231 |     |                 bStr,
+ 232 |     |                 " failed, reason: ",
+ 233 |     |                 reason
+ 234 |     |             );
+ 235 |     |             emit AssertLtFail(string(assertMsg));
+ 236 |     |             assert(false);
+ 237 |     |         }
+ 238 |     |     }
+ 239 |     | 
+ 240 |     |     /// @notice Clamps value to be between low and high, both inclusive
+ 241 |     |     function clampBetween(
+ 242 |     |         uint256 value,
+ 243 |     |         uint256 low,
+ 244 |     |         uint256 high
+ 245 |     |     ) internal returns (uint256) {
+ 246 |     |         if (value < low || value > high) {
+ 247 |     |             uint ans = low + (value % (high - low + 1));
+ 248 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 249 |     |             string memory ansStr = PropertiesLibString.toString(ans);
+ 250 |     |             bytes memory message = abi.encodePacked(
+ 251 |     |                 "Clamping value ",
+ 252 |     |                 valueStr,
+ 253 |     |                 " to ",
+ 254 |     |                 ansStr
+ 255 |     |             );
+ 256 |     |             emit LogString(string(message));
+ 257 |     |             return ans;
+ 258 |     |         }
+ 259 |     |         return value;
+ 260 |     |     }
+ 261 |     | 
+ 262 |     |     /// @notice int256 version of clampBetween
+ 263 |     |     function clampBetween(
+ 264 |     |         int256 value,
+ 265 |     |         int256 low,
+ 266 |     |         int256 high
+ 267 |     |     ) internal returns (int256) {
+ 268 |     |         if (value < low || value > high) {
+ 269 |     |             int range = high - low + 1;
+ 270 |     |             int clamped = (value - low) % (range);
+ 271 |     |             if (clamped < 0) clamped += range;
+ 272 |     |             int ans = low + clamped;
+ 273 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 274 |     |             string memory ansStr = PropertiesLibString.toString(ans);
+ 275 |     |             bytes memory message = abi.encodePacked(
+ 276 |     |                 "Clamping value ",
+ 277 |     |                 valueStr,
+ 278 |     |                 " to ",
+ 279 |     |                 ansStr
+ 280 |     |             );
+ 281 |     |             emit LogString(string(message));
+ 282 |     |             return ans;
+ 283 |     |         }
+ 284 |     |         return value;
+ 285 |     |     }
+ 286 |     | 
+ 287 |     |     /// @notice clamps a to be less than b
+ 288 |     |     function clampLt(uint256 a, uint256 b) internal returns (uint256) {
+ 289 |     |         if (!(a < b)) {
+ 290 |     |             assertNeq(
+ 291 |     |                 b,
+ 292 |     |                 0,
+ 293 |     |                 "clampLt cannot clamp value a to be less than zero. Check your inputs/assumptions."
+ 294 |     |             );
+ 295 |     |             uint256 value = a % b;
+ 296 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 297 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 298 |     |             bytes memory message = abi.encodePacked(
+ 299 |     |                 "Clamping value ",
+ 300 |     |                 aStr,
+ 301 |     |                 " to ",
+ 302 |     |                 valueStr
+ 303 |     |             );
+ 304 |     |             emit LogString(string(message));
+ 305 |     |             return value;
+ 306 |     |         }
+ 307 |     |         return a;
+ 308 |     |     }
+ 309 |     | 
+ 310 |     |     /// @notice int256 version of clampLt
+ 311 |     |     function clampLt(int256 a, int256 b) internal returns (int256) {
+ 312 |     |         if (!(a < b)) {
+ 313 |     |             int256 value = b - 1;
+ 314 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 315 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 316 |     |             bytes memory message = abi.encodePacked(
+ 317 |     |                 "Clamping value ",
+ 318 |     |                 aStr,
+ 319 |     |                 " to ",
+ 320 |     |                 valueStr
+ 321 |     |             );
+ 322 |     |             emit LogString(string(message));
+ 323 |     |             return value;
+ 324 |     |         }
+ 325 |     |         return a;
+ 326 |     |     }
+ 327 |     | 
+ 328 |     |     /// @notice clamps a to be less than or equal to b
+ 329 |     |     function clampLte(uint256 a, uint256 b) internal returns (uint256) {
+ 330 |     |         if (!(a <= b)) {
+ 331 |     |             uint256 value = a % (b + 1);
+ 332 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 333 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 334 |     |             bytes memory message = abi.encodePacked(
+ 335 |     |                 "Clamping value ",
+ 336 |     |                 aStr,
+ 337 |     |                 " to ",
+ 338 |     |                 valueStr
+ 339 |     |             );
+ 340 |     |             emit LogString(string(message));
+ 341 |     |             return value;
+ 342 |     |         }
+ 343 |     |         return a;
+ 344 |     |     }
+ 345 |     | 
+ 346 |     |     /// @notice int256 version of clampLte
+ 347 |     |     function clampLte(int256 a, int256 b) internal returns (int256) {
+ 348 |     |         if (!(a <= b)) {
+ 349 |     |             int256 value = b;
+ 350 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 351 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 352 |     |             bytes memory message = abi.encodePacked(
+ 353 |     |                 "Clamping value ",
+ 354 |     |                 aStr,
+ 355 |     |                 " to ",
+ 356 |     |                 valueStr
+ 357 |     |             );
+ 358 |     |             emit LogString(string(message));
+ 359 |     |             return value;
+ 360 |     |         }
+ 361 |     |         return a;
+ 362 |     |     }
+ 363 |     | 
+ 364 |     |     /// @notice clamps a to be greater than b
+ 365 |     |     function clampGt(uint256 a, uint256 b) internal returns (uint256) {
+ 366 |     |         if (!(a > b)) {
+ 367 |     |             assertNeq(
+ 368 |     |                 b,
+ 369 |     |                 type(uint256).max,
+ 370 |     |                 "clampGt cannot clamp value a to be larger than uint256.max. Check your inputs/assumptions."
+ 371 |     |             );
+ 372 |     |             uint256 value = b + 1;
+ 373 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 374 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 375 |     |             bytes memory message = abi.encodePacked(
+ 376 |     |                 "Clamping value ",
+ 377 |     |                 aStr,
+ 378 |     |                 " to ",
+ 379 |     |                 valueStr
+ 380 |     |             );
+ 381 |     |             emit LogString(string(message));
+ 382 |     |             return value;
+ 383 |     |         } else {
+ 384 |     |             return a;
+ 385 |     |         }
+ 386 |     |     }
+ 387 |     | 
+ 388 |     |     /// @notice int256 version of clampGt
+ 389 |     |     function clampGt(int256 a, int256 b) internal returns (int256) {
+ 390 |     |         if (!(a > b)) {
+ 391 |     |             int256 value = b + 1;
+ 392 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 393 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 394 |     |             bytes memory message = abi.encodePacked(
+ 395 |     |                 "Clamping value ",
+ 396 |     |                 aStr,
+ 397 |     |                 " to ",
+ 398 |     |                 valueStr
+ 399 |     |             );
+ 400 |     |             emit LogString(string(message));
+ 401 |     |             return value;
+ 402 |     |         } else {
+ 403 |     |             return a;
+ 404 |     |         }
+ 405 |     |     }
+ 406 |     | 
+ 407 |     |     /// @notice clamps a to be greater than or equal to b
+ 408 |     |     function clampGte(uint256 a, uint256 b) internal returns (uint256) {
+ 409 |     |         if (!(a > b)) {
+ 410 |     |             uint256 value = b;
+ 411 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 412 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 413 |     |             bytes memory message = abi.encodePacked(
+ 414 |     |                 "Clamping value ",
+ 415 |     |                 aStr,
+ 416 |     |                 " to ",
+ 417 |     |                 valueStr
+ 418 |     |             );
+ 419 |     |             emit LogString(string(message));
+ 420 |     |             return value;
+ 421 |     |         }
+ 422 |     |         return a;
+ 423 |     |     }
+ 424 |     | 
+ 425 |     |     /// @notice int256 version of clampGte
+ 426 |     |     function clampGte(int256 a, int256 b) internal returns (int256) {
+ 427 |     |         if (!(a > b)) {
+ 428 |     |             int256 value = b;
+ 429 |     |             string memory aStr = PropertiesLibString.toString(a);
+ 430 |     |             string memory valueStr = PropertiesLibString.toString(value);
+ 431 |     |             bytes memory message = abi.encodePacked(
+ 432 |     |                 "Clamping value ",
+ 433 |     |                 aStr,
+ 434 |     |                 " to ",
+ 435 |     |                 valueStr
+ 436 |     |             );
+ 437 |     |             emit LogString(string(message));
+ 438 |     |             return value;
+ 439 |     |         }
+ 440 |     |         return a;
+ 441 |     |     }
+ 442 |     | }
+ 443 |     | 
+ 444 |     | /// @notice Efficient library for creating string representations of integers.
+ 445 |     | /// @author Solmate (https://github.com/transmissions11/solmate/blob/main/src/utils/LibString.sol)
+ 446 |     | /// @author Modified from Solady (https://github.com/Vectorized/solady/blob/main/src/utils/LibString.sol)
+ 447 |     | /// @dev Name of the library is modified to prevent collisions with contract-under-test uses of LibString
+ 448 |     | library PropertiesLibString {
+ 449 |     |     function toString(int256 value) internal pure returns (string memory str) {
+ 450 |     |         uint256 absValue = value >= 0 ? uint256(value) : uint256(-value);
+ 451 |     |         str = toString(absValue);
+ 452 |     | 
+ 453 |     |         if (value < 0) {
+ 454 |     |             str = string(abi.encodePacked("-", str));
+ 455 |     |         }
+ 456 |     |     }
+ 457 |     | 
+ 458 |     |     function toString(uint256 value) internal pure returns (string memory str) {
+ 459 |     |         /// @solidity memory-safe-assembly
+ 460 |     |         assembly {
+ 461 |     |             // The maximum value of a uint256 contains 78 digits (1 byte per digit), but we allocate 160 bytes
+ 462 |     |             // to keep the free memory pointer word aligned. We'll need 1 word for the length, 1 word for the
+ 463 |     |             // trailing zeros padding, and 3 other words for a max of 78 digits. In total: 5 * 32 = 160 bytes.
+ 464 |     |             let newFreeMemoryPointer := add(mload(0x40), 160)
+ 465 |     | 
+ 466 |     |             // Update the free memory pointer to avoid overriding our string.
+ 467 |     |             mstore(0x40, newFreeMemoryPointer)
+ 468 |     | 
+ 469 |     |             // Assign str to the end of the zone of newly allocated memory.
+ 470 |     |             str := sub(newFreeMemoryPointer, 32)
+ 471 |     | 
+ 472 |     |             // Clean the last word of memory it may not be overwritten.
+ 473 |     |             mstore(str, 0)
+ 474 |     | 
+ 475 |     |             // Cache the end of the memory to calculate the length later.
+ 476 |     |             let end := str
+ 477 |     | 
+ 478 |     |             // We write the string from rightmost digit to leftmost digit.
+ 479 |     |             // The following is essentially a do-while loop that also handles the zero case.
+ 480 |     |             // prettier-ignore
+ 481 |     |             for { let temp := value } 1 {} {
+ 482 |     |                 // Move the pointer 1 byte to the left.
+ 483 |     |                 str := sub(str, 1)
+ 484 |     | 
+ 485 |     |                 // Write the character to the pointer.
+ 486 |     |                 // The ASCII index of the '0' character is 48.
+ 487 |     |                 mstore8(str, add(48, mod(temp, 10)))
+ 488 |     | 
+ 489 |     |                 // Keep dividing temp until zero.
+ 490 |     |                 temp := div(temp, 10)
+ 491 |     | 
+ 492 |     |                  // prettier-ignore
+ 493 |     |                 if iszero(temp) { break }
+ 494 |     |             }
+ 495 |     | 
+ 496 |     |             // Compute and cache the final total length of the string.
+ 497 |     |             let length := sub(end, str)
+ 498 |     | 
+ 499 |     |             // Move the pointer 32 bytes leftwards to make room for the length.
+ 500 |     |             str := sub(str, 32)
+ 501 |     | 
+ 502 |     |             // Store the string's length at the start of memory allocated for our string.
+ 503 |     |             mstore(str, length)
+ 504 |     |         }
+ 505 |     |     }
+ 506 |     | 
+ 507 |     |     function toString(address value) internal pure returns (string memory str) {
+ 508 |     |         bytes memory s = new bytes(40);
+ 509 |     |         for (uint i = 0; i < 20; i++) {
+ 510 |     |             bytes1 b = bytes1(
+ 511 |     |                 uint8(uint(uint160(value)) / (2 ** (8 * (19 - i))))
+ 512 |     |             );
+ 513 |     |             bytes1 hi = bytes1(uint8(b) / 16);
+ 514 |     |             bytes1 lo = bytes1(uint8(b) - 16 * uint8(hi));
+ 515 |     |             s[2 * i] = char(hi);
+ 516 |     |             s[2 * i + 1] = char(lo);
+ 517 |     |         }
+ 518 |     |         return string(s);
+ 519 |     |     }
+ 520 |     | 
+ 521 |     |     function char(bytes1 b) internal pure returns (bytes1 c) {
+ 522 |     |         if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
+ 523 |     |         else return bytes1(uint8(b) + 0x57);
+ 524 |     |     }
+ 525 |     | }
+ 526 |     | 
+
+/tmp/codex-phase32-properties-retry/contracts/util/PropertiesConstants.sol
+  1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+  2 |     | pragma solidity ^0.8.0;
+  3 |     | 
+  4 |     | abstract contract PropertiesConstants {
+  5 |     |     // Constant echidna addresses
+  6 | *   |     address constant USER1 = address(0x10000);
+  7 | *   |     address constant USER2 = address(0x20000);
+  8 | *   |     address constant USER3 = address(0x30000);
+  9 | *   |     uint256 constant INITIAL_BALANCE = 1000e18;
+ 10 |     | }
+ 11 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol
+   1 |     | // SPDX-License-Identifier: MIT
+   2 |     | // OpenZeppelin Contracts (last updated v4.8.0) (token/ERC20/ERC20.sol)
+   3 |     | 
+   4 |     | pragma solidity ^0.8.0;
+   5 |     | 
+   6 |     | import "./IERC20.sol";
+   7 |     | import "./extensions/IERC20Metadata.sol";
+   8 |     | import "../../utils/Context.sol";
+   9 |     | 
+  10 |     | /**
+  11 |     |  * @dev Implementation of the {IERC20} interface.
+  12 |     |  *
+  13 |     |  * This implementation is agnostic to the way tokens are created. This means
+  14 |     |  * that a supply mechanism has to be added in a derived contract using {_mint}.
+  15 |     |  * For a generic mechanism see {ERC20PresetMinterPauser}.
+  16 |     |  *
+  17 |     |  * TIP: For a detailed writeup see our guide
+  18 |     |  * https://forum.openzeppelin.com/t/how-to-implement-erc20-supply-mechanisms/226[How
+  19 |     |  * to implement supply mechanisms].
+  20 |     |  *
+  21 |     |  * The default value of {decimals} is 18. To change this, you should override
+  22 |     |  * this function so it returns a different value.
+  23 |     |  *
+  24 |     |  * We have followed general OpenZeppelin Contracts guidelines: functions revert
+  25 |     |  * instead returning `false` on failure. This behavior is nonetheless
+  26 |     |  * conventional and does not conflict with the expectations of ERC20
+  27 |     |  * applications.
+  28 |     |  *
+  29 |     |  * Additionally, an {Approval} event is emitted on calls to {transferFrom}.
+  30 |     |  * This allows applications to reconstruct the allowance for all accounts just
+  31 |     |  * by listening to said events. Other implementations of the EIP may not emit
+  32 |     |  * these events, as it isn't required by the specification.
+  33 |     |  *
+  34 |     |  * Finally, the non-standard {decreaseAllowance} and {increaseAllowance}
+  35 |     |  * functions have been added to mitigate the well-known issues around setting
+  36 |     |  * allowances. See {IERC20-approve}.
+  37 |     |  */
+  38 |     | contract ERC20 is Context, IERC20, IERC20Metadata {
+  39 |     |     mapping(address => uint256) private _balances;
+  40 |     | 
+  41 |     |     mapping(address => mapping(address => uint256)) private _allowances;
+  42 |     | 
+  43 |     |     uint256 private _totalSupply;
+  44 |     | 
+  45 |     |     string private _name;
+  46 |     |     string private _symbol;
+  47 |     | 
+  48 |     |     /**
+  49 |     |      * @dev Sets the values for {name} and {symbol}.
+  50 |     |      *
+  51 |     |      * All two of these values are immutable: they can only be set once during
+  52 |     |      * construction.
+  53 |     |      */
+  54 | *   |     constructor(string memory name_, string memory symbol_) {
+  55 | *   |         _name = name_;
+  56 | *   |         _symbol = symbol_;
+  57 |     |     }
+  58 |     | 
+  59 |     |     /**
+  60 |     |      * @dev Returns the name of the token.
+  61 |     |      */
+  62 |     |     function name() public view virtual override returns (string memory) {
+  63 |     |         return _name;
+  64 |     |     }
+  65 |     | 
+  66 |     |     /**
+  67 |     |      * @dev Returns the symbol of the token, usually a shorter version of the
+  68 |     |      * name.
+  69 |     |      */
+  70 |     |     function symbol() public view virtual override returns (string memory) {
+  71 |     |         return _symbol;
+  72 |     |     }
+  73 |     | 
+  74 |     |     /**
+  75 |     |      * @dev Returns the number of decimals used to get its user representation.
+  76 |     |      * For example, if `decimals` equals `2`, a balance of `505` tokens should
+  77 |     |      * be displayed to a user as `5.05` (`505 / 10 ** 2`).
+  78 |     |      *
+  79 |     |      * Tokens usually opt for a value of 18, imitating the relationship between
+  80 |     |      * Ether and Wei. This is the default value returned by this function, unless
+  81 |     |      * it's overridden.
+  82 |     |      *
+  83 |     |      * NOTE: This information is only used for _display_ purposes: it in
+  84 |     |      * no way affects any of the arithmetic of the contract, including
+  85 |     |      * {IERC20-balanceOf} and {IERC20-transfer}.
+  86 |     |      */
+  87 |     |     function decimals() public view virtual override returns (uint8) {
+  88 |     |         return 18;
+  89 |     |     }
+  90 |     | 
+  91 |     |     /**
+  92 |     |      * @dev See {IERC20-totalSupply}.
+  93 |     |      */
+  94 | *   |     function totalSupply() public view virtual override returns (uint256) {
+  95 | *   |         return _totalSupply;
+  96 |     |     }
+  97 |     | 
+  98 |     |     /**
+  99 |     |      * @dev See {IERC20-balanceOf}.
+ 100 |     |      */
+ 101 | *   |     function balanceOf(address account) public view virtual override returns (uint256) {
+ 102 | *   |         return _balances[account];
+ 103 |     |     }
+ 104 |     | 
+ 105 |     |     /**
+ 106 |     |      * @dev See {IERC20-transfer}.
+ 107 |     |      *
+ 108 |     |      * Requirements:
+ 109 |     |      *
+ 110 |     |      * - `to` cannot be the zero address.
+ 111 |     |      * - the caller must have a balance of at least `amount`.
+ 112 |     |      */
+ 113 | *   |     function transfer(address to, uint256 amount) public virtual override returns (bool) {
+ 114 | *   |         address owner = _msgSender();
+ 115 | *   |         _transfer(owner, to, amount);
+ 116 |     |         return true;
+ 117 |     |     }
+ 118 |     | 
+ 119 |     |     /**
+ 120 |     |      * @dev See {IERC20-allowance}.
+ 121 |     |      */
+ 122 | *   |     function allowance(address owner, address spender) public view virtual override returns (uint256) {
+ 123 | *   |         return _allowances[owner][spender];
+ 124 |     |     }
+ 125 |     | 
+ 126 |     |     /**
+ 127 |     |      * @dev See {IERC20-approve}.
+ 128 |     |      *
+ 129 |     |      * NOTE: If `amount` is the maximum `uint256`, the allowance is not updated on
+ 130 |     |      * `transferFrom`. This is semantically equivalent to an infinite approval.
+ 131 |     |      *
+ 132 |     |      * Requirements:
+ 133 |     |      *
+ 134 |     |      * - `spender` cannot be the zero address.
+ 135 |     |      */
+ 136 | *   |     function approve(address spender, uint256 amount) public virtual override returns (bool) {
+ 137 | *   |         address owner = _msgSender();
+ 138 | *   |         _approve(owner, spender, amount);
+ 139 | *   |         return true;
+ 140 |     |     }
+ 141 |     | 
+ 142 |     |     /**
+ 143 |     |      * @dev See {IERC20-transferFrom}.
+ 144 |     |      *
+ 145 |     |      * Emits an {Approval} event indicating the updated allowance. This is not
+ 146 |     |      * required by the EIP. See the note at the beginning of {ERC20}.
+ 147 |     |      *
+ 148 |     |      * NOTE: Does not update the allowance if the current allowance
+ 149 |     |      * is the maximum `uint256`.
+ 150 |     |      *
+ 151 |     |      * Requirements:
+ 152 |     |      *
+ 153 |     |      * - `from` and `to` cannot be the zero address.
+ 154 |     |      * - `from` must have a balance of at least `amount`.
+ 155 |     |      * - the caller must have allowance for ``from``'s tokens of at least
+ 156 |     |      * `amount`.
+ 157 |     |      */
+ 158 | *   |     function transferFrom(address from, address to, uint256 amount) public virtual override returns (bool) {
+ 159 | *   |         address spender = _msgSender();
+ 160 | *   |         _spendAllowance(from, spender, amount);
+ 161 |     |         _transfer(from, to, amount);
+ 162 |     |         return true;
+ 163 |     |     }
+ 164 |     | 
+ 165 |     |     /**
+ 166 |     |      * @dev Atomically increases the allowance granted to `spender` by the caller.
+ 167 |     |      *
+ 168 |     |      * This is an alternative to {approve} that can be used as a mitigation for
+ 169 |     |      * problems described in {IERC20-approve}.
+ 170 |     |      *
+ 171 |     |      * Emits an {Approval} event indicating the updated allowance.
+ 172 |     |      *
+ 173 |     |      * Requirements:
+ 174 |     |      *
+ 175 |     |      * - `spender` cannot be the zero address.
+ 176 |     |      */
+ 177 | *   |     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
+ 178 | *   |         address owner = _msgSender();
+ 179 | *   |         _approve(owner, spender, allowance(owner, spender) + addedValue);
+ 180 | *   |         return true;
+ 181 |     |     }
+ 182 |     | 
+ 183 |     |     /**
+ 184 |     |      * @dev Atomically decreases the allowance granted to `spender` by the caller.
+ 185 |     |      *
+ 186 |     |      * This is an alternative to {approve} that can be used as a mitigation for
+ 187 |     |      * problems described in {IERC20-approve}.
+ 188 |     |      *
+ 189 |     |      * Emits an {Approval} event indicating the updated allowance.
+ 190 |     |      *
+ 191 |     |      * Requirements:
+ 192 |     |      *
+ 193 |     |      * - `spender` cannot be the zero address.
+ 194 |     |      * - `spender` must have allowance for the caller of at least
+ 195 |     |      * `subtractedValue`.
+ 196 |     |      */
+ 197 |     |     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
+ 198 |     |         address owner = _msgSender();
+ 199 |     |         uint256 currentAllowance = allowance(owner, spender);
+ 200 |     |         require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
+ 201 |     |         unchecked {
+ 202 |     |             _approve(owner, spender, currentAllowance - subtractedValue);
+ 203 |     |         }
+ 204 |     | 
+ 205 |     |         return true;
+ 206 |     |     }
+ 207 |     | 
+ 208 |     |     /**
+ 209 |     |      * @dev Moves `amount` of tokens from `from` to `to`.
+ 210 |     |      *
+ 211 |     |      * This internal function is equivalent to {transfer}, and can be used to
+ 212 |     |      * e.g. implement automatic token fees, slashing mechanisms, etc.
+ 213 |     |      *
+ 214 |     |      * Emits a {Transfer} event.
+ 215 |     |      *
+ 216 |     |      * Requirements:
+ 217 |     |      *
+ 218 |     |      * - `from` cannot be the zero address.
+ 219 |     |      * - `to` cannot be the zero address.
+ 220 |     |      * - `from` must have a balance of at least `amount`.
+ 221 |     |      */
+ 222 | *   |     function _transfer(address from, address to, uint256 amount) internal virtual {
+ 223 | *   |         require(from != address(0), "ERC20: transfer from the zero address");
+ 224 | *r  |         require(to != address(0), "ERC20: transfer to the zero address");
+ 225 |     | 
+ 226 | *   |         _beforeTokenTransfer(from, to, amount);
+ 227 |     | 
+ 228 | *   |         uint256 fromBalance = _balances[from];
+ 229 | *r  |         require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+ 230 |     |         unchecked {
+ 231 |     |             _balances[from] = fromBalance - amount;
+ 232 |     |             // Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by
+ 233 |     |             // decrementing then incrementing.
+ 234 |     |             _balances[to] += amount;
+ 235 |     |         }
+ 236 |     | 
+ 237 |     |         emit Transfer(from, to, amount);
+ 238 |     | 
+ 239 |     |         _afterTokenTransfer(from, to, amount);
+ 240 |     |     }
+ 241 |     | 
+ 242 |     |     /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+ 243 |     |      * the total supply.
+ 244 |     |      *
+ 245 |     |      * Emits a {Transfer} event with `from` set to the zero address.
+ 246 |     |      *
+ 247 |     |      * Requirements:
+ 248 |     |      *
+ 249 |     |      * - `account` cannot be the zero address.
+ 250 |     |      */
+ 251 | *   |     function _mint(address account, uint256 amount) internal virtual {
+ 252 | *   |         require(account != address(0), "ERC20: mint to the zero address");
+ 253 |     | 
+ 254 | *   |         _beforeTokenTransfer(address(0), account, amount);
+ 255 |     | 
+ 256 | *   |         _totalSupply += amount;
+ 257 |     |         unchecked {
+ 258 |     |             // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
+ 259 | *   |             _balances[account] += amount;
+ 260 |     |         }
+ 261 | *   |         emit Transfer(address(0), account, amount);
+ 262 |     | 
+ 263 | *   |         _afterTokenTransfer(address(0), account, amount);
+ 264 |     |     }
+ 265 |     | 
+ 266 |     |     /**
+ 267 |     |      * @dev Destroys `amount` tokens from `account`, reducing the
+ 268 |     |      * total supply.
+ 269 |     |      *
+ 270 |     |      * Emits a {Transfer} event with `to` set to the zero address.
+ 271 |     |      *
+ 272 |     |      * Requirements:
+ 273 |     |      *
+ 274 |     |      * - `account` cannot be the zero address.
+ 275 |     |      * - `account` must have at least `amount` tokens.
+ 276 |     |      */
+ 277 | *   |     function _burn(address account, uint256 amount) internal virtual {
+ 278 | *   |         require(account != address(0), "ERC20: burn from the zero address");
+ 279 |     | 
+ 280 | *   |         _beforeTokenTransfer(account, address(0), amount);
+ 281 |     | 
+ 282 | *   |         uint256 accountBalance = _balances[account];
+ 283 | *   |         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+ 284 |     |         unchecked {
+ 285 | *   |             _balances[account] = accountBalance - amount;
+ 286 |     |             // Overflow not possible: amount <= accountBalance <= totalSupply.
+ 287 | *   |             _totalSupply -= amount;
+ 288 |     |         }
+ 289 |     | 
+ 290 | *   |         emit Transfer(account, address(0), amount);
+ 291 |     | 
+ 292 | *   |         _afterTokenTransfer(account, address(0), amount);
+ 293 |     |     }
+ 294 |     | 
+ 295 |     |     /**
+ 296 |     |      * @dev Sets `amount` as the allowance of `spender` over the `owner` s tokens.
+ 297 |     |      *
+ 298 |     |      * This internal function is equivalent to `approve`, and can be used to
+ 299 |     |      * e.g. set automatic allowances for certain subsystems, etc.
+ 300 |     |      *
+ 301 |     |      * Emits an {Approval} event.
+ 302 |     |      *
+ 303 |     |      * Requirements:
+ 304 |     |      *
+ 305 |     |      * - `owner` cannot be the zero address.
+ 306 |     |      * - `spender` cannot be the zero address.
+ 307 |     |      */
+ 308 | *   |     function _approve(address owner, address spender, uint256 amount) internal virtual {
+ 309 | *   |         require(owner != address(0), "ERC20: approve from the zero address");
+ 310 | *r  |         require(spender != address(0), "ERC20: approve to the zero address");
+ 311 |     | 
+ 312 | *   |         _allowances[owner][spender] = amount;
+ 313 | *   |         emit Approval(owner, spender, amount);
+ 314 |     |     }
+ 315 |     | 
+ 316 |     |     /**
+ 317 |     |      * @dev Updates `owner` s allowance for `spender` based on spent `amount`.
+ 318 |     |      *
+ 319 |     |      * Does not update the allowance amount in case of infinite allowance.
+ 320 |     |      * Revert if not enough allowance is available.
+ 321 |     |      *
+ 322 |     |      * Might emit an {Approval} event.
+ 323 |     |      */
+ 324 | *   |     function _spendAllowance(address owner, address spender, uint256 amount) internal virtual {
+ 325 | *   |         uint256 currentAllowance = allowance(owner, spender);
+ 326 | *   |         if (currentAllowance != type(uint256).max) {
+ 327 | *r  |             require(currentAllowance >= amount, "ERC20: insufficient allowance");
+ 328 |     |             unchecked {
+ 329 | *   |                 _approve(owner, spender, currentAllowance - amount);
+ 330 |     |             }
+ 331 |     |         }
+ 332 |     |     }
+ 333 |     | 
+ 334 |     |     /**
+ 335 |     |      * @dev Hook that is called before any transfer of tokens. This includes
+ 336 |     |      * minting and burning.
+ 337 |     |      *
+ 338 |     |      * Calling conditions:
+ 339 |     |      *
+ 340 |     |      * - when `from` and `to` are both non-zero, `amount` of ``from``'s tokens
+ 341 |     |      * will be transferred to `to`.
+ 342 |     |      * - when `from` is zero, `amount` tokens will be minted for `to`.
+ 343 |     |      * - when `to` is zero, `amount` of ``from``'s tokens will be burned.
+ 344 |     |      * - `from` and `to` are never both zero.
+ 345 |     |      *
+ 346 |     |      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+ 347 |     |      */
+ 348 | *   |     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual {}
+ 349 |     | 
+ 350 |     |     /**
+ 351 |     |      * @dev Hook that is called after any transfer of tokens. This includes
+ 352 |     |      * minting and burning.
+ 353 |     |      *
+ 354 |     |      * Calling conditions:
+ 355 |     |      *
+ 356 |     |      * - when `from` and `to` are both non-zero, `amount` of ``from``'s tokens
+ 357 |     |      * has been transferred to `to`.
+ 358 |     |      * - when `from` is zero, `amount` tokens have been minted for `to`.
+ 359 |     |      * - when `to` is zero, `amount` of ``from``'s tokens have been burned.
+ 360 |     |      * - `from` and `to` are never both zero.
+ 361 |     |      *
+ 362 |     |      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+ 363 |     |      */
+ 364 | *   |     function _afterTokenTransfer(address from, address to, uint256 amount) internal virtual {}
+ 365 |     | }
+ 366 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Interface of the ERC20 standard as defined in the EIP.
+  8 |     |  */
+  9 |     | interface IERC20 {
+ 10 |     |     /**
+ 11 |     |      * @dev Emitted when `value` tokens are moved from one account (`from`) to
+ 12 |     |      * another (`to`).
+ 13 |     |      *
+ 14 |     |      * Note that `value` may be zero.
+ 15 |     |      */
+ 16 |     |     event Transfer(address indexed from, address indexed to, uint256 value);
+ 17 |     | 
+ 18 |     |     /**
+ 19 |     |      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+ 20 |     |      * a call to {approve}. `value` is the new allowance.
+ 21 |     |      */
+ 22 |     |     event Approval(address indexed owner, address indexed spender, uint256 value);
+ 23 |     | 
+ 24 |     |     /**
+ 25 |     |      * @dev Returns the amount of tokens in existence.
+ 26 |     |      */
+ 27 |     |     function totalSupply() external view returns (uint256);
+ 28 |     | 
+ 29 |     |     /**
+ 30 |     |      * @dev Returns the amount of tokens owned by `account`.
+ 31 |     |      */
+ 32 |     |     function balanceOf(address account) external view returns (uint256);
+ 33 |     | 
+ 34 |     |     /**
+ 35 |     |      * @dev Moves `amount` tokens from the caller's account to `to`.
+ 36 |     |      *
+ 37 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 38 |     |      *
+ 39 |     |      * Emits a {Transfer} event.
+ 40 |     |      */
+ 41 |     |     function transfer(address to, uint256 amount) external returns (bool);
+ 42 |     | 
+ 43 |     |     /**
+ 44 |     |      * @dev Returns the remaining number of tokens that `spender` will be
+ 45 |     |      * allowed to spend on behalf of `owner` through {transferFrom}. This is
+ 46 |     |      * zero by default.
+ 47 |     |      *
+ 48 |     |      * This value changes when {approve} or {transferFrom} are called.
+ 49 |     |      */
+ 50 |     |     function allowance(address owner, address spender) external view returns (uint256);
+ 51 |     | 
+ 52 |     |     /**
+ 53 |     |      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+ 54 |     |      *
+ 55 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 56 |     |      *
+ 57 |     |      * IMPORTANT: Beware that changing an allowance with this method brings the risk
+ 58 |     |      * that someone may use both the old and the new allowance by unfortunate
+ 59 |     |      * transaction ordering. One possible solution to mitigate this race
+ 60 |     |      * condition is to first reduce the spender's allowance to 0 and set the
+ 61 |     |      * desired value afterwards:
+ 62 |     |      * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+ 63 |     |      *
+ 64 |     |      * Emits an {Approval} event.
+ 65 |     |      */
+ 66 |     |     function approve(address spender, uint256 amount) external returns (bool);
+ 67 |     | 
+ 68 |     |     /**
+ 69 |     |      * @dev Moves `amount` tokens from `from` to `to` using the
+ 70 |     |      * allowance mechanism. `amount` is then deducted from the caller's
+ 71 |     |      * allowance.
+ 72 |     |      *
+ 73 |     |      * Returns a boolean value indicating whether the operation succeeded.
+ 74 |     |      *
+ 75 |     |      * Emits a {Transfer} event.
+ 76 |     |      */
+ 77 |     |     function transferFrom(address from, address to, uint256 amount) external returns (bool);
+ 78 |     | }
+ 79 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts v4.4.1 (token/ERC20/extensions/IERC20Metadata.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | import "../IERC20.sol";
+  7 |     | 
+  8 |     | /**
+  9 |     |  * @dev Interface for the optional metadata functions from the ERC20 standard.
+ 10 |     |  *
+ 11 |     |  * _Available since v4.1._
+ 12 |     |  */
+ 13 |     | interface IERC20Metadata is IERC20 {
+ 14 |     |     /**
+ 15 |     |      * @dev Returns the name of the token.
+ 16 |     |      */
+ 17 |     |     function name() external view returns (string memory);
+ 18 |     | 
+ 19 |     |     /**
+ 20 |     |      * @dev Returns the symbol of the token.
+ 21 |     |      */
+ 22 |     |     function symbol() external view returns (string memory);
+ 23 |     | 
+ 24 |     |     /**
+ 25 |     |      * @dev Returns the decimals places of the token.
+ 26 |     |      */
+ 27 |     |     function decimals() external view returns (uint8);
+ 28 |     | }
+ 29 |     | 
+
+/tmp/codex-phase32-properties-retry/lib/openzeppelin-contracts/contracts/utils/Context.sol
+  1 |     | // SPDX-License-Identifier: MIT
+  2 |     | // OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
+  3 |     | 
+  4 |     | pragma solidity ^0.8.0;
+  5 |     | 
+  6 |     | /**
+  7 |     |  * @dev Provides information about the current execution context, including the
+  8 |     |  * sender of the transaction and its data. While these are generally available
+  9 |     |  * via msg.sender and msg.data, they should not be accessed in such a direct
+ 10 |     |  * manner, since when dealing with meta-transactions the account sending and
+ 11 |     |  * paying for execution may not be the actual sender (as far as an application
+ 12 |     |  * is concerned).
+ 13 |     |  *
+ 14 |     |  * This contract is only required for intermediate, library-like contracts.
+ 15 |     |  */
+ 16 |     | abstract contract Context {
+ 17 | *   |     function _msgSender() internal view virtual returns (address) {
+ 18 | *   |         return msg.sender;
+ 19 |     |     }
+ 20 |     | 
+ 21 |     |     function _msgData() internal view virtual returns (bytes calldata) {
+ 22 |     |         return msg.data;
+ 23 |     |     }
+ 24 |     | }
+ 25 |     | 
+
+/tmp/codex-phase32-properties-retry/tests/ERC20/foundry/src/ExampleToken.sol
+  1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+  2 |     | pragma solidity ^0.8.0;
+  3 |     | 
+  4 |     | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+  5 |     | import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+  6 |     | import "@openzeppelin/contracts/security/Pausable.sol";
+  7 |     | import "@openzeppelin/contracts/access/Ownable.sol";
+  8 |     | 
+  9 |     | contract ExampleToken is ERC20, ERC20Burnable, Pausable, Ownable {
+ 10 |     |     constructor() ERC20("Example token", "EXT") {}
+ 11 |     | 
+ 12 |     |     function pause() public onlyOwner {
+ 13 |     |         _pause();
+ 14 |     |     }
+ 15 |     | 
+ 16 | *   |     function unpause() public onlyOwner {
+ 17 |     |         _unpause();
+ 18 |     |     }
+ 19 |     | 
+ 20 | *   |     function mint(address to, uint256 amount) public virtual onlyOwner {
+ 21 | *   |         _mint(to, amount);
+ 22 |     |     }
+ 23 |     | 
+ 24 |     |     /*function _beforeTokenTransfer(address from, address to, uint256 amount)
+ 25 |     |         internal
+ 26 |     |         virtual
+ 27 |     |         whenNotPaused
+ 28 |     |         override
+ 29 |     |     {
+ 30 |     |         ERC20._beforeTokenTransfer(from, to, amount);
+ 31 |     |     }*/
+ 32 |     | }
+ 33 |     | 
+
+/tmp/codex-phase32-properties-retry/tests/ERC20/foundry/test/CryticTest.sol
+  1 |     | // SPDX-License-Identifier: AGPL-3.0-or-later
+  2 |     | pragma solidity ^0.8.0;
+  3 |     | import "properties/ERC20/internal/properties/ERC20BasicProperties.sol";
+  4 |     | import "../src/ExampleToken.sol";
+  5 |     | 
+  6 | *   | contract CryticERC20InternalHarness is
+  7 |     |     ExampleToken,
+  8 |     |     CryticERC20BasicProperties
+  9 |     | {
+ 10 | *   |     constructor() {
+ 11 |     |         // Setup balances for USER1, USER2 and USER3:
+ 12 | *   |         _mint(USER1, INITIAL_BALANCE);
+ 13 | *   |         _mint(USER2, INITIAL_BALANCE);
+ 14 | *   |         _mint(USER3, INITIAL_BALANCE);
+ 15 |     |         // Setup total supply:
+ 16 | *   |         initialSupply = totalSupply();
+ 17 | *   |         isMintableOrBurnable = true;
+ 18 |     |     }
+ 19 |     | }
+ 20 |     | 
+

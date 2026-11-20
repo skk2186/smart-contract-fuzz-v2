@@ -1,0 +1,305 @@
+=== /home/peter/Documents/pigfox2-repos/rwa-tokenization-demo/lib/solidity-pipeline/scripts/coverage.sh ===
+=== captured by lib/solidity-pipeline/scripts/audit-logs.sh, non-TTY, full verbosity ===
+=== provenance: no-key ===
+
+[1;34m==>[0m Running forge coverage in /home/peter/Documents/pigfox2-repos/rwa-tokenization-demo
+Warning: optimizer settings and `viaIR` have been disabled for accurate coverage reports.
+If you encounter "stack too deep" errors, consider using `--ir-minimum` which enables `viaIR` with minimum optimization resolving most of the errors
+Compiling 41 files with Solc 0.8.28
+Solc 0.8.28 finished in 6.12s
+Compiler run successful!
+Analysing contracts...
+Running tests...
+
+Ran 8 tests for test/PriceOracle.t.sol:PriceOracleTest
+[PASS] test_IsStale_FalseWhenFresh() (gas: 62250)
+[PASS] test_IsStale_RevertsBeforeFirstPush() (gas: 11243)
+[PASS] test_IsStale_TrueWhenOld() (gas: 62204)
+[PASS] test_LatestPrice_ReturnsPriceAndTimestamp() (gas: 61410)
+[PASS] test_LatestPrice_RevertsBeforeFirstPush() (gas: 10833)
+[PASS] test_SetPrice_RevertsForNonAgent() (gas: 14599)
+[PASS] test_SetPrice_Succeeds() (gas: 64196)
+[PASS] test_UpdatedAt_IsMonotonic() (gas: 66347)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 12.47ms (13.83ms CPU time)
+
+Ran 14 tests for test/IdentityRegistry.t.sol:IdentityRegistryTest
+[PASS] test_Register_RevertsForNonAgent() (gas: 16926)
+[PASS] test_Register_RevertsIfAlreadyVerified() (gas: 19116)
+[PASS] test_Register_RevertsOnZero() (gas: 13822)
+[PASS] test_Register_Succeeds() (gas: 45185)
+[PASS] test_Remove_RevertsForNonAgent() (gas: 16859)
+[PASS] test_Remove_RevertsIfNotVerified() (gas: 19121)
+[PASS] test_Remove_RevertsWhenHolderHasBalance() (gas: 80704)
+[PASS] test_Remove_Succeeds() (gas: 29644)
+[PASS] test_Remove_SucceedsAfterBalanceCleared() (gas: 71266)
+[PASS] test_Remove_SucceedsWhenNoTokenBound() (gas: 885548)
+[PASS] test_SetToken_RevertsForNonOwner() (gas: 878306)
+[PASS] test_SetToken_RevertsOnZero() (gas: 873349)
+[PASS] test_SetToken_RevertsWhenAlreadySet() (gas: 18054)
+[PASS] test_SetToken_Succeeds() (gas: 902110)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 30.69ms (29.34ms CPU time)
+
+Ran 10 tests for test/AssetRegistry.t.sol:AssetRegistryTest
+[PASS] test_GetAsset_RevertsOnUnknown() (gas: 15376)
+[PASS] test_IsActive_FalseAfterRedeemed() (gas: 114160)
+[PASS] test_IsActive_FalseForUnknown() (gas: 8692)
+[PASS] test_Register_AssignsSequentialIds() (gas: 181453)
+[PASS] test_Register_RevertsForNonAgent() (gas: 15325)
+[PASS] test_Register_Succeeds() (gas: 122314)
+[PASS] test_SetStatus_RevertsForNonAgent() (gas: 114592)
+[PASS] test_SetStatus_RevertsOnNoneStatus() (gas: 110010)
+[PASS] test_SetStatus_RevertsOnUnknownAsset() (gas: 17219)
+[PASS] test_SetStatus_Succeeds() (gas: 122550)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 34.51ms (32.47ms CPU time)
+
+Ran 12 tests for test/Roles.t.sol:RolesTest
+[PASS] test_Constructor_EmitsOwnershipAndAgent() (gas: 875295)
+[PASS] test_Constructor_RevertsOnZeroOwner() (gas: 37167)
+[PASS] test_Constructor_SetsOwnerAndFirstAgent() (gas: 870984)
+[PASS] test_OnlyAgent_AllowsGrantedAgent() (gas: 69481)
+[PASS] test_OnlyAgent_RevertsForNonAgent() (gas: 16881)
+[PASS] test_SetAgent_EnablesAndDisables() (gas: 36238)
+[PASS] test_SetAgent_RevertsOnZero() (gas: 14076)
+[PASS] test_SetAgent_RevertsWhenNotOwner() (gas: 15177)
+[PASS] test_TransferOwnership_DoesNotGrantAgentRole() (gas: 24184)
+[PASS] test_TransferOwnership_RevertsOnZero() (gas: 13771)
+[PASS] test_TransferOwnership_RevertsWhenNotOwner() (gas: 14832)
+[PASS] test_TransferOwnership_Succeeds() (gas: 24366)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 32.13ms (39.10ms CPU time)
+
+Ran 12 tests for test/Redemption.t.sol:RedemptionTest
+[PASS] test_Constructor_RevertsOnZeroAssetRegistry() (gas: 89972)
+[PASS] test_Constructor_RevertsOnZeroToken() (gas: 89971)
+[PASS] test_Constructor_SetsRefs() (gas: 15102)
+[PASS] test_GetRequest_RevertsOnUnknown() (gas: 14265)
+[PASS] test_Request_RevertsOnZeroAmount() (gas: 116185)
+[PASS] test_Request_RevertsWhenAssetNotActive() (gas: 82937)
+[PASS] test_Request_RevertsWhenHolderLacksBalance() (gas: 221681)
+[PASS] test_Request_Succeeds() (gas: 292402)
+[PASS] test_Settle_RevertsForNonAgent() (gas: 286940)
+[PASS] test_Settle_RevertsOnUnknownRequest() (gas: 16879)
+[PASS] test_Settle_RevertsWhenAlreadySettled() (gas: 288971)
+[PASS] test_Settle_Succeeds() (gas: 291725)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 25.77s (48.87ms CPU time)
+
+Ran 24 tests for test/RWAToken.t.sol:RWATokenTest
+[PASS] testFuzz_Mint_RejectsUnverified(address,uint256) (runs: 512, μ: 31386, ~: 30869)
+[PASS] testFuzz_Transfer_ConservesSupply(uint256,uint256) (runs: 512, μ: 109184, ~: 110530)
+[PASS] test_Approve_RevertsOnZeroSpender() (gas: 12017)
+[PASS] test_Approve_Succeeds() (gas: 43820)
+[PASS] test_BurnFrom_RevertsForNonRedeemer() (gas: 76496)
+[PASS] test_BurnFrom_RevertsOnInsufficientBalance() (gas: 77470)
+[PASS] test_BurnFrom_SucceedsForRedeemer() (gas: 83907)
+[PASS] test_Constructor_RevertsOnZeroRegistry() (gas: 90736)
+[PASS] test_Constructor_SetsMetadata() (gas: 27519)
+[PASS] test_Mint_RevertsForNonAgent() (gas: 17187)
+[PASS] test_Mint_RevertsForUnverifiedRecipient() (gas: 23256)
+[PASS] test_Mint_RevertsOnZeroRecipient() (gas: 14172)
+[PASS] test_Mint_Succeeds() (gas: 74639)
+[PASS] test_SetRedeemer_RevertsForNonOwner() (gas: 14848)
+[PASS] test_SetRedeemer_RevertsOnZero() (gas: 1535229)
+[PASS] test_SetRedeemer_Succeeds() (gas: 1563671)
+[PASS] test_TransferFrom_DecrementsFiniteAllowance() (gas: 135875)
+[PASS] test_TransferFrom_InfiniteAllowanceNotDecremented() (gas: 133424)
+[PASS] test_TransferFrom_RevertsOnInsufficientAllowance() (gas: 103490)
+[PASS] test_Transfer_RevertsOnInsufficientBalance() (gas: 80601)
+[PASS] test_Transfer_RevertsOnZeroRecipient() (gas: 71507)
+[PASS] test_Transfer_RevertsWhenRecipientNotVerified() (gas: 79694)
+[PASS] test_Transfer_RevertsWhenSenderNotVerified() (gas: 21291)
+[PASS] test_Transfer_SucceedsBetweenVerified() (gas: 111435)
+Suite result: ok. 24 passed; 0 failed; 0 skipped; finished in 25.77s (703.74ms CPU time)
+
+Ran 10 tests for test/Invariants.t.sol:InvariantsTest
+[PASS] invariant_OracleStampMonotonic() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------+-----------------------+-------+---------+----------╮
+| Contract   | Selector              | Calls | Reverts | Discards |
++=================================================================+
+| Properties | distribute            | 1646  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToHolder          | 1677  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToSelf            | 1697  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | pushPrice             | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeem                | 1607  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeemFromActiveAsset | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | registerAsset         | 1598  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | setAssetStatus        | 1621  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | settle                | 1649  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | tryMintPhantom        | 1607  | 0       | 0        |
+╰------------+-----------------------+-------+---------+----------╯
+
+[PASS] invariant_RedemptionLedgerConsistent() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------+-----------------------+-------+---------+----------╮
+| Contract   | Selector              | Calls | Reverts | Discards |
++=================================================================+
+| Properties | distribute            | 1646  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToHolder          | 1677  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToSelf            | 1697  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | pushPrice             | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeem                | 1607  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeemFromActiveAsset | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | registerAsset         | 1598  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | setAssetStatus        | 1621  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | settle                | 1649  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | tryMintPhantom        | 1607  | 0       | 0        |
+╰------------+-----------------------+-------+---------+----------╯
+
+[PASS] invariant_RedemptionRequiresActiveAsset() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------+-----------------------+-------+---------+----------╮
+| Contract   | Selector              | Calls | Reverts | Discards |
++=================================================================+
+| Properties | distribute            | 1646  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToHolder          | 1677  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToSelf            | 1697  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | pushPrice             | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeem                | 1607  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeemFromActiveAsset | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | registerAsset         | 1598  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | setAssetStatus        | 1621  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | settle                | 1649  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | tryMintPhantom        | 1607  | 0       | 0        |
+╰------------+-----------------------+-------+---------+----------╯
+
+[PASS] invariant_SupplyConserved() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------+-----------------------+-------+---------+----------╮
+| Contract   | Selector              | Calls | Reverts | Discards |
++=================================================================+
+| Properties | distribute            | 1646  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToHolder          | 1677  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToSelf            | 1697  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | pushPrice             | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeem                | 1607  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeemFromActiveAsset | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | registerAsset         | 1598  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | setAssetStatus        | 1621  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | settle                | 1649  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | tryMintPhantom        | 1607  | 0       | 0        |
+╰------------+-----------------------+-------+---------+----------╯
+
+[PASS] invariant_SupplyEqualsSumOfBalances() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------+-----------------------+-------+---------+----------╮
+| Contract   | Selector              | Calls | Reverts | Discards |
++=================================================================+
+| Properties | distribute            | 1646  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToHolder          | 1677  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToSelf            | 1697  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | pushPrice             | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeem                | 1607  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeemFromActiveAsset | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | registerAsset         | 1598  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | setAssetStatus        | 1621  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | settle                | 1649  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | tryMintPhantom        | 1607  | 0       | 0        |
+╰------------+-----------------------+-------+---------+----------╯
+
+[PASS] invariant_UnverifiedNeverHolds() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------+-----------------------+-------+---------+----------╮
+| Contract   | Selector              | Calls | Reverts | Discards |
++=================================================================+
+| Properties | distribute            | 1646  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToHolder          | 1677  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | mintToSelf            | 1697  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | pushPrice             | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeem                | 1607  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | redeemFromActiveAsset | 1641  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | registerAsset         | 1598  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | setAssetStatus        | 1621  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | settle                | 1649  | 0       | 0        |
+|------------+-----------------------+-------+---------+----------|
+| Properties | tryMintPhantom        | 1607  | 0       | 0        |
+╰------------+-----------------------+-------+---------+----------╯
+
+[PASS] test_declaredPropertyCountMatchesThisFile() (gas: 68002)
+[PASS] test_harnessSaysWhatItProves() (gas: 10521)
+[PASS] test_settlementLedgerEndToEnd() (gas: 9505908)
+[PASS] test_suspendedAssetCannotBeRedeemedAgainst() (gas: 9184674)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 25.77s (126.66s CPU time)
+
+Ran 7 test suites in 25.79s (77.42s CPU time): 90 tests passed, 0 failed, 0 skipped (90 total tests)
+
+╭--------------------------+-------------------+-------------------+-----------------+-----------------╮
+| File                     | % Lines           | % Statements      | % Branches      | % Funcs         |
++======================================================================================================+
+| src/AssetRegistry.sol    | 100.00% (19/19)   | 100.00% (20/20)   | 100.00% (3/3)   | 100.00% (4/4)   |
+|--------------------------+-------------------+-------------------+-----------------+-----------------|
+| src/IdentityRegistry.sol | 100.00% (19/19)   | 100.00% (21/21)   | 100.00% (7/7)   | 100.00% (4/4)   |
+|--------------------------+-------------------+-------------------+-----------------+-----------------|
+| src/PriceOracle.sol      | 100.00% (10/10)   | 100.00% (11/11)   | 100.00% (2/2)   | 100.00% (3/3)   |
+|--------------------------+-------------------+-------------------+-----------------+-----------------|
+| src/RWAToken.sol         | 100.00% (52/52)   | 100.00% (53/53)   | 100.00% (13/13) | 100.00% (11/11) |
+|--------------------------+-------------------+-------------------+-----------------+-----------------|
+| src/Redemption.sol       | 100.00% (22/22)   | 100.00% (25/25)   | 100.00% (6/6)   | 100.00% (4/4)   |
+|--------------------------+-------------------+-------------------+-----------------+-----------------|
+| src/Roles.sol            | 100.00% (18/18)   | 100.00% (18/18)   | 100.00% (5/5)   | 100.00% (5/5)   |
+|--------------------------+-------------------+-------------------+-----------------+-----------------|
+| Total                    | 100.00% (140/140) | 100.00% (148/148) | 100.00% (36/36) | 100.00% (31/31) |
+╰--------------------------+-------------------+-------------------+-----------------+-----------------╯
+
+[1;34m==>[0m Enforcing 100% coverage on src/ (no exclusions)
+  OK    src/AssetRegistry.sol                    100% lines / statements / branches / functions
+  OK    src/IdentityRegistry.sol                 100% lines / statements / branches / functions
+  OK    src/PriceOracle.sol                      100% lines / statements / branches / functions
+  OK    src/RWAToken.sol                         100% lines / statements / branches / functions
+  OK    src/Redemption.sol                       100% lines / statements / branches / functions
+  OK    src/Roles.sol                            100% lines / statements / branches / functions
+
+PASSED: 6 file(s) at 100% on all four metrics.
+
+=== exit status: 0 ===

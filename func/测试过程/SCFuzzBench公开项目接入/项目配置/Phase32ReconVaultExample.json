@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "project_name": "Phase32ReconVaultExample",
+  "v2_enabled": true,
+  "source": {
+    "repository": "https://github.com/Recon-Fuzz/vaults-fuzzing-example.git",
+    "commit": "a51aab72784acb275a50631f8236b47a469803ae",
+    "root": "sol/真实项目/ReconVaultFuzzExample",
+    "submodules": {
+      "lib/chimera": "1548edc438c1a9a74c532f20805459fb1a4c73a7",
+      "lib/forge-std": "bb4ceea94d6f10eeb5b41dc2391c6c8bf8e734ef",
+      "lib/openzeppelin-contracts": "69c8def5f222ff96f2b5beff05dfba996368aa79",
+      "lib/setup-helpers": "e932f89bde035b4193f33699ae75a91f6246d635"
+    }
+  },
+  "paths": {
+    "analysis_report": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-20261120/Vault-slither-properties-post-adapter.json",
+    "compiled_artifact": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-20261120/Vault-CryticTester-artifact.json"
+  },
+  "compiler": {
+    "build_system": "foundry",
+    "target": "sol/真实项目/ReconVaultFuzzExample",
+    "version": "0.8.28",
+    "solc": "/home/skk/.solc-select/artifacts/solc-0.8.28/solc-0.8.28",
+    "remappings": [
+      "forge-std/=sol/真实项目/ReconVaultFuzzExample/lib/forge-std/src/",
+      "openzeppelin-contracts/=sol/真实项目/ReconVaultFuzzExample/lib/openzeppelin-contracts/src/",
+      "chimera/=sol/真实项目/ReconVaultFuzzExample/lib/chimera/src/",
+      "recon/=sol/真实项目/ReconVaultFuzzExample/lib/setup-helpers/src/"
+    ],
+    "extra_args": [],
+    "compile_options": {"foundry_compile_all": true}
+  },
+  "harness": {
+    "source": ".",
+    "contract": "CryticTester"
+  },
+  "analysis": {
+    "property_functions": [
+      "property_share_solvency",
+      "property_total_supply_solvency"
+    ]
+  },
+  "deployment": {
+    "mode": "constructor",
+    "constructor_args": [],
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+    "address_derivation": "CREATE(deployer, nonce=0); CryticTester constructor calls setup()"
+  },
+  "execution": {
+    "chain_id": 1,
+    "deployment_timestamp": 1524785992,
+    "deployment_block_number": 4370000,
+    "base_fee_per_gas": 0,
+    "gas_price": 0,
+    "block_gas_limit": 100000000,
+    "max_transaction_gas": 12500000,
+    "initial_balance": 100000000000000000000,
+    "hardfork": "cancun"
+  },
+  "property": {
+    "mode": "assertion",
+    "test_mode": "assertion",
+    "engine_prefix": "property_",
+    "sender": "0x0000000000000000000000000000000000010000"
+  },
+  "actions": {
+    "senders": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "value_policy": "Only payable ABI actions receive value; all five senders and the deployer receive the same initial balance."
+  },
+  "echidna": {
+    "prefix": "property_",
+    "test_mode": "assertion",
+    "workers": 1,
+    "call_sequence_length": 8,
+    "stop_on_fail": false,
+    "disable_slither": true,
+    "isolation_rule": "Per task, allow only the selected assertion function and its statically associated state-changing actions."
+  }
+}

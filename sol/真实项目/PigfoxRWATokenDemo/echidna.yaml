@@ -1,0 +1,50 @@
+# Echidna configuration — PIGFOX SOLIDITY PIPELINE v1.
+#
+# Derived from lib/solidity-pipeline/config/echidna.yaml. Only the values under
+# "tune per repo" differ; everything below REQUIRED is the estate-wide setting,
+# and lib/solidity-pipeline/scripts/property-count.sh is what notices when a run
+# stops meaning it.
+#
+# Run:  echidna . --contract Properties --config echidna.yaml
+#
+# WARNING: artifacts must come from a fresh `forge build`. `forge coverage`
+# overwrites out/ with instrumented artifacts that crytic-compile consumes
+# without complaint, silently registering fewer properties than the source has.
+# Always `rm -rf crytic-export && forge build --force` first.
+
+# --- tune per repo ---------------------------------------------------------
+
+# The harness moves no ether — this is token accounting only — so it needs no
+# balance to construct.
+balanceContract: 0
+
+# Only the harness is a target. It owns every privileged role, and the four
+# holders are Actor contracts it calls through; letting the fuzzer reach the
+# system contracts directly would just bounce off access control forever.
+allContracts: false
+
+corpusDir: echidna-corpus
+
+# --- REQUIRED — do not diverge ---------------------------------------------
+
+# Assert against the boolean echidna_* predicates rather than Solidity asserts.
+testMode: property
+
+testLimit: 100000
+
+# seqLen MUST match foundry.toml's invariant depth, so all three engines walk
+# sequences of the same length and a bug found by one is reachable by the rest.
+seqLen: 64
+
+shrinkLimit: 5000
+
+# Deterministic runs, so a CI failure is reproducible locally.
+seed: 20260723
+
+# Fail loudly rather than reporting a pass when the harness cannot be deployed.
+stopOnFail: true
+
+# Reuse the artifacts `forge build` already produced. Without this,
+# crytic-compile tries to download its own solc, which needs network access and a
+# GitHub API budget CI should not depend on.
+cryticArgs: ["--foundry-ignore-compile"]

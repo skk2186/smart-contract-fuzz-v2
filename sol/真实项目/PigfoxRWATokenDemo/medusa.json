@@ -1,0 +1,56 @@
+{
+  "//": "Medusa configuration — PIGFOX SOLIDITY PIPELINE v1, derived from lib/solidity-pipeline/config/medusa.json. The testing block is the estate-wide setting and is not tuned here. targetContractsBalances is 0x0: this is token accounting and the harness moves no ether.",
+  "//artifacts": "WARNING: artifacts must come from a fresh `forge build`. `forge coverage` overwrites out/ with instrumented artifacts that crytic-compile consumes without complaint, silently registering fewer properties than the source has. Always `rm -rf crytic-export && forge build --force` first.",
+  "fuzzing": {
+    "workers": 8,
+    "workerResetLimit": 50,
+    "timeout": 0,
+    "testLimit": 100000,
+    "shrinkLimit": 5000,
+    "callSequenceLength": 64,
+    "corpusDirectory": "medusa-corpus",
+    "coverageEnabled": true,
+    "targetContracts": ["Properties"],
+    "targetContractsBalances": ["0x0"],
+    "constructorArgs": {},
+    "deployerAddress": "0x30000",
+    "senderAddresses": ["0x10000", "0x20000", "0x30000"],
+    "maxBlockNumberDelay": 60480,
+    "maxBlockTimestampDelay": 604800,
+    "blockNumberDelayMax": 60480,
+    "blockTimestampDelayMax": 604800,
+    "transactionGasLimit": 12500000,
+    "testing": {
+      "stopOnFailedTest": true,
+      "stopOnFailedContractMatching": true,
+      "stopOnNoTests": true,
+      "testAllContracts": false,
+      "traceAll": false,
+      "assertionTesting": {
+        "enabled": false,
+        "testViewMethods": false
+      },
+      "propertyTesting": {
+        "enabled": true,
+        "testPrefixes": ["echidna_"]
+      },
+      "optimizationTesting": {
+        "enabled": false
+      }
+    }
+  },
+  "compilation": {
+    "platform": "crytic-compile",
+    "platformConfig": {
+      "target": ".",
+      "solcVersion": "",
+      "exportDirectory": "",
+      "args": ["--foundry-ignore-compile"]
+    }
+  },
+  "logging": {
+    "level": "info",
+    "logDirectory": "",
+    "noColor": false
+  }
+}

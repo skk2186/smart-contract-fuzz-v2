@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "phase": "Phase32",
+  "frozen_at": "2026-11-20",
+  "selection_status": "frozen_before Agent A/B runs and V2 comparison",
+  "baseline_commit": "3eb48e4e7eca917c645305935227f15f28a38d80",
+  "selected_task_ids": [
+    "rwa-supply-sum",
+    "rwa-redemption-ledger",
+    "vault-share-solvency",
+    "vault-total-supply"
+  ],
+  "independent_project_count": 2,
+  "source_lock": {
+    "manifest": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-20261120/上游源码SHA256清单.json",
+    "projects": [
+      {
+        "name": "Phase32PigfoxRWADemo",
+        "url": "https://github.com/pigfox/rwa-tokenization-demo.git",
+        "commit": "2a6c4b0cfad46d1f84cbd6aaf3a2e0881660b03d",
+        "manifest_sha256": "72ddf47c5f89f63c50a6060f8268b0105f39c77c24ccc0e96335c8e7f1c8ea8a",
+        "property_source": "sol/真实项目/PigfoxRWATokenDemo/test/Properties.sol",
+        "property_source_sha256": "b7cbfdc57cc4229431705421635b3c6e576e1ed5301fae96ea30a5fd64c2066f",
+        "compiler": "solc 0.8.28 / Foundry",
+        "harness": "Properties"
+      },
+      {
+        "name": "Phase32ReconVaultExample",
+        "url": "https://github.com/Recon-Fuzz/vaults-fuzzing-example.git",
+        "commit": "a51aab72784acb275a50631f8236b47a469803ae",
+        "manifest_sha256": "3a18afe05382ba855cfcbeb14830db91fca3c7b29cf99cc332cec1867c51b277",
+        "property_source": "sol/真实项目/ReconVaultFuzzExample/test/recon/Properties.sol",
+        "property_source_sha256": "70327ece9988b98090d1cc2020f764def75d7476afaa691decb39d3ba4ec5802",
+        "compiler": "solc 0.8.28 / Foundry",
+        "harness": "CryticTester"
+      }
+    ]
+  },
+  "property_descriptors": [
+    {"task_id":"rwa-supply-sum","property_id":"2e998090c7de1e70f195","source":"Properties.echidna_supply_equals_sum_of_balances()","test_mode":"Boolean Property","initial_state":"true","expected_failure":"selected Boolean property returns false"},
+    {"task_id":"rwa-redemption-ledger","property_id":"eaf144ea41a1f5bc076d","source":"Properties.echidna_redemption_ledger_consistent()","test_mode":"Boolean Property","initial_state":"true","expected_failure":"selected Boolean property returns false"},
+    {"task_id":"vault-share-solvency","property_id":"be946ac20a91ff2f9904","source":"Properties.property_share_solvency() -> CryticAsserts.lte() -> assert(false)","test_mode":"Assertion","initial_state":"pass","expected_failure":"selected property call reverts with Solidity Panic(0x01); ordinary Error(string), RPC/deployment errors, and other top-level assertion functions do not count"},
+    {"task_id":"vault-total-supply","property_id":"76606be646ce1a2dbd78","source":"Properties.property_total_supply_solvency() -> CryticAsserts.lte() -> assert(false)","test_mode":"Assertion","initial_state":"pass","expected_failure":"selected property call reverts with Solidity Panic(0x01); ordinary Error(string), RPC/deployment errors, and other top-level assertion functions do not count"}
+  ],
+  "tools": {
+    "echidna": "2.3.2",
+    "foundry": "forge 1.9.0-dev / anvil 1.9.0-dev",
+    "slither": "see static-analysis report input metadata",
+    "agent_model": "deepseek-flash",
+    "agent_temperature": 0,
+    "agent_thinking": "disabled",
+    "agent_max_output_tokens": 4096,
+    "agent_json_mode": true
+  },
+  "environment": {
+    "chain_id": 1,
+    "anvil_hardfork": "cancun",
+    "initial_timestamp": 1524785992,
+    "deployment_block_number": 4370000,
+    "base_fee_wei": 0,
+    "gas_price_wei": 0,
+    "initial_balance_wei_each_sender_and_deployer": 100000000000000000000,
+    "senders": ["0x0000000000000000000000000000000000010000","0x0000000000000000000000000000000000020000","0x0000000000000000000000000000000000030000","0x0000000000000000000000000000000000040000","0x0000000000000000000000000000000000050000"],
+    "deployment_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+    "echidna_runtime_note": "Echidna 2.3.2 has no hardfork flag in local --help; the selected solc 0.8.28 bytecode smoke runs successfully there. Same seed and deployment parameters are used by every Echidna arm."
+  },
+  "agent_budget": {
+    "max_candidates_per_property": 1,
+    "max_sequence_steps": 8,
+    "planning_repairs": 0,
+    "schema_repairs": 0,
+    "execution_replans": 0,
+    "parameter_repair_per_candidate": 1,
+    "max_tokens_per_project_run": 400000,
+    "wall_budget_seconds_per_project_run": 600,
+    "automatic_transport_retries": 1,
+    "api_attempts_and_token_usage": "record every actual attempt under the Phase32 result directory"
+  },
+  "sequence_expansion": {
+    "implementation": "Phase31 func/功能/状态反馈序列扩展.py, search and ordering rules unchanged",
+    "max_sequence_length": 8,
+    "retained_prefixes": 4,
+    "candidate_executions_per_property_per_expansion_mode": 24,
+    "modes": {"R":"random proposals","S":"static dependency only","E3":"state feedback"},
+    "candidate_replay": "fresh Anvil deployment; one existing local constraint repair maximum",
+    "manual_oracle_used_as_input": false
+  },
+  "comparison": {
+    "groups": {
+      "E0": "native Echidna, empty external corpus",
+      "E1": "raw Agent A/B seed",
+      "E2": "same Agent A/B plan plus existing parameter repair",
+      "E3": "same Agent A/B plan plus parameter repair and Phase31 state feedback expansion",
+      "R": "same Agent A/B plan plus random expansion with equal candidate execution budget",
+      "S": "same Agent A/B plan plus static dependency-only expansion with equal candidate execution budget"
+    },
+    "random_seeds": [20261125,20261135,20261145],
+    "test_limit": 500,
+    "workers": 1,
+    "sequence_length": 8,
+    "stages": ["seed-only testLimit=0", "fuzz testLimit=500"],
+    "per_group_runs_per_task": 3,
+    "entry_rule": "seed is seed-utility eligible only when ABI-valid, fully Anvil-replayable, and it changes at least one property-related observed getter; target-reaching seeds are recorded separately",
+    "coverage_rule": "record seed-only and final LCOV, and compare line sets within each same task/group/seed; do not infer mutation from Echidna text counters",
+    "cost_rule": "report one-time preparation cost, Anvil replay count, API/token cost, seed-only time and fuzz time separately and as end-to-end total",
+    "early_failure_rule": "early target failures are reported as target outcomes, not compared as full 500-test coverage runs"
+  },
+  "artifacts": {
+    "screening": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-20261120/工程资格筛选清单.json",
+    "initial_deployment": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-20261120/部署与属性初始状态.json",
+    "source_manifest": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-20261120/上游源码SHA256清单.json"
+  }
+}

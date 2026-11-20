@@ -1,0 +1,57 @@
+{
+  "//": "The canonical list of repos on the pipeline. This file is the SINGLE source of truth; README.md's 'Repos on the pipeline' table is checked against it by scripts/consumers-check.sh, which CI runs. Add a repo here in the same commit that adopts the pipeline. See docs/CONSUMERS.md for what this guard does and does not catch.",
+  "consumers": [
+    {
+      "repo": "gas-optimization",
+      "what": "Four gas techniques, naive vs optimized, raced on-chain",
+      "coverageExclusions": [],
+      "fmtPaths": "src test script"
+    },
+    {
+      "repo": "rwa-tokenization-demo",
+      "what": "Permissioned real-world-asset token with identity gating",
+      "coverageExclusions": [],
+      "fmtPaths": "src test script"
+    },
+    {
+      "repo": "zk-kyc-pass",
+      "what": "Groth16 KYC attestation, nullifier-bound",
+      "coverageExclusions": [
+        "src/Verifier.sol"
+      ],
+      "fmtPaths": "src test script"
+    },
+    {
+      "repo": "zk-escrow",
+      "what": "UUPS escrow with zk release and arbiter dispute settlement",
+      "coverageExclusions": [
+        "src/Verifier.sol"
+      ],
+      "fmtPaths": "src test script"
+    },
+    {
+      "repo": "interest-rate-model",
+      "what": "Kinked borrow/supply rate curve, continuous at the kink",
+      "coverageExclusions": [],
+      "fmtPaths": "src test script"
+    },
+    {
+      "repo": "oracle-health-explorer",
+      "what": "Chainlink feed health verdicts with per-feed max age",
+      "coverageExclusions": [],
+      "fmtPaths": "src test script"
+    },
+    {
+      "repo": "ai-parametric-insurance",
+      "what": "Parametric claims settled by a 2-of-3 multi-model adjudication oracle",
+      "coverageExclusions": [],
+      "fmtPaths": "src test script"
+    },
+    {
+      "repo": "deposit-dispute",
+      "what": "Per-item security-deposit split, adjudicated 2-of-3 by three pinned models that never name an amount",
+      "coverageExclusions": [],
+      "fmtPaths": "src test script"
+    }
+  ]
+}

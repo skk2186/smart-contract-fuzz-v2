@@ -1,0 +1,91 @@
+name: CI
+
+# The pipeline's own build. It does not run the pipeline against itself — there
+# are no contracts here to fuzz, deploy or cover. What it does is prove that the
+# gates other repos depend on still work, still reject what they claim to reject,
+# and are still valid shell.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  selftest:
+    name: gates (self-test)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      # The self-test drives address-checksum-gate.sh, whose EIP-55 answer comes
+      # from `cast to-check-sum-address` rather than a re-derivation of the
+      # checksum. Pinned for the same reason every other Foundry use here is.
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: v1.4.2
+
+      # The self-test builds throwaway git repos to exercise the doctrine and
+      # address-checksum gates.
+      - name: Run the gate self-test
+        run: ./scripts/selftest.sh
+
+      # The consumer list went stale once — four repos listed, six on the
+      # pipeline. This checks README.md against consumers.json in both
+      # directions, and self-tests first. See docs/CONSUMERS.md for what it
+      # deliberately does not cover.
+      - name: Consumer list matches the README
+        run: ./scripts/consumers-check.sh all
+
+      # The stage table went stale the same way the consumer list did: `lint`
+      # landed as step 1 and the prose describing the pipeline did not follow.
+      # This checks the table against the reusable workflow's own jobs, in order,
+      # and self-tests first. See the header of the script for what it
+      # deliberately cannot reach.
+      - name: Stage table matches the reusable workflow
+        run: ./scripts/stages-check.sh all
+
+  shell:
+    name: shellcheck + shfmt
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Install shellcheck and shfmt
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          go install mvdan.cc/sh/v3/cmd/shfmt@v3.10.0
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: shellcheck
+        run: shellcheck scripts/*.sh
+
+      - name: shfmt (check only)
+        run: shfmt -d scripts/*.sh
+
+  solidity:
+    name: forge (build + fmt of the shared base)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      # Pinned for the same reason the reusable workflow pins its fmt job: the
+      # formatter changes between releases and a floating version turns an
+      # unchanged tree red on somebody else's release day.
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: v1.4.2
+
+      - name: Build
+        run: forge build
+
+      - name: Format check
+        run: forge fmt --check src/

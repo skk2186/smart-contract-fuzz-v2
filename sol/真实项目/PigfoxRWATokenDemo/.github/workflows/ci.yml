@@ -1,0 +1,39 @@
+name: CI
+
+# Everything here runs on a clean checkout with NO secrets. Build, test,
+# coverage, static analysis and property fuzzing need no keys — only deploying
+# does, and that is done by hand from a laptop, never here.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # PIGFOX SOLIDITY PIPELINE v1 — the estate's one verification standard, defined
+  # once in pigfox/solidity-pipeline and consumed here rather than copied. This
+  # file used to carry five hand-written jobs, and the repo carried its own
+  # Slither config and its own coverage script; all of that now lives in one
+  # place, so a fix lands once. Medusa is new here — this repo had Echidna only.
+  #
+  # The gate SCRIPTS come from lib/solidity-pipeline, vendored as a submodule at a
+  # commit this repo pins, so a local run and this run are the same bytes.
+  #
+  # https://github.com/pigfox/solidity-pipeline
+  pipeline:
+    uses: pigfox/solidity-pipeline/.github/workflows/solidity.yml@v1
+    with:
+      # test/Properties.sol declares six echidna_* predicates and states the same
+      # number in pigfoxPropertyCount(). Both fuzzers assert they registered
+      # exactly this many, so a property that silently stops being picked up fails
+      # the job instead of reporting a smaller green run.
+      #
+      # Bump this, pigfoxPropertyCount() and the predicate together, in one commit.
+      expected-properties: 6

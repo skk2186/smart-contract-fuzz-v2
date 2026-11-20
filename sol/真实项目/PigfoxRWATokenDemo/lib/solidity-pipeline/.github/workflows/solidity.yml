@@ -1,0 +1,564 @@
+name: pigfox solidity pipeline v1
+
+# The single CI definition for every pigfox contract repo. Consuming repos do
+# not copy this file; they call it:
+#
+#   jobs:
+#     pipeline:
+#       uses: pigfox/solidity-pipeline/.github/workflows/solidity.yml@v1
+#       with:
+#         expected-properties: 6
+#
+# Every stage runs on every push. There is no fast path and no opt-out: a repo
+# that skips a stage is a repo whose green means less than the next one's.
+#
+# The shell SCRIPTS this workflow runs come from the pipeline checked out as a
+# git submodule in the consuming repo (default lib/solidity-pipeline). That is
+# deliberate: it pins the gate logic to a commit the consuming repo chose, and it
+# means a developer runs byte-identical gates locally. The `uses:` ref above pins
+# only the orchestration.
+#
+# NO SECRETS. Build, test, fuzz and analysis never read a .env. Deploying and
+# running an agent need credentials; neither happens here, and this workflow
+# declares no `secrets:` input so it cannot be handed any.
+
+on:
+  workflow_call:
+    inputs:
+      expected-properties:
+        description: >-
+          How many echidna_* predicates the harness declares. Asserted three
+          ways — against the source, against the harness's own
+          pigfoxPropertyCount() literal, and against what each fuzzer actually
+          registered at runtime. A stale artifact once shrank a property set and
+          reported a smaller green run; this input is what makes that fail.
+        required: true
+        type: number
+      properties-contract:
+        description: Contract name both fuzzers target.
+        default: Properties
+        type: string
+      properties-source:
+        description: Path to the harness source, for the static count check.
+        default: test/Properties.sol
+        type: string
+      fmt-paths:
+        description: >-
+          Space-separated paths passed to `forge fmt --check`. Narrow this only
+          for a tree with pre-existing violations, and say so in the repo README.
+        default: src test script
+        type: string
+      coverage-exclusions:
+        description: >-
+          Comma-separated src/ paths excluded from the 100% coverage gate. Each
+          must be justified in the consuming repo's docs. An exclusion that
+          matches no row in the report fails the gate — stale exclusions are
+          holes that read as decisions.
+        default: ''
+        type: string
+      coverage-no-match-contract:
+        description: >-
+          A regex of TEST CONTRACTS to drop from coverage INSTRUMENTATION. This is
+          not an exclusion from the gate and not a lower threshold: the named
+          tests still RUN in full at the forge test stage and under both fuzzers,
+          no src/ row is removed, and every remaining row must still reach 100% on
+          all four metrics. That last part is the guard — the only way this could
+          hide a gap is by producing a sub-100% row, and a sub-100% row fails.
+          Default empty, so a consumer that does not set it is unaffected.
+          Set it only where instrumenting a suite costs more than it measures.
+          deposit-dispute is the one repo that does: its invariant harness builds
+          merkle proofs in Solidity, so under instrumentation (which disables the
+          optimizer) its coverage run peaks at 33.8 GiB against a 16 GB runner —
+          and it covers nothing the unit suite misses, which was measured, not
+          assumed: excluding it leaves the report byte-identical at 100% on all
+          four metrics, in 5.6s at 433 MiB instead of 6m19s at 33.8 GiB.
+        default: ''
+        type: string
+      echidna-config:
+        default: echidna.yaml
+        type: string
+      medusa-config:
+        default: medusa.json
+        type: string
+      pipeline-path:
+        description: Where the consuming repo vendors this pipeline as a submodule.
+        default: lib/solidity-pipeline
+        type: string
+      run-doctrine-gate:
+        description: >-
+          Run the no-chain-copy doctrine gate. On by default; every contract repo
+          in the estate wants it.
+        default: true
+        type: boolean
+      pipeline-ref:
+        description: >-
+          The ref this workflow was called at. Used for ONE thing: as a fallback
+          when the consuming repo's submodule pin predates a gate script this
+          workflow runs. A stage landing here must not turn every consumer red
+          before it has bumped its pin — and it must not be silently skipped
+          either, because a gate that did not run may not report green. So the
+          script is taken from the submodule when it is there, and otherwise from
+          this repo at this ref, loudly, until the pin catches up. Keep it equal
+          to the ref in your `uses:` line.
+        default: v1
+        type: string
+
+      # --- pins -----------------------------------------------------------
+      # Every tool is pinned. An unpinned toolchain turns an unchanged tree red
+      # on somebody else's release day, and — worse — can turn a red tree green.
+      foundry-fmt-version:
+        description: >-
+          Foundry version used for the formatting gate ONLY, and pinned rather
+          than tracking `stable`. forge's formatter changes between releases: a
+          tree formatted by 1.4.2 does not satisfy `--check` under a later one,
+          so gating on a floating version makes an unrelated upstream release a
+          red build on an unchanged tree. Bump this and re-run `forge fmt`
+          together, never separately.
+        default: v1.4.2
+        type: string
+      foundry-version:
+        default: v1.4.2
+        type: string
+      echidna-version:
+        default: '2.2.6'
+        type: string
+      medusa-version:
+        default: v1.5.1
+        type: string
+      slither-version:
+        default: '0.11.3'
+        type: string
+      crytic-compile-version:
+        default: '0.3.10'
+        type: string
+      solhint-version:
+        description: >-
+          Solhint version, installed by `npx --yes solhint@<this>` at CI time so no
+          repo gains a package.json, a lockfile or a node_modules directory. Pinned
+          rather than tracking latest: solhint's rule set changes between minors —
+          6.2.3 added no-unchecked-calls and no-immutable-before-declaration to
+          `recommended` — so a floating version makes somebody else's release day a
+          red build on an unchanged tree.
+        default: '6.2.3'
+        type: string
+      solhint-paths:
+        description: >-
+          Glob passed to solhint, quoted so the shell does not expand it first.
+          src/ only, mirroring Slither's filter_paths and forge lint's ignore.
+        default: 'src/**/*.sol'
+        type: string
+      go-version:
+        description: Go toolchain used only to `go install` medusa.
+        default: stable
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Nothing downstream means anything if the gate logic itself is missing or
+  # broken, so this runs first and everything else needs it.
+  pipeline:
+    name: pipeline (submodule present, gates self-test)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+
+      - name: Pipeline submodule present
+        env:
+          PIPELINE_PATH: ${{ inputs.pipeline-path }}
+        run: |
+          set -euo pipefail
+          if [ ! -x "$PIPELINE_PATH/scripts/coverage.sh" ]; then
+            echo "::error::$PIPELINE_PATH/scripts/coverage.sh not found."
+            echo "This repo calls the pigfox solidity pipeline but does not vendor it."
+            echo "Add it:  git submodule add https://github.com/pigfox/solidity-pipeline $PIPELINE_PATH"
+            exit 1
+          fi
+          echo "pipeline at $PIPELINE_PATH, commit $(git -C "$PIPELINE_PATH" rev-parse HEAD)"
+
+      # The self-test drives address-checksum-gate.sh, whose EIP-55 answer comes
+      # from `cast to-check-sum-address` rather than a re-derivation of the
+      # checksum. So the toolchain is needed to run the GATES here, not only to
+      # build contracts downstream.
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: ${{ inputs.foundry-version }}
+
+      # The gates are only worth running if they can still say no.
+      - name: Gate self-test
+        run: ${{ inputs.pipeline-path }}/scripts/selftest.sh
+
+  # ---------------------------------------------------------------------------
+  # STEP 1 of the pipeline: the two linters. Cheapest gates first — they need no
+  # fuzzing, no chain and no coverage run, so a style regression fails in seconds
+  # rather than after the fuzzers.
+  #
+  # BOTH linters run, because they cover different ground. forge lint is Foundry's
+  # own and needs no npm at all. Solhint adds the natspec surface forge lint does
+  # not check, and is installed by PINNED npx at CI time — no package.json, no
+  # lockfile, no node_modules in any repo, exactly how slither, echidna and medusa
+  # are already installed.
+  #
+  # `forge lint` is invoked BARE. Passing a path overrides the `ignore` config and
+  # would lint the generated verifiers; see docs/forge-lint-rules.md.
+  lint:
+    name: lint (forge lint + solhint, style and natspec)
+    needs: pipeline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: ${{ inputs.foundry-version }}
+
+      # The [lint] block is copied into each repo because forge lint has no
+      # --config-file. This proves the copy still agrees with the canonical one.
+      - name: Lint config matches the shared canonical block
+        run: ${{ inputs.pipeline-path }}/scripts/lint-config-check.sh all
+
+      - name: forge lint
+        run: forge lint
+
+      - uses: actions/setup-node@v4.1.0
+        with:
+          node-version: '20'
+
+      # npx --yes with an exact version: nothing is written to the repo, and the
+      # version is pinned like every other tool in this pipeline.
+      - name: solhint
+        run: >-
+          npx --yes solhint@${{ inputs.solhint-version }}
+          -c ${{ inputs.pipeline-path }}/.solhint.json
+          --max-warnings 0
+          '${{ inputs.solhint-paths }}'
+
+  # ---------------------------------------------------------------------------
+  doctrine:
+    name: no-chain-copy (doctrine gate)
+    needs: pipeline
+    if: ${{ inputs.run-doctrine-gate }}
+    runs-on: ubuntu-24.04
+    steps:
+      # fetch-depth: 0 — the gate uses `git grep` over tracked files.
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Chain-copy token gate (scan + self-test)
+        run: ${{ inputs.pipeline-path }}/scripts/no-chain-copy-gate.sh all
+
+  # ---------------------------------------------------------------------------
+  # A pinned address is not decoration. It is the `to` of a real transaction, and
+  # viem validates EIP-55 BEFORE it estimates gas — it refuses an address whose
+  # capitalisation does not match its checksum. So a mis-cased byte is not a style
+  # question, it is a demo that cannot send. Three gas-demo addresses shipped that
+  # way out of a deployments/*.json in this estate and cost two live wallet takes,
+  # with the page reporting a nonce problem it did not have. The consuming site
+  # guards its copies; this stage guards the origin, where the bytes are written
+  # down first.
+  address-checksum:
+    name: address-checksum (EIP-55 casing gate)
+    needs: pipeline
+    runs-on: ubuntu-24.04
+    steps:
+      # fetch-depth: 0 — the gate uses `git grep` over tracked files.
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # `cast to-check-sum-address` is the oracle: the toolchain's own EIP-55
+      # rather than a re-derivation here that could drift from what a wallet
+      # actually applies.
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: ${{ inputs.foundry-version }}
+
+      # Prefer the submodule — that is what makes a local run and a CI run the
+      # same bytes. Fall back to this repo at `pipeline-ref` when the pin is older
+      # than the gate, so a repo that has not bumped yet still gets the gate RUN
+      # rather than a missing-file failure or, worse, a skip that reads as green.
+      - name: Locate the gate
+        id: gate
+        env:
+          PIPELINE_PATH: ${{ inputs.pipeline-path }}
+          PIPELINE_REF: ${{ inputs.pipeline-ref }}
+        run: |
+          set -euo pipefail
+          if [ -x "$PIPELINE_PATH/scripts/address-checksum-gate.sh" ]; then
+            echo "root=$PIPELINE_PATH" >> "$GITHUB_OUTPUT"
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+            echo "gate from $PIPELINE_PATH, commit $(git -C "$PIPELINE_PATH" rev-parse HEAD)"
+            exit 0
+          fi
+          echo "::warning::$PIPELINE_PATH predates the address-checksum gate, so this run takes the gate from $PIPELINE_REF instead. Bump the submodule so CI and a local run are the same bytes again."
+          echo "root=.pipeline-address-checksum" >> "$GITHUB_OUTPUT"
+          echo "stale=true" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch the gate at the called ref (stale pin only)
+        if: steps.gate.outputs.stale == 'true'
+        uses: actions/checkout@v4.2.2
+        with:
+          repository: pigfox/solidity-pipeline
+          ref: ${{ inputs.pipeline-ref }}
+          path: .pipeline-address-checksum
+
+      - name: Address checksum gate (scan + self-test)
+        run: ${{ steps.gate.outputs.root }}/scripts/address-checksum-gate.sh all
+
+  # ---------------------------------------------------------------------------
+  properties-source:
+    name: properties (static count + declaration agree)
+    needs: pipeline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+
+      - name: Static property count
+        run: >-
+          ${{ inputs.pipeline-path }}/scripts/property-count.sh
+          --source '${{ inputs.properties-source }}'
+          --expected ${{ inputs.expected-properties }}
+
+  # ---------------------------------------------------------------------------
+  fmt:
+    name: fmt (formatting gate)
+    needs: pipeline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: ${{ inputs.foundry-fmt-version }}
+
+      - name: Format check
+        run: forge fmt --check ${{ inputs.fmt-paths }}
+
+  # ---------------------------------------------------------------------------
+  forge:
+    name: forge (build, test, invariants, 100% coverage gate)
+    needs: pipeline
+    runs-on: ubuntu-24.04
+    env:
+      FOUNDRY_PROFILE: ci
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: ${{ inputs.foundry-version }}
+
+      # Builds the WHOLE tree, so a harness or a deploy script that stopped
+      # compiling still fails here. Sizes are checked by the next step instead of
+      # by --sizes, which decides what counts as a test by filename and therefore
+      # measured test/Properties.sol — this estate's own harness naming — against
+      # a limit on deployment it never undergoes.
+      - name: Build
+        run: forge build
+
+      # EIP-170 and EIP-3860 bound DEPLOYED bytecode, so they are enforced on
+      # src/ and nowhere else. Scope comes from each artifact's own
+      # compilationTarget, not from an argument list, so a stale artifact in out/
+      # cannot put a harness back in scope. Both limits are enforced in full on
+      # src/ and there is no exclusion flag.
+      - name: Deployable-bytecode size gate (EIP-170 and EIP-3860 on src/)
+        run: ${{ inputs.pipeline-path }}/scripts/sizes.sh check
+
+      - name: Test (unit, fuzz and invariants)
+        run: forge test -vvv
+
+      - name: Coverage gate (100% on src/, named exclusions only)
+        env:
+          COVERAGE_EXCLUDE: ${{ inputs.coverage-exclusions }}
+          COVERAGE_NO_MATCH_CONTRACT: ${{ inputs.coverage-no-match-contract }}
+        run: ${{ inputs.pipeline-path }}/scripts/coverage.sh
+
+      - name: Upload coverage summary
+        if: always()
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: forge-coverage-summary
+          path: coverage-summary.txt
+          if-no-files-found: warn
+
+  # ---------------------------------------------------------------------------
+  slither:
+    name: slither (static analysis, fail on low and up)
+    needs: pipeline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: ${{ inputs.foundry-version }}
+
+      - name: Build artifacts for crytic-compile
+        run: forge build
+
+      - uses: crytic/slither-action@v0.4.0
+        with:
+          slither-version: ${{ inputs.slither-version }}
+          # The ONE Slither configuration in the estate. Every exclusion in it is
+          # written down with a reason in the pipeline's
+          # docs/slither-exclusions.md; a repo does not add its own.
+          slither-config: ${{ inputs.pipeline-path }}/slither.config.json
+          # Reuse forge's artifacts rather than letting crytic-compile fetch its
+          # own solc.
+          slither-args: --ignore-compile
+          fail-on: low
+
+  # ---------------------------------------------------------------------------
+  echidna:
+    name: echidna (property fuzzing, in-memory EVM)
+    needs: pipeline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: ${{ inputs.foundry-version }}
+
+      - name: Install crytic-compile and slither
+        run: |
+          set -euo pipefail
+          pipx install crytic-compile==${{ inputs.crytic-compile-version }}
+          pipx install slither-analyzer==${{ inputs.slither-version }}
+
+      # Echidna is installed as a plain binary rather than run via
+      # crytic/echidna-action, because that action runs echidna inside a
+      # container with no `forge` on PATH — and crytic-compile shells out to
+      # `forge config --json` to read the project layout. Installing it here
+      # keeps echidna in the same environment as the toolchain it needs, and
+      # makes the CI invocation identical to the documented local one.
+      - name: Install echidna
+        run: |
+          set -euo pipefail
+          V='${{ inputs.echidna-version }}'
+          curl -sSL -o echidna.tar.gz \
+            "https://github.com/crytic/echidna/releases/download/v${V}/echidna-${V}-x86_64-linux.tar.gz"
+          tar xzf echidna.tar.gz
+          sudo install -m 0755 echidna /usr/local/bin/echidna
+          echidna --version
+
+      # FORCED rebuild, and crytic-export deleted, immediately before fuzzing.
+      # `forge coverage` overwrites out/ with coverage-instrumented artifacts and
+      # crytic-compile will consume those — or a stale crytic-export/ — without
+      # complaint, registering a property set that does not match the source.
+      # That silently shrank a suite from five properties to four once already.
+      - name: Build artifacts for crytic-compile (forced, no stale exports)
+        run: |
+          set -euo pipefail
+          rm -rf crytic-export
+          forge build --force
+
+      - name: Fuzz
+        # Target the project directory, not the single file: crytic-compile
+        # treats a lone .sol path as a standalone solc target and tries to
+        # download a matching compiler.
+        run: |
+          set -euo pipefail
+          echidna . --contract '${{ inputs.properties-contract }}' \
+            --config '${{ inputs.echidna-config }}' | tee echidna-output.txt
+
+      - name: Property count gate
+        run: >-
+          ${{ inputs.pipeline-path }}/scripts/property-count.sh
+          --engine echidna --output echidna-output.txt
+          --expected ${{ inputs.expected-properties }}
+
+  # ---------------------------------------------------------------------------
+  medusa:
+    name: medusa (property fuzzing, in-memory EVM)
+    needs: pipeline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1.3.1
+        with:
+          version: ${{ inputs.foundry-version }}
+
+      - uses: actions/setup-go@v5.1.0
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: false
+
+      - name: Install crytic-compile and slither
+        # Medusa shells out to slither for its own analysis pass; without it the
+        # run still works but loses that coverage guidance.
+        run: |
+          set -euo pipefail
+          pipx install crytic-compile==${{ inputs.crytic-compile-version }}
+          pipx install slither-analyzer==${{ inputs.slither-version }}
+
+      - name: Install medusa
+        run: |
+          set -euo pipefail
+          go install github.com/crytic/medusa@${{ inputs.medusa-version }}
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      # Forced, and crytic-export deleted — same reasoning as the echidna job.
+      - name: Build artifacts for crytic-compile (forced, no stale exports)
+        run: |
+          set -euo pipefail
+          rm -rf crytic-export
+          forge build --force
+
+      - name: Fuzz
+        # Medusa exits non-zero when a property fails, which fails the job. The
+        # count gate below is the separate question of whether it ran them all.
+        run: |
+          set -euo pipefail
+          medusa fuzz --config '${{ inputs.medusa-config }}' 2>&1 | tee medusa-output.txt
+
+      - name: Property count gate
+        run: >-
+          ${{ inputs.pipeline-path }}/scripts/property-count.sh
+          --engine medusa --output medusa-output.txt
+          --expected ${{ inputs.expected-properties }}
+
+  # ---------------------------------------------------------------------------
+  # One required check for branch protection to point at, so adding a stage to
+  # the pipeline never needs a settings change in every consuming repo.
+  pipeline-green:
+    name: pipeline green
+    if: always()
+    needs: [pipeline, lint, doctrine, address-checksum, properties-source, fmt, forge, slither, echidna, medusa]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: All stages succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          set -euo pipefail
+          echo "stage results: $RESULTS"
+          for r in $RESULTS; do
+            case "$r" in
+              success|skipped) ;;
+              *) echo "::error::a pipeline stage reported '$r'"; exit 1 ;;
+            esac
+          done
+          echo "PIGFOX SOLIDITY PIPELINE v1: PASS"
