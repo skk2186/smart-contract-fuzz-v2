@@ -1,0 +1,799 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol",
+    "contract": "MsgSenderDelegationHarness",
+    "project_root": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditCMsgSender",
+    "detected_framework": "user_selected",
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "MsgSenderDelegationHarness",
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#5-37"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "MsgSenderDelegationHarness",
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#5-37"
+    }
+  ],
+  "properties": [
+    {
+      "property": "MsgSenderDelegationHarness.echidna_delegated_execution_is_bounded()",
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#32-36",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "816fc4e3bd3bfee42661",
+      "analysis_contract": "MsgSenderDelegationHarness",
+      "analysis_contract_source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#5-37",
+      "read_states": [
+        "MsgSenderDelegationHarness.TARGET_OPERATOR",
+        "MsgSenderDelegationHarness.TARGET_OWNER",
+        "MsgSenderDelegationHarness.authorizedOperator",
+        "MsgSenderDelegationHarness.depositedCredit",
+        "MsgSenderDelegationHarness.executedFor"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "MsgSenderDelegationHarness.echidna_delegated_execution_is_bounded()",
+          "states": [
+            "MsgSenderDelegationHarness.TARGET_OPERATOR",
+            "MsgSenderDelegationHarness.TARGET_OWNER",
+            "MsgSenderDelegationHarness.authorizedOperator",
+            "MsgSenderDelegationHarness.depositedCredit",
+            "MsgSenderDelegationHarness.executedFor"
+          ],
+          "expression": "executedFor[TARGET_OWNER] <= depositedCredit[TARGET_OWNER] && (executedFor[TARGET_OWNER] == 0 || authorizedOperator[TARGET_OWNER] == TARGET_OPERATOR)",
+          "index_accesses": [
+            {
+              "base": "executedFor",
+              "key": "TARGET_OWNER",
+              "reference": "REF_7"
+            },
+            {
+              "base": "depositedCredit",
+              "key": "TARGET_OWNER",
+              "reference": "REF_8"
+            },
+            {
+              "base": "executedFor",
+              "key": "TARGET_OWNER",
+              "reference": "REF_9"
+            },
+            {
+              "base": "authorizedOperator",
+              "key": "TARGET_OWNER",
+              "reference": "REF_10"
+            }
+          ],
+          "source_index_accesses": [
+            "authorizedOperator[TARGET_OWNER]",
+            "depositedCredit[TARGET_OWNER]",
+            "executedFor[TARGET_OWNER]"
+          ],
+          "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#33-35"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "MsgSenderDelegationHarness.authorizeOperator(address)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "MsgSenderDelegationHarness.authorizedOperator"
+          ],
+          "effect_ids": [
+            "4dbe96a9bc570c2a"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "MsgSenderDelegationHarness.executedFor"
+          ],
+          "effect_ids": [
+            "fff6a3db006f360a"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "MsgSenderDelegationHarness.fundCredit()",
+          "payable": true,
+          "environment_reads": [
+            "msg.sender",
+            "msg.value"
+          ],
+          "matched_states": [
+            "MsgSenderDelegationHarness.depositedCredit"
+          ],
+          "effect_ids": [
+            "b7ff075c14ed233a"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "4dbe96a9bc570c2a",
+        "7d6afed6bab69d2e",
+        "88be9a0d5b3494e5",
+        "b7ff075c14ed233a",
+        "fff6a3db006f360a"
+      ],
+      "evidence_summary": {
+        "candidate_links": 3,
+        "links_with_write_site": 3,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "MsgSenderDelegationHarness.availableCredit",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+              "effect_ids": [
+                "88be9a0d5b3494e5"
+              ]
+            },
+            {
+              "function": "MsgSenderDelegationHarness.fundCredit()",
+              "effect_ids": [
+                "7d6afed6bab69d2e"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "MsgSenderDelegationHarness.authorizedOperator",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "MsgSenderDelegationHarness.authorizeOperator(address)",
+              "effect_ids": [
+                "4dbe96a9bc570c2a"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "4dbe96a9bc570c2a": {
+      "state": "MsgSenderDelegationHarness.authorizedOperator",
+      "writer": "MsgSenderDelegationHarness.authorizeOperator(address)",
+      "expression": "authorizedOperator[msg.sender] = operator",
+      "index_accesses": [
+        {
+          "base": "authorizedOperator",
+          "key": "msg.sender",
+          "reference": "REF_2"
+        }
+      ],
+      "source_index_accesses": [
+        "authorizedOperator[msg.sender]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#22",
+      "call_path": [
+        {
+          "function": "MsgSenderDelegationHarness.authorizeOperator(address)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "MsgSenderDelegationHarness.authorizeOperator(address)",
+          "expression": "require(bool,string)(operator != address(0),ZERO_OPERATOR)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "operator"
+          ],
+          "data_dependencies": {
+            "operator": [
+              "operator"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#21"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "MsgSenderDelegationHarness.authorizeOperator(address)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "MsgSenderDelegationHarness.authorizeOperator(address)",
+                "expression": "require(bool,string)(operator != address(0),ZERO_OPERATOR)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "operator"
+                ],
+                "data_dependencies": {
+                  "operator": [
+                    "operator"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#21"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "4dbe96a9bc570c2a"
+    },
+    "7d6afed6bab69d2e": {
+      "state": "MsgSenderDelegationHarness.availableCredit",
+      "writer": "MsgSenderDelegationHarness.fundCredit()",
+      "expression": "availableCredit[msg.sender] += msg.value",
+      "index_accesses": [
+        {
+          "base": "availableCredit",
+          "key": "msg.sender",
+          "reference": "REF_1"
+        }
+      ],
+      "source_index_accesses": [
+        "availableCredit[msg.sender]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#17",
+      "call_path": [
+        {
+          "function": "MsgSenderDelegationHarness.fundCredit()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "MsgSenderDelegationHarness.fundCredit()",
+          "expression": "require(bool,string)(msg.value > 0,EMPTY_FUNDING)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#15"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "MsgSenderDelegationHarness.fundCredit()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "MsgSenderDelegationHarness.fundCredit()",
+                "expression": "require(bool,string)(msg.value > 0,EMPTY_FUNDING)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#15"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "7d6afed6bab69d2e"
+    },
+    "88be9a0d5b3494e5": {
+      "state": "MsgSenderDelegationHarness.availableCredit",
+      "writer": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+      "expression": "availableCredit[owner] -= amount",
+      "index_accesses": [
+        {
+          "base": "availableCredit",
+          "key": "owner",
+          "reference": "REF_5"
+        }
+      ],
+      "source_index_accesses": [
+        "availableCredit[owner]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#28",
+      "call_path": [
+        {
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "expression": "require(bool,string)(authorizedOperator[owner] == msg.sender,NOT_AUTHORIZED_OPERATOR)",
+          "branch": null,
+          "state_reads": [
+            "MsgSenderDelegationHarness.authorizedOperator"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "MsgSenderDelegationHarness.authorizedOperator",
+              "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#11"
+            }
+          ],
+          "variables_read": [
+            "authorizedOperator",
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "authorizedOperator": [
+              "authorizedOperator"
+            ],
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#26"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "expression": "require(bool,string)(amount > 0 && availableCredit[owner] >= amount,INSUFFICIENT_CREDIT)",
+          "branch": null,
+          "state_reads": [
+            "MsgSenderDelegationHarness.availableCredit"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "MsgSenderDelegationHarness.availableCredit",
+              "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#10"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "availableCredit",
+            "owner"
+          ],
+          "data_dependencies": {
+            "availableCredit": [
+              "amount",
+              "availableCredit"
+            ],
+            "amount": [
+              "amount"
+            ],
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#27"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+                "expression": "require(bool,string)(authorizedOperator[owner] == msg.sender,NOT_AUTHORIZED_OPERATOR)",
+                "branch": null,
+                "state_reads": [
+                  "MsgSenderDelegationHarness.authorizedOperator"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "MsgSenderDelegationHarness.authorizedOperator",
+                    "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "authorizedOperator",
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "authorizedOperator": [
+                    "authorizedOperator"
+                  ],
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#26"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+                "expression": "require(bool,string)(amount > 0 && availableCredit[owner] >= amount,INSUFFICIENT_CREDIT)",
+                "branch": null,
+                "state_reads": [
+                  "MsgSenderDelegationHarness.availableCredit"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "MsgSenderDelegationHarness.availableCredit",
+                    "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#10"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "availableCredit",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "availableCredit": [
+                    "amount",
+                    "availableCredit"
+                  ],
+                  "amount": [
+                    "amount"
+                  ],
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#27"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "88be9a0d5b3494e5"
+    },
+    "b7ff075c14ed233a": {
+      "state": "MsgSenderDelegationHarness.depositedCredit",
+      "writer": "MsgSenderDelegationHarness.fundCredit()",
+      "expression": "depositedCredit[msg.sender] += msg.value",
+      "index_accesses": [
+        {
+          "base": "depositedCredit",
+          "key": "msg.sender",
+          "reference": "REF_0"
+        }
+      ],
+      "source_index_accesses": [
+        "depositedCredit[msg.sender]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#16",
+      "call_path": [
+        {
+          "function": "MsgSenderDelegationHarness.fundCredit()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "MsgSenderDelegationHarness.fundCredit()",
+          "expression": "require(bool,string)(msg.value > 0,EMPTY_FUNDING)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#15"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "MsgSenderDelegationHarness.fundCredit()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "MsgSenderDelegationHarness.fundCredit()",
+                "expression": "require(bool,string)(msg.value > 0,EMPTY_FUNDING)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#15"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "b7ff075c14ed233a"
+    },
+    "fff6a3db006f360a": {
+      "state": "MsgSenderDelegationHarness.executedFor",
+      "writer": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+      "expression": "executedFor[owner] += amount",
+      "index_accesses": [
+        {
+          "base": "executedFor",
+          "key": "owner",
+          "reference": "REF_6"
+        }
+      ],
+      "source_index_accesses": [
+        "executedFor[owner]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#29",
+      "call_path": [
+        {
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "expression": "require(bool,string)(authorizedOperator[owner] == msg.sender,NOT_AUTHORIZED_OPERATOR)",
+          "branch": null,
+          "state_reads": [
+            "MsgSenderDelegationHarness.authorizedOperator"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "MsgSenderDelegationHarness.authorizedOperator",
+              "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#11"
+            }
+          ],
+          "variables_read": [
+            "authorizedOperator",
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "authorizedOperator": [
+              "authorizedOperator"
+            ],
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#26"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "expression": "require(bool,string)(amount > 0 && availableCredit[owner] >= amount,INSUFFICIENT_CREDIT)",
+          "branch": null,
+          "state_reads": [
+            "MsgSenderDelegationHarness.availableCredit"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "MsgSenderDelegationHarness.availableCredit",
+              "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#10"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "availableCredit",
+            "owner"
+          ],
+          "data_dependencies": {
+            "availableCredit": [
+              "amount",
+              "availableCredit"
+            ],
+            "amount": [
+              "amount"
+            ],
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#27"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+                "expression": "require(bool,string)(authorizedOperator[owner] == msg.sender,NOT_AUTHORIZED_OPERATOR)",
+                "branch": null,
+                "state_reads": [
+                  "MsgSenderDelegationHarness.authorizedOperator"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "MsgSenderDelegationHarness.authorizedOperator",
+                    "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "authorizedOperator",
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "authorizedOperator": [
+                    "authorizedOperator"
+                  ],
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#26"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+                "expression": "require(bool,string)(amount > 0 && availableCredit[owner] >= amount,INSUFFICIENT_CREDIT)",
+                "branch": null,
+                "state_reads": [
+                  "MsgSenderDelegationHarness.availableCredit"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "MsgSenderDelegationHarness.availableCredit",
+                    "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#10"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "availableCredit",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "availableCredit": [
+                    "amount",
+                    "availableCredit"
+                  ],
+                  "amount": [
+                    "amount"
+                  ],
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#27"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "fff6a3db006f360a"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

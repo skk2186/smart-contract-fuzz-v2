@@ -1,0 +1,151 @@
+{
+  "source": "func/功能/状态反馈序列扩展.py",
+  "source_sha256": "f2e2552d4eeb49d58343a2b41a940e2764ba8c4e617235785d1d2d3d2f91f197",
+  "role_variants_without_integer_actor": {
+    "input_transaction": {
+      "function": "authorize(address)",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000"
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    "abi": {
+      "name": "authorize",
+      "inputs": [
+        {
+          "name": "operator",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    "generated_senders": [
+      "0x0000000000000000000000000000000000020000"
+    ],
+    "sender_switch_generated": true,
+    "note": "role_variants 本身能为纯 msg.sender 候选生成另一 sender；生成不等于被 E3 接受。"
+  },
+  "state_feedback_role_expansion": {
+    "input_prior_transaction": {
+      "function": "fundCredit()",
+      "arguments": [],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "1000000000000000000",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    "replay_feedback": {
+      "transactions": [
+        {
+          "index": 1,
+          "status": "success",
+          "changed_predicate_getters": [
+            {
+              "signature": "credit(address)"
+            }
+          ],
+          "changed_effect_states": [
+            "credit"
+          ],
+          "changed_storage_slot_count": 1,
+          "balance_changes": [
+            {
+              "address": "0x00000000000000000000000000000000000000aa",
+              "delta_wei": 100
+            }
+          ],
+          "internal_call_trace": {
+            "to": "0x00000000000000000000000000000000000000aa"
+          }
+        },
+        {
+          "index": 2,
+          "status": "revert",
+          "execution_class": "outer_revert",
+          "internal_call_trace": {
+            "to": "0x00000000000000000000000000000000000000aa"
+          }
+        }
+      ]
+    },
+    "proposed_operators": [
+      "state_supported_repetition"
+    ],
+    "proposed_sequences": [
+      [
+        {
+          "function": "fundCredit()",
+          "arguments": [],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "fundCredit()",
+          "arguments": [],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        }
+      ]
+    ],
+    "sender_switch_candidate_accepted": false,
+    "source_reason": "动态分支只比较 ABI 的命名 role 参数 old_roles/new_roles；纯 msg.sender 函数两者皆空，被过滤。"
+  },
+  "erc20_like_resource_edges": {
+    "replay": {
+      "transactions": [
+        {
+          "index": 1,
+          "balance_changes": [],
+          "erc20_transfer_events": [
+            {
+              "token": "0x00000000000000000000000000000000000000aa",
+              "amount": 10
+            }
+          ],
+          "changed_storage_slot_count": 1,
+          "internal_call_trace": {
+            "to": "0x00000000000000000000000000000000000000bb",
+            "calls": [
+              {
+                "to": "0x00000000000000000000000000000000000000aa"
+              }
+            ]
+          }
+        },
+        {
+          "index": 2,
+          "balance_changes": [],
+          "allowance_changes": [
+            {
+              "token": "0x00000000000000000000000000000000000000aa",
+              "amount": -5
+            }
+          ],
+          "changed_storage_slot_count": 1,
+          "internal_call_trace": {
+            "to": "0x00000000000000000000000000000000000000bb",
+            "calls": [
+              {
+                "to": "0x00000000000000000000000000000000000000aa"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "observed_edges": [],
+    "expected_for_native_only_implementation": [],
+    "note": "输入只提供 Token/allowance 与存储变化，没有 native balance_changes，shared_resource_edges 不产出关联。"
+  }
+}

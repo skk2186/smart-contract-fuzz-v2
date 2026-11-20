@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "title": "V2 跨交易属性状态依赖能力专项审计",
+  "created_utc": "2026-11-20T08:53:35.985071+00:00",
+  "repository": "smart-contract-fuzz-v2",
+  "branch": "main",
+  "local_head": "dded14f7ad9fa7f05e999ff2319da946de79a7fb",
+  "remote_main_head_verified_via_github_read_only_api": "dded14f7ad9fa7f05e999ff2319da946de79a7fb",
+  "working_tree_before_audit": {
+    "tracked_changes": 0,
+    "preexisting_untracked": [
+      "sol/真实项目/DODOCrossChain/",
+      "sol/真实项目/Strata/",
+      "sol/真实项目/VeryLiquidVaults/",
+      "sol/真实项目/eBTC_BSM/"
+    ]
+  },
+  "scope": "最多五个主要场景；B 的改名变体属于同一任务；不修改核心算法；不提交、不推送、不启动下一阶段。",
+  "scenario_contracts": [
+    {
+      "task_id": "BWorkflow",
+      "project": "AuditBWorkflow",
+      "contract": "WorkflowHarness",
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol",
+      "source_sha256": "90cc2d4975cfc8783bf2fadbbbd66ec151f69f6911d54627a9a2f8a1892051ab",
+      "property": "echidna_workflow_respects_limit",
+      "target_definition": {
+        "kind": "workflow_stage",
+        "stage_getter": "stage()",
+        "completed_getter": "completedAmount()",
+        "stage": 3,
+        "completed_min": 1
+      }
+    },
+    {
+      "task_id": "BWorkflowRenamed",
+      "project": "AuditBWorkflowRenamed",
+      "contract": "WorkOrderHarness",
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol",
+      "source_sha256": "62379c8c741023890c194d755ab4cde0b946270f7e3b6fcb7acfe293dd480dea",
+      "property": "echidna_order_value_within_quota",
+      "target_definition": {
+        "kind": "workflow_stage",
+        "stage_getter": "phase()",
+        "completed_getter": "appliedValue()",
+        "stage": 3,
+        "completed_min": 1
+      }
+    },
+    {
+      "task_id": "CMsgSender",
+      "project": "AuditCMsgSender",
+      "contract": "MsgSenderDelegationHarness",
+      "source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol",
+      "source_sha256": "890649c0542240317ca1d36559ef2570f49b650bf5fced7cd690a45457c392fe",
+      "property": "echidna_delegated_execution_is_bounded",
+      "target_definition": {
+        "kind": "delegated_execution",
+        "owner": "0x0000000000000000000000000000000000010000",
+        "operator": "0x0000000000000000000000000000000000020000",
+        "executed_getter": "executedFor(address)",
+        "deposit_getter": "depositedCredit(address)",
+        "available_getter": "availableCredit(address)",
+        "authorization_getter": "authorizedOperator(address)",
+        "amount": 1
+      }
+    },
+    {
+      "task_id": "DAllowance",
+      "project": "AuditDAllowance",
+      "contract": "AllowanceHarness",
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol",
+      "source_sha256": "b09492daf44997f0b4e6930bf48a92766ae7d627a358ceb3ce3248849153a2c8",
+      "property": "echidna_delegated_spend_is_bounded",
+      "target_definition": {
+        "kind": "delegated_spend",
+        "owner": "0x0000000000000000000000000000000000010000",
+        "spender": "0x0000000000000000000000000000000000020000",
+        "recipient": "0x0000000000000000000000000000000000030000",
+        "amount": 4,
+        "balance_getter": "balanceOf(address)",
+        "allowance_getter": "allowance(address,address)",
+        "grant_getter": "totalGranted(address,address)",
+        "spent_getter": "delegatedSpent(address,address)",
+        "supply_getter": "totalSupply()"
+      }
+    }
+  ],
+  "human_oracle_plan": {
+    "path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/00-独立Oracle计划.json",
+    "sha256": "bb0c588292268412c7492afdb56dfd1fdedce495300831d2e3529d8b689dfd32",
+    "access_rule": "预先证明可达性/对照性质。Agent 运行入口不读取本文件或独立 Oracle 输出。"
+  },
+  "comparison_arms": {
+    "E1": "仅复用冻结/一次性 Agent A/B 原始顺序与参数；B/C/D 各仅一次初始规划、最多一次 B 参数实例化，不重试。",
+    "E2": "E1 加一次当前跨交易参数修复；保留全部交易步骤，记录是否实际修改及重放。",
+    "E3": "E2 加当前状态反馈序列扩展。",
+    "R": "相同 E1 初始候选与每场最多 24 次扩展执行预算的随机扩展。",
+    "S": "相同 E1 初始候选与每场最多 24 次扩展执行预算的静态依赖扩展。"
+  },
+  "frozen_algorithm_parameters": {
+    "head": "dded14f7ad9fa7f05e999ff2319da946de79a7fb",
+    "max_sequence_length": 8,
+    "candidate_execution_budget_per_extension_method": 24,
+    "retained_prefixes": 4,
+    "per_candidate_numeric_repair_limit": 1,
+    "runtime_constraints": true,
+    "extension_random_seed_base": 20261120,
+    "accounts": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ],
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+    "initial_balance_wei_per_sender": "100000000000000000000",
+    "anvil": {
+      "version": "1.9.0-dev",
+      "commit": "6056c5845d34205a83cf7108042adb137325c9df",
+      "chain_id": 1,
+      "block_number": 4370000,
+      "timestamp": 1524785992,
+      "hardfork": "shanghai",
+      "gas_price_wei": 0,
+      "block_gas_limit": 100000000
+    },
+    "echidna_seed_only": {
+      "version": "2.3.2",
+      "test_limit": 0,
+      "confirmation_seed": 20261125,
+      "no_fuzz_campaign": true
+    },
+    "solidity_compiler": {
+      "version": "0.8.28",
+      "path": "/home/skk/.solc-select/artifacts/solc-0.8.28/solc-0.8.28"
+    }
+  },
+  "agent_budget": {
+    "model": "deepseek-flash",
+    "thinking": "disabled",
+    "temperature": 0,
+    "max_tokens_per_call": 4096,
+    "max_retries": 0,
+    "planning_repairs": 0,
+    "schema_repairs": 0,
+    "agent_a_max_candidates": 1,
+    "agent_a_max_steps": 8,
+    "agent_a_calls": 1,
+    "agent_b_calls": 1,
+    "api_calls_per_new_task_max": 2,
+    "token_budget_per_task": 400000,
+    "wall_clock_budget_seconds_per_task": 600,
+    "cost": "记录 API 返回 usage 与本地冻结价目估算；不写入任何密钥"
+  },
+  "semantic_rename_transform": {
+    "task": "BWorkflow only; no business semantics, property logic, ABI types, transition guards or oracle conditions change.",
+    "function_map": {
+      "createTask()": "openOrder()",
+      "configureTask(uint256)": "setQuota(uint256)",
+      "executeTask(uint256)": "applyOrder(uint256)"
+    },
+    "state_map": {
+      "stage": "phase",
+      "executionLimit": "quota",
+      "completedAmount": "appliedValue"
+    },
+    "property_map": {
+      "echidna_workflow_respects_limit": "echidna_order_value_within_quota"
+    },
+    "Agent_calls_for_variant": 0
+  },
+  "historical_input_sha256": {
+    "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/03-P0-P1配对验证结果.json": "9e532a2b5b1a562758fa4a8eac6a650e132d8db51939f1dfb7828d870b371cbb",
+    "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/diagnostic-oracle/manual-oracle-result.json": "2b62477197bdb34f7d068fcecefaf4fdea062a691f08f664480257a87ae9a529",
+    "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/Inputs/E1-AgentAB-raw-seed.json": "68988fafeb36eef276ea77fb8fc3e33a8ce808461f50e9ee70fdc159003a24e2",
+    "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/CompatibilityHarness/Properties.sol": "2dc2440816d6e21ddd5980a750d448acd58686fc7c97bb28a53c786055599eb6",
+    "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/CompatibilityHarness/native-solc-source-manifest.json": "35e9e27ca3ab1dfe8b4df4efe5ac89a29d744c6591405a95dc6dd1e8704be7ee",
+    "func/功能/状态反馈序列扩展.py": "f2e2552d4eeb49d58343a2b41a940e2764ba8c4e617235785d1d2d3d2f91f197",
+    "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+    "func/功能/属性分析适配器.py": "471364b2deea55ea3dead8a8c2084de49251186a6366e364a86b0fd842b8965f",
+    "func/功能/属性种子上下文.py": "9d33d94329a36bd530850b2e00c9d821700bc5d1fc808b4e210bb55c577143c6",
+    "func/功能/种子验证.py": "4e9ba0142bba7051f423455cce39c59d590670e20b8dd65e55e8ed483260514d",
+    "deepseek/AgentA.py": "0c4c58668a17b43739202cea21d1337b9b66008b6e8885bb48bddf29b3ab0511",
+    "deepseek/AgentB.py": "f5815d057899558b4d6db36636e22a857bbf0011af2fb36c3177195c8a4f2f86"
+  },
+  "frozen_control_candidate_inputs": {
+    "A_Wallet02Refund": {
+      "source_report": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/03-P0-P1配对验证结果.json",
+      "sequence": [
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "withdraw(uint8,uint256)",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+            }
+          ]
+        }
+      ],
+      "sequence_sha256": "d06c0ff8a2766343c0854086a8a706ab6940a73624677c460827f2043dba41bb",
+      "classification": "Phase31的冻结原始P1输入；不能使用E3胜出序列替代"
+    },
+    "E_PigfoxRWASupplySum": {
+      "source_report": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/Inputs/E1-AgentAB-raw-seed.json",
+      "sequence": [
+        {
+          "function": "mintToHolder(uint256,uint256)",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": []
+        }
+      ],
+      "sequence_sha256": "256718054631e91260d90c6e07bc583979ce34ad916d14c9f08e054aa5965a5d",
+      "classification": "Phase32-R冻结E1输入；所有组共用此初始序列"
+    }
+  },
+  "execution_code_sha256": {
+    "func/测试过程/跨交易属性状态依赖审计/运行能力审计.py": "bf927c70962dcdf98bbf93bb292737fdfc7986b5dedc7aed418bb9f56e58e115",
+    "func/测试过程/SCFuzzBench公开项目接入/Phase32有限扩展与对照.py": "43e09d23bdcb92b6243f58adaf3e4c7a3574590fd58e6ad8654bef881a875d73",
+    "func/测试过程/SCFuzzBench公开项目接入/Phase31状态反馈序列扩展.py": "9e8c3dc5ad293cd60b427f760306ab13de36dbd5b5f104fde6066c2709083460",
+    "func/测试过程/SCFuzzBench公开项目接入/Phase32R正式实验.py": "482bf6f0922a6da0670c53bf9198c50c31f9e9192635345b005093b6d82e40b6",
+    "deepseek/实验过程/运行Agent种子流程.py": "1139ee4977b06c55648780d5680374b734b78217df0322e5f5dc0a57a378757d",
+    "deepseek/deepseek接口.py": "07c44940eeb7ff3cf3b719b83a8020157166739845eac4546024bab2851fee27"
+  },
+  "core_algorithm_sha256": {
+    "func/功能/属性分析适配器.py": "471364b2deea55ea3dead8a8c2084de49251186a6366e364a86b0fd842b8965f",
+    "func/功能/属性种子上下文.py": "9d33d94329a36bd530850b2e00c9d821700bc5d1fc808b4e210bb55c577143c6",
+    "func/功能/跨交易状态约束.py": "8604566558381b1714e5debf6f707f1dabbd0bc10b1768951f5d18adc1ce30d2",
+    "func/功能/状态反馈序列扩展.py": "f2e2552d4eeb49d58343a2b41a940e2764ba8c4e617235785d1d2d3d2f91f197",
+    "func/功能/种子验证.py": "4e9ba0142bba7051f423455cce39c59d590670e20b8dd65e55e8ed483260514d",
+    "deepseek/AgentA.py": "0c4c58668a17b43739202cea21d1337b9b66008b6e8885bb48bddf29b3ab0511",
+    "deepseek/AgentB.py": "f5815d057899558b4d6db36636e22a857bbf0011af2fb36c3177195c8a4f2f86"
+  },
+  "historical_positive_and_negative_controls": {
+    "A_Wallet02Refund": {
+      "input": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/03-P0-P1配对验证结果.json",
+      "oracle": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/diagnostic-oracle/manual-oracle-result.json",
+      "initial_candidate_source": "Phase30B frozen P1 source-context planner; no new model call"
+    },
+    "E_PigfoxRWASupplySum": {
+      "input": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/Inputs/E1-AgentAB-raw-seed.json",
+      "compatibility_harness": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/CompatibilityHarness/Properties.sol",
+      "oracle": "Phase32-R E1 Anvil state trajectory; property true with totalSupply equal to holder-balance sum",
+      "note": "same read-only Harness adaptation for all methods; not an unmodified upstream Harness run"
+    }
+  },
+  "stop_rules": [
+    "最多五个主要场景。",
+    "B/C/D 每类只调用一次 A/B 初始规划。",
+    "不修改算法、真实项目业务逻辑、冻结合约、属性或预算。",
+    "编译/部署/Harness 单类问题最多一次有明确依据的通用环境修复。",
+    "未执行场景标记未验证，不计为成功或失败。"
+  ]
+}

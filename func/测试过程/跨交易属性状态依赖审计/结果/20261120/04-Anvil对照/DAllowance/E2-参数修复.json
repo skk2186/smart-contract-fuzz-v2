@@ -1,0 +1,1122 @@
+{
+  "task_id": "DAllowance",
+  "sequence": [
+    {
+      "function": "mint(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        1000
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "approve(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000",
+        500
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "transferFrom(address,address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        500
+      ],
+      "sender": "0x0000000000000000000000000000000000020000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "from_transaction": 1,
+          "field": "recipient",
+          "used_as": "owner"
+        },
+        {
+          "from_transaction": 2,
+          "field": "spender",
+          "used_as": "recipient"
+        }
+      ]
+    }
+  ],
+  "sequence_sha256": "7e60f17a8049a00d0a9bf2e817fdd7c476569f65f7d2aa90b144921c51296726",
+  "parameter_repair": null,
+  "parameter_repair_replays": 0,
+  "replay": {
+    "project": "AuditDAllowance",
+    "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+    "deployment_status": "success",
+    "candidate_id": "c4adf1a248a1-01-seq-1",
+    "target_property_test_mode": "boolean_property",
+    "replay_status": "executable",
+    "target_property_violation": null,
+    "initial_property_values": {
+      "echidna_delegated_spend_is_bounded()": true
+    },
+    "initial_property_errors": {},
+    "initial_property_violations": [],
+    "initial_predicate_getters": [
+      {
+        "function": "delegatedSpent",
+        "expressions": [
+          "TARGET_OWNER"
+        ],
+        "status": "unresolved",
+        "reason": "索引状态没有唯一匹配的单参数公开 view getter"
+      },
+      {
+        "signature": "TARGET_OWNER()",
+        "expressions": [
+          "TARGET_OWNER"
+        ],
+        "arguments": [],
+        "receiver": null,
+        "receiver_getter": null,
+        "receiver_type": null,
+        "status": "observed",
+        "receiver_address": null,
+        "value": "0x0000000000000000000000000000000000010000"
+      },
+      {
+        "signature": "TARGET_SPENDER()",
+        "expressions": [
+          "TARGET_SPENDER"
+        ],
+        "arguments": [],
+        "receiver": null,
+        "receiver_getter": null,
+        "receiver_type": null,
+        "status": "observed",
+        "receiver_address": null,
+        "value": "0x0000000000000000000000000000000000020000"
+      },
+      {
+        "signature": "totalSupply()",
+        "expressions": [
+          "totalSupply"
+        ],
+        "arguments": [],
+        "receiver": null,
+        "receiver_getter": null,
+        "receiver_type": null,
+        "status": "observed",
+        "receiver_address": null,
+        "value": 0
+      }
+    ],
+    "target_property_state": {
+      "property": "echidna_delegated_spend_is_bounded()",
+      "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+      "status": "property_related_state_changed_property_holds",
+      "target_property_state_established": true,
+      "counterexample_state_established": false,
+      "property_related_state_changed": true,
+      "first_established_transaction_index": 1,
+      "first_property_related_change_transaction_index": 1,
+      "first_counterexample_transaction_index": null,
+      "trajectory": [
+        {
+          "transaction_index": 0,
+          "value": true,
+          "predicate_getters": [
+            {
+              "function": "delegatedSpent",
+              "expressions": [
+                "TARGET_OWNER"
+              ],
+              "status": "unresolved",
+              "reason": "索引状态没有唯一匹配的单参数公开 view getter"
+            },
+            {
+              "signature": "TARGET_OWNER()",
+              "expressions": [
+                "TARGET_OWNER"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": "0x0000000000000000000000000000000000010000"
+            },
+            {
+              "signature": "TARGET_SPENDER()",
+              "expressions": [
+                "TARGET_SPENDER"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": "0x0000000000000000000000000000000000020000"
+            },
+            {
+              "signature": "totalSupply()",
+              "expressions": [
+                "totalSupply"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 0
+            }
+          ],
+          "changed_predicate_getters": []
+        },
+        {
+          "transaction_index": 1,
+          "value": true,
+          "predicate_getters": [
+            {
+              "function": "delegatedSpent",
+              "expressions": [
+                "TARGET_OWNER"
+              ],
+              "status": "unresolved",
+              "reason": "索引状态没有唯一匹配的单参数公开 view getter"
+            },
+            {
+              "signature": "TARGET_OWNER()",
+              "expressions": [
+                "TARGET_OWNER"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": "0x0000000000000000000000000000000000010000"
+            },
+            {
+              "signature": "TARGET_SPENDER()",
+              "expressions": [
+                "TARGET_SPENDER"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": "0x0000000000000000000000000000000000020000"
+            },
+            {
+              "signature": "totalSupply()",
+              "expressions": [
+                "totalSupply"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 1000
+            }
+          ],
+          "changed_predicate_getters": [
+            {
+              "signature": "totalSupply()",
+              "receiver": null,
+              "receiver_address": null,
+              "arguments": [],
+              "before": 0,
+              "after": 1000
+            }
+          ]
+        },
+        {
+          "transaction_index": 2,
+          "value": true,
+          "predicate_getters": [
+            {
+              "function": "delegatedSpent",
+              "expressions": [
+                "TARGET_OWNER"
+              ],
+              "status": "unresolved",
+              "reason": "索引状态没有唯一匹配的单参数公开 view getter"
+            },
+            {
+              "signature": "TARGET_OWNER()",
+              "expressions": [
+                "TARGET_OWNER"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": "0x0000000000000000000000000000000000010000"
+            },
+            {
+              "signature": "TARGET_SPENDER()",
+              "expressions": [
+                "TARGET_SPENDER"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": "0x0000000000000000000000000000000000020000"
+            },
+            {
+              "signature": "totalSupply()",
+              "expressions": [
+                "totalSupply"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 1000
+            }
+          ],
+          "changed_predicate_getters": []
+        },
+        {
+          "transaction_index": 3,
+          "value": true,
+          "predicate_getters": [
+            {
+              "function": "delegatedSpent",
+              "expressions": [
+                "TARGET_OWNER"
+              ],
+              "status": "unresolved",
+              "reason": "索引状态没有唯一匹配的单参数公开 view getter"
+            },
+            {
+              "signature": "TARGET_OWNER()",
+              "expressions": [
+                "TARGET_OWNER"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": "0x0000000000000000000000000000000000010000"
+            },
+            {
+              "signature": "TARGET_SPENDER()",
+              "expressions": [
+                "TARGET_SPENDER"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": "0x0000000000000000000000000000000000020000"
+            },
+            {
+              "signature": "totalSupply()",
+              "expressions": [
+                "totalSupply"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 1000
+            }
+          ],
+          "changed_predicate_getters": []
+        }
+      ]
+    },
+    "environment": {
+      "chain_id": 1,
+      "initial_timestamp": 1524785992,
+      "initial_block_number": 4370000,
+      "deployment_timestamp": 1524785992,
+      "deployment_block_number": 4370000,
+      "deployer": "0x0000000000000000000000000000000000030000",
+      "property_sender": "0x0000000000000000000000000000000000010000",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000"
+      ],
+      "gas_price_wei": 0,
+      "evm_revision": "shanghai",
+      "gas_limit_per_transaction": 12500000,
+      "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+    },
+    "transactions": [
+      {
+        "index": 1,
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "argument_bindings": [],
+        "slither_preconditions": [
+          {
+            "state": "AllowanceHarness.balanceOf",
+            "writer": "AllowanceHarness.mint(address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(recipient != address(0) && amount > 0,BAD_MINT)",
+            "branch": null,
+            "variables_read": [
+              "amount",
+              "recipient"
+            ],
+            "state_reads": [],
+            "data_dependencies": {
+              "recipient": [
+                "recipient"
+              ],
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#17"
+          },
+          {
+            "state": "AllowanceHarness.totalSupply",
+            "writer": "AllowanceHarness.mint(address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(recipient != address(0) && amount > 0,BAD_MINT)",
+            "branch": null,
+            "variables_read": [
+              "amount",
+              "recipient"
+            ],
+            "state_reads": [],
+            "data_dependencies": {
+              "recipient": [
+                "recipient"
+              ],
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#17"
+          }
+        ],
+        "slither_source_excerpt": "16: function mint(address recipient, uint256 amount) external {\n17:         require(recipient != address(0) && amount > 0, \"BAD_MINT\");\n18:         balanceOf[recipient] += amount;\n19:         totalSupply += amount;\n20:     }",
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "tx_hash": "3b6fa0471d30a22fd1778e8074d628d73abace09b7d0343286e3b2ad9996afe0",
+        "block_number": 4370001,
+        "status": "success",
+        "gas_used": 66818,
+        "execution_class": "state_established",
+        "expected_outcome": "state_change",
+        "internal_errors": [],
+        "internal_call_trace": {
+          "type": "CALL",
+          "from": "0x0000000000000000000000000000000000010000",
+          "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "input": "0x40c10f19000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000003e8",
+          "value": "0x0",
+          "calls": []
+        },
+        "changed_storage_slot_count": 2,
+        "balance_changes": [],
+        "trace_error": null,
+        "events": [],
+        "observed_view_state_changed": true,
+        "view_state_changes": [
+          {
+            "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:totalSupply()",
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "observed_view_count": 5,
+        "tracked_contract_count": 1,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "observed_effect_status": "changed",
+        "expected_effect_states": [
+          "AllowanceHarness.balanceOf",
+          "AllowanceHarness.totalSupply"
+        ],
+        "observed_effect_states": [
+          "AllowanceHarness.totalSupply"
+        ],
+        "changed_effect_states": [
+          "AllowanceHarness.totalSupply"
+        ],
+        "unobserved_effect_states": [
+          "AllowanceHarness.balanceOf"
+        ],
+        "execution_effect_error": null,
+        "state_fingerprint_before": "30d29288dba479500f75bcf22b00c44b2e90331ecac3329c88327089cbd62ca0",
+        "state_fingerprint_after": "1aacef5a68e19f4b5aa16f5188aadfae14be65a4e77b4a2d08b31192cad6f47f",
+        "target_property": true,
+        "assertion_check": null,
+        "assertion_failure_scope": null,
+        "property_error": null,
+        "predicate_getter_values": [
+          {
+            "function": "delegatedSpent",
+            "expressions": [
+              "TARGET_OWNER"
+            ],
+            "status": "unresolved",
+            "reason": "索引状态没有唯一匹配的单参数公开 view getter"
+          },
+          {
+            "signature": "TARGET_OWNER()",
+            "expressions": [
+              "TARGET_OWNER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000010000"
+          },
+          {
+            "signature": "TARGET_SPENDER()",
+            "expressions": [
+              "TARGET_SPENDER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000020000"
+          },
+          {
+            "signature": "totalSupply()",
+            "expressions": [
+              "totalSupply"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 1000
+          }
+        ],
+        "runtime_constraint_observations": [],
+        "constraint_repair_proposal": null,
+        "all_property_values": {
+          "echidna_delegated_spend_is_bounded()": true
+        },
+        "all_property_errors": {},
+        "other_property_violations_during_prevalidation": [],
+        "changed_predicate_getters": [
+          {
+            "signature": "totalSupply()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1000
+          }
+        ],
+        "property_related_state_changed": true
+      },
+      {
+        "index": 2,
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "argument_bindings": [],
+        "slither_preconditions": [
+          {
+            "state": "AllowanceHarness.totalGranted",
+            "writer": "AllowanceHarness.approve(address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(spender != address(0),ZERO_SPENDER)",
+            "branch": null,
+            "variables_read": [
+              "spender"
+            ],
+            "state_reads": [],
+            "data_dependencies": {
+              "spender": [
+                "spender"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#23"
+          }
+        ],
+        "slither_source_excerpt": "22: function approve(address spender, uint256 amount) external {\n23:         require(spender != address(0), \"ZERO_SPENDER\");\n24:         allowance[msg.sender][spender] = amount;\n25:         totalGranted[msg.sender][spender] += amount;\n26:     }",
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "tx_hash": "dd9edea206d3d9caf65584e90c6a5fa7baeddb7773b6c576045b84fb1298c5fe",
+        "block_number": 4370002,
+        "status": "success",
+        "gas_used": 66785,
+        "execution_class": "state_established",
+        "expected_outcome": "state_change",
+        "internal_errors": [],
+        "internal_call_trace": {
+          "type": "CALL",
+          "from": "0x0000000000000000000000000000000000010000",
+          "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "input": "0x095ea7b3000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000001f4",
+          "value": "0x0",
+          "calls": []
+        },
+        "changed_storage_slot_count": 2,
+        "balance_changes": [],
+        "trace_error": null,
+        "events": [],
+        "observed_view_state_changed": false,
+        "view_state_changes": [],
+        "observed_view_count": 5,
+        "tracked_contract_count": 1,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "observed_effect_status": "unknown",
+        "expected_effect_states": [
+          "AllowanceHarness.totalGranted"
+        ],
+        "observed_effect_states": [],
+        "changed_effect_states": [],
+        "unobserved_effect_states": [
+          "AllowanceHarness.totalGranted"
+        ],
+        "execution_effect_error": null,
+        "state_fingerprint_before": "1aacef5a68e19f4b5aa16f5188aadfae14be65a4e77b4a2d08b31192cad6f47f",
+        "state_fingerprint_after": "1aacef5a68e19f4b5aa16f5188aadfae14be65a4e77b4a2d08b31192cad6f47f",
+        "target_property": true,
+        "assertion_check": null,
+        "assertion_failure_scope": null,
+        "property_error": null,
+        "predicate_getter_values": [
+          {
+            "function": "delegatedSpent",
+            "expressions": [
+              "TARGET_OWNER"
+            ],
+            "status": "unresolved",
+            "reason": "索引状态没有唯一匹配的单参数公开 view getter"
+          },
+          {
+            "signature": "TARGET_OWNER()",
+            "expressions": [
+              "TARGET_OWNER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000010000"
+          },
+          {
+            "signature": "TARGET_SPENDER()",
+            "expressions": [
+              "TARGET_SPENDER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000020000"
+          },
+          {
+            "signature": "totalSupply()",
+            "expressions": [
+              "totalSupply"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 1000
+          }
+        ],
+        "runtime_constraint_observations": [],
+        "constraint_repair_proposal": null,
+        "all_property_values": {
+          "echidna_delegated_spend_is_bounded()": true
+        },
+        "all_property_errors": {},
+        "other_property_violations_during_prevalidation": [],
+        "changed_predicate_getters": [],
+        "property_related_state_changed": false
+      },
+      {
+        "index": 3,
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "argument_bindings": [],
+        "slither_preconditions": [
+          {
+            "state": "AllowanceHarness.balanceOf",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+            "branch": null,
+            "variables_read": [
+              "amount"
+            ],
+            "state_reads": [],
+            "data_dependencies": {
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+          },
+          {
+            "state": "AllowanceHarness.balanceOf",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+            "branch": null,
+            "variables_read": [
+              "allowance",
+              "amount",
+              "msg.sender",
+              "owner"
+            ],
+            "state_reads": [
+              "AllowanceHarness.allowance"
+            ],
+            "data_dependencies": {
+              "owner": [
+                "owner"
+              ],
+              "allowance": [
+                "allowance"
+              ],
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+          },
+          {
+            "state": "AllowanceHarness.balanceOf",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+            "branch": null,
+            "variables_read": [
+              "amount",
+              "balanceOf",
+              "owner"
+            ],
+            "state_reads": [
+              "AllowanceHarness.balanceOf"
+            ],
+            "data_dependencies": {
+              "owner": [
+                "owner"
+              ],
+              "balanceOf": [
+                "amount",
+                "balanceOf"
+              ],
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+          },
+          {
+            "state": "AllowanceHarness.balanceOf",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+            "branch": null,
+            "variables_read": [
+              "amount"
+            ],
+            "state_reads": [],
+            "data_dependencies": {
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+          },
+          {
+            "state": "AllowanceHarness.balanceOf",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+            "branch": null,
+            "variables_read": [
+              "allowance",
+              "amount",
+              "msg.sender",
+              "owner"
+            ],
+            "state_reads": [
+              "AllowanceHarness.allowance"
+            ],
+            "data_dependencies": {
+              "owner": [
+                "owner"
+              ],
+              "allowance": [
+                "allowance"
+              ],
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+          },
+          {
+            "state": "AllowanceHarness.balanceOf",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+            "branch": null,
+            "variables_read": [
+              "amount",
+              "balanceOf",
+              "owner"
+            ],
+            "state_reads": [
+              "AllowanceHarness.balanceOf"
+            ],
+            "data_dependencies": {
+              "owner": [
+                "owner"
+              ],
+              "balanceOf": [
+                "amount",
+                "balanceOf"
+              ],
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+          },
+          {
+            "state": "AllowanceHarness.delegatedSpent",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+            "branch": null,
+            "variables_read": [
+              "amount"
+            ],
+            "state_reads": [],
+            "data_dependencies": {
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+          },
+          {
+            "state": "AllowanceHarness.delegatedSpent",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+            "branch": null,
+            "variables_read": [
+              "allowance",
+              "amount",
+              "msg.sender",
+              "owner"
+            ],
+            "state_reads": [
+              "AllowanceHarness.allowance"
+            ],
+            "data_dependencies": {
+              "owner": [
+                "owner"
+              ],
+              "allowance": [
+                "allowance"
+              ],
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+          },
+          {
+            "state": "AllowanceHarness.delegatedSpent",
+            "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+            "branch": null,
+            "variables_read": [
+              "amount",
+              "balanceOf",
+              "owner"
+            ],
+            "state_reads": [
+              "AllowanceHarness.balanceOf"
+            ],
+            "data_dependencies": {
+              "owner": [
+                "owner"
+              ],
+              "balanceOf": [
+                "amount",
+                "balanceOf"
+              ],
+              "amount": [
+                "amount"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+          }
+        ],
+        "slither_source_excerpt": "28: function transferFrom(address owner, address recipient, uint256 amount) external {\n29:         require(amount > 0, \"EMPTY_TRANSFER\");\n30:         require(allowance[owner][msg.sender] >= amount, \"ALLOWANCE_TOO_LOW\");\n31:         require(balanceOf[owner] >= amount, \"BALANCE_TOO_LOW\");\n32:         allowance[owner][msg.sender] -= amount;\n33:         balanceOf[owner] -= amount;\n34:         balanceOf[recipient] += amount;\n35:         delegatedSpent[owner][msg.sender] += amount;\n36:     }",
+        "sender": "0x0000000000000000000000000000000000020000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "tx_hash": "436368a3595a09fcaa2ac73a7a3490dd11b9cb21e4e8bc7a4e70a760de41fa4e",
+        "block_number": 4370003,
+        "status": "success",
+        "gas_used": 73679,
+        "execution_class": "state_established",
+        "expected_outcome": "state_change",
+        "internal_errors": [],
+        "internal_call_trace": {
+          "type": "CALL",
+          "from": "0x0000000000000000000000000000000000020000",
+          "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "input": "0x23b872dd0000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000001f4",
+          "value": "0x0",
+          "calls": []
+        },
+        "changed_storage_slot_count": 4,
+        "balance_changes": [],
+        "trace_error": null,
+        "events": [],
+        "observed_view_state_changed": false,
+        "view_state_changes": [],
+        "observed_view_count": 5,
+        "tracked_contract_count": 1,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "observed_effect_status": "unknown",
+        "expected_effect_states": [
+          "AllowanceHarness.balanceOf",
+          "AllowanceHarness.delegatedSpent"
+        ],
+        "observed_effect_states": [],
+        "changed_effect_states": [],
+        "unobserved_effect_states": [
+          "AllowanceHarness.balanceOf",
+          "AllowanceHarness.delegatedSpent"
+        ],
+        "execution_effect_error": null,
+        "state_fingerprint_before": "1aacef5a68e19f4b5aa16f5188aadfae14be65a4e77b4a2d08b31192cad6f47f",
+        "state_fingerprint_after": "1aacef5a68e19f4b5aa16f5188aadfae14be65a4e77b4a2d08b31192cad6f47f",
+        "target_property": true,
+        "assertion_check": null,
+        "assertion_failure_scope": null,
+        "property_error": null,
+        "predicate_getter_values": [
+          {
+            "function": "delegatedSpent",
+            "expressions": [
+              "TARGET_OWNER"
+            ],
+            "status": "unresolved",
+            "reason": "索引状态没有唯一匹配的单参数公开 view getter"
+          },
+          {
+            "signature": "TARGET_OWNER()",
+            "expressions": [
+              "TARGET_OWNER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000010000"
+          },
+          {
+            "signature": "TARGET_SPENDER()",
+            "expressions": [
+              "TARGET_SPENDER"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": "0x0000000000000000000000000000000000020000"
+          },
+          {
+            "signature": "totalSupply()",
+            "expressions": [
+              "totalSupply"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 1000
+          }
+        ],
+        "runtime_constraint_observations": [],
+        "constraint_repair_proposal": null,
+        "all_property_values": {
+          "echidna_delegated_spend_is_bounded()": true
+        },
+        "all_property_errors": {},
+        "other_property_violations_during_prevalidation": [],
+        "changed_predicate_getters": [],
+        "property_related_state_changed": false
+      }
+    ],
+    "resolved_transactions": [
+      {
+        "function": "mint(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          1000
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "approve(address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "transferFrom(address,address,uint256)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000",
+          500
+        ],
+        "sender": "0x0000000000000000000000000000000000020000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 1,
+            "field": "recipient",
+            "used_as": "owner"
+          },
+          {
+            "from_transaction": 2,
+            "field": "spender",
+            "used_as": "recipient"
+          }
+        ]
+      }
+    ]
+  },
+  "target_state": {
+    "goal_kind": "delegated_spend",
+    "reached": false,
+    "goal_state_values": {
+      "owner_balance": 0,
+      "spender_balance": 0,
+      "allowance": 0,
+      "total_granted": 0,
+      "delegated_spent": 0,
+      "total_supply": 1000
+    },
+    "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+    "property_value": true,
+    "property_related_state_changed": true,
+    "replay_status": "executable",
+    "getter_observation_incomplete": false
+  },
+  "repair_effective": false
+}

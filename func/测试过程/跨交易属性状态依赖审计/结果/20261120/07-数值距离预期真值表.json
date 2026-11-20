@@ -1,0 +1,118 @@
+{
+  "source": "func/功能/状态反馈序列扩展.py",
+  "source_sha256": "f2e2552d4eeb49d58343a2b41a940e2764ba8c4e617235785d1d2d3d2f91f197",
+  "distance_interpretation": "左侧整数单位变化到属性首次变为 false；当前属性已 false 则距离 0。",
+  "cases": [
+    {
+      "operator": ">",
+      "left": 5,
+      "right": 7,
+      "direct_return": {
+        "expected_violation_distance_units": 0,
+        "actual": 3
+      },
+      "if_condition_returns_false": {
+        "expected_violation_distance_units": 3,
+        "actual": 3
+      }
+    },
+    {
+      "operator": ">",
+      "left": 8,
+      "right": 7,
+      "direct_return": {
+        "expected_violation_distance_units": 1,
+        "actual": 0
+      },
+      "if_condition_returns_false": {
+        "expected_violation_distance_units": 0,
+        "actual": 0
+      }
+    },
+    {
+      "operator": "<",
+      "left": 9,
+      "right": 7,
+      "direct_return": {
+        "expected_violation_distance_units": 0,
+        "actual": 3
+      },
+      "if_condition_returns_false": {
+        "expected_violation_distance_units": 3,
+        "actual": 3
+      }
+    },
+    {
+      "operator": "<",
+      "left": 6,
+      "right": 7,
+      "direct_return": {
+        "expected_violation_distance_units": 1,
+        "actual": 0
+      },
+      "if_condition_returns_false": {
+        "expected_violation_distance_units": 0,
+        "actual": 0
+      }
+    },
+    {
+      "operator": ">=",
+      "left": 5,
+      "right": 7,
+      "direct_return": {
+        "expected_violation_distance_units": 0,
+        "actual": 2
+      },
+      "if_condition_returns_false": {
+        "expected_violation_distance_units": 2,
+        "actual": 2
+      }
+    },
+    {
+      "operator": ">=",
+      "left": 7,
+      "right": 7,
+      "direct_return": {
+        "expected_violation_distance_units": 1,
+        "actual": 0
+      },
+      "if_condition_returns_false": {
+        "expected_violation_distance_units": 0,
+        "actual": 0
+      }
+    },
+    {
+      "operator": "<=",
+      "left": 9,
+      "right": 7,
+      "direct_return": {
+        "expected_violation_distance_units": 0,
+        "actual": 2
+      },
+      "if_condition_returns_false": {
+        "expected_violation_distance_units": 2,
+        "actual": 2
+      }
+    },
+    {
+      "operator": "<=",
+      "left": 7,
+      "right": 7,
+      "direct_return": {
+        "expected_violation_distance_units": 1,
+        "actual": 0
+      },
+      "if_condition_returns_false": {
+        "expected_violation_distance_units": 0,
+        "actual": 0
+      }
+    }
+  ],
+  "equality": {
+    "operator": "==",
+    "source": "return left[i] == right[i];",
+    "expected_violation_distance_units": 1,
+    "actual": null
+  },
+  "result": "直接 return 比较与 if(cond)return false 共用同一公式；后者的8个边界样例方向正确，直接返回属性的8个样例方向相反/边界为0；== 未被正则识别。"
+}

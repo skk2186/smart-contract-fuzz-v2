@@ -1,0 +1,1012 @@
+{
+  "task_id": "BWorkflowRenamed",
+  "sequence": [
+    {
+      "function": "openOrder()",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "setQuota(uint256)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        100
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "applyOrder(uint256)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        100
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "from_transaction": 2,
+          "field": "maxAmount",
+          "relation": "executeTask.amount 复用 configureTask.maxAmount 的值，以满足 amount<=executionLimit 守卫"
+        }
+      ]
+    }
+  ],
+  "sequence_sha256": "eb8b6ea355ff896807b6c626c8964c23b15d15e093e0bf1f6869a7f0a639c994",
+  "parameter_repair": null,
+  "parameter_repair_replays": 0,
+  "replay": {
+    "project": "AuditBWorkflowRenamed",
+    "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+    "deployment_status": "success",
+    "candidate_id": "b1f382e929f9-01-seq-1",
+    "target_property_test_mode": "boolean_property",
+    "replay_status": "executable",
+    "target_property_violation": null,
+    "initial_property_values": {
+      "echidna_order_value_within_quota()": true
+    },
+    "initial_property_errors": {},
+    "initial_property_violations": [],
+    "initial_predicate_getters": [
+      {
+        "signature": "phase()",
+        "expressions": [
+          "phase"
+        ],
+        "arguments": [],
+        "receiver": null,
+        "receiver_getter": null,
+        "receiver_type": null,
+        "status": "observed",
+        "receiver_address": null,
+        "value": 0
+      },
+      {
+        "signature": "appliedValue()",
+        "expressions": [
+          "appliedValue"
+        ],
+        "arguments": [],
+        "receiver": null,
+        "receiver_getter": null,
+        "receiver_type": null,
+        "status": "observed",
+        "receiver_address": null,
+        "value": 0
+      },
+      {
+        "signature": "quota()",
+        "expressions": [
+          "quota"
+        ],
+        "arguments": [],
+        "receiver": null,
+        "receiver_getter": null,
+        "receiver_type": null,
+        "status": "observed",
+        "receiver_address": null,
+        "value": 0
+      }
+    ],
+    "target_property_state": {
+      "property": "echidna_order_value_within_quota()",
+      "semantics": "属性布尔反例与属性谓词操作数 getter 变化分别判定",
+      "status": "property_related_state_changed_property_holds",
+      "target_property_state_established": true,
+      "counterexample_state_established": false,
+      "property_related_state_changed": true,
+      "first_established_transaction_index": 1,
+      "first_property_related_change_transaction_index": 1,
+      "first_counterexample_transaction_index": null,
+      "trajectory": [
+        {
+          "transaction_index": 0,
+          "value": true,
+          "predicate_getters": [
+            {
+              "signature": "phase()",
+              "expressions": [
+                "phase"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 0
+            },
+            {
+              "signature": "appliedValue()",
+              "expressions": [
+                "appliedValue"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 0
+            },
+            {
+              "signature": "quota()",
+              "expressions": [
+                "quota"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 0
+            }
+          ],
+          "changed_predicate_getters": []
+        },
+        {
+          "transaction_index": 1,
+          "value": true,
+          "predicate_getters": [
+            {
+              "signature": "phase()",
+              "expressions": [
+                "phase"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 1
+            },
+            {
+              "signature": "appliedValue()",
+              "expressions": [
+                "appliedValue"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 0
+            },
+            {
+              "signature": "quota()",
+              "expressions": [
+                "quota"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 0
+            }
+          ],
+          "changed_predicate_getters": [
+            {
+              "signature": "phase()",
+              "receiver": null,
+              "receiver_address": null,
+              "arguments": [],
+              "before": 0,
+              "after": 1
+            }
+          ]
+        },
+        {
+          "transaction_index": 2,
+          "value": true,
+          "predicate_getters": [
+            {
+              "signature": "phase()",
+              "expressions": [
+                "phase"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 2
+            },
+            {
+              "signature": "appliedValue()",
+              "expressions": [
+                "appliedValue"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 0
+            },
+            {
+              "signature": "quota()",
+              "expressions": [
+                "quota"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 100
+            }
+          ],
+          "changed_predicate_getters": [
+            {
+              "signature": "phase()",
+              "receiver": null,
+              "receiver_address": null,
+              "arguments": [],
+              "before": 1,
+              "after": 2
+            },
+            {
+              "signature": "quota()",
+              "receiver": null,
+              "receiver_address": null,
+              "arguments": [],
+              "before": 0,
+              "after": 100
+            }
+          ]
+        },
+        {
+          "transaction_index": 3,
+          "value": true,
+          "predicate_getters": [
+            {
+              "signature": "phase()",
+              "expressions": [
+                "phase"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 3
+            },
+            {
+              "signature": "appliedValue()",
+              "expressions": [
+                "appliedValue"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 100
+            },
+            {
+              "signature": "quota()",
+              "expressions": [
+                "quota"
+              ],
+              "arguments": [],
+              "receiver": null,
+              "receiver_getter": null,
+              "receiver_type": null,
+              "status": "observed",
+              "receiver_address": null,
+              "value": 100
+            }
+          ],
+          "changed_predicate_getters": [
+            {
+              "signature": "phase()",
+              "receiver": null,
+              "receiver_address": null,
+              "arguments": [],
+              "before": 2,
+              "after": 3
+            },
+            {
+              "signature": "appliedValue()",
+              "receiver": null,
+              "receiver_address": null,
+              "arguments": [],
+              "before": 0,
+              "after": 100
+            }
+          ]
+        }
+      ]
+    },
+    "environment": {
+      "chain_id": 1,
+      "initial_timestamp": 1524785992,
+      "initial_block_number": 4370000,
+      "deployment_timestamp": 1524785992,
+      "deployment_block_number": 4370000,
+      "deployer": "0x0000000000000000000000000000000000030000",
+      "property_sender": "0x0000000000000000000000000000000000010000",
+      "sender_pool": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000020000",
+        "0x0000000000000000000000000000000000030000",
+        "0x0000000000000000000000000000000000040000",
+        "0x0000000000000000000000000000000000050000"
+      ],
+      "gas_price_wei": 0,
+      "evm_revision": "shanghai",
+      "gas_limit_per_transaction": 12500000,
+      "contract_address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66"
+    },
+    "transactions": [
+      {
+        "index": 1,
+        "function": "openOrder()",
+        "arguments": [],
+        "argument_bindings": [],
+        "slither_preconditions": [
+          {
+            "state": "WorkOrderHarness.phase",
+            "writer": "WorkOrderHarness.openOrder()",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(phase == 0,ORDER_ALREADY_OPEN)",
+            "branch": null,
+            "variables_read": [
+              "phase"
+            ],
+            "state_reads": [
+              "WorkOrderHarness.phase"
+            ],
+            "data_dependencies": {
+              "phase": [
+                "phase"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#11"
+          }
+        ],
+        "slither_source_excerpt": "10: function openOrder() external {\n11:         require(phase == 0, \"ORDER_ALREADY_OPEN\");\n12:         phase = 1;\n13:     }",
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "tx_hash": "20de3c551f91e745397d6f9d6fa11dcb5fd63ea8a652a9b6a5f5f10d19ec567b",
+        "block_number": 4370001,
+        "status": "success",
+        "gas_used": 43342,
+        "execution_class": "state_established",
+        "expected_outcome": "state_change",
+        "internal_errors": [],
+        "internal_call_trace": {
+          "type": "CALL",
+          "from": "0x0000000000000000000000000000000000010000",
+          "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "input": "0x1f1a9d8a",
+          "value": "0x0",
+          "calls": []
+        },
+        "changed_storage_slot_count": 1,
+        "balance_changes": [],
+        "trace_error": null,
+        "events": [],
+        "observed_view_state_changed": true,
+        "view_state_changes": [
+          {
+            "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:phase()",
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "observed_view_count": 4,
+        "tracked_contract_count": 1,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "observed_effect_status": "changed",
+        "expected_effect_states": [
+          "WorkOrderHarness.phase"
+        ],
+        "observed_effect_states": [
+          "WorkOrderHarness.phase"
+        ],
+        "changed_effect_states": [
+          "WorkOrderHarness.phase"
+        ],
+        "unobserved_effect_states": [],
+        "execution_effect_error": null,
+        "state_fingerprint_before": "f7fba9238e1f3789a3927de3717c626784449f2b12fefce6ceec88795badcf4a",
+        "state_fingerprint_after": "c1bfedde7a99169dea4a7fdbd04ee826e379b3cb436f347fc93cb77ecf323a7a",
+        "target_property": true,
+        "assertion_check": null,
+        "assertion_failure_scope": null,
+        "property_error": null,
+        "predicate_getter_values": [
+          {
+            "signature": "phase()",
+            "expressions": [
+              "phase"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 1
+          },
+          {
+            "signature": "appliedValue()",
+            "expressions": [
+              "appliedValue"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "quota()",
+            "expressions": [
+              "quota"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          }
+        ],
+        "runtime_constraint_observations": [],
+        "constraint_repair_proposal": null,
+        "all_property_values": {
+          "echidna_order_value_within_quota()": true
+        },
+        "all_property_errors": {},
+        "other_property_violations_during_prevalidation": [],
+        "changed_predicate_getters": [
+          {
+            "signature": "phase()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "property_related_state_changed": true
+      },
+      {
+        "index": 2,
+        "function": "setQuota(uint256)",
+        "arguments": [
+          100
+        ],
+        "argument_bindings": [],
+        "slither_preconditions": [
+          {
+            "state": "WorkOrderHarness.phase",
+            "writer": "WorkOrderHarness.setQuota(uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(phase == 1,ORDER_NOT_OPEN)",
+            "branch": null,
+            "variables_read": [
+              "phase"
+            ],
+            "state_reads": [
+              "WorkOrderHarness.phase"
+            ],
+            "data_dependencies": {
+              "phase": [
+                "phase"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#16"
+          },
+          {
+            "state": "WorkOrderHarness.phase",
+            "writer": "WorkOrderHarness.setQuota(uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(ceiling > 0,EMPTY_QUOTA)",
+            "branch": null,
+            "variables_read": [
+              "ceiling"
+            ],
+            "state_reads": [],
+            "data_dependencies": {
+              "ceiling": [
+                "ceiling"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#17"
+          },
+          {
+            "state": "WorkOrderHarness.quota",
+            "writer": "WorkOrderHarness.setQuota(uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(phase == 1,ORDER_NOT_OPEN)",
+            "branch": null,
+            "variables_read": [
+              "phase"
+            ],
+            "state_reads": [
+              "WorkOrderHarness.phase"
+            ],
+            "data_dependencies": {
+              "phase": [
+                "phase"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#16"
+          },
+          {
+            "state": "WorkOrderHarness.quota",
+            "writer": "WorkOrderHarness.setQuota(uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(ceiling > 0,EMPTY_QUOTA)",
+            "branch": null,
+            "variables_read": [
+              "ceiling"
+            ],
+            "state_reads": [],
+            "data_dependencies": {
+              "ceiling": [
+                "ceiling"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#17"
+          }
+        ],
+        "slither_source_excerpt": "15: function setQuota(uint256 ceiling) external {\n16:         require(phase == 1, \"ORDER_NOT_OPEN\");\n17:         require(ceiling > 0, \"EMPTY_QUOTA\");\n18:         quota = ceiling;\n19:         phase = 2;\n20:     }",
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "tx_hash": "6e8e743ad1fe7fdddc7275d390f147ea5f63e87cc4239965fd096c7c1c91e39d",
+        "block_number": 4370002,
+        "status": "success",
+        "gas_used": 48821,
+        "execution_class": "state_established",
+        "expected_outcome": "state_change",
+        "internal_errors": [],
+        "internal_call_trace": {
+          "type": "CALL",
+          "from": "0x0000000000000000000000000000000000010000",
+          "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "input": "0xa257db8e0000000000000000000000000000000000000000000000000000000000000064",
+          "value": "0x0",
+          "calls": []
+        },
+        "changed_storage_slot_count": 2,
+        "balance_changes": [],
+        "trace_error": null,
+        "events": [],
+        "observed_view_state_changed": true,
+        "view_state_changes": [
+          {
+            "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:phase()",
+            "before": 1,
+            "after": 2
+          },
+          {
+            "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:quota()",
+            "before": 0,
+            "after": 100
+          }
+        ],
+        "observed_view_count": 4,
+        "tracked_contract_count": 1,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "observed_effect_status": "changed",
+        "expected_effect_states": [
+          "WorkOrderHarness.phase",
+          "WorkOrderHarness.quota"
+        ],
+        "observed_effect_states": [
+          "WorkOrderHarness.phase",
+          "WorkOrderHarness.quota"
+        ],
+        "changed_effect_states": [
+          "WorkOrderHarness.phase",
+          "WorkOrderHarness.quota"
+        ],
+        "unobserved_effect_states": [],
+        "execution_effect_error": null,
+        "state_fingerprint_before": "c1bfedde7a99169dea4a7fdbd04ee826e379b3cb436f347fc93cb77ecf323a7a",
+        "state_fingerprint_after": "b578f99d8ceee6de1d64398c053c27c44ec187940c0336e5bc01c2186689fe5b",
+        "target_property": true,
+        "assertion_check": null,
+        "assertion_failure_scope": null,
+        "property_error": null,
+        "predicate_getter_values": [
+          {
+            "signature": "phase()",
+            "expressions": [
+              "phase"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 2
+          },
+          {
+            "signature": "appliedValue()",
+            "expressions": [
+              "appliedValue"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 0
+          },
+          {
+            "signature": "quota()",
+            "expressions": [
+              "quota"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 100
+          }
+        ],
+        "runtime_constraint_observations": [],
+        "constraint_repair_proposal": null,
+        "all_property_values": {
+          "echidna_order_value_within_quota()": true
+        },
+        "all_property_errors": {},
+        "other_property_violations_during_prevalidation": [],
+        "changed_predicate_getters": [
+          {
+            "signature": "phase()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "quota()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 100
+          }
+        ],
+        "property_related_state_changed": true
+      },
+      {
+        "index": 3,
+        "function": "applyOrder(uint256)",
+        "arguments": [
+          100
+        ],
+        "argument_bindings": [],
+        "slither_preconditions": [
+          {
+            "state": "WorkOrderHarness.appliedValue",
+            "writer": "WorkOrderHarness.applyOrder(uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(phase == 2,ORDER_NOT_CONFIGURED)",
+            "branch": null,
+            "variables_read": [
+              "phase"
+            ],
+            "state_reads": [
+              "WorkOrderHarness.phase"
+            ],
+            "data_dependencies": {
+              "phase": [
+                "phase"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#23"
+          },
+          {
+            "state": "WorkOrderHarness.appliedValue",
+            "writer": "WorkOrderHarness.applyOrder(uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(value > 0 && value <= quota,QUOTA_EXCEEDED)",
+            "branch": null,
+            "variables_read": [
+              "quota",
+              "value"
+            ],
+            "state_reads": [
+              "WorkOrderHarness.quota"
+            ],
+            "data_dependencies": {
+              "value": [
+                "value"
+              ],
+              "quota": [
+                "quota"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#24"
+          },
+          {
+            "state": "WorkOrderHarness.phase",
+            "writer": "WorkOrderHarness.applyOrder(uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(phase == 2,ORDER_NOT_CONFIGURED)",
+            "branch": null,
+            "variables_read": [
+              "phase"
+            ],
+            "state_reads": [
+              "WorkOrderHarness.phase"
+            ],
+            "data_dependencies": {
+              "phase": [
+                "phase"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#23"
+          },
+          {
+            "state": "WorkOrderHarness.phase",
+            "writer": "WorkOrderHarness.applyOrder(uint256)",
+            "kind": "require_or_assert",
+            "expression": "require(bool,string)(value > 0 && value <= quota,QUOTA_EXCEEDED)",
+            "branch": null,
+            "variables_read": [
+              "quota",
+              "value"
+            ],
+            "state_reads": [
+              "WorkOrderHarness.quota"
+            ],
+            "data_dependencies": {
+              "value": [
+                "value"
+              ],
+              "quota": [
+                "quota"
+              ]
+            },
+            "predicate_calls": [],
+            "predicate_logic": [],
+            "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#24"
+          }
+        ],
+        "slither_source_excerpt": "22: function applyOrder(uint256 value) external {\n23:         require(phase == 2, \"ORDER_NOT_CONFIGURED\");\n24:         require(value > 0 && value <= quota, \"QUOTA_EXCEEDED\");\n25:         appliedValue += value;\n26:         phase = 3;\n27:     }",
+        "sender": "0x0000000000000000000000000000000000010000",
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "tx_hash": "a2c8a74b003ce92bb18698c114a29dd718e496e87b7679ab4aebfb51cfcaa00f",
+        "block_number": 4370003,
+        "status": "success",
+        "gas_used": 51107,
+        "execution_class": "state_established",
+        "expected_outcome": "state_change",
+        "internal_errors": [],
+        "internal_call_trace": {
+          "type": "CALL",
+          "from": "0x0000000000000000000000000000000000010000",
+          "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+          "input": "0xb06f86770000000000000000000000000000000000000000000000000000000000000064",
+          "value": "0x0",
+          "calls": []
+        },
+        "changed_storage_slot_count": 2,
+        "balance_changes": [],
+        "trace_error": null,
+        "events": [],
+        "observed_view_state_changed": true,
+        "view_state_changes": [
+          {
+            "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:appliedValue()",
+            "before": 0,
+            "after": 100
+          },
+          {
+            "getter": "0xa647ff3c36cfab592509e13860ab8c4f28781a66:phase()",
+            "before": 2,
+            "after": 3
+          }
+        ],
+        "observed_view_count": 4,
+        "tracked_contract_count": 1,
+        "tracked_contract_types": [
+          "Harness"
+        ],
+        "observed_effect_status": "changed",
+        "expected_effect_states": [
+          "WorkOrderHarness.appliedValue",
+          "WorkOrderHarness.phase"
+        ],
+        "observed_effect_states": [
+          "WorkOrderHarness.appliedValue",
+          "WorkOrderHarness.phase"
+        ],
+        "changed_effect_states": [
+          "WorkOrderHarness.appliedValue",
+          "WorkOrderHarness.phase"
+        ],
+        "unobserved_effect_states": [],
+        "execution_effect_error": null,
+        "state_fingerprint_before": "b578f99d8ceee6de1d64398c053c27c44ec187940c0336e5bc01c2186689fe5b",
+        "state_fingerprint_after": "47e478501fcbcd718e04e201ee7cea70c8e68887168231b52f02187aa7438e9c",
+        "target_property": true,
+        "assertion_check": null,
+        "assertion_failure_scope": null,
+        "property_error": null,
+        "predicate_getter_values": [
+          {
+            "signature": "phase()",
+            "expressions": [
+              "phase"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 3
+          },
+          {
+            "signature": "appliedValue()",
+            "expressions": [
+              "appliedValue"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 100
+          },
+          {
+            "signature": "quota()",
+            "expressions": [
+              "quota"
+            ],
+            "arguments": [],
+            "receiver": null,
+            "receiver_getter": null,
+            "receiver_type": null,
+            "status": "observed",
+            "receiver_address": null,
+            "value": 100
+          }
+        ],
+        "runtime_constraint_observations": [],
+        "constraint_repair_proposal": null,
+        "all_property_values": {
+          "echidna_order_value_within_quota()": true
+        },
+        "all_property_errors": {},
+        "other_property_violations_during_prevalidation": [],
+        "changed_predicate_getters": [
+          {
+            "signature": "phase()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "appliedValue()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 100
+          }
+        ],
+        "property_related_state_changed": true
+      }
+    ],
+    "resolved_transactions": [
+      {
+        "function": "openOrder()",
+        "sender": "0x0000000000000000000000000000000000010000",
+        "arguments": [],
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "setQuota(uint256)",
+        "sender": "0x0000000000000000000000000000000000010000",
+        "arguments": [
+          100
+        ],
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change"
+      },
+      {
+        "function": "applyOrder(uint256)",
+        "sender": "0x0000000000000000000000000000000000010000",
+        "arguments": [
+          100
+        ],
+        "value_wei": "0",
+        "delay_seconds": 0,
+        "delay_blocks": 0,
+        "expected_outcome": "state_change",
+        "data_dependencies": [
+          {
+            "from_transaction": 2,
+            "field": "maxAmount",
+            "relation": "executeTask.amount 复用 configureTask.maxAmount 的值，以满足 amount<=executionLimit 守卫"
+          }
+        ]
+      }
+    ]
+  },
+  "target_state": {
+    "goal_kind": "workflow_stage",
+    "reached": true,
+    "goal_state_values": {
+      "stage": 3,
+      "completed": 100
+    },
+    "reason": "预先定义的关键持久状态全部成立",
+    "property_value": true,
+    "property_related_state_changed": true,
+    "replay_status": "executable",
+    "getter_observation_incomplete": false
+  },
+  "repair_effective": false
+}

@@ -1,0 +1,833 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol",
+    "contract": "WorkOrderHarness",
+    "project_root": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow",
+    "detected_framework": "user_selected",
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "WorkOrderHarness",
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#5-32"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "WorkOrderHarness",
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#5-32"
+    }
+  ],
+  "properties": [
+    {
+      "property": "WorkOrderHarness.echidna_order_value_within_quota()",
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#29-31",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "e6f94dd55fae71147f6a",
+      "analysis_contract": "WorkOrderHarness",
+      "analysis_contract_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#5-32",
+      "read_states": [
+        "WorkOrderHarness.appliedValue",
+        "WorkOrderHarness.phase",
+        "WorkOrderHarness.quota"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "WorkOrderHarness.echidna_order_value_within_quota()",
+          "states": [
+            "WorkOrderHarness.appliedValue",
+            "WorkOrderHarness.phase",
+            "WorkOrderHarness.quota"
+          ],
+          "expression": "phase != 3 || appliedValue <= quota",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#30"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "WorkOrderHarness.appliedValue",
+            "WorkOrderHarness.phase"
+          ],
+          "effect_ids": [
+            "bf3035354aae90a4",
+            "7771dc79d8d3584a"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "WorkOrderHarness.openOrder()",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "WorkOrderHarness.phase"
+          ],
+          "effect_ids": [
+            "081aeb21d6eafe9f"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "WorkOrderHarness.phase",
+            "WorkOrderHarness.quota"
+          ],
+          "effect_ids": [
+            "72e638892d86942c",
+            "4d5ccf7d791e2552"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "081aeb21d6eafe9f",
+        "4d5ccf7d791e2552",
+        "72e638892d86942c",
+        "7771dc79d8d3584a",
+        "bf3035354aae90a4"
+      ],
+      "evidence_summary": {
+        "candidate_links": 3,
+        "links_with_write_site": 3,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "WorkOrderHarness.phase",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "WorkOrderHarness.applyOrder(uint256)",
+              "effect_ids": [
+                "7771dc79d8d3584a"
+              ]
+            },
+            {
+              "function": "WorkOrderHarness.openOrder()",
+              "effect_ids": [
+                "081aeb21d6eafe9f"
+              ]
+            },
+            {
+              "function": "WorkOrderHarness.setQuota(uint256)",
+              "effect_ids": [
+                "72e638892d86942c"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "WorkOrderHarness.quota",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "WorkOrderHarness.setQuota(uint256)",
+              "effect_ids": [
+                "4d5ccf7d791e2552"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "081aeb21d6eafe9f": {
+      "state": "WorkOrderHarness.phase",
+      "writer": "WorkOrderHarness.openOrder()",
+      "expression": "phase = 1",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#12",
+      "call_path": [
+        {
+          "function": "WorkOrderHarness.openOrder()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.openOrder()",
+          "expression": "require(bool,string)(phase == 0,ORDER_ALREADY_OPEN)",
+          "branch": null,
+          "state_reads": [
+            "WorkOrderHarness.phase"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkOrderHarness.phase",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+            }
+          ],
+          "variables_read": [
+            "phase"
+          ],
+          "data_dependencies": {
+            "phase": [
+              "phase"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#11"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkOrderHarness.openOrder()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.openOrder()",
+                "expression": "require(bool,string)(phase == 0,ORDER_ALREADY_OPEN)",
+                "branch": null,
+                "state_reads": [
+                  "WorkOrderHarness.phase"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkOrderHarness.phase",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "phase"
+                ],
+                "data_dependencies": {
+                  "phase": [
+                    "phase"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#11"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "081aeb21d6eafe9f"
+    },
+    "4d5ccf7d791e2552": {
+      "state": "WorkOrderHarness.quota",
+      "writer": "WorkOrderHarness.setQuota(uint256)",
+      "expression": "quota = ceiling",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#18",
+      "call_path": [
+        {
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "expression": "require(bool,string)(phase == 1,ORDER_NOT_OPEN)",
+          "branch": null,
+          "state_reads": [
+            "WorkOrderHarness.phase"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkOrderHarness.phase",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+            }
+          ],
+          "variables_read": [
+            "phase"
+          ],
+          "data_dependencies": {
+            "phase": [
+              "phase"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#16"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "expression": "require(bool,string)(ceiling > 0,EMPTY_QUOTA)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "ceiling"
+          ],
+          "data_dependencies": {
+            "ceiling": [
+              "ceiling"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#17"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.setQuota(uint256)",
+                "expression": "require(bool,string)(phase == 1,ORDER_NOT_OPEN)",
+                "branch": null,
+                "state_reads": [
+                  "WorkOrderHarness.phase"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkOrderHarness.phase",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "phase"
+                ],
+                "data_dependencies": {
+                  "phase": [
+                    "phase"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#16"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.setQuota(uint256)",
+                "expression": "require(bool,string)(ceiling > 0,EMPTY_QUOTA)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "ceiling"
+                ],
+                "data_dependencies": {
+                  "ceiling": [
+                    "ceiling"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#17"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "4d5ccf7d791e2552"
+    },
+    "72e638892d86942c": {
+      "state": "WorkOrderHarness.phase",
+      "writer": "WorkOrderHarness.setQuota(uint256)",
+      "expression": "phase = 2",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#19",
+      "call_path": [
+        {
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "expression": "require(bool,string)(phase == 1,ORDER_NOT_OPEN)",
+          "branch": null,
+          "state_reads": [
+            "WorkOrderHarness.phase"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkOrderHarness.phase",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+            }
+          ],
+          "variables_read": [
+            "phase"
+          ],
+          "data_dependencies": {
+            "phase": [
+              "phase"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#16"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "expression": "require(bool,string)(ceiling > 0,EMPTY_QUOTA)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "ceiling"
+          ],
+          "data_dependencies": {
+            "ceiling": [
+              "ceiling"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#17"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkOrderHarness.setQuota(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.setQuota(uint256)",
+                "expression": "require(bool,string)(phase == 1,ORDER_NOT_OPEN)",
+                "branch": null,
+                "state_reads": [
+                  "WorkOrderHarness.phase"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkOrderHarness.phase",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "phase"
+                ],
+                "data_dependencies": {
+                  "phase": [
+                    "phase"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#16"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.setQuota(uint256)",
+                "expression": "require(bool,string)(ceiling > 0,EMPTY_QUOTA)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "ceiling"
+                ],
+                "data_dependencies": {
+                  "ceiling": [
+                    "ceiling"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#17"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "72e638892d86942c"
+    },
+    "7771dc79d8d3584a": {
+      "state": "WorkOrderHarness.phase",
+      "writer": "WorkOrderHarness.applyOrder(uint256)",
+      "expression": "phase = 3",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#26",
+      "call_path": [
+        {
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "expression": "require(bool,string)(phase == 2,ORDER_NOT_CONFIGURED)",
+          "branch": null,
+          "state_reads": [
+            "WorkOrderHarness.phase"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkOrderHarness.phase",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+            }
+          ],
+          "variables_read": [
+            "phase"
+          ],
+          "data_dependencies": {
+            "phase": [
+              "phase"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#23"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "expression": "require(bool,string)(value > 0 && value <= quota,QUOTA_EXCEEDED)",
+          "branch": null,
+          "state_reads": [
+            "WorkOrderHarness.quota"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkOrderHarness.quota",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#7"
+            }
+          ],
+          "variables_read": [
+            "quota",
+            "value"
+          ],
+          "data_dependencies": {
+            "value": [
+              "value"
+            ],
+            "quota": [
+              "quota"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#24"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.applyOrder(uint256)",
+                "expression": "require(bool,string)(phase == 2,ORDER_NOT_CONFIGURED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkOrderHarness.phase"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkOrderHarness.phase",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "phase"
+                ],
+                "data_dependencies": {
+                  "phase": [
+                    "phase"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#23"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.applyOrder(uint256)",
+                "expression": "require(bool,string)(value > 0 && value <= quota,QUOTA_EXCEEDED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkOrderHarness.quota"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkOrderHarness.quota",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "quota",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "value": [
+                    "value"
+                  ],
+                  "quota": [
+                    "quota"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#24"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "7771dc79d8d3584a"
+    },
+    "bf3035354aae90a4": {
+      "state": "WorkOrderHarness.appliedValue",
+      "writer": "WorkOrderHarness.applyOrder(uint256)",
+      "expression": "appliedValue += value",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#25",
+      "call_path": [
+        {
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "expression": "require(bool,string)(phase == 2,ORDER_NOT_CONFIGURED)",
+          "branch": null,
+          "state_reads": [
+            "WorkOrderHarness.phase"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkOrderHarness.phase",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+            }
+          ],
+          "variables_read": [
+            "phase"
+          ],
+          "data_dependencies": {
+            "phase": [
+              "phase"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#23"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "expression": "require(bool,string)(value > 0 && value <= quota,QUOTA_EXCEEDED)",
+          "branch": null,
+          "state_reads": [
+            "WorkOrderHarness.quota"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkOrderHarness.quota",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#7"
+            }
+          ],
+          "variables_read": [
+            "quota",
+            "value"
+          ],
+          "data_dependencies": {
+            "value": [
+              "value"
+            ],
+            "quota": [
+              "quota"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#24"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkOrderHarness.applyOrder(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.applyOrder(uint256)",
+                "expression": "require(bool,string)(phase == 2,ORDER_NOT_CONFIGURED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkOrderHarness.phase"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkOrderHarness.phase",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "phase"
+                ],
+                "data_dependencies": {
+                  "phase": [
+                    "phase"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#23"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "WorkOrderHarness.applyOrder(uint256)",
+                "expression": "require(bool,string)(value > 0 && value <= quota,QUOTA_EXCEEDED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkOrderHarness.quota"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkOrderHarness.quota",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "quota",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "value": [
+                    "value"
+                  ],
+                  "quota": [
+                    "quota"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol#24"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "bf3035354aae90a4"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

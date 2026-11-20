@@ -1,0 +1,1224 @@
+{
+  "status": "complete",
+  "frozen_inputs_unchanged": true,
+  "static_analysis": [
+    {
+      "task_id": "BWorkflow",
+      "report_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/BWorkflow/属性分析.json",
+      "report_sha256": "3d534f96069aae27a7c0abd030c022aa86026f1f17fb97849ae2e1b0ab9e7d69",
+      "property_id": "b1f382e929f9df6e9ab5",
+      "property": "WorkflowHarness.echidna_workflow_respects_limit()",
+      "property_kind": "boolean_property",
+      "analysis_status": "analyzed",
+      "dependency_status": "statically_closed",
+      "read_states": [
+        "WorkflowHarness.completedAmount",
+        "WorkflowHarness.executionLimit",
+        "WorkflowHarness.stage"
+      ],
+      "candidate_actions": [
+        null,
+        null,
+        null
+      ],
+      "cross_contract_observations": [],
+      "cross_contract_candidate_actions": [],
+      "static_unknowns": []
+    },
+    {
+      "task_id": "BWorkflowRenamed",
+      "report_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/BWorkflowRenamed/属性分析.json",
+      "report_sha256": "c65cb51c8c5dc192d49e3cae26e84eeb62b5f59c65cf01d14d451c317f49e7c1",
+      "property_id": "e6f94dd55fae71147f6a",
+      "property": "WorkOrderHarness.echidna_order_value_within_quota()",
+      "property_kind": "boolean_property",
+      "analysis_status": "analyzed",
+      "dependency_status": "statically_closed",
+      "read_states": [
+        "WorkOrderHarness.appliedValue",
+        "WorkOrderHarness.phase",
+        "WorkOrderHarness.quota"
+      ],
+      "candidate_actions": [
+        null,
+        null,
+        null
+      ],
+      "cross_contract_observations": [],
+      "cross_contract_candidate_actions": [],
+      "static_unknowns": []
+    },
+    {
+      "task_id": "CMsgSender",
+      "report_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/CMsgSender/属性分析.json",
+      "report_sha256": "c7e200af15595d5a5b00c0716616c6ba11fad9b43fc335374bbf2d65c5367ea1",
+      "property_id": "816fc4e3bd3bfee42661",
+      "property": "MsgSenderDelegationHarness.echidna_delegated_execution_is_bounded()",
+      "property_kind": "boolean_property",
+      "analysis_status": "analyzed",
+      "dependency_status": "statically_supported_with_limits",
+      "read_states": [
+        "MsgSenderDelegationHarness.TARGET_OPERATOR",
+        "MsgSenderDelegationHarness.TARGET_OWNER",
+        "MsgSenderDelegationHarness.authorizedOperator",
+        "MsgSenderDelegationHarness.depositedCredit",
+        "MsgSenderDelegationHarness.executedFor"
+      ],
+      "candidate_actions": [
+        null,
+        null,
+        null
+      ],
+      "cross_contract_observations": [],
+      "cross_contract_candidate_actions": [],
+      "static_unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+      ]
+    },
+    {
+      "task_id": "DAllowance",
+      "report_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/DAllowance/属性分析.json",
+      "report_sha256": "d828b320fed4dbdfe1b4495b53f9382f4dddec16b48ee8953d30d6d969f02fcf",
+      "property_id": "c4adf1a248a169bde10e",
+      "property": "AllowanceHarness.echidna_delegated_spend_is_bounded()",
+      "property_kind": "boolean_property",
+      "analysis_status": "analyzed",
+      "dependency_status": "statically_supported_with_limits",
+      "read_states": [
+        "AllowanceHarness.TARGET_OWNER",
+        "AllowanceHarness.TARGET_SPENDER",
+        "AllowanceHarness.balanceOf",
+        "AllowanceHarness.delegatedSpent",
+        "AllowanceHarness.totalGranted",
+        "AllowanceHarness.totalSupply"
+      ],
+      "candidate_actions": [
+        null,
+        null,
+        null
+      ],
+      "cross_contract_observations": [],
+      "cross_contract_candidate_actions": [],
+      "static_unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+      ]
+    }
+  ],
+  "oracle": [
+    {
+      "task_id": "BWorkflow",
+      "project": "AuditBWorkflow",
+      "status": "oracle_reached",
+      "deployment": {
+        "status": 1,
+        "transaction_hash": "3b7ce995d6646a5006338e7fc5b4db976656aebe6f16311982111c150b459790",
+        "address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+      },
+      "initial_property": true,
+      "initial_getters": [
+        {
+          "function": "stage()",
+          "arguments": [],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "executionLimit()",
+          "arguments": [],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "completedAmount()",
+          "arguments": [],
+          "status": "observed",
+          "value": 0
+        }
+      ],
+      "steps": [
+        {
+          "index": 1,
+          "function": "createTask()",
+          "arguments": [],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "61a52ed612f6cf26ac5daff6ace26a550423226af167c2bd2ebc07b323feb3db",
+          "gas_used": 43341,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xa7476493",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 1,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "stage()",
+              "arguments": [],
+              "status": "observed",
+              "value": 1
+            },
+            {
+              "function": "executionLimit()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "completedAmount()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "function": "configureTask(uint256)",
+          "arguments": [
+            5
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "323b513341a7e0ff1c76abfe215f751232c32fc2135fc5293d33e0b780993495",
+          "gas_used": 48842,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xeff794e30000000000000000000000000000000000000000000000000000000000000005",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 2,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "stage()",
+              "arguments": [],
+              "status": "observed",
+              "value": 2
+            },
+            {
+              "function": "executionLimit()",
+              "arguments": [],
+              "status": "observed",
+              "value": 5
+            },
+            {
+              "function": "completedAmount()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "function": "executeTask(uint256)",
+          "arguments": [
+            3
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "6798908b04e3b64023c465ea47a7b2ed9c3499386d3e1cefa2f415dbe2228a4f",
+          "gas_used": 51130,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000020000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x6e3480c70000000000000000000000000000000000000000000000000000000000000003",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 2,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "stage()",
+              "arguments": [],
+              "status": "observed",
+              "value": 3
+            },
+            {
+              "function": "executionLimit()",
+              "arguments": [],
+              "status": "observed",
+              "value": 5
+            },
+            {
+              "function": "completedAmount()",
+              "arguments": [],
+              "status": "observed",
+              "value": 3
+            }
+          ]
+        }
+      ],
+      "final_property": true,
+      "final_getters": [
+        {
+          "function": "stage()",
+          "arguments": [],
+          "status": "observed",
+          "value": 3
+        },
+        {
+          "function": "executionLimit()",
+          "arguments": [],
+          "status": "observed",
+          "value": 5
+        },
+        {
+          "function": "completedAmount()",
+          "arguments": [],
+          "status": "observed",
+          "value": 3
+        }
+      ],
+      "target_goal": {
+        "kind": "workflow_stage",
+        "stage_getter": "stage()",
+        "completed_getter": "completedAmount()",
+        "stage": 3,
+        "completed_min": 1
+      },
+      "target_reached": true,
+      "oracle_sequence_sha256": "362ca3a4cb03398f7348f3f6ff30d634bc6d1d4a412fc225992ac8a7dd4974ea",
+      "elapsed_seconds": 0.361725,
+      "isolation": "Oracle only; no steps or output passed to Agent A/B or extension methods"
+    },
+    {
+      "task_id": "BWorkflowRenamed",
+      "project": "AuditBWorkflowRenamed",
+      "status": "oracle_reached",
+      "deployment": {
+        "status": 1,
+        "transaction_hash": "4d80026a5d1cd7cf91b669fd7b1b4da7873feac4666c8650e618e78ab500cc96",
+        "address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+      },
+      "initial_property": true,
+      "initial_getters": [
+        {
+          "function": "phase()",
+          "arguments": [],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "quota()",
+          "arguments": [],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "appliedValue()",
+          "arguments": [],
+          "status": "observed",
+          "value": 0
+        }
+      ],
+      "steps": [
+        {
+          "index": 1,
+          "function": "openOrder()",
+          "arguments": [],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "20de3c551f91e745397d6f9d6fa11dcb5fd63ea8a652a9b6a5f5f10d19ec567b",
+          "gas_used": 43342,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x1f1a9d8a",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 1,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "phase()",
+              "arguments": [],
+              "status": "observed",
+              "value": 1
+            },
+            {
+              "function": "quota()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "appliedValue()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "function": "setQuota(uint256)",
+          "arguments": [
+            5
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "9393c4071a6a6bd84daff132501d8c036d79e7c98b7330e670f3c8d4acee349c",
+          "gas_used": 48821,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xa257db8e0000000000000000000000000000000000000000000000000000000000000005",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 2,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "phase()",
+              "arguments": [],
+              "status": "observed",
+              "value": 2
+            },
+            {
+              "function": "quota()",
+              "arguments": [],
+              "status": "observed",
+              "value": 5
+            },
+            {
+              "function": "appliedValue()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "function": "applyOrder(uint256)",
+          "arguments": [
+            3
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "cfb09455ad40702aa036e3bd0282840336c9c64347137ed8ef79d87b06a299c7",
+          "gas_used": 51107,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000020000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xb06f86770000000000000000000000000000000000000000000000000000000000000003",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 2,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "phase()",
+              "arguments": [],
+              "status": "observed",
+              "value": 3
+            },
+            {
+              "function": "quota()",
+              "arguments": [],
+              "status": "observed",
+              "value": 5
+            },
+            {
+              "function": "appliedValue()",
+              "arguments": [],
+              "status": "observed",
+              "value": 3
+            }
+          ]
+        }
+      ],
+      "final_property": true,
+      "final_getters": [
+        {
+          "function": "phase()",
+          "arguments": [],
+          "status": "observed",
+          "value": 3
+        },
+        {
+          "function": "quota()",
+          "arguments": [],
+          "status": "observed",
+          "value": 5
+        },
+        {
+          "function": "appliedValue()",
+          "arguments": [],
+          "status": "observed",
+          "value": 3
+        }
+      ],
+      "target_goal": {
+        "kind": "workflow_stage",
+        "stage_getter": "phase()",
+        "completed_getter": "appliedValue()",
+        "stage": 3,
+        "completed_min": 1
+      },
+      "target_reached": true,
+      "oracle_sequence_sha256": "2dfce7fe3ba9ef0c7d0d68c3fc69ca44f76c99e448970ebde3c7465f3c3b9936",
+      "elapsed_seconds": 0.294307,
+      "isolation": "Oracle only; no steps or output passed to Agent A/B or extension methods"
+    },
+    {
+      "task_id": "CMsgSender",
+      "project": "AuditCMsgSender",
+      "status": "oracle_reached",
+      "deployment": {
+        "status": 1,
+        "transaction_hash": "ba77ecb7fc11227508ea11d450f56122e3c441374bc34ecdad526c90fa9e78eb",
+        "address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+      },
+      "initial_property": true,
+      "initial_getters": [
+        {
+          "function": "depositedCredit(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "availableCredit(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "authorizedOperator(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": "0x0000000000000000000000000000000000000000"
+        },
+        {
+          "function": "executedFor(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": 0
+        }
+      ],
+      "steps": [
+        {
+          "index": 1,
+          "function": "fundCredit()",
+          "arguments": [],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "receipt_status": 1,
+          "transaction_hash": "9f949f7b5ed2ec4f239a2489e02687dc5d76aa79b4882e38da9a76fec96c63c7",
+          "gas_used": 66020,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x2e66059b",
+              "value": "0xde0b6b3a7640000",
+              "calls": []
+            },
+            "changed_storage_slot_count": 2,
+            "balance_changes": [
+              {
+                "address": "0x0000000000000000000000000000000000010000",
+                "before_wei": 100000000000000000000,
+                "after_wei": 99000000000000000000,
+                "delta_wei": -1000000000000000000
+              },
+              {
+                "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "before_wei": 0,
+                "after_wei": 1000000000000000000,
+                "delta_wei": 1000000000000000000
+              }
+            ],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "depositedCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            },
+            {
+              "function": "availableCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            },
+            {
+              "function": "authorizedOperator(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": "0x0000000000000000000000000000000000000000"
+            },
+            {
+              "function": "executedFor(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "function": "authorizeOperator(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "d873a0a4aa62169178ef080bdade8ac6a0bfe44210e4295b0a4d02f09dbd3ebd",
+          "gas_used": 43940,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x959b8c3f0000000000000000000000000000000000000000000000000000000000020000",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 1,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "depositedCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            },
+            {
+              "function": "availableCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            },
+            {
+              "function": "authorizedOperator(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": "0x0000000000000000000000000000000000020000"
+            },
+            {
+              "function": "executedFor(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "function": "executeFor(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            1
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "ac786971c685bc3e2f2d783352920b17e9e4811eba2312064e4d332afc05ba39",
+          "gas_used": 52228,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000020000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0xeface2c200000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000001",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 2,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "depositedCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            },
+            {
+              "function": "availableCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 999999999999999999
+            },
+            {
+              "function": "authorizedOperator(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": "0x0000000000000000000000000000000000020000"
+            },
+            {
+              "function": "executedFor(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "final_property": true,
+      "final_getters": [
+        {
+          "function": "depositedCredit(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": 1000000000000000000
+        },
+        {
+          "function": "availableCredit(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": 999999999999999999
+        },
+        {
+          "function": "authorizedOperator(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": "0x0000000000000000000000000000000000020000"
+        },
+        {
+          "function": "executedFor(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": 1
+        }
+      ],
+      "target_goal": {
+        "kind": "delegated_execution",
+        "owner": "0x0000000000000000000000000000000000010000",
+        "operator": "0x0000000000000000000000000000000000020000",
+        "executed_getter": "executedFor(address)",
+        "deposit_getter": "depositedCredit(address)",
+        "available_getter": "availableCredit(address)",
+        "authorization_getter": "authorizedOperator(address)",
+        "amount": 1
+      },
+      "target_reached": true,
+      "oracle_sequence_sha256": "9fb6ef73ca436c5526da8b781896bb9c25cde62aa4c75ee0a774522b1e3d50d2",
+      "elapsed_seconds": 0.347761,
+      "isolation": "Oracle only; no steps or output passed to Agent A/B or extension methods"
+    },
+    {
+      "task_id": "DAllowance",
+      "project": "AuditDAllowance",
+      "status": "oracle_reached",
+      "deployment": {
+        "status": 1,
+        "transaction_hash": "80847d1de8c4b82f120da00f0d29ae86b5f8d23e35e9713cb9df7108662722a9",
+        "address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+      },
+      "initial_property": true,
+      "initial_getters": [
+        {
+          "function": "balanceOf(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "balanceOf(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "allowance(address,address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "totalGranted(address,address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "delegatedSpent(address,address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "totalSupply()",
+          "arguments": [],
+          "status": "observed",
+          "value": 0
+        }
+      ],
+      "steps": [
+        {
+          "index": 1,
+          "function": "mint(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            10
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "3aaf338226065bbd5431d7ba21cf738a2c1f83b057bc773b8161e97fe1b7e3fe",
+          "gas_used": 66806,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x40c10f190000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000a",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 2,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 10
+            },
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "allowance(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "totalGranted(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "delegatedSpent(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "totalSupply()",
+              "arguments": [],
+              "status": "observed",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "function": "approve(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000",
+            7
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "90d9f1559e01b6ff29ff901003e7432327ff2bbe1b6132a532fe945eecfd345e",
+          "gas_used": 66773,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000010000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x095ea7b300000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000007",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 2,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 10
+            },
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "allowance(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 7
+            },
+            {
+              "function": "totalGranted(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 7
+            },
+            {
+              "function": "delegatedSpent(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "totalSupply()",
+              "arguments": [],
+              "status": "observed",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "function": "transferFrom(address,address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000030000",
+            4
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0",
+          "receipt_status": 1,
+          "transaction_hash": "67ea587fd62f57d1045da9e9983364b71c9a947f841949e96c868ee9a1d48c43",
+          "gas_used": 78467,
+          "revert_reason": null,
+          "trace": {
+            "internal_errors": [],
+            "internal_call_trace": {
+              "type": "CALL",
+              "from": "0x0000000000000000000000000000000000020000",
+              "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+              "input": "0x23b872dd000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000004",
+              "value": "0x0",
+              "calls": []
+            },
+            "changed_storage_slot_count": 4,
+            "balance_changes": [],
+            "top_level_trace_error": null,
+            "top_level_output": null
+          },
+          "target_property": true,
+          "getter_snapshot": [
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 6
+            },
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "allowance(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 3
+            },
+            {
+              "function": "totalGranted(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 7
+            },
+            {
+              "function": "delegatedSpent(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 4
+            },
+            {
+              "function": "totalSupply()",
+              "arguments": [],
+              "status": "observed",
+              "value": 10
+            }
+          ]
+        }
+      ],
+      "final_property": true,
+      "final_getters": [
+        {
+          "function": "balanceOf(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "status": "observed",
+          "value": 6
+        },
+        {
+          "function": "balanceOf(address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "status": "observed",
+          "value": 0
+        },
+        {
+          "function": "allowance(address,address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "status": "observed",
+          "value": 3
+        },
+        {
+          "function": "totalGranted(address,address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "status": "observed",
+          "value": 7
+        },
+        {
+          "function": "delegatedSpent(address,address)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "status": "observed",
+          "value": 4
+        },
+        {
+          "function": "totalSupply()",
+          "arguments": [],
+          "status": "observed",
+          "value": 10
+        }
+      ],
+      "target_goal": {
+        "kind": "delegated_spend",
+        "owner": "0x0000000000000000000000000000000000010000",
+        "spender": "0x0000000000000000000000000000000000020000",
+        "recipient": "0x0000000000000000000000000000000000030000",
+        "amount": 4,
+        "balance_getter": "balanceOf(address)",
+        "allowance_getter": "allowance(address,address)",
+        "grant_getter": "totalGranted(address,address)",
+        "spent_getter": "delegatedSpent(address,address)",
+        "supply_getter": "totalSupply()"
+      },
+      "target_reached": true,
+      "oracle_sequence_sha256": "ec3982cb6b6533876fd59a4d062cc1de8987ac689993dacf57f947a2da9c35cc",
+      "elapsed_seconds": 0.43822,
+      "isolation": "Oracle only; no steps or output passed to Agent A/B or extension methods"
+    }
+  ],
+  "historical_oracle_evidence": [
+    {
+      "scenario": "A_Wallet02Refund",
+      "status": "verified",
+      "path": "func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/Phase30B-20261119/diagnostic-oracle/manual-oracle-result.json",
+      "sha256": "2b62477197bdb34f7d068fcecefaf4fdea062a691f08f664480257a87ae9a529",
+      "final_property_value": false,
+      "oracle_target_state_reached": true,
+      "source_report": "docs/31_目标可达性与多交易规划修复.md"
+    },
+    {
+      "scenario": "E_PigfoxRWASupplySum",
+      "status": "verified",
+      "input": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/Inputs/E1-AgentAB-raw-seed.json",
+      "input_sha256": "68988fafeb36eef276ea77fb8fc3e33a8ce808461f50e9ee70fdc159003a24e2",
+      "observer": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/Observer/validation-summary.json",
+      "observer_sha256": "0680afec294b4ec122f516a696c982e36cb7c59ea7a18faf7a4a2e2125b84795",
+      "seed_only_matrix_sha256": "7aac08509167412201c79ad157d2d66b7fa59446781bcd9cac353ccb118c510f",
+      "note": "Phase32-R Anvil 逐笔状态已证明供给与持有人余额同增且属性保持真；本轮将它定义为低依赖无增益对照。"
+    }
+  ],
+  "agent_may_run": true
+}

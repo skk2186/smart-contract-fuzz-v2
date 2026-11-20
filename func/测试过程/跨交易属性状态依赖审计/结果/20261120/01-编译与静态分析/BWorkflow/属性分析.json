@@ -1,0 +1,833 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol",
+    "contract": "WorkflowHarness",
+    "project_root": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow",
+    "detected_framework": "user_selected",
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "WorkflowHarness",
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#5-32"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "WorkflowHarness",
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#5-32"
+    }
+  ],
+  "properties": [
+    {
+      "property": "WorkflowHarness.echidna_workflow_respects_limit()",
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#29-31",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "b1f382e929f9df6e9ab5",
+      "analysis_contract": "WorkflowHarness",
+      "analysis_contract_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#5-32",
+      "read_states": [
+        "WorkflowHarness.completedAmount",
+        "WorkflowHarness.executionLimit",
+        "WorkflowHarness.stage"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "WorkflowHarness.echidna_workflow_respects_limit()",
+          "states": [
+            "WorkflowHarness.completedAmount",
+            "WorkflowHarness.executionLimit",
+            "WorkflowHarness.stage"
+          ],
+          "expression": "stage != 3 || completedAmount <= executionLimit",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#30"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "WorkflowHarness.executionLimit",
+            "WorkflowHarness.stage"
+          ],
+          "effect_ids": [
+            "e454be448c9058ed",
+            "2313fac8bfd8e9fc"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "WorkflowHarness.createTask()",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "WorkflowHarness.stage"
+          ],
+          "effect_ids": [
+            "20d85a41156fff62"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "WorkflowHarness.completedAmount",
+            "WorkflowHarness.stage"
+          ],
+          "effect_ids": [
+            "aeeff850e90a3f07",
+            "0141c7dfdcd3ea67"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "0141c7dfdcd3ea67",
+        "20d85a41156fff62",
+        "2313fac8bfd8e9fc",
+        "aeeff850e90a3f07",
+        "e454be448c9058ed"
+      ],
+      "evidence_summary": {
+        "candidate_links": 3,
+        "links_with_write_site": 3,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "WorkflowHarness.stage",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "WorkflowHarness.configureTask(uint256)",
+              "effect_ids": [
+                "2313fac8bfd8e9fc"
+              ]
+            },
+            {
+              "function": "WorkflowHarness.createTask()",
+              "effect_ids": [
+                "20d85a41156fff62"
+              ]
+            },
+            {
+              "function": "WorkflowHarness.executeTask(uint256)",
+              "effect_ids": [
+                "0141c7dfdcd3ea67"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "WorkflowHarness.executionLimit",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "WorkflowHarness.configureTask(uint256)",
+              "effect_ids": [
+                "e454be448c9058ed"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "0141c7dfdcd3ea67": {
+      "state": "WorkflowHarness.stage",
+      "writer": "WorkflowHarness.executeTask(uint256)",
+      "expression": "stage = 3",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#26",
+      "call_path": [
+        {
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "expression": "require(bool,string)(stage == 2,TASK_NOT_CONFIGURED)",
+          "branch": null,
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkflowHarness.stage",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "stage"
+          ],
+          "data_dependencies": {
+            "stage": [
+              "stage"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#23"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "expression": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+          "branch": null,
+          "state_reads": [
+            "WorkflowHarness.executionLimit"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkflowHarness.executionLimit",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#7"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "executionLimit"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ],
+            "executionLimit": [
+              "executionLimit"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.executeTask(uint256)",
+                "expression": "require(bool,string)(stage == 2,TASK_NOT_CONFIGURED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkflowHarness.stage"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkflowHarness.stage",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "stage"
+                ],
+                "data_dependencies": {
+                  "stage": [
+                    "stage"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#23"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.executeTask(uint256)",
+                "expression": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkflowHarness.executionLimit"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkflowHarness.executionLimit",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "executionLimit"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ],
+                  "executionLimit": [
+                    "executionLimit"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "0141c7dfdcd3ea67"
+    },
+    "20d85a41156fff62": {
+      "state": "WorkflowHarness.stage",
+      "writer": "WorkflowHarness.createTask()",
+      "expression": "stage = 1",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#12",
+      "call_path": [
+        {
+          "function": "WorkflowHarness.createTask()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.createTask()",
+          "expression": "require(bool,string)(stage == 0,ALREADY_CREATED)",
+          "branch": null,
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkflowHarness.stage",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "stage"
+          ],
+          "data_dependencies": {
+            "stage": [
+              "stage"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#11"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkflowHarness.createTask()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.createTask()",
+                "expression": "require(bool,string)(stage == 0,ALREADY_CREATED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkflowHarness.stage"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkflowHarness.stage",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "stage"
+                ],
+                "data_dependencies": {
+                  "stage": [
+                    "stage"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#11"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "20d85a41156fff62"
+    },
+    "2313fac8bfd8e9fc": {
+      "state": "WorkflowHarness.stage",
+      "writer": "WorkflowHarness.configureTask(uint256)",
+      "expression": "stage = 2",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#19",
+      "call_path": [
+        {
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "expression": "require(bool,string)(stage == 1,TASK_NOT_CREATED)",
+          "branch": null,
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkflowHarness.stage",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "stage"
+          ],
+          "data_dependencies": {
+            "stage": [
+              "stage"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#16"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "expression": "require(bool,string)(maxAmount > 0,EMPTY_LIMIT)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "maxAmount"
+          ],
+          "data_dependencies": {
+            "maxAmount": [
+              "maxAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#17"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.configureTask(uint256)",
+                "expression": "require(bool,string)(stage == 1,TASK_NOT_CREATED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkflowHarness.stage"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkflowHarness.stage",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "stage"
+                ],
+                "data_dependencies": {
+                  "stage": [
+                    "stage"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#16"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.configureTask(uint256)",
+                "expression": "require(bool,string)(maxAmount > 0,EMPTY_LIMIT)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "maxAmount"
+                ],
+                "data_dependencies": {
+                  "maxAmount": [
+                    "maxAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#17"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "2313fac8bfd8e9fc"
+    },
+    "aeeff850e90a3f07": {
+      "state": "WorkflowHarness.completedAmount",
+      "writer": "WorkflowHarness.executeTask(uint256)",
+      "expression": "completedAmount += amount",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#25",
+      "call_path": [
+        {
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "expression": "require(bool,string)(stage == 2,TASK_NOT_CONFIGURED)",
+          "branch": null,
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkflowHarness.stage",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "stage"
+          ],
+          "data_dependencies": {
+            "stage": [
+              "stage"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#23"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "expression": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+          "branch": null,
+          "state_reads": [
+            "WorkflowHarness.executionLimit"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkflowHarness.executionLimit",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#7"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "executionLimit"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ],
+            "executionLimit": [
+              "executionLimit"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkflowHarness.executeTask(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.executeTask(uint256)",
+                "expression": "require(bool,string)(stage == 2,TASK_NOT_CONFIGURED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkflowHarness.stage"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkflowHarness.stage",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "stage"
+                ],
+                "data_dependencies": {
+                  "stage": [
+                    "stage"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#23"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.executeTask(uint256)",
+                "expression": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkflowHarness.executionLimit"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkflowHarness.executionLimit",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "executionLimit"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ],
+                  "executionLimit": [
+                    "executionLimit"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "aeeff850e90a3f07"
+    },
+    "e454be448c9058ed": {
+      "state": "WorkflowHarness.executionLimit",
+      "writer": "WorkflowHarness.configureTask(uint256)",
+      "expression": "executionLimit = maxAmount",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#18",
+      "call_path": [
+        {
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "expression": "require(bool,string)(stage == 1,TASK_NOT_CREATED)",
+          "branch": null,
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "WorkflowHarness.stage",
+              "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "stage"
+          ],
+          "data_dependencies": {
+            "stage": [
+              "stage"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#16"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "expression": "require(bool,string)(maxAmount > 0,EMPTY_LIMIT)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "maxAmount"
+          ],
+          "data_dependencies": {
+            "maxAmount": [
+              "maxAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#17"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "WorkflowHarness.configureTask(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.configureTask(uint256)",
+                "expression": "require(bool,string)(stage == 1,TASK_NOT_CREATED)",
+                "branch": null,
+                "state_reads": [
+                  "WorkflowHarness.stage"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "WorkflowHarness.stage",
+                    "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "stage"
+                ],
+                "data_dependencies": {
+                  "stage": [
+                    "stage"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#16"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "WorkflowHarness.configureTask(uint256)",
+                "expression": "require(bool,string)(maxAmount > 0,EMPTY_LIMIT)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "maxAmount"
+                ],
+                "data_dependencies": {
+                  "maxAmount": [
+                    "maxAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#17"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "e454be448c9058ed"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

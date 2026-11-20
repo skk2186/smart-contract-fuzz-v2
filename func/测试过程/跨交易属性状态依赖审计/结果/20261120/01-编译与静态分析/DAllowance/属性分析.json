@@ -1,0 +1,1504 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol",
+    "contract": "AllowanceHarness",
+    "project_root": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance",
+    "detected_framework": "user_selected",
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "AllowanceHarness",
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#5-43"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "AllowanceHarness",
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#5-43"
+    }
+  ],
+  "properties": [
+    {
+      "property": "AllowanceHarness.echidna_delegated_spend_is_bounded()",
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#38-42",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "c4adf1a248a169bde10e",
+      "analysis_contract": "AllowanceHarness",
+      "analysis_contract_source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#5-43",
+      "read_states": [
+        "AllowanceHarness.TARGET_OWNER",
+        "AllowanceHarness.TARGET_SPENDER",
+        "AllowanceHarness.balanceOf",
+        "AllowanceHarness.delegatedSpent",
+        "AllowanceHarness.totalGranted",
+        "AllowanceHarness.totalSupply"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "AllowanceHarness.echidna_delegated_spend_is_bounded()",
+          "states": [
+            "AllowanceHarness.TARGET_OWNER",
+            "AllowanceHarness.TARGET_SPENDER",
+            "AllowanceHarness.balanceOf",
+            "AllowanceHarness.delegatedSpent",
+            "AllowanceHarness.totalGranted",
+            "AllowanceHarness.totalSupply"
+          ],
+          "expression": "delegatedSpent[TARGET_OWNER][TARGET_SPENDER] <= totalGranted[TARGET_OWNER][TARGET_SPENDER] && balanceOf[TARGET_OWNER] + balanceOf[TARGET_SPENDER] <= totalSupply",
+          "index_accesses": [
+            {
+              "base": "delegatedSpent",
+              "key": "TARGET_OWNER",
+              "reference": "REF_14"
+            },
+            {
+              "base": "REF_14",
+              "key": "TARGET_SPENDER",
+              "reference": "REF_15"
+            },
+            {
+              "base": "totalGranted",
+              "key": "TARGET_OWNER",
+              "reference": "REF_16"
+            },
+            {
+              "base": "REF_16",
+              "key": "TARGET_SPENDER",
+              "reference": "REF_17"
+            },
+            {
+              "base": "balanceOf",
+              "key": "TARGET_OWNER",
+              "reference": "REF_18"
+            },
+            {
+              "base": "balanceOf",
+              "key": "TARGET_SPENDER",
+              "reference": "REF_19"
+            }
+          ],
+          "source_index_accesses": [
+            "balanceOf[TARGET_OWNER]",
+            "balanceOf[TARGET_SPENDER]",
+            "delegatedSpent[TARGET_OWNER]",
+            "totalGranted[TARGET_OWNER]"
+          ],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#39-41"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "AllowanceHarness.approve(address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "AllowanceHarness.totalGranted"
+          ],
+          "effect_ids": [
+            "02d3034a16a90319"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "AllowanceHarness.mint(address,uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "AllowanceHarness.balanceOf",
+            "AllowanceHarness.totalSupply"
+          ],
+          "effect_ids": [
+            "034f95a0a31f8f26",
+            "bef61e7f0768d7e9"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "AllowanceHarness.balanceOf",
+            "AllowanceHarness.delegatedSpent"
+          ],
+          "effect_ids": [
+            "e8c393fbc3618e87",
+            "35c816356009548e",
+            "30a8fc146fa73f38"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "02d3034a16a90319",
+        "034f95a0a31f8f26",
+        "30a8fc146fa73f38",
+        "35c816356009548e",
+        "afca47adffc70899",
+        "bef61e7f0768d7e9",
+        "e4c089e0fb01b21c",
+        "e8c393fbc3618e87"
+      ],
+      "evidence_summary": {
+        "candidate_links": 3,
+        "links_with_write_site": 3,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "AllowanceHarness.balanceOf",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "AllowanceHarness.mint(address,uint256)",
+              "effect_ids": [
+                "034f95a0a31f8f26"
+              ]
+            },
+            {
+              "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+              "effect_ids": [
+                "e8c393fbc3618e87",
+                "35c816356009548e"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "AllowanceHarness.allowance",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "AllowanceHarness.approve(address,uint256)",
+              "effect_ids": [
+                "e4c089e0fb01b21c"
+              ]
+            },
+            {
+              "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+              "effect_ids": [
+                "afca47adffc70899"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "02d3034a16a90319": {
+      "state": "AllowanceHarness.totalGranted",
+      "writer": "AllowanceHarness.approve(address,uint256)",
+      "expression": "totalGranted[msg.sender][spender] += amount",
+      "index_accesses": [
+        {
+          "base": "totalGranted",
+          "key": "msg.sender",
+          "reference": "REF_3"
+        },
+        {
+          "base": "REF_3",
+          "key": "spender",
+          "reference": "REF_4"
+        }
+      ],
+      "source_index_accesses": [
+        "totalGranted[msg.sender]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#25",
+      "call_path": [
+        {
+          "function": "AllowanceHarness.approve(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.approve(address,uint256)",
+          "expression": "require(bool,string)(spender != address(0),ZERO_SPENDER)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "spender"
+          ],
+          "data_dependencies": {
+            "spender": [
+              "spender"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#23"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "AllowanceHarness.approve(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.approve(address,uint256)",
+                "expression": "require(bool,string)(spender != address(0),ZERO_SPENDER)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "spender"
+                ],
+                "data_dependencies": {
+                  "spender": [
+                    "spender"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#23"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "02d3034a16a90319"
+    },
+    "034f95a0a31f8f26": {
+      "state": "AllowanceHarness.balanceOf",
+      "writer": "AllowanceHarness.mint(address,uint256)",
+      "expression": "balanceOf[recipient] += amount",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "recipient",
+          "reference": "REF_0"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[recipient]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#18",
+      "call_path": [
+        {
+          "function": "AllowanceHarness.mint(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.mint(address,uint256)",
+          "expression": "require(bool,string)(recipient != address(0) && amount > 0,BAD_MINT)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount",
+            "recipient"
+          ],
+          "data_dependencies": {
+            "recipient": [
+              "recipient"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#17"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "AllowanceHarness.mint(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.mint(address,uint256)",
+                "expression": "require(bool,string)(recipient != address(0) && amount > 0,BAD_MINT)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount",
+                  "recipient"
+                ],
+                "data_dependencies": {
+                  "recipient": [
+                    "recipient"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#17"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "034f95a0a31f8f26"
+    },
+    "30a8fc146fa73f38": {
+      "state": "AllowanceHarness.delegatedSpent",
+      "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+      "expression": "delegatedSpent[owner][msg.sender] += amount",
+      "index_accesses": [
+        {
+          "base": "delegatedSpent",
+          "key": "owner",
+          "reference": "REF_12"
+        },
+        {
+          "base": "REF_12",
+          "key": "msg.sender",
+          "reference": "REF_13"
+        }
+      ],
+      "source_index_accesses": [
+        "delegatedSpent[owner]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#35",
+      "call_path": [
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "AllowanceHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "AllowanceHarness.allowance",
+              "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#11"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "amount",
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ],
+            "allowance": [
+              "allowance"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "AllowanceHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "AllowanceHarness.balanceOf",
+              "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#10"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "balanceOf",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ],
+            "balanceOf": [
+              "amount",
+              "balanceOf"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "AllowanceHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "AllowanceHarness.allowance",
+                    "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "amount",
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ],
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "AllowanceHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "AllowanceHarness.balanceOf",
+                    "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#10"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "balanceOf",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ],
+                  "balanceOf": [
+                    "amount",
+                    "balanceOf"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "30a8fc146fa73f38"
+    },
+    "35c816356009548e": {
+      "state": "AllowanceHarness.balanceOf",
+      "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+      "expression": "balanceOf[recipient] += amount",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "recipient",
+          "reference": "REF_11"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[recipient]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#34",
+      "call_path": [
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "AllowanceHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "AllowanceHarness.allowance",
+              "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#11"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "amount",
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ],
+            "allowance": [
+              "allowance"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "AllowanceHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "AllowanceHarness.balanceOf",
+              "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#10"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "balanceOf",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ],
+            "balanceOf": [
+              "amount",
+              "balanceOf"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "AllowanceHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "AllowanceHarness.allowance",
+                    "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "amount",
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ],
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "AllowanceHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "AllowanceHarness.balanceOf",
+                    "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#10"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "balanceOf",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ],
+                  "balanceOf": [
+                    "amount",
+                    "balanceOf"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "35c816356009548e"
+    },
+    "afca47adffc70899": {
+      "state": "AllowanceHarness.allowance",
+      "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+      "expression": "allowance[owner][msg.sender] -= amount",
+      "index_accesses": [
+        {
+          "base": "allowance",
+          "key": "owner",
+          "reference": "REF_8"
+        },
+        {
+          "base": "REF_8",
+          "key": "msg.sender",
+          "reference": "REF_9"
+        }
+      ],
+      "source_index_accesses": [
+        "allowance[owner]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#32",
+      "call_path": [
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "AllowanceHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "AllowanceHarness.allowance",
+              "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#11"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "amount",
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ],
+            "allowance": [
+              "allowance"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "AllowanceHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "AllowanceHarness.balanceOf",
+              "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#10"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "balanceOf",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ],
+            "balanceOf": [
+              "amount",
+              "balanceOf"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "AllowanceHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "AllowanceHarness.allowance",
+                    "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "amount",
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ],
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "AllowanceHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "AllowanceHarness.balanceOf",
+                    "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#10"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "balanceOf",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ],
+                  "balanceOf": [
+                    "amount",
+                    "balanceOf"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "afca47adffc70899"
+    },
+    "bef61e7f0768d7e9": {
+      "state": "AllowanceHarness.totalSupply",
+      "writer": "AllowanceHarness.mint(address,uint256)",
+      "expression": "totalSupply += amount",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#19",
+      "call_path": [
+        {
+          "function": "AllowanceHarness.mint(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.mint(address,uint256)",
+          "expression": "require(bool,string)(recipient != address(0) && amount > 0,BAD_MINT)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount",
+            "recipient"
+          ],
+          "data_dependencies": {
+            "recipient": [
+              "recipient"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#17"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "AllowanceHarness.mint(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.mint(address,uint256)",
+                "expression": "require(bool,string)(recipient != address(0) && amount > 0,BAD_MINT)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount",
+                  "recipient"
+                ],
+                "data_dependencies": {
+                  "recipient": [
+                    "recipient"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#17"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "bef61e7f0768d7e9"
+    },
+    "e4c089e0fb01b21c": {
+      "state": "AllowanceHarness.allowance",
+      "writer": "AllowanceHarness.approve(address,uint256)",
+      "expression": "allowance[msg.sender][spender] = amount",
+      "index_accesses": [
+        {
+          "base": "allowance",
+          "key": "msg.sender",
+          "reference": "REF_1"
+        },
+        {
+          "base": "REF_1",
+          "key": "spender",
+          "reference": "REF_2"
+        }
+      ],
+      "source_index_accesses": [
+        "allowance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#24",
+      "call_path": [
+        {
+          "function": "AllowanceHarness.approve(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.approve(address,uint256)",
+          "expression": "require(bool,string)(spender != address(0),ZERO_SPENDER)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "spender"
+          ],
+          "data_dependencies": {
+            "spender": [
+              "spender"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#23"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "AllowanceHarness.approve(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.approve(address,uint256)",
+                "expression": "require(bool,string)(spender != address(0),ZERO_SPENDER)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "spender"
+                ],
+                "data_dependencies": {
+                  "spender": [
+                    "spender"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#23"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "e4c089e0fb01b21c"
+    },
+    "e8c393fbc3618e87": {
+      "state": "AllowanceHarness.balanceOf",
+      "writer": "AllowanceHarness.transferFrom(address,address,uint256)",
+      "expression": "balanceOf[owner] -= amount",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "owner",
+          "reference": "REF_10"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[owner]"
+      ],
+      "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#33",
+      "call_path": [
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "AllowanceHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "AllowanceHarness.allowance",
+              "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#11"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "amount",
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ],
+            "allowance": [
+              "allowance"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "AllowanceHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "AllowanceHarness.balanceOf",
+              "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#10"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "balanceOf",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ],
+            "balanceOf": [
+              "amount",
+              "balanceOf"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(amount > 0,EMPTY_TRANSFER)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#29"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(allowance[owner][msg.sender] >= amount,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "AllowanceHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "AllowanceHarness.allowance",
+                    "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "amount",
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ],
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#30"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "AllowanceHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(balanceOf[owner] >= amount,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "AllowanceHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "AllowanceHarness.balanceOf",
+                    "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#10"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "balanceOf",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ],
+                  "balanceOf": [
+                    "amount",
+                    "balanceOf"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "e8c393fbc3618e87"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

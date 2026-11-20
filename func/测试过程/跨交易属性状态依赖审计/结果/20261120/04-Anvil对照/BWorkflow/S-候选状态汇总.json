@@ -1,0 +1,62 @@
+{
+  "mode": "static",
+  "group": "S",
+  "status": "valid_related_state_candidate",
+  "candidate_execution_budget": 24,
+  "candidate_executions": 0,
+  "parameter_repair_replays": 0,
+  "total_anvil_replays": 1,
+  "elapsed_seconds": 10.911463,
+  "base_sequence": [
+    {
+      "index": 1,
+      "function": "createTask()",
+      "abi_signature": "createTask()",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "rationale": "部署时 stage=0，满足 require(stage==0)；将 stage 置为 1。"
+    },
+    {
+      "index": 2,
+      "function": "configureTask(uint256)",
+      "abi_signature": "configureTask(uint256)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        100
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "rationale": "stage 已为 1，满足守卫；maxAmount=100>0，写入 executionLimit=100 与 stage=2。"
+    },
+    {
+      "index": 3,
+      "function": "executeTask(uint256)",
+      "abi_signature": "executeTask(uint256)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        100
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "rationale": "stage 已为 2，amount=100 满足 0<amount<=executionLimit(100)；completedAmount 变为 100，stage=3，属性谓词进入 stage==3 分支并检验 completedAmount<=executionLimit。",
+      "data_dependencies": [
+        {
+          "from_transaction": 2,
+          "field": "maxAmount",
+          "relation": "executeTask.amount 复用 configureTask.maxAmount 的值，以满足 amount<=executionLimit 守卫"
+        }
+      ]
+    }
+  ],
+  "base_parameter_repair": null,
+  "candidates": [],
+  "raw_log": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/04-Anvil对照/BWorkflow/extensions/S-扩展回放.json"
+}

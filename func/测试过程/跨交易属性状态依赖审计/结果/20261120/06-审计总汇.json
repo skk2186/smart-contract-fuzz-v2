@@ -1,0 +1,2754 @@
+{
+  "schema_version": 1,
+  "status": "complete_with_observer_and_seed_path_limitations",
+  "repository": {
+    "head": "dded14f7ad9fa7f05e999ff2319da946de79a7fb",
+    "branch": "main",
+    "remote_head_at_start": "dded14f7ad9fa7f05e999ff2319da946de79a7fb",
+    "tracked_worktree_changes_at_audit_close": 1,
+    "tracked_worktree_change_paths": [
+      "docs/研究总览与最新进展.md"
+    ],
+    "preexisting_untracked_projects_preserved": [
+      "sol/真实项目/DODOCrossChain/",
+      "sol/真实项目/Strata/",
+      "sol/真实项目/VeryLiquidVaults/",
+      "sol/真实项目/eBTC_BSM/"
+    ]
+  },
+  "freeze": {
+    "path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/00-实验冻结方案.json",
+    "sha256": "1c27ee3908737df6525064f5def007db7d56b288a6677af7e266cf2f623ec187",
+    "oracle_plan_sha256": "bb0c588292268412c7492afdb56dfd1fdedce495300831d2e3529d8b689dfd32",
+    "core_algorithm_changed": false
+  },
+  "independent_oracle_preflight": {
+    "status": "complete",
+    "all_new_scenario_targets_reached": true,
+    "B/C/D_historical_independent_oracle": {
+      "B": "oracle_reached",
+      "C": "oracle_reached",
+      "D": "oracle_reached"
+    }
+  },
+  "agent_calls": {
+    "status": "completed_after_explicit_user_authorization",
+    "initial_block_record": "08-Agent调用审批记录.json",
+    "final_run_record": "14-B-C-D最终对照与归因.json",
+    "model": "deepseek-flash",
+    "tasks": 3,
+    "api_requests": 6,
+    "failed_requests": 0,
+    "tokens": 34327,
+    "estimated_cost_usd_offpeak": "0.006177966",
+    "estimated_cost_usd_peak": "0.012355932",
+    "retries": 0,
+    "external_requests_before_user_authorization": 0
+  },
+  "scenarios": {
+    "A_Wallet02Refund": {
+      "initial_source": "Phase30B P1 frozen candidate",
+      "E1": {
+        "replay_status": "executable",
+        "target_state": {
+          "goal_kind": "wallet_counterexample",
+          "reached": false,
+          "goal_state_values": {
+            "target_property": true
+          },
+          "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+          "property_value": true,
+          "property_related_state_changed": true,
+          "replay_status": "executable",
+          "getter_observation_incomplete": false
+        },
+        "sequence": [
+          {
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "withdraw(uint8,uint256)",
+            "arguments": [
+              0,
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "account",
+                "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+              }
+            ]
+          }
+        ]
+      },
+      "E2": {
+        "replay_status": "executable",
+        "target_state": {
+          "goal_kind": "wallet_counterexample",
+          "reached": false,
+          "goal_state_values": {
+            "target_property": true
+          },
+          "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+          "property_value": true,
+          "property_related_state_changed": true,
+          "replay_status": "executable",
+          "getter_observation_incomplete": false
+        },
+        "parameter_repair": null,
+        "sequence": [
+          {
+            "function": "deposit(uint8)",
+            "arguments": [
+              0
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "withdraw(uint8,uint256)",
+            "arguments": [
+              0,
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "account",
+                "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+              }
+            ]
+          }
+        ]
+      },
+      "methods": {
+        "R": {
+          "status": "valid_related_state_candidate",
+          "candidate_execution_budget": 24,
+          "candidate_executions": 24,
+          "total_anvil_replays": 25,
+          "parameter_repair_replays": 0,
+          "elapsed_seconds": 12.553501
+        },
+        "S": {
+          "status": "valid_related_state_candidate",
+          "candidate_execution_budget": 24,
+          "candidate_executions": 2,
+          "total_anvil_replays": 3,
+          "parameter_repair_replays": 0,
+          "elapsed_seconds": 14.0924
+        },
+        "E3": {
+          "status": "target_reached",
+          "candidate_execution_budget": 24,
+          "candidate_executions": 10,
+          "total_anvil_replays": 11,
+          "parameter_repair_replays": 0,
+          "elapsed_seconds": 20.256027
+        }
+      },
+      "method_attribution": {
+        "agent_a_or_b_reached_goal": false,
+        "parameter_repair_reached_goal": false,
+        "parameter_repair_changed_sequence": false,
+        "goal_kind": "wallet_counterexample",
+        "extension_attribution": {
+          "R": {
+            "reached_frozen_goal": false,
+            "newly_reached_after_E2": false,
+            "first_goal_candidate_no": null,
+            "first_goal_operator": null,
+            "reached_by_repetition": false,
+            "candidate_added_transaction_count": 0,
+            "candidate_added_transaction_step": false,
+            "repetition_candidate_count": 0,
+            "only_repetition_observed": false,
+            "candidate_count": 24,
+            "contribution": "no_goal_completion"
+          },
+          "S": {
+            "reached_frozen_goal": false,
+            "newly_reached_after_E2": false,
+            "first_goal_candidate_no": null,
+            "first_goal_operator": null,
+            "reached_by_repetition": false,
+            "candidate_added_transaction_count": 0,
+            "candidate_added_transaction_step": false,
+            "repetition_candidate_count": 0,
+            "only_repetition_observed": false,
+            "candidate_count": 2,
+            "contribution": "no_goal_completion"
+          },
+          "E3": {
+            "reached_frozen_goal": true,
+            "newly_reached_after_E2": true,
+            "first_goal_candidate_no": 10,
+            "first_goal_operator": "shared_resource_role_expansion",
+            "reached_by_repetition": false,
+            "candidate_added_transaction_count": 2,
+            "candidate_added_transaction_step": true,
+            "repetition_candidate_count": 4,
+            "only_repetition_observed": false,
+            "candidate_count": 10,
+            "contribution": "new_transaction_steps_reached_frozen_goal"
+          }
+        }
+      },
+      "echidna_seed_only": {
+        "correctly_loaded": [
+          {
+            "task_id": "A_Wallet02Refund",
+            "group": "E1",
+            "status": "seed_replayed",
+            "seed_input_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E1/corpus-input",
+            "test_limit": 0,
+            "seed": 20261125,
+            "anvil_expected_property": true,
+            "loaded_seed_count": 1,
+            "replayed_sequence_count": 1,
+            "property_failure_reported": false,
+            "target_property_results": [
+              "echidna_wallet_accounting_respected: passing"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.329,
+            "run": {
+              "project": "Wallet02Refund",
+              "property_name": "echidna_wallet_accounting_respected",
+              "test_mode": "property",
+              "command": [
+                "/usr/local/bin/echidna",
+                "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+                "--contract",
+                "WalletHarness",
+                "--crytic-args",
+                "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E1/Wallet02Refund-corpus-input-crytic-compile.json",
+                "--config",
+                "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E1/Wallet02Refund-corpus-input-echidna.yaml",
+                "--test-limit",
+                "0",
+                "--seq-len",
+                "8",
+                "--shrink-limit",
+                "1",
+                "--seed",
+                "20261125",
+                "--workers",
+                "1",
+                "--format",
+                "text",
+                "--deployer",
+                "0x0000000000000000000000000000000000030000",
+                "--contract-addr",
+                "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                "--sender",
+                "0x0000000000000000000000000000000000010000",
+                "--sender",
+                "0x0000000000000000000000000000000000020000",
+                "--sender",
+                "0x0000000000000000000000000000000000030000",
+                "--sender",
+                "0x0000000000000000000000000000000000040000",
+                "--sender",
+                "0x0000000000000000000000000000000000050000",
+                "--disable-slither"
+              ],
+              "exit_code": 0,
+              "status": "completed",
+              "timed_out": false,
+              "seed": 20261125,
+              "test_limit": 0,
+              "seq_len": 8,
+              "shrink_limit": 1,
+              "elapsed_seconds": 0.329,
+              "loaded_seed_count": 1,
+              "loaded_seed_evidence": true,
+              "replayed_sequence_count": 1,
+              "replay_evidence": true,
+              "replayed_lines": [
+                "[2026-11-20 16:57:22.23] [Worker 0] Sequence replayed from corpus file seed-8bbc18d2aaa34f11839157d6ff82d953.txt (1/1)"
+              ],
+              "mutation_evidence": false,
+              "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+              "fuzzing_activity_evidence": true,
+              "fuzzing_transactions": 3,
+              "fuzzing_cases": null,
+              "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+              "fuzzing_progress_count": 3,
+              "fuzzing_progress_limit": 0,
+              "tests_status_snapshots": [
+                {
+                  "completed": 0,
+                  "total": 1
+                }
+              ],
+              "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+              "property_failure_reported": false,
+              "worker_crashes": [],
+              "unique_instructions": 1130,
+              "coverage_source": "final_unique_instructions",
+              "initial_corpus_file_count": 1,
+              "initial_corpus_files": [
+                "seed-8bbc18d2aaa34f11839157d6ff82d953.txt"
+              ],
+              "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E1/corpus-input/echidna.log",
+              "stop_on_fail": false,
+              "target_property_results": [
+                "echidna_wallet_accounting_respected: passing"
+              ],
+              "property_failures": [],
+              "first_property_failure_observed_seconds": null,
+              "property_failure_time_is_upper_bound": false,
+              "initial_state_failures": [],
+              "output": "[2026-11-20 16:57:22.02] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.18115649s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol:WalletHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E1/corpus-input/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E1/corpus-input/coverage\n[2026-11-20 16:57:22.23] [Worker 0] New coverage: 1130 instr, 3 contracts, 1 seqs in corpus\n[2026-11-20 16:57:22.23] [Worker 0] Sequence replayed from corpus file seed-8bbc18d2aaa34f11839157d6ff82d953.txt (1/1)\n[2026-11-20 16:57:22.23] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 16:57:22.23] [status] tests: 0/1, fuzzing: 3/0, values: [], cov: 1130, corpus: 1, gas/s: 0\nechidna_wallet_accounting_respected: passing\n\nUnique instructions: 1130\nUnique codehashes: 3\nCorpus size: 1\nSeed: 20261125\nTotal calls: 3\n\n[2026-11-20 16:57:22.23] Saving test reproducers... Done! (0.000000818s)\n[2026-11-20 16:57:22.23] Saving corpus... Done! (0.000088562s)\n[2026-11-20 16:57:22.23] Saving foundry reproducers... Done! (0.000445948s)\n[2026-11-20 16:57:22.24] Saving coverage... Done! (0.061974195s)\n"
+            },
+            "prior_unseeded_attempt": "initial-unseeded-attempt.json"
+          },
+          {
+            "task_id": "A_Wallet02Refund",
+            "group": "R",
+            "status": "seed_replayed",
+            "seed_input_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/R/corpus-input",
+            "test_limit": 0,
+            "seed": 20261125,
+            "anvil_expected_property": true,
+            "loaded_seed_count": 1,
+            "replayed_sequence_count": 1,
+            "property_failure_reported": false,
+            "target_property_results": [
+              "echidna_wallet_accounting_respected: passing"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.256,
+            "run": {
+              "project": "Wallet02Refund",
+              "property_name": "echidna_wallet_accounting_respected",
+              "test_mode": "property",
+              "command": [
+                "/usr/local/bin/echidna",
+                "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+                "--contract",
+                "WalletHarness",
+                "--crytic-args",
+                "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/R/Wallet02Refund-corpus-input-crytic-compile.json",
+                "--config",
+                "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/R/Wallet02Refund-corpus-input-echidna.yaml",
+                "--test-limit",
+                "0",
+                "--seq-len",
+                "8",
+                "--shrink-limit",
+                "1",
+                "--seed",
+                "20261125",
+                "--workers",
+                "1",
+                "--format",
+                "text",
+                "--deployer",
+                "0x0000000000000000000000000000000000030000",
+                "--contract-addr",
+                "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                "--sender",
+                "0x0000000000000000000000000000000000010000",
+                "--sender",
+                "0x0000000000000000000000000000000000020000",
+                "--sender",
+                "0x0000000000000000000000000000000000030000",
+                "--sender",
+                "0x0000000000000000000000000000000000040000",
+                "--sender",
+                "0x0000000000000000000000000000000000050000",
+                "--disable-slither"
+              ],
+              "exit_code": 0,
+              "status": "completed",
+              "timed_out": false,
+              "seed": 20261125,
+              "test_limit": 0,
+              "seq_len": 8,
+              "shrink_limit": 1,
+              "elapsed_seconds": 0.256,
+              "loaded_seed_count": 1,
+              "loaded_seed_evidence": true,
+              "replayed_sequence_count": 1,
+              "replay_evidence": true,
+              "replayed_lines": [
+                "[2026-11-20 16:57:22.59] [Worker 0] Sequence replayed from corpus file seed-b84b2b5f8d1145ce8b1e63b9fef9db47.txt (1/1)"
+              ],
+              "mutation_evidence": false,
+              "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+              "fuzzing_activity_evidence": true,
+              "fuzzing_transactions": 4,
+              "fuzzing_cases": null,
+              "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+              "fuzzing_progress_count": 4,
+              "fuzzing_progress_limit": 0,
+              "tests_status_snapshots": [
+                {
+                  "completed": 0,
+                  "total": 1
+                }
+              ],
+              "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+              "property_failure_reported": false,
+              "worker_crashes": [],
+              "unique_instructions": 1130,
+              "coverage_source": "final_unique_instructions",
+              "initial_corpus_file_count": 1,
+              "initial_corpus_files": [
+                "seed-b84b2b5f8d1145ce8b1e63b9fef9db47.txt"
+              ],
+              "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/R/corpus-input/echidna.log",
+              "stop_on_fail": false,
+              "target_property_results": [
+                "echidna_wallet_accounting_respected: passing"
+              ],
+              "property_failures": [],
+              "first_property_failure_observed_seconds": null,
+              "property_failure_time_is_upper_bound": false,
+              "initial_state_failures": [],
+              "output": "[2026-11-20 16:57:22.41] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.161628526s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol:WalletHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/R/corpus-input/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/R/corpus-input/coverage\n[2026-11-20 16:57:22.59] [Worker 0] New coverage: 1130 instr, 3 contracts, 1 seqs in corpus\n[2026-11-20 16:57:22.59] [Worker 0] Sequence replayed from corpus file seed-b84b2b5f8d1145ce8b1e63b9fef9db47.txt (1/1)\n[2026-11-20 16:57:22.59] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 16:57:22.59] [status] tests: 0/1, fuzzing: 4/0, values: [], cov: 1130, corpus: 1, gas/s: 0\nechidna_wallet_accounting_respected: passing\n\nUnique instructions: 1130\nUnique codehashes: 3\nCorpus size: 1\nSeed: 20261125\nTotal calls: 4\n\n[2026-11-20 16:57:22.59] Saving test reproducers... Done! (0.000000655s)\n[2026-11-20 16:57:22.59] Saving corpus... Done! (0.000107434s)\n[2026-11-20 16:57:22.59] Saving foundry reproducers... Done! (0.000349528s)\n[2026-11-20 16:57:22.59] Saving coverage... Done! (0.039322848s)\n"
+            },
+            "prior_unseeded_attempt": "initial-unseeded-attempt.json"
+          },
+          {
+            "task_id": "A_Wallet02Refund",
+            "group": "E3",
+            "status": "seed_replayed",
+            "seed_input_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3/corpus-input",
+            "test_limit": 0,
+            "seed": 20261125,
+            "anvil_expected_property": true,
+            "loaded_seed_count": 1,
+            "replayed_sequence_count": 1,
+            "property_failure_reported": false,
+            "target_property_results": [
+              "echidna_wallet_accounting_respected: passing"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.263,
+            "run": {
+              "project": "Wallet02Refund",
+              "property_name": "echidna_wallet_accounting_respected",
+              "test_mode": "property",
+              "command": [
+                "/usr/local/bin/echidna",
+                "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+                "--contract",
+                "WalletHarness",
+                "--crytic-args",
+                "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3/Wallet02Refund-corpus-input-crytic-compile.json",
+                "--config",
+                "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3/Wallet02Refund-corpus-input-echidna.yaml",
+                "--test-limit",
+                "0",
+                "--seq-len",
+                "8",
+                "--shrink-limit",
+                "1",
+                "--seed",
+                "20261125",
+                "--workers",
+                "1",
+                "--format",
+                "text",
+                "--deployer",
+                "0x0000000000000000000000000000000000030000",
+                "--contract-addr",
+                "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+                "--sender",
+                "0x0000000000000000000000000000000000010000",
+                "--sender",
+                "0x0000000000000000000000000000000000020000",
+                "--sender",
+                "0x0000000000000000000000000000000000030000",
+                "--sender",
+                "0x0000000000000000000000000000000000040000",
+                "--sender",
+                "0x0000000000000000000000000000000000050000",
+                "--disable-slither"
+              ],
+              "exit_code": 0,
+              "status": "completed",
+              "timed_out": false,
+              "seed": 20261125,
+              "test_limit": 0,
+              "seq_len": 8,
+              "shrink_limit": 1,
+              "elapsed_seconds": 0.263,
+              "loaded_seed_count": 1,
+              "loaded_seed_evidence": true,
+              "replayed_sequence_count": 1,
+              "replay_evidence": true,
+              "replayed_lines": [
+                "[2026-11-20 16:57:22.93] [Worker 0] Sequence replayed from corpus file seed-738e4c42d4294f0c8ca0123fc9705a88.txt (1/1)"
+              ],
+              "mutation_evidence": false,
+              "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+              "fuzzing_activity_evidence": true,
+              "fuzzing_transactions": 4,
+              "fuzzing_cases": null,
+              "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+              "fuzzing_progress_count": 4,
+              "fuzzing_progress_limit": 0,
+              "tests_status_snapshots": [
+                {
+                  "completed": 0,
+                  "total": 1
+                }
+              ],
+              "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+              "property_failure_reported": false,
+              "worker_crashes": [],
+              "unique_instructions": 1130,
+              "coverage_source": "final_unique_instructions",
+              "initial_corpus_file_count": 1,
+              "initial_corpus_files": [
+                "seed-738e4c42d4294f0c8ca0123fc9705a88.txt"
+              ],
+              "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3/corpus-input/echidna.log",
+              "stop_on_fail": false,
+              "target_property_results": [
+                "echidna_wallet_accounting_respected: passing"
+              ],
+              "property_failures": [],
+              "first_property_failure_observed_seconds": null,
+              "property_failure_time_is_upper_bound": false,
+              "initial_state_failures": [],
+              "output": "[2026-11-20 16:57:22.74] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.166157863s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol:WalletHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3/corpus-input/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3/corpus-input/coverage\n[2026-11-20 16:57:22.93] [Worker 0] New coverage: 1130 instr, 3 contracts, 1 seqs in corpus\n[2026-11-20 16:57:22.93] [Worker 0] Sequence replayed from corpus file seed-738e4c42d4294f0c8ca0123fc9705a88.txt (1/1)\n[2026-11-20 16:57:22.93] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 16:57:22.93] [status] tests: 0/1, fuzzing: 4/0, values: [], cov: 1130, corpus: 1, gas/s: 0\nechidna_wallet_accounting_respected: passing\n\nUnique instructions: 1130\nUnique codehashes: 3\nCorpus size: 1\nSeed: 20261125\nTotal calls: 4\n\n[2026-11-20 16:57:22.93] Saving test reproducers... Done! (0.000000515s)\n[2026-11-20 16:57:22.93] Saving corpus... Done! (0.000066095s)\n[2026-11-20 16:57:22.93] Saving foundry reproducers... Done! (0.000269922s)\n[2026-11-20 16:57:22.93] Saving coverage... Done! (0.041750809s)\n"
+            },
+            "prior_unseeded_attempt": "initial-unseeded-attempt.json"
+          }
+        ],
+        "winner": {
+          "task_id": "A_Wallet02Refund",
+          "group": "E3-goal",
+          "candidate_no": 10,
+          "anvil_target_state": {
+            "goal_kind": "wallet_counterexample",
+            "reached": true,
+            "goal_state_values": {
+              "target_property": false
+            },
+            "reason": "预先定义的关键持久状态全部成立",
+            "property_value": false,
+            "property_related_state_changed": true,
+            "replay_status": "executable",
+            "getter_observation_incomplete": false
+          },
+          "anvil_property": false,
+          "sequence": [
+            {
+              "function": "deposit(uint8)",
+              "arguments": [
+                0
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "1000000000000000000",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change"
+            },
+            {
+              "function": "refund(uint8)",
+              "arguments": [
+                0
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change"
+            },
+            {
+              "function": "deposit(uint8)",
+              "arguments": [
+                1
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "1000000000000000000",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change"
+            },
+            {
+              "function": "withdraw(uint8,uint256)",
+              "arguments": [
+                0,
+                1000000000000000000
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "delay_seconds": 0,
+              "delay_blocks": 0,
+              "expected_outcome": "state_change",
+              "data_dependencies": [
+                {
+                  "from_transaction": 1,
+                  "field": "account",
+                  "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+                }
+              ]
+            }
+          ],
+          "seed_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3-goal/corpus/coverage/seed-80bc7db91973406cbba6140cb21bdd48.txt",
+          "test_limit": 0,
+          "loaded_seed_count": 1,
+          "replayed_sequence_count": 1,
+          "property_failure_reported": true,
+          "target_property_results": [
+            "[2026-11-20 16:58:09.99] [Worker 0] Test echidna_wallet_accounting_respected falsified!",
+            "echidna_wallet_accounting_respected: failed!💥"
+          ],
+          "exit_code": 1,
+          "elapsed_seconds": 0.856,
+          "run": {
+            "project": "Wallet02Refund",
+            "property_name": "echidna_wallet_accounting_respected",
+            "test_mode": "property",
+            "command": [
+              "/usr/local/bin/echidna",
+              "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol",
+              "--contract",
+              "WalletHarness",
+              "--crytic-args",
+              "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3-goal/Wallet02Refund-corpus-crytic-compile.json",
+              "--config",
+              "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3-goal/Wallet02Refund-corpus-echidna.yaml",
+              "--test-limit",
+              "0",
+              "--seq-len",
+              "8",
+              "--shrink-limit",
+              "1",
+              "--seed",
+              "20261125",
+              "--workers",
+              "1",
+              "--format",
+              "text",
+              "--deployer",
+              "0x0000000000000000000000000000000000030000",
+              "--contract-addr",
+              "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+              "--sender",
+              "0x0000000000000000000000000000000000010000",
+              "--sender",
+              "0x0000000000000000000000000000000000020000",
+              "--sender",
+              "0x0000000000000000000000000000000000030000",
+              "--sender",
+              "0x0000000000000000000000000000000000040000",
+              "--sender",
+              "0x0000000000000000000000000000000000050000",
+              "--disable-slither"
+            ],
+            "exit_code": 1,
+            "status": "completed",
+            "timed_out": false,
+            "seed": 20261125,
+            "test_limit": 0,
+            "seq_len": 8,
+            "shrink_limit": 1,
+            "elapsed_seconds": 0.856,
+            "loaded_seed_count": 1,
+            "loaded_seed_evidence": true,
+            "replayed_sequence_count": 1,
+            "replay_evidence": true,
+            "replayed_lines": [
+              "[2026-11-20 16:58:09.99] [Worker 0] Sequence replayed from corpus file seed-80bc7db91973406cbba6140cb21bdd48.txt (1/1)"
+            ],
+            "mutation_evidence": false,
+            "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+            "fuzzing_activity_evidence": true,
+            "fuzzing_transactions": 5,
+            "fuzzing_cases": null,
+            "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+            "fuzzing_progress_count": 5,
+            "fuzzing_progress_limit": 0,
+            "tests_status_snapshots": [
+              {
+                "completed": 1,
+                "total": 1
+              }
+            ],
+            "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+            "property_failure_reported": true,
+            "worker_crashes": [],
+            "unique_instructions": 1478,
+            "coverage_source": "final_unique_instructions",
+            "initial_corpus_file_count": 1,
+            "initial_corpus_files": [
+              "seed-80bc7db91973406cbba6140cb21bdd48.txt"
+            ],
+            "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3-goal/corpus/echidna.log",
+            "stop_on_fail": false,
+            "target_property_results": [
+              "[2026-11-20 16:58:09.99] [Worker 0] Test echidna_wallet_accounting_respected falsified!",
+              "echidna_wallet_accounting_respected: failed!💥"
+            ],
+            "property_failures": [
+              "[2026-11-20 16:58:09.99] [Worker 0] Test echidna_wallet_accounting_respected falsified!",
+              "echidna_wallet_accounting_respected: failed!💥"
+            ],
+            "first_property_failure_observed_seconds": 0.856,
+            "property_failure_time_is_upper_bound": true,
+            "initial_state_failures": [],
+            "output": "[2026-11-20 16:58:09.37] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.497283129s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test/WalletHarness.sol:WalletHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3-goal/corpus/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3-goal/corpus/coverage\n[2026-11-20 16:58:09.99] [Worker 0] Test echidna_wallet_accounting_respected falsified!\n  Call sequence:\nWalletHarness.deposit(0) Value: 0xde0b6b3a7640000\nWalletHarness.refund(0)\nWalletHarness.deposit(1) Value: 0xde0b6b3a7640000\nWalletHarness.withdraw(0,1000000000000000000)\n\n[2026-11-20 16:58:09.99] [Worker 0] New coverage: 1478 instr, 3 contracts, 1 seqs in corpus\n[2026-11-20 16:58:09.99] [Worker 0] Sequence replayed from corpus file seed-80bc7db91973406cbba6140cb21bdd48.txt (1/1)\n[2026-11-20 16:58:09.99]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3-goal/corpus/reproducers-unshrunk/5153933086396221819.txt\n[2026-11-20 16:58:09.99]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/A_Wallet02Refund/E3-goal/corpus/coverage/5153933086396221819.txt\n[2026-11-20 16:58:09.99] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 16:58:09.99] [status] tests: 1/1, fuzzing: 5/0, values: [], cov: 1478, corpus: 1, gas/s: 0\nechidna_wallet_accounting_respected: failed!💥  \n  Call sequence:\n    WalletHarness.deposit(0) Value: 0xde0b6b3a7640000\n    WalletHarness.refund(0)\n    WalletHarness.deposit(1) Value: 0x5cc6398eba80afb\n    WalletHarness.withdraw(0,330330969467021044)\n\nTraces: \n\n\nUnique instructions: 1478\nUnique codehashes: 3\nCorpus size: 1\nSeed: 20261125\nTotal calls: 5\n\n[2026-11-20 16:58:10.00] Saving test reproducers... Done! (0.001034251s)\n[2026-11-20 16:58:10.00] Saving corpus... Done! (0.000183467s)\n[2026-11-20 16:58:10.00] Saving foundry reproducers... Done! (0.002663628s)\n[2026-11-20 16:58:10.00] Saving coverage... Done! (0.098091567s)\n"
+          }
+        }
+      }
+    },
+    "B_Workflow": {
+      "contract": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol",
+      "analysis": {
+        "task_id": "BWorkflow",
+        "report_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/BWorkflow/属性分析.json",
+        "report_sha256": "3d534f96069aae27a7c0abd030c022aa86026f1f17fb97849ae2e1b0ab9e7d69",
+        "property_id": "b1f382e929f9df6e9ab5",
+        "property": "WorkflowHarness.echidna_workflow_respects_limit()",
+        "property_kind": "boolean_property",
+        "analysis_status": "analyzed",
+        "dependency_status": "statically_closed",
+        "read_states": [
+          "WorkflowHarness.completedAmount",
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "candidate_actions": [
+          null,
+          null,
+          null
+        ],
+        "cross_contract_observations": [],
+        "cross_contract_candidate_actions": [],
+        "static_unknowns": []
+      },
+      "oracle": {
+        "task_id": "BWorkflow",
+        "project": "AuditBWorkflow",
+        "status": "oracle_reached",
+        "deployment": {
+          "status": 1,
+          "transaction_hash": "3b7ce995d6646a5006338e7fc5b4db976656aebe6f16311982111c150b459790",
+          "address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+        },
+        "initial_property": true,
+        "initial_getters": [
+          {
+            "function": "stage()",
+            "arguments": [],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "executionLimit()",
+            "arguments": [],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "completedAmount()",
+            "arguments": [],
+            "status": "observed",
+            "value": 0
+          }
+        ],
+        "steps": [
+          {
+            "index": 1,
+            "function": "createTask()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "receipt_status": 1,
+            "transaction_hash": "61a52ed612f6cf26ac5daff6ace26a550423226af167c2bd2ebc07b323feb3db",
+            "gas_used": 43341,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000010000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0xa7476493",
+                "value": "0x0",
+                "calls": []
+              },
+              "changed_storage_slot_count": 1,
+              "balance_changes": [],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "stage()",
+                "arguments": [],
+                "status": "observed",
+                "value": 1
+              },
+              {
+                "function": "executionLimit()",
+                "arguments": [],
+                "status": "observed",
+                "value": 0
+              },
+              {
+                "function": "completedAmount()",
+                "arguments": [],
+                "status": "observed",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "function": "configureTask(uint256)",
+            "arguments": [
+              5
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "receipt_status": 1,
+            "transaction_hash": "323b513341a7e0ff1c76abfe215f751232c32fc2135fc5293d33e0b780993495",
+            "gas_used": 48842,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000010000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0xeff794e30000000000000000000000000000000000000000000000000000000000000005",
+                "value": "0x0",
+                "calls": []
+              },
+              "changed_storage_slot_count": 2,
+              "balance_changes": [],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "stage()",
+                "arguments": [],
+                "status": "observed",
+                "value": 2
+              },
+              {
+                "function": "executionLimit()",
+                "arguments": [],
+                "status": "observed",
+                "value": 5
+              },
+              {
+                "function": "completedAmount()",
+                "arguments": [],
+                "status": "observed",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0",
+            "receipt_status": 1,
+            "transaction_hash": "6798908b04e3b64023c465ea47a7b2ed9c3499386d3e1cefa2f415dbe2228a4f",
+            "gas_used": 51130,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000020000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0x6e3480c70000000000000000000000000000000000000000000000000000000000000003",
+                "value": "0x0",
+                "calls": []
+              },
+              "changed_storage_slot_count": 2,
+              "balance_changes": [],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "stage()",
+                "arguments": [],
+                "status": "observed",
+                "value": 3
+              },
+              {
+                "function": "executionLimit()",
+                "arguments": [],
+                "status": "observed",
+                "value": 5
+              },
+              {
+                "function": "completedAmount()",
+                "arguments": [],
+                "status": "observed",
+                "value": 3
+              }
+            ]
+          }
+        ],
+        "final_property": true,
+        "final_getters": [
+          {
+            "function": "stage()",
+            "arguments": [],
+            "status": "observed",
+            "value": 3
+          },
+          {
+            "function": "executionLimit()",
+            "arguments": [],
+            "status": "observed",
+            "value": 5
+          },
+          {
+            "function": "completedAmount()",
+            "arguments": [],
+            "status": "observed",
+            "value": 3
+          }
+        ],
+        "target_goal": {
+          "kind": "workflow_stage",
+          "stage_getter": "stage()",
+          "completed_getter": "completedAmount()",
+          "stage": 3,
+          "completed_min": 1
+        },
+        "target_reached": true,
+        "oracle_sequence_sha256": "362ca3a4cb03398f7348f3f6ff30d634bc6d1d4a412fc225992ac8a7dd4974ea",
+        "elapsed_seconds": 0.361725,
+        "isolation": "Oracle only; no steps or output passed to Agent A/B or extension methods"
+      },
+      "agent_methods": {
+        "status": "completed_after_explicit_user_authorization",
+        "final_record": "14-B-C-D最终对照与归因.json",
+        "agent_record": "03-Agent输入与输出/BWorkflow/AgentAB初始种子.json",
+        "model": "deepseek-flash",
+        "api_calls": 2,
+        "failed_requests": 0,
+        "tokens": 11133,
+        "estimated_cost_usd_offpeak": "0.001959522",
+        "estimated_cost_usd_peak": "0.003919044",
+        "agent_a_order": [],
+        "agent_b_sequence": [
+          {
+            "index": 1,
+            "function": "createTask()",
+            "abi_signature": "createTask()",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "rationale": "部署时 stage=0，满足 require(stage==0)；将 stage 置为 1。"
+          },
+          {
+            "index": 2,
+            "function": "configureTask(uint256)",
+            "abi_signature": "configureTask(uint256)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              100
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "rationale": "stage 已为 1，满足守卫；maxAmount=100>0，写入 executionLimit=100 与 stage=2。"
+          },
+          {
+            "index": 3,
+            "function": "executeTask(uint256)",
+            "abi_signature": "executeTask(uint256)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              100
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "rationale": "stage 已为 2，amount=100 满足 0<amount<=executionLimit(100)；completedAmount 变为 100，stage=3，属性谓词进入 stage==3 分支并检验 completedAmount<=executionLimit。",
+            "data_dependencies": [
+              {
+                "from_transaction": 2,
+                "field": "maxAmount",
+                "relation": "executeTask.amount 复用 configureTask.maxAmount 的值，以满足 amount<=executionLimit 守卫"
+              }
+            ]
+          }
+        ],
+        "E1": {
+          "status": "executable",
+          "property": true,
+          "direct_goal_reached": true,
+          "direct_goal_getters": [
+            {
+              "function": "stage()",
+              "arguments": [],
+              "status": "observed",
+              "value": 3
+            },
+            {
+              "function": "executionLimit()",
+              "arguments": [],
+              "status": "observed",
+              "value": 100
+            },
+            {
+              "function": "completedAmount()",
+              "arguments": [],
+              "status": "observed",
+              "value": 100
+            }
+          ],
+          "direct_oracle_record": "02-独立Oracle/BWorkflow-AgentAB-StateReadback-独立Oracle.json",
+          "adapter_goal_value": {
+            "goal_kind": "workflow_stage",
+            "reached": true,
+            "goal_state_values": {
+              "stage": 3,
+              "completed": 100
+            },
+            "reason": "预先定义的关键持久状态全部成立",
+            "property_value": true,
+            "property_related_state_changed": true,
+            "replay_status": "executable",
+            "getter_observation_incomplete": false
+          },
+          "adapter_goal_observation_incomplete": false
+        },
+        "E2": {
+          "parameter_repair": null,
+          "normalized_sequence_unchanged": true,
+          "direct_goal_already_reached_before_extension": true
+        },
+        "methods": {
+          "R": {
+            "candidate_attempts": 24,
+            "total_anvil_replays": 25,
+            "elapsed_seconds": 10.241655,
+            "complete_sequence_replay_statuses": {
+              "replay_failed": 24
+            },
+            "executable_complete_candidates": 0,
+            "operators": {
+              "random_role_or_sender": 19,
+              "random_action": 5
+            },
+            "raw_summary": "04-Anvil对照/BWorkflow/R-候选状态汇总.json"
+          },
+          "S": {
+            "candidate_attempts": 0,
+            "total_anvil_replays": 1,
+            "elapsed_seconds": 10.911463,
+            "complete_sequence_replay_statuses": {},
+            "executable_complete_candidates": 0,
+            "operators": {},
+            "raw_summary": "04-Anvil对照/BWorkflow/S-候选状态汇总.json"
+          },
+          "E3": {
+            "candidate_attempts": 24,
+            "total_anvil_replays": 25,
+            "elapsed_seconds": 23.144469,
+            "complete_sequence_replay_statuses": {
+              "replay_failed": 24
+            },
+            "executable_complete_candidates": 0,
+            "operators": {
+              "state_supported_repetition": 24
+            },
+            "raw_summary": "04-Anvil对照/BWorkflow/E3-候选状态汇总.json"
+          }
+        },
+        "echidna_corrected_seed_only": [
+          "05-Echidna-seed-only/BWorkflow/E1/corpus-replay-summary.json"
+        ],
+        "renamed_variant_record": "04-Anvil对照/BWorkflowRenamed/方法对照总汇.json"
+      },
+      "renamed_semantic_variant": {
+        "contract": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness-Renamed.sol",
+        "analysis": {
+          "task_id": "BWorkflowRenamed",
+          "report_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/BWorkflowRenamed/属性分析.json",
+          "report_sha256": "c65cb51c8c5dc192d49e3cae26e84eeb62b5f59c65cf01d14d451c317f49e7c1",
+          "property_id": "e6f94dd55fae71147f6a",
+          "property": "WorkOrderHarness.echidna_order_value_within_quota()",
+          "property_kind": "boolean_property",
+          "analysis_status": "analyzed",
+          "dependency_status": "statically_closed",
+          "read_states": [
+            "WorkOrderHarness.appliedValue",
+            "WorkOrderHarness.phase",
+            "WorkOrderHarness.quota"
+          ],
+          "candidate_actions": [
+            null,
+            null,
+            null
+          ],
+          "cross_contract_observations": [],
+          "cross_contract_candidate_actions": [],
+          "static_unknowns": []
+        },
+        "oracle": {
+          "task_id": "BWorkflowRenamed",
+          "project": "AuditBWorkflowRenamed",
+          "status": "oracle_reached",
+          "deployment": {
+            "status": 1,
+            "transaction_hash": "4d80026a5d1cd7cf91b669fd7b1b4da7873feac4666c8650e618e78ab500cc96",
+            "address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+          },
+          "initial_property": true,
+          "initial_getters": [
+            {
+              "function": "phase()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "quota()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "appliedValue()",
+              "arguments": [],
+              "status": "observed",
+              "value": 0
+            }
+          ],
+          "steps": [
+            {
+              "index": 1,
+              "function": "openOrder()",
+              "arguments": [],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "receipt_status": 1,
+              "transaction_hash": "20de3c551f91e745397d6f9d6fa11dcb5fd63ea8a652a9b6a5f5f10d19ec567b",
+              "gas_used": 43342,
+              "revert_reason": null,
+              "trace": {
+                "internal_errors": [],
+                "internal_call_trace": {
+                  "type": "CALL",
+                  "from": "0x0000000000000000000000000000000000010000",
+                  "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "input": "0x1f1a9d8a",
+                  "value": "0x0",
+                  "calls": []
+                },
+                "changed_storage_slot_count": 1,
+                "balance_changes": [],
+                "top_level_trace_error": null,
+                "top_level_output": null
+              },
+              "target_property": true,
+              "getter_snapshot": [
+                {
+                  "function": "phase()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 1
+                },
+                {
+                  "function": "quota()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 0
+                },
+                {
+                  "function": "appliedValue()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "function": "setQuota(uint256)",
+              "arguments": [
+                5
+              ],
+              "sender": "0x0000000000000000000000000000000000010000",
+              "value_wei": "0",
+              "receipt_status": 1,
+              "transaction_hash": "9393c4071a6a6bd84daff132501d8c036d79e7c98b7330e670f3c8d4acee349c",
+              "gas_used": 48821,
+              "revert_reason": null,
+              "trace": {
+                "internal_errors": [],
+                "internal_call_trace": {
+                  "type": "CALL",
+                  "from": "0x0000000000000000000000000000000000010000",
+                  "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "input": "0xa257db8e0000000000000000000000000000000000000000000000000000000000000005",
+                  "value": "0x0",
+                  "calls": []
+                },
+                "changed_storage_slot_count": 2,
+                "balance_changes": [],
+                "top_level_trace_error": null,
+                "top_level_output": null
+              },
+              "target_property": true,
+              "getter_snapshot": [
+                {
+                  "function": "phase()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 2
+                },
+                {
+                  "function": "quota()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 5
+                },
+                {
+                  "function": "appliedValue()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "function": "applyOrder(uint256)",
+              "arguments": [
+                3
+              ],
+              "sender": "0x0000000000000000000000000000000000020000",
+              "value_wei": "0",
+              "receipt_status": 1,
+              "transaction_hash": "cfb09455ad40702aa036e3bd0282840336c9c64347137ed8ef79d87b06a299c7",
+              "gas_used": 51107,
+              "revert_reason": null,
+              "trace": {
+                "internal_errors": [],
+                "internal_call_trace": {
+                  "type": "CALL",
+                  "from": "0x0000000000000000000000000000000000020000",
+                  "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "input": "0xb06f86770000000000000000000000000000000000000000000000000000000000000003",
+                  "value": "0x0",
+                  "calls": []
+                },
+                "changed_storage_slot_count": 2,
+                "balance_changes": [],
+                "top_level_trace_error": null,
+                "top_level_output": null
+              },
+              "target_property": true,
+              "getter_snapshot": [
+                {
+                  "function": "phase()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 3
+                },
+                {
+                  "function": "quota()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 5
+                },
+                {
+                  "function": "appliedValue()",
+                  "arguments": [],
+                  "status": "observed",
+                  "value": 3
+                }
+              ]
+            }
+          ],
+          "final_property": true,
+          "final_getters": [
+            {
+              "function": "phase()",
+              "arguments": [],
+              "status": "observed",
+              "value": 3
+            },
+            {
+              "function": "quota()",
+              "arguments": [],
+              "status": "observed",
+              "value": 5
+            },
+            {
+              "function": "appliedValue()",
+              "arguments": [],
+              "status": "observed",
+              "value": 3
+            }
+          ],
+          "target_goal": {
+            "kind": "workflow_stage",
+            "stage_getter": "phase()",
+            "completed_getter": "appliedValue()",
+            "stage": 3,
+            "completed_min": 1
+          },
+          "target_reached": true,
+          "oracle_sequence_sha256": "2dfce7fe3ba9ef0c7d0d68c3fc69ca44f76c99e448970ebde3c7465f3c3b9936",
+          "elapsed_seconds": 0.294307,
+          "isolation": "Oracle only; no steps or output passed to Agent A/B or extension methods"
+        },
+        "agent_methods": {
+          "status": "completed_without_additional_model_calls",
+          "source_task": "BWorkflow",
+          "final_record": "14-B-C-D最终对照与归因.json",
+          "agent_calls": 0,
+          "function_mapping": {
+            "createTask()": "openOrder()",
+            "configureTask(uint256)": "setQuota(uint256)",
+            "executeTask(uint256)": "applyOrder(uint256)"
+          },
+          "E1_goal_state": {
+            "goal_kind": "workflow_stage",
+            "reached": true,
+            "goal_state_values": {
+              "stage": 3,
+              "completed": 100
+            },
+            "reason": "预先定义的关键持久状态全部成立",
+            "property_value": true,
+            "property_related_state_changed": true,
+            "replay_status": "executable",
+            "getter_observation_incomplete": false
+          },
+          "E2_parameter_repair": null,
+          "methods": {
+            "R": {
+              "candidate_attempts": 24,
+              "total_anvil_replays": 25,
+              "elapsed_seconds": 9.461896,
+              "complete_sequence_replay_statuses": {
+                "replay_failed": 24
+              },
+              "executable_complete_candidates": 0,
+              "operators": {
+                "random_role_or_sender": 19,
+                "random_action": 5
+              },
+              "raw_summary": "04-Anvil对照/BWorkflowRenamed/R-候选状态汇总.json"
+            },
+            "S": {
+              "candidate_attempts": 0,
+              "total_anvil_replays": 1,
+              "elapsed_seconds": 9.921719,
+              "complete_sequence_replay_statuses": {},
+              "executable_complete_candidates": 0,
+              "operators": {},
+              "raw_summary": "04-Anvil对照/BWorkflowRenamed/S-候选状态汇总.json"
+            },
+            "E3": {
+              "candidate_attempts": 24,
+              "total_anvil_replays": 25,
+              "elapsed_seconds": 20.788986,
+              "complete_sequence_replay_statuses": {
+                "replay_failed": 24
+              },
+              "executable_complete_candidates": 0,
+              "operators": {
+                "state_supported_repetition": 24
+              },
+              "raw_summary": "04-Anvil对照/BWorkflowRenamed/E3-候选状态汇总.json"
+            }
+          },
+          "echidna_corrected_seed_only": [
+            "05-Echidna-seed-only/BWorkflowRenamed/E1/corpus-replay-summary.json"
+          ]
+        }
+      }
+    },
+    "C_MsgSender": {
+      "contract": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol",
+      "analysis": {
+        "task_id": "CMsgSender",
+        "report_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/CMsgSender/属性分析.json",
+        "report_sha256": "c7e200af15595d5a5b00c0716616c6ba11fad9b43fc335374bbf2d65c5367ea1",
+        "property_id": "816fc4e3bd3bfee42661",
+        "property": "MsgSenderDelegationHarness.echidna_delegated_execution_is_bounded()",
+        "property_kind": "boolean_property",
+        "analysis_status": "analyzed",
+        "dependency_status": "statically_supported_with_limits",
+        "read_states": [
+          "MsgSenderDelegationHarness.TARGET_OPERATOR",
+          "MsgSenderDelegationHarness.TARGET_OWNER",
+          "MsgSenderDelegationHarness.authorizedOperator",
+          "MsgSenderDelegationHarness.depositedCredit",
+          "MsgSenderDelegationHarness.executedFor"
+        ],
+        "candidate_actions": [
+          null,
+          null,
+          null
+        ],
+        "cross_contract_observations": [],
+        "cross_contract_candidate_actions": [],
+        "static_unknowns": [
+          "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+        ]
+      },
+      "oracle": {
+        "task_id": "CMsgSender",
+        "project": "AuditCMsgSender",
+        "status": "oracle_reached",
+        "deployment": {
+          "status": 1,
+          "transaction_hash": "ba77ecb7fc11227508ea11d450f56122e3c441374bc34ecdad526c90fa9e78eb",
+          "address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+        },
+        "initial_property": true,
+        "initial_getters": [
+          {
+            "function": "depositedCredit(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "availableCredit(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "authorizedOperator(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": "0x0000000000000000000000000000000000000000"
+          },
+          {
+            "function": "executedFor(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 0
+          }
+        ],
+        "steps": [
+          {
+            "index": 1,
+            "function": "fundCredit()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000",
+            "receipt_status": 1,
+            "transaction_hash": "9f949f7b5ed2ec4f239a2489e02687dc5d76aa79b4882e38da9a76fec96c63c7",
+            "gas_used": 66020,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000010000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0x2e66059b",
+                "value": "0xde0b6b3a7640000",
+                "calls": []
+              },
+              "changed_storage_slot_count": 2,
+              "balance_changes": [
+                {
+                  "address": "0x0000000000000000000000000000000000010000",
+                  "before_wei": 100000000000000000000,
+                  "after_wei": 99000000000000000000,
+                  "delta_wei": -1000000000000000000
+                },
+                {
+                  "address": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                  "before_wei": 0,
+                  "after_wei": 1000000000000000000,
+                  "delta_wei": 1000000000000000000
+                }
+              ],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "depositedCredit(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 1000000000000000000
+              },
+              {
+                "function": "availableCredit(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 1000000000000000000
+              },
+              {
+                "function": "authorizedOperator(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": "0x0000000000000000000000000000000000000000"
+              },
+              {
+                "function": "executedFor(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "function": "authorizeOperator(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "receipt_status": 1,
+            "transaction_hash": "d873a0a4aa62169178ef080bdade8ac6a0bfe44210e4295b0a4d02f09dbd3ebd",
+            "gas_used": 43940,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000010000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0x959b8c3f0000000000000000000000000000000000000000000000000000000000020000",
+                "value": "0x0",
+                "calls": []
+              },
+              "changed_storage_slot_count": 1,
+              "balance_changes": [],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "depositedCredit(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 1000000000000000000
+              },
+              {
+                "function": "availableCredit(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 1000000000000000000
+              },
+              {
+                "function": "authorizedOperator(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": "0x0000000000000000000000000000000000020000"
+              },
+              {
+                "function": "executedFor(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "function": "executeFor(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0",
+            "receipt_status": 1,
+            "transaction_hash": "ac786971c685bc3e2f2d783352920b17e9e4811eba2312064e4d332afc05ba39",
+            "gas_used": 52228,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000020000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0xeface2c200000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000001",
+                "value": "0x0",
+                "calls": []
+              },
+              "changed_storage_slot_count": 2,
+              "balance_changes": [],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "depositedCredit(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 1000000000000000000
+              },
+              {
+                "function": "availableCredit(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 999999999999999999
+              },
+              {
+                "function": "authorizedOperator(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": "0x0000000000000000000000000000000000020000"
+              },
+              {
+                "function": "executedFor(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 1
+              }
+            ]
+          }
+        ],
+        "final_property": true,
+        "final_getters": [
+          {
+            "function": "depositedCredit(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 1000000000000000000
+          },
+          {
+            "function": "availableCredit(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 999999999999999999
+          },
+          {
+            "function": "authorizedOperator(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": "0x0000000000000000000000000000000000020000"
+          },
+          {
+            "function": "executedFor(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 1
+          }
+        ],
+        "target_goal": {
+          "kind": "delegated_execution",
+          "owner": "0x0000000000000000000000000000000000010000",
+          "operator": "0x0000000000000000000000000000000000020000",
+          "executed_getter": "executedFor(address)",
+          "deposit_getter": "depositedCredit(address)",
+          "available_getter": "availableCredit(address)",
+          "authorization_getter": "authorizedOperator(address)",
+          "amount": 1
+        },
+        "target_reached": true,
+        "oracle_sequence_sha256": "9fb6ef73ca436c5526da8b781896bb9c25cde62aa4c75ee0a774522b1e3d50d2",
+        "elapsed_seconds": 0.347761,
+        "isolation": "Oracle only; no steps or output passed to Agent A/B or extension methods"
+      },
+      "agent_methods": {
+        "status": "completed_after_explicit_user_authorization",
+        "final_record": "14-B-C-D最终对照与归因.json",
+        "agent_record": "03-Agent输入与输出/CMsgSender/AgentAB初始种子.json",
+        "model": "deepseek-flash",
+        "api_calls": 2,
+        "failed_requests": 0,
+        "tokens": 10483,
+        "estimated_cost_usd_offpeak": "0.001935372",
+        "estimated_cost_usd_peak": "0.003870744",
+        "agent_a_order": [],
+        "agent_b_sequence": [
+          {
+            "function": "fundCredit()",
+            "abi_signature": "fundCredit()",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [],
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "authorizeOperator(address)",
+            "abi_signature": "authorizeOperator(address)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "executeFor(address,uint256)",
+            "abi_signature": "executeFor(address,uint256)",
+            "sender": "0x0000000000000000000000000000000000020000",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1000000000000000000
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "sender",
+                "relation": "owner 参数复用第 1 笔交易的 sender，即 TARGET_OWNER，确保 depositedCredit/availableCredit 与 executedFor 索引同一账户"
+              },
+              {
+                "from_transaction": 2,
+                "field": "arguments[0]",
+                "relation": "executeFor 的 msg.sender 复用第 2 笔交易 authorizeOperator 的 operator 参数，即 TARGET_OPERATOR，满足 authorizedOperator[owner]==msg.sender"
+              }
+            ]
+          }
+        ],
+        "E1": {
+          "status": "executable",
+          "property": true,
+          "direct_goal_reached": true,
+          "direct_goal_getters": [
+            {
+              "function": "depositedCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            },
+            {
+              "function": "availableCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "authorizedOperator(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": "0x0000000000000000000000000000000000020000"
+            },
+            {
+              "function": "executedFor(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            }
+          ],
+          "direct_oracle_record": "02-独立Oracle/CMsgSender-AgentAB-StateReadback-独立Oracle.json",
+          "adapter_goal_value": {
+            "goal_kind": "delegated_execution",
+            "reached": false,
+            "goal_state_values": {
+              "deposit": 0,
+              "available": 0,
+              "authorized_operator": null,
+              "executed": 0
+            },
+            "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+            "property_value": true,
+            "property_related_state_changed": false,
+            "replay_status": "executable",
+            "getter_observation_incomplete": true
+          },
+          "adapter_goal_observation_incomplete": true,
+          "adapter_direct_goal_disagreement": true,
+          "adapter_reported_goal_reached": false,
+          "direct_readback_is_authoritative": true,
+          "observer_reason": "executedFor[TARGET_OWNER] mapping index was unresolved; getter observation was incomplete."
+        },
+        "E2": {
+          "parameter_repair": null,
+          "normalized_sequence_unchanged": true,
+          "direct_goal_already_reached_before_extension": true
+        },
+        "methods": {
+          "R": {
+            "candidate_attempts": 24,
+            "total_anvil_replays": 25,
+            "elapsed_seconds": 11.118614,
+            "complete_sequence_replay_statuses": {
+              "executable": 12,
+              "replay_failed": 12
+            },
+            "executable_complete_candidates": 12,
+            "operators": {
+              "random_role_or_sender": 18,
+              "random_action": 6
+            },
+            "raw_summary": "04-Anvil对照/CMsgSender/R-候选状态汇总.json"
+          },
+          "S": {
+            "candidate_attempts": 0,
+            "total_anvil_replays": 1,
+            "elapsed_seconds": 11.633776,
+            "complete_sequence_replay_statuses": {},
+            "executable_complete_candidates": 0,
+            "operators": {},
+            "raw_summary": "04-Anvil对照/CMsgSender/S-候选状态汇总.json"
+          },
+          "E3": {
+            "candidate_attempts": 0,
+            "total_anvil_replays": 1,
+            "elapsed_seconds": 12.144008,
+            "complete_sequence_replay_statuses": {},
+            "executable_complete_candidates": 0,
+            "operators": {},
+            "raw_summary": "04-Anvil对照/CMsgSender/E3-候选状态汇总.json"
+          }
+        },
+        "echidna_corrected_seed_only": [
+          "05-Echidna-seed-only/CMsgSender/E1/corpus-replay-summary.json"
+        ]
+      },
+      "code_microtest": "09-扩展机制微观核验.json"
+    },
+    "D_Allowance": {
+      "contract": "sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol",
+      "analysis": {
+        "task_id": "DAllowance",
+        "report_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/DAllowance/属性分析.json",
+        "report_sha256": "d828b320fed4dbdfe1b4495b53f9382f4dddec16b48ee8953d30d6d969f02fcf",
+        "property_id": "c4adf1a248a169bde10e",
+        "property": "AllowanceHarness.echidna_delegated_spend_is_bounded()",
+        "property_kind": "boolean_property",
+        "analysis_status": "analyzed",
+        "dependency_status": "statically_supported_with_limits",
+        "read_states": [
+          "AllowanceHarness.TARGET_OWNER",
+          "AllowanceHarness.TARGET_SPENDER",
+          "AllowanceHarness.balanceOf",
+          "AllowanceHarness.delegatedSpent",
+          "AllowanceHarness.totalGranted",
+          "AllowanceHarness.totalSupply"
+        ],
+        "candidate_actions": [
+          null,
+          null,
+          null
+        ],
+        "cross_contract_observations": [],
+        "cross_contract_candidate_actions": [],
+        "static_unknowns": [
+          "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+        ]
+      },
+      "oracle": {
+        "task_id": "DAllowance",
+        "project": "AuditDAllowance",
+        "status": "oracle_reached",
+        "deployment": {
+          "status": 1,
+          "transaction_hash": "80847d1de8c4b82f120da00f0d29ae86b5f8d23e35e9713cb9df7108662722a9",
+          "address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66"
+        },
+        "initial_property": true,
+        "initial_getters": [
+          {
+            "function": "balanceOf(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "balanceOf(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "allowance(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "totalGranted(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "delegatedSpent(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "totalSupply()",
+            "arguments": [],
+            "status": "observed",
+            "value": 0
+          }
+        ],
+        "steps": [
+          {
+            "index": 1,
+            "function": "mint(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              10
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "receipt_status": 1,
+            "transaction_hash": "3aaf338226065bbd5431d7ba21cf738a2c1f83b057bc773b8161e97fe1b7e3fe",
+            "gas_used": 66806,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000010000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0x40c10f190000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000a",
+                "value": "0x0",
+                "calls": []
+              },
+              "changed_storage_slot_count": 2,
+              "balance_changes": [],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "balanceOf(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 10
+              },
+              {
+                "function": "balanceOf(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 0
+              },
+              {
+                "function": "allowance(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 0
+              },
+              {
+                "function": "totalGranted(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 0
+              },
+              {
+                "function": "delegatedSpent(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 0
+              },
+              {
+                "function": "totalSupply()",
+                "arguments": [],
+                "status": "observed",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "function": "approve(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000",
+              7
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "receipt_status": 1,
+            "transaction_hash": "90d9f1559e01b6ff29ff901003e7432327ff2bbe1b6132a532fe945eecfd345e",
+            "gas_used": 66773,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000010000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0x095ea7b300000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000007",
+                "value": "0x0",
+                "calls": []
+              },
+              "changed_storage_slot_count": 2,
+              "balance_changes": [],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "balanceOf(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 10
+              },
+              {
+                "function": "balanceOf(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 0
+              },
+              {
+                "function": "allowance(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 7
+              },
+              {
+                "function": "totalGranted(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 7
+              },
+              {
+                "function": "delegatedSpent(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 0
+              },
+              {
+                "function": "totalSupply()",
+                "arguments": [],
+                "status": "observed",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "function": "transferFrom(address,address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000030000",
+              4
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0",
+            "receipt_status": 1,
+            "transaction_hash": "67ea587fd62f57d1045da9e9983364b71c9a947f841949e96c868ee9a1d48c43",
+            "gas_used": 78467,
+            "revert_reason": null,
+            "trace": {
+              "internal_errors": [],
+              "internal_call_trace": {
+                "type": "CALL",
+                "from": "0x0000000000000000000000000000000000020000",
+                "to": "0xa647ff3c36cfab592509e13860ab8c4f28781a66",
+                "input": "0x23b872dd000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000004",
+                "value": "0x0",
+                "calls": []
+              },
+              "changed_storage_slot_count": 4,
+              "balance_changes": [],
+              "top_level_trace_error": null,
+              "top_level_output": null
+            },
+            "target_property": true,
+            "getter_snapshot": [
+              {
+                "function": "balanceOf(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000"
+                ],
+                "status": "observed",
+                "value": 6
+              },
+              {
+                "function": "balanceOf(address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 0
+              },
+              {
+                "function": "allowance(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 3
+              },
+              {
+                "function": "totalGranted(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 7
+              },
+              {
+                "function": "delegatedSpent(address,address)",
+                "arguments": [
+                  "0x0000000000000000000000000000000000010000",
+                  "0x0000000000000000000000000000000000020000"
+                ],
+                "status": "observed",
+                "value": 4
+              },
+              {
+                "function": "totalSupply()",
+                "arguments": [],
+                "status": "observed",
+                "value": 10
+              }
+            ]
+          }
+        ],
+        "final_property": true,
+        "final_getters": [
+          {
+            "function": "balanceOf(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 6
+          },
+          {
+            "function": "balanceOf(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "allowance(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 3
+          },
+          {
+            "function": "totalGranted(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 7
+          },
+          {
+            "function": "delegatedSpent(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 4
+          },
+          {
+            "function": "totalSupply()",
+            "arguments": [],
+            "status": "observed",
+            "value": 10
+          }
+        ],
+        "target_goal": {
+          "kind": "delegated_spend",
+          "owner": "0x0000000000000000000000000000000000010000",
+          "spender": "0x0000000000000000000000000000000000020000",
+          "recipient": "0x0000000000000000000000000000000000030000",
+          "amount": 4,
+          "balance_getter": "balanceOf(address)",
+          "allowance_getter": "allowance(address,address)",
+          "grant_getter": "totalGranted(address,address)",
+          "spent_getter": "delegatedSpent(address,address)",
+          "supply_getter": "totalSupply()"
+        },
+        "target_reached": true,
+        "oracle_sequence_sha256": "ec3982cb6b6533876fd59a4d062cc1de8987ac689993dacf57f947a2da9c35cc",
+        "elapsed_seconds": 0.43822,
+        "isolation": "Oracle only; no steps or output passed to Agent A/B or extension methods"
+      },
+      "agent_methods": {
+        "status": "completed_after_explicit_user_authorization",
+        "final_record": "14-B-C-D最终对照与归因.json",
+        "agent_record": "03-Agent输入与输出/DAllowance/AgentAB初始种子.json",
+        "model": "deepseek-flash",
+        "api_calls": 2,
+        "failed_requests": 0,
+        "tokens": 12711,
+        "estimated_cost_usd_offpeak": "0.002283072",
+        "estimated_cost_usd_peak": "0.004566144",
+        "agent_a_order": [],
+        "agent_b_sequence": [
+          {
+            "function": "mint(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "approve(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000",
+              500
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "transferFrom(address,address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000",
+              500
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "recipient",
+                "used_as": "owner"
+              },
+              {
+                "from_transaction": 2,
+                "field": "spender",
+                "used_as": "recipient"
+              }
+            ]
+          }
+        ],
+        "E1": {
+          "status": "executable",
+          "property": true,
+          "direct_goal_reached": true,
+          "direct_goal_getters": [
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 500
+            },
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 500
+            },
+            {
+              "function": "allowance(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "totalGranted(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 500
+            },
+            {
+              "function": "delegatedSpent(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 500
+            },
+            {
+              "function": "totalSupply()",
+              "arguments": [],
+              "status": "observed",
+              "value": 1000
+            }
+          ],
+          "direct_oracle_record": "02-独立Oracle/DAllowance-AgentAB-StateReadback-独立Oracle.json",
+          "adapter_goal_value": {
+            "goal_kind": "delegated_spend",
+            "reached": false,
+            "goal_state_values": {
+              "owner_balance": 0,
+              "spender_balance": 0,
+              "allowance": 0,
+              "total_granted": 0,
+              "delegated_spent": 0,
+              "total_supply": 1000
+            },
+            "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+            "property_value": true,
+            "property_related_state_changed": true,
+            "replay_status": "executable",
+            "getter_observation_incomplete": false
+          },
+          "adapter_goal_observation_incomplete": false,
+          "adapter_direct_goal_disagreement": true,
+          "adapter_reported_goal_reached": false,
+          "direct_readback_is_authoritative": true,
+          "observer_reason": "goal mapping getters (balanceOf/allowance/totalGranted/delegatedSpent at concrete keys) were not included in predicate_getter_values; observer did not mark this incomplete."
+        },
+        "E2": {
+          "parameter_repair": null,
+          "normalized_sequence_unchanged": true,
+          "direct_goal_already_reached_before_extension": true
+        },
+        "methods": {
+          "R": {
+            "candidate_attempts": 24,
+            "total_anvil_replays": 25,
+            "elapsed_seconds": 72.734276,
+            "complete_sequence_replay_statuses": {
+              "executable": 18,
+              "replay_failed": 6
+            },
+            "executable_complete_candidates": 18,
+            "operators": {
+              "random_role_or_sender": 18,
+              "random_action": 6
+            },
+            "raw_summary": "04-Anvil对照/DAllowance/R-候选状态汇总.json"
+          },
+          "S": {
+            "candidate_attempts": 0,
+            "total_anvil_replays": 1,
+            "elapsed_seconds": 73.34735,
+            "complete_sequence_replay_statuses": {},
+            "executable_complete_candidates": 0,
+            "operators": {},
+            "raw_summary": "04-Anvil对照/DAllowance/S-候选状态汇总.json"
+          },
+          "E3": {
+            "candidate_attempts": 5,
+            "total_anvil_replays": 6,
+            "elapsed_seconds": 78.819013,
+            "complete_sequence_replay_statuses": {
+              "executable": 5
+            },
+            "executable_complete_candidates": 5,
+            "operators": {
+              "state_supported_repetition": 5
+            },
+            "raw_summary": "04-Anvil对照/DAllowance/E3-候选状态汇总.json"
+          }
+        },
+        "echidna_corrected_seed_only": [
+          "05-Echidna-seed-only/DAllowance/E1/corpus-replay-summary.json",
+          "05-Echidna-seed-only/DAllowance/R/corpus-replay-summary.json",
+          "05-Echidna-seed-only/DAllowance/E3/corpus-replay-summary.json"
+        ]
+      },
+      "code_microtest": "09-扩展机制微观核验.json"
+    },
+    "E_PigfoxRWASupplySum": {
+      "initial_source": "Phase32-R frozen E1 candidate",
+      "E1": {
+        "replay_status": "executable",
+        "target_state": {
+          "goal_kind": "rwa_supply_sum",
+          "reached": true,
+          "goal_state_values": {
+            "balanceOf(address):[\"0xA647ff3c36cFab592509E13860ab8c4F28781a66\"]": 0,
+            "balanceOf(address):[\"0x0000000000000000000000000000000000000Bad\"]": 0,
+            "balanceOf(address):[\"0x587be02D13c624E65b3D98C33fdf3Eea13aAAf97\"]": 1000000000000000000,
+            "balanceOf(address):[\"0x51D51e848cF1252b8d3DeD7532c7f2bD405301A9\"]": 0,
+            "balanceOf(address):[\"0x9c6a6B0ec78aA6e4b9bebD9DcEE3F2b071377d07\"]": 0,
+            "balanceOf(address):[\"0x574dC8E657cb00098cA1831c02434353Cc65ABAd\"]": 0,
+            "totalSupply():[]": 1000000000000000000,
+            "holders(uint256):[0]": "0x587be02D13c624E65b3D98C33fdf3Eea13aAAf97",
+            "holders(uint256):[1]": "0x51D51e848cF1252b8d3DeD7532c7f2bD405301A9",
+            "holders(uint256):[2]": "0x9c6a6B0ec78aA6e4b9bebD9DcEE3F2b071377d07",
+            "holders(uint256):[3]": "0x574dC8E657cb00098cA1831c02434353Cc65ABAd",
+            "TOKEN():[]": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          },
+          "reason": "预先定义的关键持久状态全部成立",
+          "property_value": true,
+          "property_related_state_changed": true,
+          "replay_status": "executable",
+          "getter_observation_incomplete": false
+        },
+        "sequence": [
+          {
+            "function": "mintToHolder(uint256,uint256)",
+            "arguments": [
+              0,
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": []
+          }
+        ]
+      },
+      "E2": {
+        "replay_status": "executable",
+        "target_state": {
+          "goal_kind": "rwa_supply_sum",
+          "reached": true,
+          "goal_state_values": {
+            "balanceOf(address):[\"0xA647ff3c36cFab592509E13860ab8c4F28781a66\"]": 0,
+            "balanceOf(address):[\"0x0000000000000000000000000000000000000Bad\"]": 0,
+            "balanceOf(address):[\"0x587be02D13c624E65b3D98C33fdf3Eea13aAAf97\"]": 1000000000000000000,
+            "balanceOf(address):[\"0x51D51e848cF1252b8d3DeD7532c7f2bD405301A9\"]": 0,
+            "balanceOf(address):[\"0x9c6a6B0ec78aA6e4b9bebD9DcEE3F2b071377d07\"]": 0,
+            "balanceOf(address):[\"0x574dC8E657cb00098cA1831c02434353Cc65ABAd\"]": 0,
+            "totalSupply():[]": 1000000000000000000,
+            "holders(uint256):[0]": "0x587be02D13c624E65b3D98C33fdf3Eea13aAAf97",
+            "holders(uint256):[1]": "0x51D51e848cF1252b8d3DeD7532c7f2bD405301A9",
+            "holders(uint256):[2]": "0x9c6a6B0ec78aA6e4b9bebD9DcEE3F2b071377d07",
+            "holders(uint256):[3]": "0x574dC8E657cb00098cA1831c02434353Cc65ABAd",
+            "TOKEN():[]": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0"
+          },
+          "reason": "预先定义的关键持久状态全部成立",
+          "property_value": true,
+          "property_related_state_changed": true,
+          "replay_status": "executable",
+          "getter_observation_incomplete": false
+        },
+        "parameter_repair": null,
+        "sequence": [
+          {
+            "function": "mintToHolder(uint256,uint256)",
+            "arguments": [
+              0,
+              1000000000000000000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": []
+          }
+        ]
+      },
+      "methods": {
+        "R": {
+          "status": "valid_related_state_candidate",
+          "candidate_execution_budget": 24,
+          "candidate_executions": 24,
+          "total_anvil_replays": 25,
+          "parameter_repair_replays": 0,
+          "elapsed_seconds": 40.455527
+        },
+        "S": {
+          "status": "valid_related_state_candidate",
+          "candidate_execution_budget": 24,
+          "candidate_executions": 0,
+          "total_anvil_replays": 1,
+          "parameter_repair_replays": 0,
+          "elapsed_seconds": 41.855653
+        },
+        "E3": {
+          "status": "valid_related_state_candidate",
+          "candidate_execution_budget": 24,
+          "candidate_executions": 7,
+          "total_anvil_replays": 8,
+          "parameter_repair_replays": 0,
+          "elapsed_seconds": 132.08409
+        }
+      },
+      "method_attribution": {
+        "agent_a_or_b_reached_goal": true,
+        "parameter_repair_reached_goal": false,
+        "parameter_repair_changed_sequence": false,
+        "goal_kind": "rwa_supply_sum",
+        "extension_attribution": {
+          "R": {
+            "reached_frozen_goal": true,
+            "newly_reached_after_E2": false,
+            "first_goal_candidate_no": 1,
+            "first_goal_operator": "random_role_or_sender",
+            "reached_by_repetition": false,
+            "candidate_added_transaction_count": 1,
+            "candidate_added_transaction_step": true,
+            "repetition_candidate_count": 0,
+            "only_repetition_observed": false,
+            "candidate_count": 24,
+            "contribution": "base_candidate_already_reached_goal"
+          },
+          "S": {
+            "reached_frozen_goal": false,
+            "newly_reached_after_E2": false,
+            "first_goal_candidate_no": null,
+            "first_goal_operator": null,
+            "reached_by_repetition": false,
+            "candidate_added_transaction_count": 0,
+            "candidate_added_transaction_step": false,
+            "repetition_candidate_count": 0,
+            "only_repetition_observed": false,
+            "candidate_count": 0,
+            "contribution": "no_goal_completion"
+          },
+          "E3": {
+            "reached_frozen_goal": true,
+            "newly_reached_after_E2": false,
+            "first_goal_candidate_no": 1,
+            "first_goal_operator": "state_supported_repetition",
+            "reached_by_repetition": true,
+            "candidate_added_transaction_count": 1,
+            "candidate_added_transaction_step": true,
+            "repetition_candidate_count": 7,
+            "only_repetition_observed": true,
+            "candidate_count": 7,
+            "contribution": "base_candidate_already_reached_goal"
+          }
+        }
+      },
+      "historical_seed_only": {
+        "scenario": "E_PigfoxRWASupplySum",
+        "historical_seed_path": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase32-R-20261120/E1/seed-pack/E1/coverage/seed-3e6b8a2f386a4acbac55b482a5a0e3f6.txt",
+        "historical_seed_sha256": "d63d575f17ba66b83d8f06420bc532fe1116aa7cb3bb94e5cf7481d8dc20e4b7",
+        "historical_sequence_canonical_sha256": "391a335668575efd6aa17935f43d2fc3cd6a74a743824e2df3817f3dbeb94f80",
+        "current_candidate_sequence_matches_historical_seed": true,
+        "historical_seed_only_runs": [
+          {
+            "seed": 20261125,
+            "exit_code": 0,
+            "status": "completed",
+            "external_seed_used": true,
+            "loaded_seed_count": 1,
+            "replayed_sequence_count": 1,
+            "property_failure_reported": false
+          },
+          {
+            "seed": 20261135,
+            "exit_code": 0,
+            "status": "completed",
+            "external_seed_used": true,
+            "loaded_seed_count": 1,
+            "replayed_sequence_count": 1,
+            "property_failure_reported": false
+          },
+          {
+            "seed": 20261145,
+            "exit_code": 0,
+            "status": "completed",
+            "external_seed_used": true,
+            "loaded_seed_count": 1,
+            "replayed_sequence_count": 1,
+            "property_failure_reported": false
+          }
+        ],
+        "historical_anvil_property": {
+          "replay_status": "executable",
+          "initial_property": true,
+          "final_property": true,
+          "changed_property_getters": [
+            {
+              "signature": "balanceOf(address)",
+              "receiver": "TOKEN",
+              "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+              "arguments": [
+                "0x587be02D13c624E65b3D98C33fdf3Eea13aAAf97"
+              ],
+              "before": 0,
+              "after": 1000000000000000000
+            },
+            {
+              "signature": "totalSupply()",
+              "receiver": "TOKEN",
+              "receiver_address": "0x01375317AA980daaBF22f990a378ECCaD9B40dc0",
+              "arguments": [],
+              "before": 0,
+              "after": 1000000000000000000
+            }
+          ]
+        },
+        "meaning": "E1 候选与历史种子一致；Echidna 确认回放一条且属性保持 true。不能据此证明 E3 新扩展的语料复核。"
+      },
+      "current_extension_seed_only": "R/E3 当前种子复核未验证；一次 Harness target 路径尝试失败，日志在各组 echidna-path-repair/corpus/echidna.log"
+    }
+  },
+  "numeric_function_checks": {
+    "direction_and_boundaries": "07-数值边界方向核验.json",
+    "expected_truth_table": "07-数值距离预期真值表.json"
+  },
+  "resource_and_role_checks": {
+    "path": "09-扩展机制微观核验.json",
+    "budget_starvation": "10-候选预算排序核验.json"
+  },
+  "stop_rule": "最多五个主要场景；不把 Oracle 人工序列输入扩展算法；等待外发授权，不重试 Agent，不修改核心规则。",
+  "initial_auto_review_block": {
+    "status": "blocked_before_external_call",
+    "agent_calls": 0,
+    "tokens": 0,
+    "estimated_cost_usd": 0,
+    "record": "08-Agent调用审批记录.json",
+    "reason": "auto_review rejected external transmission of source/property context"
+  },
+  "post_authorization_algorithm_run": {
+    "record": "14-B-C-D最终对照与归因.json",
+    "state_readback": "13-AgentAB独立状态核验.json",
+    "echidna_path_fix": "14-Echidna路径修复后seed-only汇总.json",
+    "B_name_variant": "04-Anvil对照/BWorkflowRenamed/方法对照总汇.json",
+    "A_E_historical_method_results_preserved": true
+  },
+  "measurement_limitations": [
+    "C/D 的自动目标状态聚合未解析 mapping 键；同一 Agent A/B 序列已通过隔离 Anvil 直接 getter 读取得到目标状态。",
+    "初次 B/C/D Echidna 命令将 corpusDir 指向 run/ 而非 corpus-input；旧日志标记为未加载，后续一次通用路径修复后每条种子均加载并重放 1 次。",
+    "Pigfox E3/R 本轮 Echidna 路径问题仍按未验证记录；Anvil 对照保留。"
+  ]
+}

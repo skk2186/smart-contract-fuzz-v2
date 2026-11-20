@@ -1,0 +1,1758 @@
+{
+  "schema_version": 1,
+  "status": "complete_with_observer_and_seed_path_limitations",
+  "repository": {
+    "head": "dded14f7ad9fa7f05e999ff2319da946de79a7fb",
+    "branch": "main"
+  },
+  "freeze_sha256": "1c27ee3908737df6525064f5def007db7d56b288a6677af7e266cf2f623ec187",
+  "core_algorithm_changed": false,
+  "external_calls_authorized_and_completed": {
+    "authorization": "用户明确授权：仅本轮 B/C/D 各一次初始 Agent A/B 流程；所有请求 max_retries=0。",
+    "automatic_review_history": "08-Agent调用审批记录.json 只记初始拦截和当时零外发；后续授权执行详见本文件。",
+    "model": "deepseek-flash",
+    "thinking": "disabled",
+    "temperature": 0,
+    "max_tokens_per_call": 4096,
+    "api_requests_total": 6,
+    "failed_requests_total": 0,
+    "tokens_total": 34327,
+    "estimated_cost_usd_offpeak_total": "0.006177966",
+    "estimated_cost_usd_peak_total": "0.012355932",
+    "billing_note": "费用按接口返回 usage 与冻结价目估算；供应商未返回实际账单金额。",
+    "per_task": {
+      "BWorkflow": {
+        "agent_record": "03-Agent输入与输出/BWorkflow/AgentAB初始种子.json",
+        "model": "deepseek-flash",
+        "planning_status": "executable",
+        "api_calls": 2,
+        "failed_requests": 0,
+        "prompt_tokens": 10155,
+        "completion_tokens": 978,
+        "total_tokens": 11133,
+        "estimated_cost_usd_offpeak": "0.001959522",
+        "estimated_cost_usd_peak": "0.003919044",
+        "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+        "agent_a_order": [],
+        "agent_b_sequence": [
+          {
+            "index": 1,
+            "function": "createTask()",
+            "abi_signature": "createTask()",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "rationale": "部署时 stage=0，满足 require(stage==0)；将 stage 置为 1。"
+          },
+          {
+            "index": 2,
+            "function": "configureTask(uint256)",
+            "abi_signature": "configureTask(uint256)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              100
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "rationale": "stage 已为 1，满足守卫；maxAmount=100>0，写入 executionLimit=100 与 stage=2。"
+          },
+          {
+            "index": 3,
+            "function": "executeTask(uint256)",
+            "abi_signature": "executeTask(uint256)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              100
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "rationale": "stage 已为 2，amount=100 满足 0<amount<=executionLimit(100)；completedAmount 变为 100，stage=3，属性谓词进入 stage==3 分支并检验 completedAmount<=executionLimit。",
+            "data_dependencies": [
+              {
+                "from_transaction": 2,
+                "field": "maxAmount",
+                "relation": "executeTask.amount 复用 configureTask.maxAmount 的值，以满足 amount<=executionLimit 守卫"
+              }
+            ]
+          }
+        ],
+        "E1_execution": {
+          "status": "executable",
+          "property": true,
+          "direct_goal_reached": true,
+          "direct_goal_getters": [
+            {
+              "function": "stage()",
+              "arguments": [],
+              "status": "observed",
+              "value": 3
+            },
+            {
+              "function": "executionLimit()",
+              "arguments": [],
+              "status": "observed",
+              "value": 100
+            },
+            {
+              "function": "completedAmount()",
+              "arguments": [],
+              "status": "observed",
+              "value": 100
+            }
+          ],
+          "direct_oracle_record": "02-独立Oracle/BWorkflow-AgentAB-StateReadback-独立Oracle.json",
+          "adapter_goal_value": {
+            "goal_kind": "workflow_stage",
+            "reached": true,
+            "goal_state_values": {
+              "stage": 3,
+              "completed": 100
+            },
+            "reason": "预先定义的关键持久状态全部成立",
+            "property_value": true,
+            "property_related_state_changed": true,
+            "replay_status": "executable",
+            "getter_observation_incomplete": false
+          },
+          "adapter_goal_observation_incomplete": false
+        },
+        "E2": {
+          "parameter_repair": null,
+          "normalized_sequence_unchanged": true,
+          "direct_goal_already_reached_before_extension": true
+        },
+        "methods": {
+          "R": {
+            "candidate_attempts": 24,
+            "total_anvil_replays": 25,
+            "elapsed_seconds": 10.241655,
+            "complete_sequence_replay_statuses": {
+              "replay_failed": 24
+            },
+            "executable_complete_candidates": 0,
+            "operators": {
+              "random_role_or_sender": 19,
+              "random_action": 5
+            },
+            "raw_summary": "04-Anvil对照/BWorkflow/R-候选状态汇总.json"
+          },
+          "S": {
+            "candidate_attempts": 0,
+            "total_anvil_replays": 1,
+            "elapsed_seconds": 10.911463,
+            "complete_sequence_replay_statuses": {},
+            "executable_complete_candidates": 0,
+            "operators": {},
+            "raw_summary": "04-Anvil对照/BWorkflow/S-候选状态汇总.json"
+          },
+          "E3": {
+            "candidate_attempts": 24,
+            "total_anvil_replays": 25,
+            "elapsed_seconds": 23.144469,
+            "complete_sequence_replay_statuses": {
+              "replay_failed": 24
+            },
+            "executable_complete_candidates": 0,
+            "operators": {
+              "state_supported_repetition": 24
+            },
+            "raw_summary": "04-Anvil对照/BWorkflow/E3-候选状态汇总.json"
+          }
+        },
+        "echidna_corrected_seed_only": [
+          "05-Echidna-seed-only/BWorkflow/E1/corpus-replay-summary.json"
+        ]
+      },
+      "CMsgSender": {
+        "agent_record": "03-Agent输入与输出/CMsgSender/AgentAB初始种子.json",
+        "model": "deepseek-flash",
+        "planning_status": "executable",
+        "api_calls": 2,
+        "failed_requests": 0,
+        "prompt_tokens": 9342,
+        "completion_tokens": 1141,
+        "total_tokens": 10483,
+        "estimated_cost_usd_offpeak": "0.001935372",
+        "estimated_cost_usd_peak": "0.003870744",
+        "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+        "agent_a_order": [],
+        "agent_b_sequence": [
+          {
+            "function": "fundCredit()",
+            "abi_signature": "fundCredit()",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [],
+            "value_wei": "1000000000000000000",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "authorizeOperator(address)",
+            "abi_signature": "authorizeOperator(address)",
+            "sender": "0x0000000000000000000000000000000000010000",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "executeFor(address,uint256)",
+            "abi_signature": "executeFor(address,uint256)",
+            "sender": "0x0000000000000000000000000000000000020000",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1000000000000000000
+            ],
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "sender",
+                "relation": "owner 参数复用第 1 笔交易的 sender，即 TARGET_OWNER，确保 depositedCredit/availableCredit 与 executedFor 索引同一账户"
+              },
+              {
+                "from_transaction": 2,
+                "field": "arguments[0]",
+                "relation": "executeFor 的 msg.sender 复用第 2 笔交易 authorizeOperator 的 operator 参数，即 TARGET_OPERATOR，满足 authorizedOperator[owner]==msg.sender"
+              }
+            ]
+          }
+        ],
+        "E1_execution": {
+          "status": "executable",
+          "property": true,
+          "direct_goal_reached": true,
+          "direct_goal_getters": [
+            {
+              "function": "depositedCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            },
+            {
+              "function": "availableCredit(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "authorizedOperator(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": "0x0000000000000000000000000000000000020000"
+            },
+            {
+              "function": "executedFor(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 1000000000000000000
+            }
+          ],
+          "direct_oracle_record": "02-独立Oracle/CMsgSender-AgentAB-StateReadback-独立Oracle.json",
+          "adapter_goal_value": {
+            "goal_kind": "delegated_execution",
+            "reached": false,
+            "goal_state_values": {
+              "deposit": 0,
+              "available": 0,
+              "authorized_operator": null,
+              "executed": 0
+            },
+            "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+            "property_value": true,
+            "property_related_state_changed": false,
+            "replay_status": "executable",
+            "getter_observation_incomplete": true
+          },
+          "adapter_goal_observation_incomplete": true
+        },
+        "E2": {
+          "parameter_repair": null,
+          "normalized_sequence_unchanged": true,
+          "direct_goal_already_reached_before_extension": true
+        },
+        "methods": {
+          "R": {
+            "candidate_attempts": 24,
+            "total_anvil_replays": 25,
+            "elapsed_seconds": 11.118614,
+            "complete_sequence_replay_statuses": {
+              "executable": 12,
+              "replay_failed": 12
+            },
+            "executable_complete_candidates": 12,
+            "operators": {
+              "random_role_or_sender": 18,
+              "random_action": 6
+            },
+            "raw_summary": "04-Anvil对照/CMsgSender/R-候选状态汇总.json"
+          },
+          "S": {
+            "candidate_attempts": 0,
+            "total_anvil_replays": 1,
+            "elapsed_seconds": 11.633776,
+            "complete_sequence_replay_statuses": {},
+            "executable_complete_candidates": 0,
+            "operators": {},
+            "raw_summary": "04-Anvil对照/CMsgSender/S-候选状态汇总.json"
+          },
+          "E3": {
+            "candidate_attempts": 0,
+            "total_anvil_replays": 1,
+            "elapsed_seconds": 12.144008,
+            "complete_sequence_replay_statuses": {},
+            "executable_complete_candidates": 0,
+            "operators": {},
+            "raw_summary": "04-Anvil对照/CMsgSender/E3-候选状态汇总.json"
+          }
+        },
+        "echidna_corrected_seed_only": [
+          "05-Echidna-seed-only/CMsgSender/E1/corpus-replay-summary.json"
+        ]
+      },
+      "DAllowance": {
+        "agent_record": "03-Agent输入与输出/DAllowance/AgentAB初始种子.json",
+        "model": "deepseek-flash",
+        "planning_status": "executable",
+        "api_calls": 2,
+        "failed_requests": 0,
+        "prompt_tokens": 11540,
+        "completion_tokens": 1171,
+        "total_tokens": 12711,
+        "estimated_cost_usd_offpeak": "0.002283072",
+        "estimated_cost_usd_peak": "0.004566144",
+        "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+        "agent_a_order": [],
+        "agent_b_sequence": [
+          {
+            "function": "mint(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1000
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "approve(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000",
+              500
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change"
+          },
+          {
+            "function": "transferFrom(address,address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000",
+              500
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "data_dependencies": [
+              {
+                "from_transaction": 1,
+                "field": "recipient",
+                "used_as": "owner"
+              },
+              {
+                "from_transaction": 2,
+                "field": "spender",
+                "used_as": "recipient"
+              }
+            ]
+          }
+        ],
+        "E1_execution": {
+          "status": "executable",
+          "property": true,
+          "direct_goal_reached": true,
+          "direct_goal_getters": [
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000"
+              ],
+              "status": "observed",
+              "value": 500
+            },
+            {
+              "function": "balanceOf(address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 500
+            },
+            {
+              "function": "allowance(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 0
+            },
+            {
+              "function": "totalGranted(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 500
+            },
+            {
+              "function": "delegatedSpent(address,address)",
+              "arguments": [
+                "0x0000000000000000000000000000000000010000",
+                "0x0000000000000000000000000000000000020000"
+              ],
+              "status": "observed",
+              "value": 500
+            },
+            {
+              "function": "totalSupply()",
+              "arguments": [],
+              "status": "observed",
+              "value": 1000
+            }
+          ],
+          "direct_oracle_record": "02-独立Oracle/DAllowance-AgentAB-StateReadback-独立Oracle.json",
+          "adapter_goal_value": {
+            "goal_kind": "delegated_spend",
+            "reached": false,
+            "goal_state_values": {
+              "owner_balance": 0,
+              "spender_balance": 0,
+              "allowance": 0,
+              "total_granted": 0,
+              "delegated_spent": 0,
+              "total_supply": 1000
+            },
+            "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+            "property_value": true,
+            "property_related_state_changed": true,
+            "replay_status": "executable",
+            "getter_observation_incomplete": false
+          },
+          "adapter_goal_observation_incomplete": false
+        },
+        "E2": {
+          "parameter_repair": null,
+          "normalized_sequence_unchanged": true,
+          "direct_goal_already_reached_before_extension": true
+        },
+        "methods": {
+          "R": {
+            "candidate_attempts": 24,
+            "total_anvil_replays": 25,
+            "elapsed_seconds": 72.734276,
+            "complete_sequence_replay_statuses": {
+              "executable": 18,
+              "replay_failed": 6
+            },
+            "executable_complete_candidates": 18,
+            "operators": {
+              "random_role_or_sender": 18,
+              "random_action": 6
+            },
+            "raw_summary": "04-Anvil对照/DAllowance/R-候选状态汇总.json"
+          },
+          "S": {
+            "candidate_attempts": 0,
+            "total_anvil_replays": 1,
+            "elapsed_seconds": 73.34735,
+            "complete_sequence_replay_statuses": {},
+            "executable_complete_candidates": 0,
+            "operators": {},
+            "raw_summary": "04-Anvil对照/DAllowance/S-候选状态汇总.json"
+          },
+          "E3": {
+            "candidate_attempts": 5,
+            "total_anvil_replays": 6,
+            "elapsed_seconds": 78.819013,
+            "complete_sequence_replay_statuses": {
+              "executable": 5
+            },
+            "executable_complete_candidates": 5,
+            "operators": {
+              "state_supported_repetition": 5
+            },
+            "raw_summary": "04-Anvil对照/DAllowance/E3-候选状态汇总.json"
+          }
+        },
+        "echidna_corrected_seed_only": [
+          "05-Echidna-seed-only/DAllowance/E1/corpus-replay-summary.json",
+          "05-Echidna-seed-only/DAllowance/R/corpus-replay-summary.json",
+          "05-Echidna-seed-only/DAllowance/E3/corpus-replay-summary.json"
+        ]
+      }
+    }
+  },
+  "scenario_results": {
+    "BWorkflow": {
+      "agent_record": "03-Agent输入与输出/BWorkflow/AgentAB初始种子.json",
+      "model": "deepseek-flash",
+      "planning_status": "executable",
+      "api_calls": 2,
+      "failed_requests": 0,
+      "prompt_tokens": 10155,
+      "completion_tokens": 978,
+      "total_tokens": 11133,
+      "estimated_cost_usd_offpeak": "0.001959522",
+      "estimated_cost_usd_peak": "0.003919044",
+      "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+      "agent_a_order": [],
+      "agent_b_sequence": [
+        {
+          "index": 1,
+          "function": "createTask()",
+          "abi_signature": "createTask()",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "rationale": "部署时 stage=0，满足 require(stage==0)；将 stage 置为 1。"
+        },
+        {
+          "index": 2,
+          "function": "configureTask(uint256)",
+          "abi_signature": "configureTask(uint256)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            100
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "rationale": "stage 已为 1，满足守卫；maxAmount=100>0，写入 executionLimit=100 与 stage=2。"
+        },
+        {
+          "index": 3,
+          "function": "executeTask(uint256)",
+          "abi_signature": "executeTask(uint256)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            100
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "rationale": "stage 已为 2，amount=100 满足 0<amount<=executionLimit(100)；completedAmount 变为 100，stage=3，属性谓词进入 stage==3 分支并检验 completedAmount<=executionLimit。",
+          "data_dependencies": [
+            {
+              "from_transaction": 2,
+              "field": "maxAmount",
+              "relation": "executeTask.amount 复用 configureTask.maxAmount 的值，以满足 amount<=executionLimit 守卫"
+            }
+          ]
+        }
+      ],
+      "E1_execution": {
+        "status": "executable",
+        "property": true,
+        "direct_goal_reached": true,
+        "direct_goal_getters": [
+          {
+            "function": "stage()",
+            "arguments": [],
+            "status": "observed",
+            "value": 3
+          },
+          {
+            "function": "executionLimit()",
+            "arguments": [],
+            "status": "observed",
+            "value": 100
+          },
+          {
+            "function": "completedAmount()",
+            "arguments": [],
+            "status": "observed",
+            "value": 100
+          }
+        ],
+        "direct_oracle_record": "02-独立Oracle/BWorkflow-AgentAB-StateReadback-独立Oracle.json",
+        "adapter_goal_value": {
+          "goal_kind": "workflow_stage",
+          "reached": true,
+          "goal_state_values": {
+            "stage": 3,
+            "completed": 100
+          },
+          "reason": "预先定义的关键持久状态全部成立",
+          "property_value": true,
+          "property_related_state_changed": true,
+          "replay_status": "executable",
+          "getter_observation_incomplete": false
+        },
+        "adapter_goal_observation_incomplete": false
+      },
+      "E2": {
+        "parameter_repair": null,
+        "normalized_sequence_unchanged": true,
+        "direct_goal_already_reached_before_extension": true
+      },
+      "methods": {
+        "R": {
+          "candidate_attempts": 24,
+          "total_anvil_replays": 25,
+          "elapsed_seconds": 10.241655,
+          "complete_sequence_replay_statuses": {
+            "replay_failed": 24
+          },
+          "executable_complete_candidates": 0,
+          "operators": {
+            "random_role_or_sender": 19,
+            "random_action": 5
+          },
+          "raw_summary": "04-Anvil对照/BWorkflow/R-候选状态汇总.json"
+        },
+        "S": {
+          "candidate_attempts": 0,
+          "total_anvil_replays": 1,
+          "elapsed_seconds": 10.911463,
+          "complete_sequence_replay_statuses": {},
+          "executable_complete_candidates": 0,
+          "operators": {},
+          "raw_summary": "04-Anvil对照/BWorkflow/S-候选状态汇总.json"
+        },
+        "E3": {
+          "candidate_attempts": 24,
+          "total_anvil_replays": 25,
+          "elapsed_seconds": 23.144469,
+          "complete_sequence_replay_statuses": {
+            "replay_failed": 24
+          },
+          "executable_complete_candidates": 0,
+          "operators": {
+            "state_supported_repetition": 24
+          },
+          "raw_summary": "04-Anvil对照/BWorkflow/E3-候选状态汇总.json"
+        }
+      },
+      "echidna_corrected_seed_only": [
+        "05-Echidna-seed-only/BWorkflow/E1/corpus-replay-summary.json"
+      ]
+    },
+    "CMsgSender": {
+      "agent_record": "03-Agent输入与输出/CMsgSender/AgentAB初始种子.json",
+      "model": "deepseek-flash",
+      "planning_status": "executable",
+      "api_calls": 2,
+      "failed_requests": 0,
+      "prompt_tokens": 9342,
+      "completion_tokens": 1141,
+      "total_tokens": 10483,
+      "estimated_cost_usd_offpeak": "0.001935372",
+      "estimated_cost_usd_peak": "0.003870744",
+      "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+      "agent_a_order": [],
+      "agent_b_sequence": [
+        {
+          "function": "fundCredit()",
+          "abi_signature": "fundCredit()",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [],
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "authorizeOperator(address)",
+          "abi_signature": "authorizeOperator(address)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "executeFor(address,uint256)",
+          "abi_signature": "executeFor(address,uint256)",
+          "sender": "0x0000000000000000000000000000000000020000",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            1000000000000000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "sender",
+              "relation": "owner 参数复用第 1 笔交易的 sender，即 TARGET_OWNER，确保 depositedCredit/availableCredit 与 executedFor 索引同一账户"
+            },
+            {
+              "from_transaction": 2,
+              "field": "arguments[0]",
+              "relation": "executeFor 的 msg.sender 复用第 2 笔交易 authorizeOperator 的 operator 参数，即 TARGET_OPERATOR，满足 authorizedOperator[owner]==msg.sender"
+            }
+          ]
+        }
+      ],
+      "E1_execution": {
+        "status": "executable",
+        "property": true,
+        "direct_goal_reached": true,
+        "direct_goal_getters": [
+          {
+            "function": "depositedCredit(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 1000000000000000000
+          },
+          {
+            "function": "availableCredit(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "authorizedOperator(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": "0x0000000000000000000000000000000000020000"
+          },
+          {
+            "function": "executedFor(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 1000000000000000000
+          }
+        ],
+        "direct_oracle_record": "02-独立Oracle/CMsgSender-AgentAB-StateReadback-独立Oracle.json",
+        "adapter_goal_value": {
+          "goal_kind": "delegated_execution",
+          "reached": false,
+          "goal_state_values": {
+            "deposit": 0,
+            "available": 0,
+            "authorized_operator": null,
+            "executed": 0
+          },
+          "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+          "property_value": true,
+          "property_related_state_changed": false,
+          "replay_status": "executable",
+          "getter_observation_incomplete": true
+        },
+        "adapter_goal_observation_incomplete": true,
+        "adapter_direct_goal_disagreement": true,
+        "adapter_reported_goal_reached": false,
+        "direct_readback_is_authoritative": true,
+        "observer_reason": "executedFor[TARGET_OWNER] mapping index was unresolved; getter observation was incomplete."
+      },
+      "E2": {
+        "parameter_repair": null,
+        "normalized_sequence_unchanged": true,
+        "direct_goal_already_reached_before_extension": true
+      },
+      "methods": {
+        "R": {
+          "candidate_attempts": 24,
+          "total_anvil_replays": 25,
+          "elapsed_seconds": 11.118614,
+          "complete_sequence_replay_statuses": {
+            "executable": 12,
+            "replay_failed": 12
+          },
+          "executable_complete_candidates": 12,
+          "operators": {
+            "random_role_or_sender": 18,
+            "random_action": 6
+          },
+          "raw_summary": "04-Anvil对照/CMsgSender/R-候选状态汇总.json"
+        },
+        "S": {
+          "candidate_attempts": 0,
+          "total_anvil_replays": 1,
+          "elapsed_seconds": 11.633776,
+          "complete_sequence_replay_statuses": {},
+          "executable_complete_candidates": 0,
+          "operators": {},
+          "raw_summary": "04-Anvil对照/CMsgSender/S-候选状态汇总.json"
+        },
+        "E3": {
+          "candidate_attempts": 0,
+          "total_anvil_replays": 1,
+          "elapsed_seconds": 12.144008,
+          "complete_sequence_replay_statuses": {},
+          "executable_complete_candidates": 0,
+          "operators": {},
+          "raw_summary": "04-Anvil对照/CMsgSender/E3-候选状态汇总.json"
+        }
+      },
+      "echidna_corrected_seed_only": [
+        "05-Echidna-seed-only/CMsgSender/E1/corpus-replay-summary.json"
+      ]
+    },
+    "DAllowance": {
+      "agent_record": "03-Agent输入与输出/DAllowance/AgentAB初始种子.json",
+      "model": "deepseek-flash",
+      "planning_status": "executable",
+      "api_calls": 2,
+      "failed_requests": 0,
+      "prompt_tokens": 11540,
+      "completion_tokens": 1171,
+      "total_tokens": 12711,
+      "estimated_cost_usd_offpeak": "0.002283072",
+      "estimated_cost_usd_peak": "0.004566144",
+      "cost_basis": "按 API 返回的实际 Token usage 与接口记录价目估算；供应商未在响应中返回实际账单金额",
+      "agent_a_order": [],
+      "agent_b_sequence": [
+        {
+          "function": "mint(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            1000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "approve(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000",
+            500
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "transferFrom(address,address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000020000",
+            500
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "recipient",
+              "used_as": "owner"
+            },
+            {
+              "from_transaction": 2,
+              "field": "spender",
+              "used_as": "recipient"
+            }
+          ]
+        }
+      ],
+      "E1_execution": {
+        "status": "executable",
+        "property": true,
+        "direct_goal_reached": true,
+        "direct_goal_getters": [
+          {
+            "function": "balanceOf(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000"
+            ],
+            "status": "observed",
+            "value": 500
+          },
+          {
+            "function": "balanceOf(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 500
+          },
+          {
+            "function": "allowance(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 0
+          },
+          {
+            "function": "totalGranted(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 500
+          },
+          {
+            "function": "delegatedSpent(address,address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "status": "observed",
+            "value": 500
+          },
+          {
+            "function": "totalSupply()",
+            "arguments": [],
+            "status": "observed",
+            "value": 1000
+          }
+        ],
+        "direct_oracle_record": "02-独立Oracle/DAllowance-AgentAB-StateReadback-独立Oracle.json",
+        "adapter_goal_value": {
+          "goal_kind": "delegated_spend",
+          "reached": false,
+          "goal_state_values": {
+            "owner_balance": 0,
+            "spender_balance": 0,
+            "allowance": 0,
+            "total_granted": 0,
+            "delegated_spent": 0,
+            "total_supply": 1000
+          },
+          "reason": "关键状态未满足；按逐笔 getter 与交易 trace 定位缺口",
+          "property_value": true,
+          "property_related_state_changed": true,
+          "replay_status": "executable",
+          "getter_observation_incomplete": false
+        },
+        "adapter_goal_observation_incomplete": false,
+        "adapter_direct_goal_disagreement": true,
+        "adapter_reported_goal_reached": false,
+        "direct_readback_is_authoritative": true,
+        "observer_reason": "goal mapping getters (balanceOf/allowance/totalGranted/delegatedSpent at concrete keys) were not included in predicate_getter_values; observer did not mark this incomplete."
+      },
+      "E2": {
+        "parameter_repair": null,
+        "normalized_sequence_unchanged": true,
+        "direct_goal_already_reached_before_extension": true
+      },
+      "methods": {
+        "R": {
+          "candidate_attempts": 24,
+          "total_anvil_replays": 25,
+          "elapsed_seconds": 72.734276,
+          "complete_sequence_replay_statuses": {
+            "executable": 18,
+            "replay_failed": 6
+          },
+          "executable_complete_candidates": 18,
+          "operators": {
+            "random_role_or_sender": 18,
+            "random_action": 6
+          },
+          "raw_summary": "04-Anvil对照/DAllowance/R-候选状态汇总.json"
+        },
+        "S": {
+          "candidate_attempts": 0,
+          "total_anvil_replays": 1,
+          "elapsed_seconds": 73.34735,
+          "complete_sequence_replay_statuses": {},
+          "executable_complete_candidates": 0,
+          "operators": {},
+          "raw_summary": "04-Anvil对照/DAllowance/S-候选状态汇总.json"
+        },
+        "E3": {
+          "candidate_attempts": 5,
+          "total_anvil_replays": 6,
+          "elapsed_seconds": 78.819013,
+          "complete_sequence_replay_statuses": {
+            "executable": 5
+          },
+          "executable_complete_candidates": 5,
+          "operators": {
+            "state_supported_repetition": 5
+          },
+          "raw_summary": "04-Anvil对照/DAllowance/E3-候选状态汇总.json"
+        }
+      },
+      "echidna_corrected_seed_only": [
+        "05-Echidna-seed-only/DAllowance/E1/corpus-replay-summary.json",
+        "05-Echidna-seed-only/DAllowance/R/corpus-replay-summary.json",
+        "05-Echidna-seed-only/DAllowance/E3/corpus-replay-summary.json"
+      ]
+    },
+    "BWorkflowRenamed": {
+      "source_task": "BWorkflow",
+      "agent_calls": 0,
+      "name_transform": {
+        "functions": {
+          "createTask()": "openOrder()",
+          "configureTask(uint256)": "setQuota(uint256)",
+          "executeTask(uint256)": "applyOrder(uint256)"
+        }
+      },
+      "sequence": [
+        "openOrder()",
+        "setQuota(uint256)",
+        "applyOrder(uint256)"
+      ],
+      "E1_goal_state": {
+        "goal_kind": "workflow_stage",
+        "reached": true,
+        "goal_state_values": {
+          "stage": 3,
+          "completed": 100
+        },
+        "reason": "预先定义的关键持久状态全部成立",
+        "property_value": true,
+        "property_related_state_changed": true,
+        "replay_status": "executable",
+        "getter_observation_incomplete": false
+      },
+      "E2_parameter_repair": null,
+      "methods": {
+        "R": {
+          "candidate_attempts": 24,
+          "total_anvil_replays": 25,
+          "elapsed_seconds": 9.461896,
+          "complete_sequence_replay_statuses": {
+            "replay_failed": 24
+          },
+          "executable_complete_candidates": 0,
+          "operators": {
+            "random_role_or_sender": 19,
+            "random_action": 5
+          },
+          "raw_summary": "04-Anvil对照/BWorkflowRenamed/R-候选状态汇总.json"
+        },
+        "S": {
+          "candidate_attempts": 0,
+          "total_anvil_replays": 1,
+          "elapsed_seconds": 9.921719,
+          "complete_sequence_replay_statuses": {},
+          "executable_complete_candidates": 0,
+          "operators": {},
+          "raw_summary": "04-Anvil对照/BWorkflowRenamed/S-候选状态汇总.json"
+        },
+        "E3": {
+          "candidate_attempts": 24,
+          "total_anvil_replays": 25,
+          "elapsed_seconds": 20.788986,
+          "complete_sequence_replay_statuses": {
+            "replay_failed": 24
+          },
+          "executable_complete_candidates": 0,
+          "operators": {
+            "state_supported_repetition": 24
+          },
+          "raw_summary": "04-Anvil对照/BWorkflowRenamed/E3-候选状态汇总.json"
+        }
+      },
+      "echidna_corrected_seed_only": [
+        "05-Echidna-seed-only/BWorkflowRenamed/E1/corpus-replay-summary.json"
+      ]
+    }
+  },
+  "DAllowance_E3_first_candidate_direct_state_readback": {
+    "target_reached": true,
+    "final_getters": [
+      {
+        "function": "balanceOf(address)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000"
+        ],
+        "status": "observed",
+        "value": 1500
+      },
+      {
+        "function": "balanceOf(address)",
+        "arguments": [
+          "0x0000000000000000000000000000000000020000"
+        ],
+        "status": "observed",
+        "value": 500
+      },
+      {
+        "function": "allowance(address,address)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000"
+        ],
+        "status": "observed",
+        "value": 0
+      },
+      {
+        "function": "totalGranted(address,address)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000"
+        ],
+        "status": "observed",
+        "value": 500
+      },
+      {
+        "function": "delegatedSpent(address,address)",
+        "arguments": [
+          "0x0000000000000000000000000000000000010000",
+          "0x0000000000000000000000000000000000020000"
+        ],
+        "status": "observed",
+        "value": 500
+      },
+      {
+        "function": "totalSupply()",
+        "arguments": [],
+        "status": "observed",
+        "value": 2000
+      }
+    ],
+    "record": "02-独立Oracle/DAllowance-E3-first-StateReadback-独立Oracle.json"
+  },
+  "corrected_echidna_replays": {
+    "shared_fix": "指向保存现成种子的 corpus-input 作为 corpusDir；旧 run/ 记录保留为未加载尝试。",
+    "cases": [
+      {
+        "task_id": "BWorkflow",
+        "group": "E1",
+        "status": "seed_replayed",
+        "input_seed_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/BWorkflow/E1/corpus-input/coverage/seed-ca0bfeb89d674badae61a7bf50a98190.txt",
+        "corpus_dir": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/BWorkflow/E1/corpus-input",
+        "path_fix": "set Echidna corpusDir to the directory containing the frozen seed; prior run/ output is preserved",
+        "test_limit": 0,
+        "seed": 20261125,
+        "loaded_seed_count": 1,
+        "replayed_sequence_count": 1,
+        "property_failure_reported": false,
+        "target_property_results": [
+          "echidna_workflow_respects_limit: passing"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.462,
+        "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/BWorkflow/E1/corpus-input/echidna.log",
+        "initial_corpus_file_count": 1,
+        "initial_corpus_files": [
+          "seed-ca0bfeb89d674badae61a7bf50a98190.txt"
+        ],
+        "raw_run": {
+          "project": "AuditBWorkflow",
+          "property_name": "echidna_workflow_respects_limit",
+          "test_mode": "property",
+          "command": [
+            "/usr/local/bin/echidna",
+            "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol",
+            "--contract",
+            "WorkflowHarness",
+            "--crytic-args",
+            "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/BWorkflow/E1/AuditBWorkflow-corpus-input-crytic-compile.json",
+            "--config",
+            "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/BWorkflow/E1/AuditBWorkflow-corpus-input-echidna.yaml",
+            "--test-limit",
+            "0",
+            "--seq-len",
+            "8",
+            "--shrink-limit",
+            "1",
+            "--seed",
+            "20261125",
+            "--workers",
+            "1",
+            "--format",
+            "text",
+            "--deployer",
+            "0x0000000000000000000000000000000000030000",
+            "--contract-addr",
+            "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "--sender",
+            "0x0000000000000000000000000000000000010000",
+            "--sender",
+            "0x0000000000000000000000000000000000020000",
+            "--sender",
+            "0x0000000000000000000000000000000000030000",
+            "--sender",
+            "0x0000000000000000000000000000000000040000",
+            "--sender",
+            "0x0000000000000000000000000000000000050000",
+            "--disable-slither"
+          ],
+          "exit_code": 0,
+          "status": "completed",
+          "timed_out": false,
+          "seed": 20261125,
+          "test_limit": 0,
+          "seq_len": 8,
+          "shrink_limit": 1,
+          "elapsed_seconds": 0.462,
+          "loaded_seed_count": 1,
+          "loaded_seed_evidence": true,
+          "replayed_sequence_count": 1,
+          "replay_evidence": true,
+          "replayed_lines": [
+            "[2026-11-20 19:30:59.44] [Worker 0] Sequence replayed from corpus file seed-ca0bfeb89d674badae61a7bf50a98190.txt (1/1)"
+          ],
+          "mutation_evidence": false,
+          "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+          "fuzzing_activity_evidence": true,
+          "fuzzing_transactions": 4,
+          "fuzzing_cases": null,
+          "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+          "fuzzing_progress_count": 4,
+          "fuzzing_progress_limit": 0,
+          "tests_status_snapshots": [
+            {
+              "completed": 0,
+              "total": 1
+            }
+          ],
+          "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+          "property_failure_reported": false,
+          "worker_crashes": [],
+          "unique_instructions": 209,
+          "coverage_source": "final_unique_instructions",
+          "initial_corpus_file_count": 1,
+          "initial_corpus_files": [
+            "seed-ca0bfeb89d674badae61a7bf50a98190.txt"
+          ],
+          "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/BWorkflow/E1/corpus-input/echidna.log",
+          "stop_on_fail": false,
+          "target_property_results": [
+            "echidna_workflow_respects_limit: passing"
+          ],
+          "property_failures": [],
+          "first_property_failure_observed_seconds": null,
+          "property_failure_time_is_upper_bound": false,
+          "initial_state_failures": [],
+          "output": "[2026-11-20 19:30:59.07] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.296992738s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol:WorkflowHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/BWorkflow/E1/corpus-input/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/BWorkflow/E1/corpus-input/coverage\n[2026-11-20 19:30:59.44] [Worker 0] New coverage: 209 instr, 1 contracts, 1 seqs in corpus\n[2026-11-20 19:30:59.44] [Worker 0] Sequence replayed from corpus file seed-ca0bfeb89d674badae61a7bf50a98190.txt (1/1)\n[2026-11-20 19:30:59.44] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 19:30:59.44] [status] tests: 0/1, fuzzing: 4/0, values: [], cov: 209, corpus: 1, gas/s: 0\nechidna_workflow_respects_limit: passing\n\nUnique instructions: 209\nUnique codehashes: 1\nCorpus size: 1\nSeed: 20261125\nTotal calls: 4\n\n[2026-11-20 19:30:59.45] Saving test reproducers... Done! (0.0000005s)\n[2026-11-20 19:30:59.45] Saving corpus... Done! (0.000082256s)\n[2026-11-20 19:30:59.45] Saving foundry reproducers... Done! (0.000439399s)\n[2026-11-20 19:30:59.45] Saving coverage... Done! (0.006052163s)\n"
+        }
+      },
+      {
+        "task_id": "CMsgSender",
+        "group": "E1",
+        "status": "seed_replayed",
+        "input_seed_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/CMsgSender/E1/corpus-input/coverage/seed-7d59d2c0ae934adabee6a21f21a3e019.txt",
+        "corpus_dir": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/CMsgSender/E1/corpus-input",
+        "path_fix": "set Echidna corpusDir to the directory containing the frozen seed; prior run/ output is preserved",
+        "test_limit": 0,
+        "seed": 20261125,
+        "loaded_seed_count": 1,
+        "replayed_sequence_count": 1,
+        "property_failure_reported": false,
+        "target_property_results": [
+          "echidna_delegated_execution_is_bounded: passing"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.193,
+        "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/CMsgSender/E1/corpus-input/echidna.log",
+        "initial_corpus_file_count": 1,
+        "initial_corpus_files": [
+          "seed-7d59d2c0ae934adabee6a21f21a3e019.txt"
+        ],
+        "raw_run": {
+          "project": "AuditCMsgSender",
+          "property_name": "echidna_delegated_execution_is_bounded",
+          "test_mode": "property",
+          "command": [
+            "/usr/local/bin/echidna",
+            "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol",
+            "--contract",
+            "MsgSenderDelegationHarness",
+            "--crytic-args",
+            "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/CMsgSender/E1/AuditCMsgSender-corpus-input-crytic-compile.json",
+            "--config",
+            "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/CMsgSender/E1/AuditCMsgSender-corpus-input-echidna.yaml",
+            "--test-limit",
+            "0",
+            "--seq-len",
+            "8",
+            "--shrink-limit",
+            "1",
+            "--seed",
+            "20261125",
+            "--workers",
+            "1",
+            "--format",
+            "text",
+            "--deployer",
+            "0x0000000000000000000000000000000000030000",
+            "--contract-addr",
+            "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "--sender",
+            "0x0000000000000000000000000000000000010000",
+            "--sender",
+            "0x0000000000000000000000000000000000020000",
+            "--sender",
+            "0x0000000000000000000000000000000000030000",
+            "--sender",
+            "0x0000000000000000000000000000000000040000",
+            "--sender",
+            "0x0000000000000000000000000000000000050000",
+            "--disable-slither"
+          ],
+          "exit_code": 0,
+          "status": "completed",
+          "timed_out": false,
+          "seed": 20261125,
+          "test_limit": 0,
+          "seq_len": 8,
+          "shrink_limit": 1,
+          "elapsed_seconds": 0.193,
+          "loaded_seed_count": 1,
+          "loaded_seed_evidence": true,
+          "replayed_sequence_count": 1,
+          "replay_evidence": true,
+          "replayed_lines": [
+            "[2026-11-20 19:30:59.71] [Worker 0] Sequence replayed from corpus file seed-7d59d2c0ae934adabee6a21f21a3e019.txt (1/1)"
+          ],
+          "mutation_evidence": false,
+          "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+          "fuzzing_activity_evidence": true,
+          "fuzzing_transactions": 4,
+          "fuzzing_cases": null,
+          "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+          "fuzzing_progress_count": 4,
+          "fuzzing_progress_limit": 0,
+          "tests_status_snapshots": [
+            {
+              "completed": 0,
+              "total": 1
+            }
+          ],
+          "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+          "property_failure_reported": false,
+          "worker_crashes": [],
+          "unique_instructions": 362,
+          "coverage_source": "final_unique_instructions",
+          "initial_corpus_file_count": 1,
+          "initial_corpus_files": [
+            "seed-7d59d2c0ae934adabee6a21f21a3e019.txt"
+          ],
+          "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/CMsgSender/E1/corpus-input/echidna.log",
+          "stop_on_fail": false,
+          "target_property_results": [
+            "echidna_delegated_execution_is_bounded: passing"
+          ],
+          "property_failures": [],
+          "first_property_failure_observed_seconds": null,
+          "property_failure_time_is_upper_bound": false,
+          "initial_state_failures": [],
+          "output": "[2026-11-20 19:30:59.56] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.132686815s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol:MsgSenderDelegationHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/CMsgSender/E1/corpus-input/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/CMsgSender/E1/corpus-input/coverage\n[2026-11-20 19:30:59.71] [Worker 0] New coverage: 362 instr, 1 contracts, 1 seqs in corpus\n[2026-11-20 19:30:59.71] [Worker 0] Sequence replayed from corpus file seed-7d59d2c0ae934adabee6a21f21a3e019.txt (1/1)\n[2026-11-20 19:30:59.71] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 19:30:59.71] [status] tests: 0/1, fuzzing: 4/0, values: [], cov: 362, corpus: 1, gas/s: 0\nechidna_delegated_execution_is_bounded: passing\n\nUnique instructions: 362\nUnique codehashes: 1\nCorpus size: 1\nSeed: 20261125\nTotal calls: 4\n\n[2026-11-20 19:30:59.71] Saving test reproducers... Done! (0.000001003s)\n[2026-11-20 19:30:59.71] Saving corpus... Done! (0.000102733s)\n[2026-11-20 19:30:59.71] Saving foundry reproducers... Done! (0.000351336s)\n[2026-11-20 19:30:59.71] Saving coverage... Done! (0.00754135s)\n"
+        }
+      },
+      {
+        "task_id": "DAllowance",
+        "group": "E1",
+        "status": "seed_replayed",
+        "input_seed_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E1/corpus-input/coverage/seed-735e5c2716c247a590b4dbe43cbe711f.txt",
+        "corpus_dir": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E1/corpus-input",
+        "path_fix": "set Echidna corpusDir to the directory containing the frozen seed; prior run/ output is preserved",
+        "test_limit": 0,
+        "seed": 20261125,
+        "loaded_seed_count": 1,
+        "replayed_sequence_count": 1,
+        "property_failure_reported": false,
+        "target_property_results": [
+          "echidna_delegated_spend_is_bounded: passing"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.195,
+        "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E1/corpus-input/echidna.log",
+        "initial_corpus_file_count": 1,
+        "initial_corpus_files": [
+          "seed-735e5c2716c247a590b4dbe43cbe711f.txt"
+        ],
+        "raw_run": {
+          "project": "AuditDAllowance",
+          "property_name": "echidna_delegated_spend_is_bounded",
+          "test_mode": "property",
+          "command": [
+            "/usr/local/bin/echidna",
+            "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol",
+            "--contract",
+            "AllowanceHarness",
+            "--crytic-args",
+            "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E1/AuditDAllowance-corpus-input-crytic-compile.json",
+            "--config",
+            "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E1/AuditDAllowance-corpus-input-echidna.yaml",
+            "--test-limit",
+            "0",
+            "--seq-len",
+            "8",
+            "--shrink-limit",
+            "1",
+            "--seed",
+            "20261125",
+            "--workers",
+            "1",
+            "--format",
+            "text",
+            "--deployer",
+            "0x0000000000000000000000000000000000030000",
+            "--contract-addr",
+            "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "--sender",
+            "0x0000000000000000000000000000000000010000",
+            "--sender",
+            "0x0000000000000000000000000000000000020000",
+            "--sender",
+            "0x0000000000000000000000000000000000030000",
+            "--sender",
+            "0x0000000000000000000000000000000000040000",
+            "--sender",
+            "0x0000000000000000000000000000000000050000",
+            "--disable-slither"
+          ],
+          "exit_code": 0,
+          "status": "completed",
+          "timed_out": false,
+          "seed": 20261125,
+          "test_limit": 0,
+          "seq_len": 8,
+          "shrink_limit": 1,
+          "elapsed_seconds": 0.195,
+          "loaded_seed_count": 1,
+          "loaded_seed_evidence": true,
+          "replayed_sequence_count": 1,
+          "replay_evidence": true,
+          "replayed_lines": [
+            "[2026-11-20 19:30:59.98] [Worker 0] Sequence replayed from corpus file seed-735e5c2716c247a590b4dbe43cbe711f.txt (1/1)"
+          ],
+          "mutation_evidence": false,
+          "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+          "fuzzing_activity_evidence": true,
+          "fuzzing_transactions": 4,
+          "fuzzing_cases": null,
+          "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+          "fuzzing_progress_count": 4,
+          "fuzzing_progress_limit": 0,
+          "tests_status_snapshots": [
+            {
+              "completed": 0,
+              "total": 1
+            }
+          ],
+          "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+          "property_failure_reported": false,
+          "worker_crashes": [],
+          "unique_instructions": 429,
+          "coverage_source": "final_unique_instructions",
+          "initial_corpus_file_count": 1,
+          "initial_corpus_files": [
+            "seed-735e5c2716c247a590b4dbe43cbe711f.txt"
+          ],
+          "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E1/corpus-input/echidna.log",
+          "stop_on_fail": false,
+          "target_property_results": [
+            "echidna_delegated_spend_is_bounded: passing"
+          ],
+          "property_failures": [],
+          "first_property_failure_observed_seconds": null,
+          "property_failure_time_is_upper_bound": false,
+          "initial_state_failures": [],
+          "output": "[2026-11-20 19:30:59.83] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.132852582s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol:AllowanceHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E1/corpus-input/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E1/corpus-input/coverage\n[2026-11-20 19:30:59.98] [Worker 0] New coverage: 429 instr, 1 contracts, 1 seqs in corpus\n[2026-11-20 19:30:59.98] [Worker 0] Sequence replayed from corpus file seed-735e5c2716c247a590b4dbe43cbe711f.txt (1/1)\n[2026-11-20 19:30:59.98] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 19:30:59.98] [status] tests: 0/1, fuzzing: 4/0, values: [], cov: 429, corpus: 1, gas/s: 0\nechidna_delegated_spend_is_bounded: passing\n\nUnique instructions: 429\nUnique codehashes: 1\nCorpus size: 1\nSeed: 20261125\nTotal calls: 4\n\n[2026-11-20 19:30:59.99] Saving test reproducers... Done! (0.000000444s)\n[2026-11-20 19:30:59.99] Saving corpus... Done! (0.000107634s)\n[2026-11-20 19:30:59.99] Saving foundry reproducers... Done! (0.000300242s)\n[2026-11-20 19:30:59.99] Saving coverage... Done! (0.009960238s)\n"
+        }
+      },
+      {
+        "task_id": "DAllowance",
+        "group": "R",
+        "status": "seed_replayed",
+        "input_seed_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/R/corpus-input/coverage/seed-71944bef23b3478981a7b6af976d6dfd.txt",
+        "corpus_dir": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/R/corpus-input",
+        "path_fix": "set Echidna corpusDir to the directory containing the frozen seed; prior run/ output is preserved",
+        "test_limit": 0,
+        "seed": 20261125,
+        "loaded_seed_count": 1,
+        "replayed_sequence_count": 1,
+        "property_failure_reported": false,
+        "target_property_results": [
+          "echidna_delegated_spend_is_bounded: passing"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.202,
+        "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/R/corpus-input/echidna.log",
+        "initial_corpus_file_count": 1,
+        "initial_corpus_files": [
+          "seed-71944bef23b3478981a7b6af976d6dfd.txt"
+        ],
+        "raw_run": {
+          "project": "AuditDAllowance",
+          "property_name": "echidna_delegated_spend_is_bounded",
+          "test_mode": "property",
+          "command": [
+            "/usr/local/bin/echidna",
+            "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol",
+            "--contract",
+            "AllowanceHarness",
+            "--crytic-args",
+            "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/R/AuditDAllowance-corpus-input-crytic-compile.json",
+            "--config",
+            "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/R/AuditDAllowance-corpus-input-echidna.yaml",
+            "--test-limit",
+            "0",
+            "--seq-len",
+            "8",
+            "--shrink-limit",
+            "1",
+            "--seed",
+            "20261125",
+            "--workers",
+            "1",
+            "--format",
+            "text",
+            "--deployer",
+            "0x0000000000000000000000000000000000030000",
+            "--contract-addr",
+            "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "--sender",
+            "0x0000000000000000000000000000000000010000",
+            "--sender",
+            "0x0000000000000000000000000000000000020000",
+            "--sender",
+            "0x0000000000000000000000000000000000030000",
+            "--sender",
+            "0x0000000000000000000000000000000000040000",
+            "--sender",
+            "0x0000000000000000000000000000000000050000",
+            "--disable-slither"
+          ],
+          "exit_code": 0,
+          "status": "completed",
+          "timed_out": false,
+          "seed": 20261125,
+          "test_limit": 0,
+          "seq_len": 8,
+          "shrink_limit": 1,
+          "elapsed_seconds": 0.202,
+          "loaded_seed_count": 1,
+          "loaded_seed_evidence": true,
+          "replayed_sequence_count": 1,
+          "replay_evidence": true,
+          "replayed_lines": [
+            "[2026-11-20 19:31:00.27] [Worker 0] Sequence replayed from corpus file seed-71944bef23b3478981a7b6af976d6dfd.txt (1/1)"
+          ],
+          "mutation_evidence": false,
+          "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+          "fuzzing_activity_evidence": true,
+          "fuzzing_transactions": 5,
+          "fuzzing_cases": null,
+          "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+          "fuzzing_progress_count": 5,
+          "fuzzing_progress_limit": 0,
+          "tests_status_snapshots": [
+            {
+              "completed": 0,
+              "total": 1
+            }
+          ],
+          "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+          "property_failure_reported": false,
+          "worker_crashes": [],
+          "unique_instructions": 429,
+          "coverage_source": "final_unique_instructions",
+          "initial_corpus_file_count": 1,
+          "initial_corpus_files": [
+            "seed-71944bef23b3478981a7b6af976d6dfd.txt"
+          ],
+          "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/R/corpus-input/echidna.log",
+          "stop_on_fail": false,
+          "target_property_results": [
+            "echidna_delegated_spend_is_bounded: passing"
+          ],
+          "property_failures": [],
+          "first_property_failure_observed_seconds": null,
+          "property_failure_time_is_upper_bound": false,
+          "initial_state_failures": [],
+          "output": "[2026-11-20 19:31:00.12] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.133224689s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol:AllowanceHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/R/corpus-input/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/R/corpus-input/coverage\n[2026-11-20 19:31:00.27] [Worker 0] New coverage: 429 instr, 1 contracts, 1 seqs in corpus\n[2026-11-20 19:31:00.27] [Worker 0] Sequence replayed from corpus file seed-71944bef23b3478981a7b6af976d6dfd.txt (1/1)\n[2026-11-20 19:31:00.27] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 19:31:00.27] [status] tests: 0/1, fuzzing: 5/0, values: [], cov: 429, corpus: 1, gas/s: 0\nechidna_delegated_spend_is_bounded: passing\n\nUnique instructions: 429\nUnique codehashes: 1\nCorpus size: 1\nSeed: 20261125\nTotal calls: 5\n\n[2026-11-20 19:31:00.27] Saving test reproducers... Done! (0.000000443s)\n[2026-11-20 19:31:00.27] Saving corpus... Done! (0.000085253s)\n[2026-11-20 19:31:00.27] Saving foundry reproducers... Done! (0.00028883s)\n[2026-11-20 19:31:00.27] Saving coverage... Done! (0.010187044s)\n"
+        }
+      },
+      {
+        "task_id": "DAllowance",
+        "group": "E3",
+        "status": "seed_replayed",
+        "input_seed_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E3/corpus-input/coverage/seed-8ea12bd2848949e1a602a484bbffb7f8.txt",
+        "corpus_dir": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E3/corpus-input",
+        "path_fix": "set Echidna corpusDir to the directory containing the frozen seed; prior run/ output is preserved",
+        "test_limit": 0,
+        "seed": 20261125,
+        "loaded_seed_count": 1,
+        "replayed_sequence_count": 1,
+        "property_failure_reported": false,
+        "target_property_results": [
+          "echidna_delegated_spend_is_bounded: passing"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.185,
+        "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E3/corpus-input/echidna.log",
+        "initial_corpus_file_count": 1,
+        "initial_corpus_files": [
+          "seed-8ea12bd2848949e1a602a484bbffb7f8.txt"
+        ],
+        "raw_run": {
+          "project": "AuditDAllowance",
+          "property_name": "echidna_delegated_spend_is_bounded",
+          "test_mode": "property",
+          "command": [
+            "/usr/local/bin/echidna",
+            "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol",
+            "--contract",
+            "AllowanceHarness",
+            "--crytic-args",
+            "--config-file /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E3/AuditDAllowance-corpus-input-crytic-compile.json",
+            "--config",
+            "/home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E3/AuditDAllowance-corpus-input-echidna.yaml",
+            "--test-limit",
+            "0",
+            "--seq-len",
+            "8",
+            "--shrink-limit",
+            "1",
+            "--seed",
+            "20261125",
+            "--workers",
+            "1",
+            "--format",
+            "text",
+            "--deployer",
+            "0x0000000000000000000000000000000000030000",
+            "--contract-addr",
+            "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+            "--sender",
+            "0x0000000000000000000000000000000000010000",
+            "--sender",
+            "0x0000000000000000000000000000000000020000",
+            "--sender",
+            "0x0000000000000000000000000000000000030000",
+            "--sender",
+            "0x0000000000000000000000000000000000040000",
+            "--sender",
+            "0x0000000000000000000000000000000000050000",
+            "--disable-slither"
+          ],
+          "exit_code": 0,
+          "status": "completed",
+          "timed_out": false,
+          "seed": 20261125,
+          "test_limit": 0,
+          "seq_len": 8,
+          "shrink_limit": 1,
+          "elapsed_seconds": 0.185,
+          "loaded_seed_count": 1,
+          "loaded_seed_evidence": true,
+          "replayed_sequence_count": 1,
+          "replay_evidence": true,
+          "replayed_lines": [
+            "[2026-11-20 19:31:00.53] [Worker 0] Sequence replayed from corpus file seed-8ea12bd2848949e1a602a484bbffb7f8.txt (1/1)"
+          ],
+          "mutation_evidence": false,
+          "mutation_evidence_status": "not_inferable_without_input_output_coverage_or_sequence_diff",
+          "fuzzing_activity_evidence": true,
+          "fuzzing_transactions": 5,
+          "fuzzing_cases": null,
+          "fuzzing_case_count_status": "not_inferable_from_text_progress_denominator",
+          "fuzzing_progress_count": 5,
+          "fuzzing_progress_limit": 0,
+          "tests_status_snapshots": [
+            {
+              "completed": 0,
+              "total": 1
+            }
+          ],
+          "tests_status_semantics": "Echidna text-mode property status (failed/total), not executed test-case count",
+          "property_failure_reported": false,
+          "worker_crashes": [],
+          "unique_instructions": 429,
+          "coverage_source": "final_unique_instructions",
+          "initial_corpus_file_count": 1,
+          "initial_corpus_files": [
+            "seed-8ea12bd2848949e1a602a484bbffb7f8.txt"
+          ],
+          "full_log_path": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E3/corpus-input/echidna.log",
+          "stop_on_fail": false,
+          "target_property_results": [
+            "echidna_delegated_spend_is_bounded: passing"
+          ],
+          "property_failures": [],
+          "first_property_failure_observed_seconds": null,
+          "property_failure_time_is_upper_bound": false,
+          "initial_state_failures": [],
+          "output": "[2026-11-20 19:31:00.38] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.\nDone! (0.135263421s)\nAnalyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/StateDependencyAuditDAllowance/AllowanceHarness.sol:AllowanceHarness\nLoaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E3/corpus-input/reproducers\nLoaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/跨交易属性状态依赖审计/结果/20261120/05-Echidna-seed-only/DAllowance/E3/corpus-input/coverage\n[2026-11-20 19:31:00.53] [Worker 0] New coverage: 429 instr, 1 contracts, 1 seqs in corpus\n[2026-11-20 19:31:00.53] [Worker 0] Sequence replayed from corpus file seed-8ea12bd2848949e1a602a484bbffb7f8.txt (1/1)\n[2026-11-20 19:31:00.53] [Worker 0] Test limit reached. Stopping.\n[2026-11-20 19:31:00.53] [status] tests: 0/1, fuzzing: 5/0, values: [], cov: 429, corpus: 1, gas/s: 0\nechidna_delegated_spend_is_bounded: passing\n\nUnique instructions: 429\nUnique codehashes: 1\nCorpus size: 1\nSeed: 20261125\nTotal calls: 5\n\n[2026-11-20 19:31:00.53] Saving test reproducers... Done! (0.000000414s)\n[2026-11-20 19:31:00.53] Saving corpus... Done! (0.000059384s)\n[2026-11-20 19:31:00.53] Saving foundry reproducers... Done! (0.00026716s)\n[2026-11-20 19:31:00.53] Saving coverage... Done! (0.006623692s)\n"
+        }
+      }
+    ],
+    "summary": "14-Echidna路径修复后seed-only汇总.json"
+  },
+  "resolved_run_artifacts": {
+    "first_BCD_wrapper_summary": "12-B-C-D-补充运行总汇.json",
+    "B_rename_wrapper_error": "原补充执行在 B 主方法已完成后引用了 BWorkflowRenamed.rename_map；保留 12 号错误记录，随后用冻结的 BWorkflow.rename_map 完成变体，不再调用模型。",
+    "first_agent_oracle_bootstrap": "02-独立Oracle/BWorkflow-AgentAB-独立Oracle.json 在 profile 未注册时停止于部署前；修正 profile 后的三类直接状态读数记录见 13-AgentAB独立状态核验.json。"
+  },
+  "conclusions": {
+    "agent_ab_target_reached": [
+      "BWorkflow",
+      "BWorkflowRenamed",
+      "CMsgSender",
+      "DAllowance"
+    ],
+    "e3_new_missing_steps_observed_only": [
+      "A_Wallet02Refund"
+    ],
+    "B_e3": "24 repetition proposals; 0 complete candidate replays; all fail after replaying the successful initial prefix.",
+    "C_e3": "0 candidate executions; static sender-index observations unresolved; randomized extension 12/24 complete, no goal improvement over already successful E1.",
+    "D_e3": "5/5 complete candidates, all state_supported_repetition of mint; target already reached by E1 and direct getter readback confirms repeated mint changed owner balance/supply from 500/1000 to 1500/2000 while authorization/spend stayed at 500/500 and allowance at 0.",
+    "E3_attribution": "B/C/D E1 sequences already established their frozen target states; no E3 credit is assigned."
+  },
+  "original_anvil_results_preserved": [
+    "04-Anvil对照/A_Wallet02Refund/方法对照总汇.json",
+    "04-Anvil对照/E_PigfoxRWASupplySum/方法对照总汇.json"
+  ],
+  "human_oracle_passed_to_agent_or_extensions": false
+}

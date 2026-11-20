@@ -1,0 +1,62 @@
+{
+  "mode": "static",
+  "group": "S",
+  "status": "no_valid_related_state_candidate",
+  "candidate_execution_budget": 24,
+  "candidate_executions": 0,
+  "parameter_repair_replays": 0,
+  "total_anvil_replays": 1,
+  "elapsed_seconds": 11.633776,
+  "base_sequence": [
+    {
+      "function": "fundCredit()",
+      "abi_signature": "fundCredit()",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [],
+      "value_wei": "1000000000000000000",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "authorizeOperator(address)",
+      "abi_signature": "authorizeOperator(address)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000"
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "executeFor(address,uint256)",
+      "abi_signature": "executeFor(address,uint256)",
+      "sender": "0x0000000000000000000000000000000000020000",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        1000000000000000000
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "from_transaction": 1,
+          "field": "sender",
+          "relation": "owner 参数复用第 1 笔交易的 sender，即 TARGET_OWNER，确保 depositedCredit/availableCredit 与 executedFor 索引同一账户"
+        },
+        {
+          "from_transaction": 2,
+          "field": "arguments[0]",
+          "relation": "executeFor 的 msg.sender 复用第 2 笔交易 authorizeOperator 的 operator 参数，即 TARGET_OPERATOR，满足 authorizedOperator[owner]==msg.sender"
+        }
+      ]
+    }
+  ],
+  "base_parameter_repair": null,
+  "candidates": [],
+  "raw_log": "func/测试过程/跨交易属性状态依赖审计/结果/20261120/04-Anvil对照/CMsgSender/extensions/S-扩展回放.json"
+}
