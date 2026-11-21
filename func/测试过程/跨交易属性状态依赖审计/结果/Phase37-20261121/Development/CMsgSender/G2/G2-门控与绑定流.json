@@ -1,0 +1,311 @@
+{
+  "gate_records": [
+    {
+      "proposal_no": 1,
+      "iteration": 1,
+      "operator": "static_dependency_insertion",
+      "sequence_fingerprint": "4e4aeb5aff073d566714eab11fe2abbe3730ab399371eba613520393615aff90",
+      "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+      "proposal_evidence": {
+        "matched_states": [
+          "MsgSenderDelegationHarness.authorizedOperator"
+        ],
+        "position": 1
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 2.2360000002663583e-06
+    },
+    {
+      "proposal_no": 2,
+      "iteration": 1,
+      "operator": "static_dependency_insertion",
+      "sequence_fingerprint": "d79dfae9579b86b279e78f9f84c66214dbc48a03d4832430636c80292a84c0d0",
+      "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+      "proposal_evidence": {
+        "matched_states": [
+          "MsgSenderDelegationHarness.authorizedOperator"
+        ],
+        "position": 2
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.4649995137006044e-06
+    }
+  ],
+  "candidate_records": [
+    {
+      "candidate_no": 0,
+      "proposal_no": 0,
+      "origin": "frozen_base_replay",
+      "proposal_evidence": null,
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "delegated_execution",
+          "reached": false,
+          "goal_state_values": {
+            "deposit": 0,
+            "available": 0,
+            "authorized_operator": null,
+            "executed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 1,
+      "proposal_no": 1,
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "MsgSenderDelegationHarness.authorizedOperator"
+        ],
+        "position": 1
+      },
+      "constraint_binding": {
+        "status": "applied",
+        "sequence": [
+          {
+            "function": "fundCredit()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "1000000000000000000"
+          },
+          {
+            "function": "authorizeOperator(address)",
+            "arguments": [
+              "0x0000000000000000000000000000000000020000"
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "sequence_extension_evidence": {
+              "matched_states": [
+                "MsgSenderDelegationHarness.authorizedOperator"
+              ],
+              "read_states": [],
+              "write_states": [],
+              "evidence_origin": "property_action_inventory"
+            }
+          },
+          {
+            "function": "executeFor(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0"
+          }
+        ],
+        "bindings": [
+          {
+            "field": "argument:0",
+            "before": "0x0000000000000000000000000000000000010000",
+            "after": "0x0000000000000000000000000000000000020000"
+          }
+        ],
+        "evidence": {
+          "state": "MsgSenderDelegationHarness.authorizedOperator",
+          "read_state_expression": "authorizedOperator[owner]",
+          "writer_expression": "authorizedOperator[msg.sender] = operator",
+          "consumer_guard": "require(bool,string)(authorizedOperator[owner] == msg.sender,NOT_AUTHORIZED_OPERATOR)",
+          "writer_source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#22",
+          "guard_source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#26",
+          "consumer_effect_writer": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "bindings": [
+            {
+              "producer_field": "sender",
+              "before": "0x0000000000000000000000000000000000010000",
+              "after": "0x0000000000000000000000000000000000010000",
+              "relation": "same mapping index position",
+              "mapping_position": 0,
+              "consumer_key": "owner",
+              "consumer_value_source": "consumer.arguments[0]"
+            },
+            {
+              "producer_field": "argument:0",
+              "before": "0x0000000000000000000000000000000000010000",
+              "after": "0x0000000000000000000000000000000000020000",
+              "relation": "writer value satisfies consumer guard",
+              "consumer_expression": "msg.sender",
+              "consumer_value_source": "consumer.msg.sender",
+              "guard_operator": "==",
+              "numeric_constraint": null
+            }
+          ],
+          "field_updates": [
+            {
+              "producer_field": "sender",
+              "after": "0x0000000000000000000000000000000000010000"
+            },
+            {
+              "producer_field": "argument:0",
+              "after": "0x0000000000000000000000000000000000020000"
+            }
+          ],
+          "numeric_constraint": null,
+          "producer_index": 2,
+          "consumer_index": 3,
+          "producer_signature": "authorizeOperator(address)",
+          "consumer_signature": "executeFor(address,uint256)",
+          "runtime_trace": {
+            "index": 2,
+            "function": "executeFor(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "status": "reverted",
+            "execution_class": "outer_revert",
+            "property_error": "tx_revert: ContractLogicError: ('execution reverted: NOT_AUTHORIZED_OPERATOR', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000174e4f545f415554484f52495a45445f4f50455241544f52000000000000000000')",
+            "state_fingerprint_before": "0x88709461b10286e42b8151ffbaf9636d4fe5c0804865ff1ee30bf32253fd5a7c",
+            "state_fingerprint_after": "0x88709461b10286e42b8151ffbaf9636d4fe5c0804865ff1ee30bf32253fd5a7c"
+          }
+        },
+        "alternative_count": 1,
+        "candidate_limit": 1
+      },
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": "applied",
+        "constraint_binding_evidence": {
+          "state": "MsgSenderDelegationHarness.authorizedOperator",
+          "read_state_expression": "authorizedOperator[owner]",
+          "writer_expression": "authorizedOperator[msg.sender] = operator",
+          "consumer_guard": "require(bool,string)(authorizedOperator[owner] == msg.sender,NOT_AUTHORIZED_OPERATOR)",
+          "writer_source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#22",
+          "guard_source": "sol/单合约测试/StateDependencyAuditCMsgSender/MsgSenderDelegationHarness.sol#26",
+          "consumer_effect_writer": "MsgSenderDelegationHarness.executeFor(address,uint256)",
+          "bindings": [
+            {
+              "producer_field": "sender",
+              "before": "0x0000000000000000000000000000000000010000",
+              "after": "0x0000000000000000000000000000000000010000",
+              "relation": "same mapping index position",
+              "mapping_position": 0,
+              "consumer_key": "owner",
+              "consumer_value_source": "consumer.arguments[0]"
+            },
+            {
+              "producer_field": "argument:0",
+              "before": "0x0000000000000000000000000000000000010000",
+              "after": "0x0000000000000000000000000000000000020000",
+              "relation": "writer value satisfies consumer guard",
+              "consumer_expression": "msg.sender",
+              "consumer_value_source": "consumer.msg.sender",
+              "guard_operator": "==",
+              "numeric_constraint": null
+            }
+          ],
+          "field_updates": [
+            {
+              "producer_field": "sender",
+              "after": "0x0000000000000000000000000000000000010000"
+            },
+            {
+              "producer_field": "argument:0",
+              "after": "0x0000000000000000000000000000000000020000"
+            }
+          ],
+          "numeric_constraint": null,
+          "producer_index": 2,
+          "consumer_index": 3,
+          "producer_signature": "authorizeOperator(address)",
+          "consumer_signature": "executeFor(address,uint256)",
+          "runtime_trace": {
+            "index": 2,
+            "function": "executeFor(address,uint256)",
+            "arguments": [
+              "0x0000000000000000000000000000000000010000",
+              1
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "status": "reverted",
+            "execution_class": "outer_revert",
+            "property_error": "tx_revert: ContractLogicError: ('execution reverted: NOT_AUTHORIZED_OPERATOR', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000174e4f545f415554484f52495a45445f4f50455241544f52000000000000000000')",
+            "state_fingerprint_before": "0x88709461b10286e42b8151ffbaf9636d4fe5c0804865ff1ee30bf32253fd5a7c",
+            "state_fingerprint_after": "0x88709461b10286e42b8151ffbaf9636d4fe5c0804865ff1ee30bf32253fd5a7c"
+          }
+        },
+        "full_sequence_executed": true,
+        "target_state_reached": true,
+        "target_state": {
+          "goal_kind": "delegated_execution",
+          "reached": false,
+          "goal_state_values": {
+            "deposit": 0,
+            "available": 0,
+            "authorized_operator": null,
+            "executed": 0
+          },
+          "property_value": true,
+          "replay_status": "executable",
+          "direct_anvil_confirmation": {
+            "deposit": 1000000000000000000,
+            "available": 999999999999999999,
+            "authorized_operator": "0x0000000000000000000000000000000000020000",
+            "executed": 1
+          }
+        },
+        "security_property_counterexample": false,
+        "direct_target_property_value": true
+      }
+    },
+    {
+      "candidate_no": 2,
+      "proposal_no": 2,
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "MsgSenderDelegationHarness.authorizedOperator"
+        ],
+        "position": 2
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "delegated_execution",
+          "reached": false,
+          "goal_state_values": {
+            "deposit": 0,
+            "available": 0,
+            "authorized_operator": null,
+            "executed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    }
+  ]
+}

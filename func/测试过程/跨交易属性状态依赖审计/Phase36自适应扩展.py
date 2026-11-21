@@ -203,11 +203,15 @@ def _fingerprint(sequence: list[dict[str, Any]]) -> str:
 
 def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
             abi_by_signature: dict[str, dict[str, Any]], sequence: list[dict[str, Any]],
-            senders: list[str], output: Path, gate_module) -> dict[str, Any]:
+            senders: list[str], output: Path, gate_module, *,
+            binding_enabled: bool = False, effect_catalog: dict[str, Any] | None = None
+            ) -> dict[str, Any]:
     import Phase32有限扩展与对照 as extension_driver
-    from 种子验证 import AnvilSession
+    from 种子验证 import AnvilSession, replay_seed
     from 状态反馈序列扩展 import (build_action_templates, feedback_vector,
         propose_extensions, retain_diverse_prefixes, sequence_fingerprint)
+    if binding_enabled:
+        from 跨交易状态约束 import bind_inserted_prerequisite
 
     started = time.monotonic()
     prep, trigger = extension_driver._split_trigger(prop, sequence, senders[0])
@@ -218,7 +222,7 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
     evidence = {str(row["abi_signature"]): row for row in inventory}
     target_states = set(prop.get("read_states", [])) | set(prop.get("property_write_states", []))
     gate = gate_module.AdaptiveGate(prop, MAX_LENGTH)
-    considered = executed = total_replays = repair_replays = gate_seconds = 0
+    considered = executed = total_replays = repair_replays = binding_replays = gate_seconds = 0
     records: list[dict[str, Any]] = []
     decisions: list[dict[str, Any]] = []
     gate_records: list[dict[str, Any]] = []
@@ -284,12 +288,50 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
                     one_started = time.monotonic()
                     parent_sequence = copy.deepcopy(parent["sequence"])
                     parent_replay = parent["replay"]
+                    binding = None
+                    replay_input = full
+                    if binding_enabled:
+                        binding = bind_inserted_prerequisite(
+                            parent_sequence, preparation, effect_catalog or {}, abi_by_signature,
+                            parent_replay=parent_replay)
+                        if binding:
+                            replay_input = extension_driver._with_trigger(binding["sequence"], trigger)
                     repaired, replay, repair, repair_count = extension_driver._replay_candidate(
-                        project, candidate, full, session)
+                        project, candidate, replay_input, session)
+                    binding_replay_count = 0
+                    repair_preserved_binding = None
+                    if binding and repair:
+                        repaired_prep, _ = extension_driver._split_trigger(prop, repaired, senders[0])
+                        rebound = bind_inserted_prerequisite(
+                            parent_sequence, repaired_prep, effect_catalog or {}, abi_by_signature,
+                            parent_replay=parent_replay)
+                        if rebound is None:
+                            # Reject a consumer-side repair that loses the prerequisite
+                            # relation; replay the original bound sequence as the final record.
+                            repaired = replay_input
+                            replay = replay_seed(project, candidate,
+                                [extension_driver._tx(item) for item in repaired],
+                                session=session, runtime_constraints=False)
+                            binding_replay_count += 1
+                            repair_preserved_binding = False
+                        elif rebound["sequence"] != repaired_prep:
+                            repaired = extension_driver._with_trigger(rebound["sequence"], trigger)
+                            replay = replay_seed(project, candidate,
+                                [extension_driver._tx(item) for item in repaired],
+                                session=session, runtime_constraints=False)
+                            binding_replay_count += 1
+                            binding = {**rebound,
+                                       "post_parameter_repair_rebinding": True}
+                            repair_preserved_binding = True
+                        else:
+                            binding = {**rebound,
+                                       "post_parameter_repair_rebinding": False}
+                            repair_preserved_binding = True
                     elapsed = time.monotonic() - one_started
                     executed += 1
-                    total_replays += 1 + repair_count
+                    total_replays += 1 + repair_count + binding_replay_count
                     repair_replays += repair_count
+                    binding_replays += binding_replay_count
                     vector = feedback_vector(replay, property_source=str(prop.get("property_source", "")),
                                              seen_states=seen_states)
                     seen_states.update(vector.get("getter_state_fingerprints", []))
@@ -301,6 +343,9 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
                         "proposal_evidence": proposal.get("evidence"),
                         "sequence_fingerprint": sequence_fingerprint(repaired),
                         "sequence": repaired, "replay": replay, "parameter_repair": repair,
+                        "constraint_binding": binding,
+                        "post_repair_binding_preserved": repair_preserved_binding,
+                        "binding_replay_count": binding_replay_count,
                         "elapsed_seconds": round(elapsed, 6), "feedback": vector,
                         "adaptive_relation_probe": proof, "retention_decision": "pending"}
                     records.append(record)
@@ -335,6 +380,7 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
         "retained_prefixes": RETAINED_PREFIXES, "candidate_execution_budget": MAX_EXECUTIONS,
         "candidate_proposals_considered": considered, "candidate_executions": executed,
         "base_replay_executions": 1, "parameter_repair_replays": repair_replays,
+        "binding_replays": binding_replays, "constraint_binding_enabled": binding_enabled,
         "total_anvil_replays": total_replays, "elapsed_seconds": round(time.monotonic() - started, 6),
         "gate_elapsed_seconds": round(gate_seconds, 6), "api_calls": 0, "api_tokens": 0,
         "template_decisions": template_decisions, "records": records,
@@ -432,7 +478,8 @@ def _safety_runs(task_id: str, row: dict[str, Any], reduced: list[dict[str, Any]
             "g2_kept_or_unknown_candidates": sum(item.get("action") == "extend" for item in out["G2"].get("gate_records", []))}
 
 
-def _run_wallet_echidna(row: dict[str, Any], record: dict[str, Any]) -> dict[str, Any]:
+def _run_wallet_echidna(row: dict[str, Any], record: dict[str, Any],
+                        output_root: Path | None = None) -> dict[str, Any]:
     from 属性种子上下文 import PROJECTS
     from 种子验证 import new_seed_id, run_echidna, write_corpus
 
@@ -442,7 +489,7 @@ def _run_wallet_echidna(row: dict[str, Any], record: dict[str, Any]) -> dict[str
     replay = candidate_record["replay"]
     sequence = candidate_record["sequence"]
     project, candidate, context, prop = row["project"], row["candidate"], row["context"], row["prop"]
-    out = RESULTS / "Echidna-seed-only/Wallet02Refund/G2"
+    out = output_root or RESULTS / "Echidna-seed-only/Wallet02Refund/G2"
     corpus_root = out / "corpus-input"
     seed_path = write_corpus(project, candidate, replay.get("resolved_transactions") or sequence,
                              context, corpus_root, replay=replay, seed_id=new_seed_id())
@@ -460,7 +507,7 @@ def _run_wallet_echidna(row: dict[str, Any], record: dict[str, Any]) -> dict[str
         working_directory=working)
     result = {"status": "complete" if run.get("exit_code") == 0 or
               run.get("corpus_evidence", {}).get("property_failure_reported") else "echidna_failed",
-        "group": "G2", "candidate_no": candidate_record.get("candidate_no"),
+        "group": record.get("group", "G2"), "candidate_no": candidate_record.get("candidate_no"),
         "anvil_property_violation": replay.get("target_property_violation"),
         "sequence": sequence, "sequence_sha256": seq_sha(sequence),
         "seed_path": str(seed_path.relative_to(ROOT)), "test_limit": 0,

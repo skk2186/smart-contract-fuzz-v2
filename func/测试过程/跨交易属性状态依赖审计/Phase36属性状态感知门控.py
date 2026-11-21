@@ -37,6 +37,14 @@ def _is_complete_success(replay: dict[str, Any]) -> bool:
             all(row.get("status") == "success" for row in txs))
 
 
+def _parent_state_fingerprint(replay: dict[str, Any]) -> str | None:
+    transactions = replay.get("transactions") or []
+    if not transactions:
+        return None
+    fingerprint = transactions[-1].get("state_fingerprint_after")
+    return str(fingerprint) if fingerprint else None
+
+
 def _guard_false_evidence(proposal: dict[str, Any], replay: dict[str, Any]
                           ) -> dict[str, Any] | None:
     """Prove that an exact appended call contradicts a simple observed static guard."""
@@ -187,11 +195,20 @@ class AdaptiveGate:
         repeat_key = hashlib.sha256(_key([appended.get("function"), appended.get("arguments"),
                                          appended.get("sender"), appended.get("value_wei")]).encode()).hexdigest()
         prior_probe = self.probed_repeats.get(repeat_key)
-        if prior_probe:
+        current_parent_state = _parent_state_fingerprint(parent_replay)
+        if (prior_probe and current_parent_state is not None and
+                prior_probe.get("parent_state_fingerprint") == current_parent_state):
             return {"decision": "skip", "action": "skip",
                     "reason": "a prior clean probe of this exact repeated call preserved a complete source-level aggregate relation within the frozen numeric horizon",
                     "evidence": prior_probe,
                     "elapsed_seconds": time.monotonic() - started}
+        if prior_probe:
+            return {"decision": "extend", "action": "extend",
+                    "reason": "cached repeat evidence belongs to a different or unobservable parent state; re-probe",
+                    "evidence": {"cached_parent_state_fingerprint": prior_probe.get("parent_state_fingerprint"),
+                                "current_parent_state_fingerprint": current_parent_state},
+                    "elapsed_seconds": time.monotonic() - started,
+                    "repeat_key": repeat_key}
         return {"decision": "extend", "action": "extend",
                 "reason": "no sound static guard contradiction or prior relation-preserving probe; default to execute",
                 "evidence": {"origin": origin, "proposal_evidence": proposal.get("evidence")},
@@ -207,5 +224,6 @@ class AdaptiveGate:
                                    parent_sequence, child_sequence,
                                    self.prop, self.max_length)
         if proof:
+            proof["parent_state_fingerprint"] = _parent_state_fingerprint(parent_replay)
             self.probed_repeats[repeat_key] = proof
         return proof

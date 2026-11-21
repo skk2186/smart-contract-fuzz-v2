@@ -263,6 +263,378 @@ def propose_numeric_repair(abi_inputs: list[dict[str, Any]], arguments: list[Any
                             else "observed_numeric_upper_bound")}
 
 
+def _short_signature(value: Any) -> str:
+    return str(value or "").rsplit(".", 1)[-1]
+
+
+def _effect_values(effect_catalog: Any) -> list[dict[str, Any]]:
+    if isinstance(effect_catalog, dict):
+        return [row for row in effect_catalog.values() if isinstance(row, dict)]
+    if isinstance(effect_catalog, list):
+        return [row for row in effect_catalog if isinstance(row, dict)]
+    return []
+
+
+def _effects_for_transaction(effect_catalog: Any, signature: str) -> list[dict[str, Any]]:
+    target = _short_signature(signature)
+    return [row for row in _effect_values(effect_catalog)
+            if _short_signature(row.get("writer")) == target]
+
+
+def _transaction_key(tx: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (_short_signature(tx.get("function")),
+            json_compact(tx.get("arguments", [])),
+            str(tx.get("sender", "")).lower(),
+            str(tx.get("value_wei", "0")))
+
+
+def _inserted_positions(parent: list[dict[str, Any]],
+                        child: list[dict[str, Any]]) -> list[int]:
+    """Return child indexes absent from an LCS alignment with its parent."""
+    left = [_transaction_key(row) for row in parent]
+    right = [_transaction_key(row) for row in child]
+    rows, cols = len(left), len(right)
+    lengths = [[0] * (cols + 1) for _ in range(rows + 1)]
+    for i in range(rows - 1, -1, -1):
+        for j in range(cols - 1, -1, -1):
+            lengths[i][j] = (1 + lengths[i + 1][j + 1] if left[i] == right[j]
+                             else max(lengths[i + 1][j], lengths[i][j + 1]))
+    matched_child: set[int] = set()
+    i = j = 0
+    while i < rows and j < cols:
+        if left[i] == right[j]:
+            matched_child.add(j)
+            i += 1
+            j += 1
+        elif lengths[i + 1][j] >= lengths[i][j + 1]:
+            i += 1
+        else:
+            j += 1
+    return [index for index in range(cols) if index not in matched_child]
+
+
+def _state_access(expression: str, state: str) -> tuple[str, list[str]] | None:
+    base = str(state or "").rsplit(".", 1)[-1]
+    if not base:
+        return None
+    match = re.search(r"(?<![A-Za-z0-9_])" + re.escape(base) +
+                      r"\s*((?:\[[^\]]*\]\s*)*)", expression)
+    if not match:
+        return None
+    indexes = [item.strip() for item in re.findall(r"\[([^\]]*)\]", match.group(1))]
+    return base, indexes
+
+
+def _guard_condition(expression: str) -> str | None:
+    marker = expression.find(")(")
+    if marker < 0:
+        return None
+    body = expression[marker + 2:]
+    depth = 0
+    for index, char in enumerate(body):
+        if char in "([{}":
+            depth += 1
+        elif char in ")]}":
+            if char == ")" and depth == 0:
+                return None
+            depth = max(0, depth - 1)
+        elif char == "," and depth == 0:
+            return body[:index].strip()
+    return None
+
+
+def _condition_comparisons(condition: str) -> list[tuple[str, str, str]]:
+    pattern = re.compile(r"([^&|]+?)\s*(>=|<=|==|!=|>|<)\s*([^&|]+?)"
+                         r"(?=\s*(?:&&|\|\|)|$)")
+    return [(match.group(1).strip().strip("()"), match.group(2),
+             match.group(3).strip().strip("()"))
+            for match in pattern.finditer(condition)]
+
+
+def _abi_inputs(abi_by_signature: dict[str, dict[str, Any]],
+                signature: str) -> list[dict[str, Any]] | None:
+    entry = abi_by_signature.get(_short_signature(signature))
+    return entry.get("inputs", []) if isinstance(entry, dict) else None
+
+
+def _argument_index(inputs: list[dict[str, Any]], name: str) -> int | None:
+    key = _canonical_name(name)
+    matches = [index for index, item in enumerate(inputs)
+               if key and _canonical_name(str(item.get("name") or "")) == key]
+    return matches[0] if len(matches) == 1 else None
+
+
+def _resolve_consumer_value(expression: str, consumer: dict[str, Any],
+                            inputs: list[dict[str, Any]]) -> tuple[Any, str] | None:
+    value = expression.strip().strip("()")
+    if value == "msg.sender":
+        return consumer.get("sender"), "consumer.msg.sender"
+    index = _argument_index(inputs, value)
+    arguments = consumer.get("arguments", [])
+    if index is not None and index < len(arguments):
+        return arguments[index], f"consumer.arguments[{index}]"
+    if re.fullmatch(r"0x[0-9a-fA-F]{40}", value):
+        return value, "guard_literal_address"
+    if re.fullmatch(r"-?\d+", value):
+        return int(value), "guard_literal_integer"
+    return None
+
+
+def _producer_argument(inputs: list[dict[str, Any]], expression: str) -> int | None:
+    value = expression.strip().strip("()")
+    if not re.fullmatch(r"[A-Za-z_]\w*", value):
+        return None
+    return _argument_index(inputs, value)
+
+
+def _same_value(left: Any, right: Any) -> bool:
+    if isinstance(left, str) and isinstance(right, str) and left.startswith("0x") and right.startswith("0x"):
+        return left.lower() == right.lower()
+    return left == right
+
+
+def _set_binding(changes: dict[str, Any], field: str, value: Any) -> bool:
+    if field in changes and not _same_value(changes[field], value):
+        return False
+    changes[field] = value
+    return True
+
+
+def _numeric_type_fits(kind: str, value: int) -> bool:
+    match = re.fullmatch(r"(u?)int(\d*)", kind)
+    if not match:
+        return False
+    bits = int(match.group(2) or 256)
+    if not 8 <= bits <= 256 or bits % 8:
+        return False
+    return 0 <= value < (1 << bits) if match.group(1) else -(1 << (bits - 1)) <= value < (1 << (bits - 1))
+
+
+def _invert_comparison(operator: str) -> str:
+    return {">=": "<=", "<=": ">=", ">": "<", "<": ">",
+            "==": "==", "!=": "!="}[operator]
+
+
+def _numeric_boundary(operator: str, raw_value: Any, kind: str) -> tuple[int, dict[str, Any]] | None:
+    if not isinstance(raw_value, int) or isinstance(raw_value, bool):
+        return None
+    selected = {">=": raw_value, ">": raw_value + 1,
+                "<=": raw_value, "<": raw_value - 1,
+                "==": raw_value}.get(operator)
+    if selected is None or not _numeric_type_fits(kind, selected):
+        return None
+    signed = kind.startswith("int")
+    bits_match = re.fullmatch(r"(?:u?)int(\d*)", kind)
+    bits = int(bits_match.group(1) or 256) if bits_match else 256
+    lower = -(1 << (bits - 1)) if signed else 0
+    upper = (1 << (bits - 1)) - 1 if signed else (1 << bits) - 1
+    return selected, {"operator": operator, "observed_consumer_value": raw_value,
+                      "satisfying_range": {"minimum": max(lower, raw_value) if operator in {">=", ">"} else lower,
+                                           "maximum": min(upper, raw_value) if operator in {"<=", "<"} else upper},
+                      "selected_boundary_value": selected}
+
+
+def _trace_match(parent_replay: dict[str, Any] | None, consumer: dict[str, Any]) -> dict[str, Any] | None:
+    if not isinstance(parent_replay, dict):
+        return None
+    signature = _short_signature(consumer.get("function"))
+    args = json_compact(consumer.get("arguments", []))
+    sender = str(consumer.get("sender", "")).lower()
+    for row in parent_replay.get("transactions", []):
+        if (_short_signature(row.get("function")) == signature and
+                json_compact(row.get("arguments", [])) == args and
+                str(row.get("sender", "")).lower() == sender):
+            return {key: row.get(key) for key in
+                    ("index", "function", "arguments", "sender", "status",
+                     "execution_class", "property_error", "state_fingerprint_before",
+                     "state_fingerprint_after")}
+    return None
+
+
+def _derive_writer_binding(writer_effect: dict[str, Any],
+                           consumer_effect: dict[str, Any],
+                           guard: dict[str, Any],
+                           producer: dict[str, Any], consumer: dict[str, Any],
+                           producer_inputs: list[dict[str, Any]],
+                           consumer_inputs: list[dict[str, Any]]) -> dict[str, Any] | None:
+    state = str(writer_effect.get("state") or "")
+    writer_expression = str(writer_effect.get("expression") or "")
+    assignment = re.search(r"^\s*(?P<lhs>.+?)\s*(?P<op>\+=|-=|=(?!=))\s*(?P<rhs>[^;]+?)\s*$",
+                           writer_expression)
+    condition = _guard_condition(str(guard.get("expression") or ""))
+    if not assignment or assignment.group("op") != "=" or not condition:
+        return None
+    write_access = _state_access(assignment.group("lhs"), state)
+    if write_access is None:
+        return None
+    state_reads = set(guard.get("state_reads") or [])
+    if state not in state_reads:
+        return None
+
+    changes: dict[str, Any] = {}
+    bindings: list[dict[str, Any]] = []
+    read_state_expression = None
+    numeric_constraint = None
+    write_keys = write_access[1]
+
+    for left, operator, right in _condition_comparisons(condition):
+        left_access = _state_access(left, state)
+        right_access = _state_access(right, state)
+        if bool(left_access) == bool(right_access):
+            continue
+        read_side = left if left_access else right
+        other_side = right if left_access else left
+        read_keys = (left_access or right_access)[1]
+        read_state_expression = read_side
+        if len(write_keys) != len(read_keys):
+            continue
+
+        # Mapping-key positions define the correspondence. Resolve the consumer key
+        # through its ABI input or actual sender, then bind the producer key to it.
+        mapping_ok = True
+        mapping_updates = []
+        for position, (write_key, read_key) in enumerate(zip(write_keys, read_keys)):
+            resolved = _resolve_consumer_value(read_key, consumer, consumer_inputs)
+            if resolved is None or resolved[0] is None:
+                mapping_ok = False
+                break
+            value, source = resolved
+            if write_key == "msg.sender":
+                field = "sender"
+            else:
+                arg_index = _producer_argument(producer_inputs, write_key)
+                if arg_index is None:
+                    mapping_ok = False
+                    break
+                field = f"argument:{arg_index}"
+            if not _set_binding(changes, field, value):
+                return None
+            mapping_updates.append({"producer_field": field, "before": (
+                producer.get("sender") if field == "sender" else
+                (producer.get("arguments", [])[int(field.split(":")[1])] if
+                 int(field.split(":")[1]) < len(producer.get("arguments", [])) else None)),
+                "after": value, "relation": "same mapping index position",
+                "mapping_position": position, "consumer_key": read_key,
+                "consumer_value_source": source})
+        if not mapping_ok:
+            continue
+
+        rhs = assignment.group("rhs").strip().strip("()")
+        rhs_index = _producer_argument(producer_inputs, rhs)
+        if rhs_index is None:
+            if mapping_updates:
+                continue
+            continue
+
+        other_value = _resolve_consumer_value(other_side, consumer, consumer_inputs)
+        if other_value is None:
+            continue
+        value, value_source = other_value
+        producer_kind = str(producer_inputs[rhs_index].get("type", ""))
+        effective_operator = operator if left_access else _invert_comparison(operator)
+        numeric_proof = None
+        if producer_kind.startswith(("uint", "int")):
+            boundary = _numeric_boundary(effective_operator, value, producer_kind)
+            if boundary is None:
+                continue
+            value, numeric_proof = boundary
+            numeric_constraint = numeric_proof
+        elif effective_operator != "==":
+            continue
+        field = f"argument:{rhs_index}"
+        if not _set_binding(changes, field, value):
+            return None
+        bindings.extend(mapping_updates)
+        bindings.append({"producer_field": field,
+                         "before": producer.get("arguments", [])[rhs_index]
+                         if rhs_index < len(producer.get("arguments", [])) else None,
+                         "after": value, "relation": "writer value satisfies consumer guard",
+                         "consumer_expression": other_side,
+                         "consumer_value_source": value_source,
+                         "guard_operator": effective_operator,
+                         "numeric_constraint": numeric_proof})
+        return {"state": state, "read_state_expression": read_state_expression,
+                "writer_expression": writer_expression,
+                "consumer_guard": guard.get("expression"),
+                "writer_source": writer_effect.get("source"),
+                "guard_source": guard.get("source"),
+                "consumer_effect_writer": consumer_effect.get("writer"),
+                "bindings": bindings,
+                "field_updates": [{"producer_field": field, "after": value}
+                                  for field, value in changes.items()],
+                "numeric_constraint": numeric_constraint}
+    return None
+
+
+def bind_inserted_prerequisite(parent_sequence: list[dict[str, Any]],
+                               candidate_sequence: list[dict[str, Any]],
+                               effect_catalog: Any,
+                               abi_by_signature: dict[str, dict[str, Any]], *,
+                               parent_replay: dict[str, Any] | None = None
+                               ) -> dict[str, Any] | None:
+    """Bind one inserted state writer to a later consumer using Slither and ABI evidence.
+
+    The function only changes the newly inserted transaction. It does not inspect
+    oracle sequences or alter transactions already present in the parent prefix.
+    """
+    inserted = _inserted_positions(parent_sequence, candidate_sequence)
+    rows = _effect_values(effect_catalog)
+    for producer_index in inserted:
+        producer = candidate_sequence[producer_index]
+        producer_signature = _short_signature(producer.get("function"))
+        producer_inputs = _abi_inputs(abi_by_signature, producer_signature)
+        if producer_inputs is None or len(producer_inputs) != len(producer.get("arguments", [])):
+            continue
+        writer_effects = _effects_for_transaction(rows, producer_signature)
+        for consumer_index in range(producer_index + 1, len(candidate_sequence)):
+            consumer = candidate_sequence[consumer_index]
+            consumer_signature = _short_signature(consumer.get("function"))
+            consumer_inputs = _abi_inputs(abi_by_signature, consumer_signature)
+            if consumer_inputs is None or len(consumer_inputs) != len(consumer.get("arguments", [])):
+                continue
+            consumer_effects = _effects_for_transaction(rows, consumer_signature)
+            for writer_effect in writer_effects:
+                state = str(writer_effect.get("state") or "")
+                if not state:
+                    continue
+                for consumer_effect in consumer_effects:
+                    for guard in consumer_effect.get("guards", []) or []:
+                        if state not in set(guard.get("state_reads") or []):
+                            continue
+                        proof = _derive_writer_binding(
+                            writer_effect, consumer_effect, guard, producer, consumer,
+                            producer_inputs, consumer_inputs)
+                        if proof is None:
+                            continue
+                        bound = [dict(row) for row in candidate_sequence]
+                        applied = []
+                        for item in proof["field_updates"]:
+                            field = item["producer_field"]
+                            value = item["after"]
+                            if field == "sender":
+                                before = bound[producer_index].get("sender")
+                                bound[producer_index]["sender"] = value
+                            else:
+                                arg_index = int(field.split(":", 1)[1])
+                                arguments = list(bound[producer_index].get("arguments", []))
+                                before = arguments[arg_index]
+                                arguments[arg_index] = value
+                                bound[producer_index]["arguments"] = arguments
+                            if not _same_value(before, value):
+                                applied.append({"field": field, "before": before, "after": value})
+                        proof.update({"producer_index": producer_index + 1,
+                                      "consumer_index": consumer_index + 1,
+                                      "producer_signature": producer_signature,
+                                      "consumer_signature": consumer_signature,
+                                      "runtime_trace": _trace_match(parent_replay, consumer)})
+                        return {"status": "applied" if applied else "already_satisfied",
+                                "sequence": bound,
+                                "bindings": applied, "evidence": proof,
+                                "alternative_count": 1,
+                                "candidate_limit": 1}
+    return None
+
+
 def json_compact(value: Any) -> str:
     """将守卫依赖结构转为稳定文本，避免引入项目专属字段分支。"""
     if isinstance(value, dict):

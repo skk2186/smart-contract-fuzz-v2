@@ -1,0 +1,2118 @@
+{
+  "gate_records": [
+    {
+      "proposal_no": 1,
+      "iteration": 1,
+      "operator": "static_dependency_insertion",
+      "sequence_fingerprint": "ecf417f66c791a0749e59d0891f43b617ead1970c72d263ccae32dd058963a4c",
+      "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 1
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 2.826000127242878e-06
+    },
+    {
+      "proposal_no": 2,
+      "iteration": 1,
+      "operator": "static_dependency_insertion",
+      "sequence_fingerprint": "c43d79a3120453973a9fdc0f6786750bb1c1530c5f7a80eec2a26b5fd62403c0",
+      "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 2
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.4459992598858662e-06
+    },
+    {
+      "proposal_no": 3,
+      "iteration": 1,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "8dfad168fe8109d52f71f500d03947f62636912256c80e47c82c6ba8a2b6e90b",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.475999852118548e-06
+    },
+    {
+      "proposal_no": 4,
+      "iteration": 2,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "f024fa7997592bfce3e8d8c3b1a473e880bb0fa49b2bc45225488889c67f7ef9",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "skip",
+      "action": "skip",
+      "reason": "appended transaction is predicted to revert from the parent state",
+      "evidence": {
+        "kind": "observed_static_guard_is_false",
+        "function": "createTask()",
+        "failed_guard": {
+          "variable": "stage",
+          "observed": 3,
+          "operator": "==",
+          "bound": 0,
+          "satisfied": false,
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#11",
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ]
+        },
+        "conclusion": "appended transaction is predicted to revert from the parent state"
+      },
+      "elapsed_seconds": 0.00026202000026387395
+    },
+    {
+      "proposal_no": 5,
+      "iteration": 2,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "62ca8812ac782aa0ad9b78a19a2676635af3e6c8cd27ecbf45b279166343db33",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "executionLimit()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "skip",
+      "action": "skip",
+      "reason": "appended transaction is predicted to revert from the parent state",
+      "evidence": {
+        "kind": "observed_static_guard_is_false",
+        "function": "configureTask(uint256)",
+        "failed_guard": {
+          "variable": "stage",
+          "observed": 3,
+          "operator": "==",
+          "bound": 1,
+          "satisfied": false,
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#16",
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ]
+        },
+        "conclusion": "appended transaction is predicted to revert from the parent state"
+      },
+      "elapsed_seconds": 1.4672999895992689e-05
+    },
+    {
+      "proposal_no": 6,
+      "iteration": 2,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "94369c8b81f334feca4348da61c19eb20ffa7decfac08fc3f1d62ae9cae88b1c",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 3,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "completedAmount()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "skip",
+      "action": "skip",
+      "reason": "appended transaction is predicted to revert from the parent state",
+      "evidence": {
+        "kind": "observed_static_guard_is_false",
+        "function": "executeTask(uint256)",
+        "failed_guard": {
+          "variable": "stage",
+          "observed": 3,
+          "operator": "==",
+          "bound": 2,
+          "satisfied": false,
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#23",
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ]
+        },
+        "conclusion": "appended transaction is predicted to revert from the parent state"
+      },
+      "elapsed_seconds": 1.2583000170707237e-05
+    },
+    {
+      "proposal_no": 7,
+      "iteration": 2,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "a9636d9f20ecc2117c77182202876aa8f23046880d2672343c5ccc077ce4fcbc",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 7.240005288622342e-07
+    },
+    {
+      "proposal_no": 8,
+      "iteration": 2,
+      "operator": "static_dependency_insertion",
+      "sequence_fingerprint": "0269cce17634798f22315951743a23a73b78fbaf13947856e43eba14350f95c6",
+      "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 1
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.5680006981710903e-06
+    },
+    {
+      "proposal_no": 9,
+      "iteration": 2,
+      "operator": "static_dependency_insertion",
+      "sequence_fingerprint": "4a24f016b884e5cbeb2f8710b3f5497b0b2db6b73d41de9b3ebb637a96d8a418",
+      "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 3
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.886000063677784e-06
+    },
+    {
+      "proposal_no": 10,
+      "iteration": 2,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "b764ebbcf06e7eb43ae8bbc6e430fb4822797cbe396af369788813601fb6c297",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.7909997040987946e-06
+    },
+    {
+      "proposal_no": 11,
+      "iteration": 3,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "2774c838b4e19a7af7bd5325dc97219fe9e1f8c4cfdcec08974f6d88acc498d0",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.3250000847619958e-06
+    },
+    {
+      "proposal_no": 12,
+      "iteration": 3,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "be1311b47423cada5960da4c41471c9c8d92cb0bcdb277df81c2e03fda681b9c",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "executionLimit()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.8049995560431853e-06
+    },
+    {
+      "proposal_no": 13,
+      "iteration": 3,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "20d482304af4eeb1d4e154ade229adc8b8c5b6b879b38857ed3d86228798b53b",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 3,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "completedAmount()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.503000021330081e-06
+    },
+    {
+      "proposal_no": 14,
+      "iteration": 3,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "c68c2a119aeccf2277e99637ef25466f08e5dcbac33c03c8cb0b416b12b284ee",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.2340005923761055e-06
+    },
+    {
+      "proposal_no": 15,
+      "iteration": 3,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "61dd749404d5d48b2dd247abf416ec30ef9dcbb237fa4a6768bd48adc5f1dbae",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.1890006135217845e-06
+    },
+    {
+      "proposal_no": 16,
+      "iteration": 3,
+      "operator": "static_dependency_insertion",
+      "sequence_fingerprint": "941526bbdd7c0e6e5f34aaddbd9a95b6aa12f31de31030853d05b43431741d56",
+      "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 1
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.3810004020342603e-06
+    },
+    {
+      "proposal_no": 17,
+      "iteration": 3,
+      "operator": "static_dependency_insertion",
+      "sequence_fingerprint": "ccd1d0a56923d015ae8574da0004787f1a16fd76dc2bf43ba20ea00a9a3cda54",
+      "proposal_reason": "action evidence overlaps a property-relevant state; preserve prior prefix",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 4
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 2.1129999367985874e-06
+    },
+    {
+      "proposal_no": 18,
+      "iteration": 3,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "219996c370fdb33caf98b1dec1630cef815e0185f4957bfe4f40eed08bf1a801",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.6490002963109873e-06
+    },
+    {
+      "proposal_no": 19,
+      "iteration": 4,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "7a8cd012340bd3a8ab1a0040420064d2f3a52ba4fa8cb02fdc48c3c16a95a8fb",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.2820000847568735e-06
+    },
+    {
+      "proposal_no": 20,
+      "iteration": 4,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "b19e630f119e9ecb18909a2f3988b35902174ca89d1750b15028a6f7e9a6da1b",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "executionLimit()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.5590003386023454e-06
+    },
+    {
+      "proposal_no": 21,
+      "iteration": 4,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "a4f4aac06f63fb66a0469cc441ae45ee9459ffe5c555c05dd186e07cfb76aae3",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 3,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "completedAmount()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.407000127073843e-06
+    },
+    {
+      "proposal_no": 22,
+      "iteration": 4,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "b6a8765a1c848ca85e0fa41fdb9e0a596e04914401a24a0d21c67e41830adde6",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 2.3370002963929437e-06
+    },
+    {
+      "proposal_no": 23,
+      "iteration": 4,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "809ad9950ea94deaeb43ffff1ae2325d2193e3a9c014367de99b258b8271ec14",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "executionLimit()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.3810004020342603e-06
+    },
+    {
+      "proposal_no": 24,
+      "iteration": 4,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "6d1312ed707211835d01a890331a2a6dcd46a15988b5ba6da167ac3b71cd5531",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 3,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "completedAmount()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "unknown",
+      "action": "extend",
+      "reason": "parent sequence is incomplete or contains a failed transaction; preserve expansion",
+      "evidence": {
+        "replay_status": "replay_failed"
+      },
+      "elapsed_seconds": 1.8390001059742644e-06
+    }
+  ],
+  "candidate_records": [
+    {
+      "candidate_no": 0,
+      "proposal_no": 0,
+      "origin": "frozen_base_replay",
+      "proposal_evidence": null,
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 1,
+      "proposal_no": 1,
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 1
+      },
+      "constraint_binding": {
+        "status": "applied",
+        "sequence": [
+          {
+            "function": "createTask()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0"
+          },
+          {
+            "function": "configureTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "sequence_extension_evidence": {
+              "matched_states": [
+                "WorkflowHarness.executionLimit",
+                "WorkflowHarness.stage"
+              ],
+              "read_states": [],
+              "write_states": [],
+              "evidence_origin": "property_action_inventory"
+            }
+          },
+          {
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0"
+          }
+        ],
+        "bindings": [
+          {
+            "field": "argument:0",
+            "before": 1,
+            "after": 3
+          }
+        ],
+        "evidence": {
+          "state": "WorkflowHarness.executionLimit",
+          "read_state_expression": "executionLimit",
+          "writer_expression": "executionLimit = maxAmount",
+          "consumer_guard": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+          "writer_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#18",
+          "guard_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24",
+          "consumer_effect_writer": "WorkflowHarness.executeTask(uint256)",
+          "bindings": [
+            {
+              "producer_field": "argument:0",
+              "before": 1,
+              "after": 3,
+              "relation": "writer value satisfies consumer guard",
+              "consumer_expression": "amount",
+              "consumer_value_source": "consumer.arguments[0]",
+              "guard_operator": ">=",
+              "numeric_constraint": {
+                "operator": ">=",
+                "observed_consumer_value": 3,
+                "satisfying_range": {
+                  "minimum": 3,
+                  "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+                },
+                "selected_boundary_value": 3
+              }
+            }
+          ],
+          "field_updates": [
+            {
+              "producer_field": "argument:0",
+              "after": 3
+            }
+          ],
+          "numeric_constraint": {
+            "operator": ">=",
+            "observed_consumer_value": 3,
+            "satisfying_range": {
+              "minimum": 3,
+              "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+            },
+            "selected_boundary_value": 3
+          },
+          "producer_index": 2,
+          "consumer_index": 3,
+          "producer_signature": "configureTask(uint256)",
+          "consumer_signature": "executeTask(uint256)",
+          "runtime_trace": {
+            "index": 2,
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "status": "reverted",
+            "execution_class": "outer_revert",
+            "property_error": "tx_revert: ContractLogicError: ('execution reverted: TASK_NOT_CONFIGURED', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000135441534b5f4e4f545f434f4e4649475552454400000000000000000000000000')",
+            "state_fingerprint_before": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970",
+            "state_fingerprint_after": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970"
+          }
+        },
+        "alternative_count": 1,
+        "candidate_limit": 1
+      },
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": "applied",
+        "constraint_binding_evidence": {
+          "state": "WorkflowHarness.executionLimit",
+          "read_state_expression": "executionLimit",
+          "writer_expression": "executionLimit = maxAmount",
+          "consumer_guard": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+          "writer_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#18",
+          "guard_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24",
+          "consumer_effect_writer": "WorkflowHarness.executeTask(uint256)",
+          "bindings": [
+            {
+              "producer_field": "argument:0",
+              "before": 1,
+              "after": 3,
+              "relation": "writer value satisfies consumer guard",
+              "consumer_expression": "amount",
+              "consumer_value_source": "consumer.arguments[0]",
+              "guard_operator": ">=",
+              "numeric_constraint": {
+                "operator": ">=",
+                "observed_consumer_value": 3,
+                "satisfying_range": {
+                  "minimum": 3,
+                  "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+                },
+                "selected_boundary_value": 3
+              }
+            }
+          ],
+          "field_updates": [
+            {
+              "producer_field": "argument:0",
+              "after": 3
+            }
+          ],
+          "numeric_constraint": {
+            "operator": ">=",
+            "observed_consumer_value": 3,
+            "satisfying_range": {
+              "minimum": 3,
+              "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+            },
+            "selected_boundary_value": 3
+          },
+          "producer_index": 2,
+          "consumer_index": 3,
+          "producer_signature": "configureTask(uint256)",
+          "consumer_signature": "executeTask(uint256)",
+          "runtime_trace": {
+            "index": 2,
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "status": "reverted",
+            "execution_class": "outer_revert",
+            "property_error": "tx_revert: ContractLogicError: ('execution reverted: TASK_NOT_CONFIGURED', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000135441534b5f4e4f545f434f4e4649475552454400000000000000000000000000')",
+            "state_fingerprint_before": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970",
+            "state_fingerprint_after": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970"
+          }
+        },
+        "full_sequence_executed": true,
+        "target_state_reached": true,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": true,
+          "goal_state_values": {
+            "stage": 3,
+            "completed": 3
+          },
+          "property_value": true,
+          "replay_status": "executable",
+          "direct_anvil_confirmation": {
+            "stage": 3,
+            "completed_amount": 3,
+            "execution_limit": 3
+          }
+        },
+        "security_property_counterexample": false,
+        "direct_target_property_value": true
+      }
+    },
+    {
+      "candidate_no": 2,
+      "proposal_no": 2,
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 2
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 3,
+      "proposal_no": 3,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 4,
+      "proposal_no": 7,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 5,
+      "proposal_no": 8,
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 1
+      },
+      "constraint_binding": {
+        "status": "applied",
+        "sequence": [
+          {
+            "function": "createTask()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0"
+          },
+          {
+            "function": "configureTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "sequence_extension_evidence": {
+              "matched_states": [
+                "WorkflowHarness.executionLimit",
+                "WorkflowHarness.stage"
+              ],
+              "read_states": [],
+              "write_states": [],
+              "evidence_origin": "property_action_inventory"
+            }
+          },
+          {
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0"
+          },
+          {
+            "function": "createTask()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0"
+          }
+        ],
+        "bindings": [
+          {
+            "field": "argument:0",
+            "before": 1,
+            "after": 3
+          }
+        ],
+        "evidence": {
+          "state": "WorkflowHarness.executionLimit",
+          "read_state_expression": "executionLimit",
+          "writer_expression": "executionLimit = maxAmount",
+          "consumer_guard": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+          "writer_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#18",
+          "guard_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24",
+          "consumer_effect_writer": "WorkflowHarness.executeTask(uint256)",
+          "bindings": [
+            {
+              "producer_field": "argument:0",
+              "before": 1,
+              "after": 3,
+              "relation": "writer value satisfies consumer guard",
+              "consumer_expression": "amount",
+              "consumer_value_source": "consumer.arguments[0]",
+              "guard_operator": ">=",
+              "numeric_constraint": {
+                "operator": ">=",
+                "observed_consumer_value": 3,
+                "satisfying_range": {
+                  "minimum": 3,
+                  "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+                },
+                "selected_boundary_value": 3
+              }
+            }
+          ],
+          "field_updates": [
+            {
+              "producer_field": "argument:0",
+              "after": 3
+            }
+          ],
+          "numeric_constraint": {
+            "operator": ">=",
+            "observed_consumer_value": 3,
+            "satisfying_range": {
+              "minimum": 3,
+              "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+            },
+            "selected_boundary_value": 3
+          },
+          "producer_index": 2,
+          "consumer_index": 3,
+          "producer_signature": "configureTask(uint256)",
+          "consumer_signature": "executeTask(uint256)",
+          "runtime_trace": {
+            "index": 2,
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "status": "reverted",
+            "execution_class": "outer_revert",
+            "property_error": "tx_revert: ContractLogicError: ('execution reverted: TASK_NOT_CONFIGURED', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000135441534b5f4e4f545f434f4e4649475552454400000000000000000000000000')",
+            "state_fingerprint_before": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970",
+            "state_fingerprint_after": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970"
+          }
+        },
+        "alternative_count": 1,
+        "candidate_limit": 1
+      },
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": "applied",
+        "constraint_binding_evidence": {
+          "state": "WorkflowHarness.executionLimit",
+          "read_state_expression": "executionLimit",
+          "writer_expression": "executionLimit = maxAmount",
+          "consumer_guard": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+          "writer_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#18",
+          "guard_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24",
+          "consumer_effect_writer": "WorkflowHarness.executeTask(uint256)",
+          "bindings": [
+            {
+              "producer_field": "argument:0",
+              "before": 1,
+              "after": 3,
+              "relation": "writer value satisfies consumer guard",
+              "consumer_expression": "amount",
+              "consumer_value_source": "consumer.arguments[0]",
+              "guard_operator": ">=",
+              "numeric_constraint": {
+                "operator": ">=",
+                "observed_consumer_value": 3,
+                "satisfying_range": {
+                  "minimum": 3,
+                  "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+                },
+                "selected_boundary_value": 3
+              }
+            }
+          ],
+          "field_updates": [
+            {
+              "producer_field": "argument:0",
+              "after": 3
+            }
+          ],
+          "numeric_constraint": {
+            "operator": ">=",
+            "observed_consumer_value": 3,
+            "satisfying_range": {
+              "minimum": 3,
+              "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+            },
+            "selected_boundary_value": 3
+          },
+          "producer_index": 2,
+          "consumer_index": 3,
+          "producer_signature": "configureTask(uint256)",
+          "consumer_signature": "executeTask(uint256)",
+          "runtime_trace": {
+            "index": 2,
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "status": "reverted",
+            "execution_class": "outer_revert",
+            "property_error": "tx_revert: ContractLogicError: ('execution reverted: TASK_NOT_CONFIGURED', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000135441534b5f4e4f545f434f4e4649475552454400000000000000000000000000')",
+            "state_fingerprint_before": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970",
+            "state_fingerprint_after": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970"
+          }
+        },
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 6,
+      "proposal_no": 9,
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 3
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 7,
+      "proposal_no": 10,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 8,
+      "proposal_no": 11,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 9,
+      "proposal_no": 12,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "executionLimit()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 10,
+      "proposal_no": 13,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 3,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "completedAmount()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 11,
+      "proposal_no": 14,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 12,
+      "proposal_no": 15,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 13,
+      "proposal_no": 16,
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 1
+      },
+      "constraint_binding": {
+        "status": "applied",
+        "sequence": [
+          {
+            "function": "createTask()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0"
+          },
+          {
+            "function": "configureTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0",
+            "delay_seconds": 0,
+            "delay_blocks": 0,
+            "expected_outcome": "state_change",
+            "sequence_extension_evidence": {
+              "matched_states": [
+                "WorkflowHarness.executionLimit",
+                "WorkflowHarness.stage"
+              ],
+              "read_states": [],
+              "write_states": [],
+              "evidence_origin": "property_action_inventory"
+            }
+          },
+          {
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "value_wei": "0"
+          },
+          {
+            "function": "createTask()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0"
+          },
+          {
+            "function": "createTask()",
+            "arguments": [],
+            "sender": "0x0000000000000000000000000000000000010000",
+            "value_wei": "0"
+          }
+        ],
+        "bindings": [
+          {
+            "field": "argument:0",
+            "before": 1,
+            "after": 3
+          }
+        ],
+        "evidence": {
+          "state": "WorkflowHarness.executionLimit",
+          "read_state_expression": "executionLimit",
+          "writer_expression": "executionLimit = maxAmount",
+          "consumer_guard": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+          "writer_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#18",
+          "guard_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24",
+          "consumer_effect_writer": "WorkflowHarness.executeTask(uint256)",
+          "bindings": [
+            {
+              "producer_field": "argument:0",
+              "before": 1,
+              "after": 3,
+              "relation": "writer value satisfies consumer guard",
+              "consumer_expression": "amount",
+              "consumer_value_source": "consumer.arguments[0]",
+              "guard_operator": ">=",
+              "numeric_constraint": {
+                "operator": ">=",
+                "observed_consumer_value": 3,
+                "satisfying_range": {
+                  "minimum": 3,
+                  "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+                },
+                "selected_boundary_value": 3
+              }
+            }
+          ],
+          "field_updates": [
+            {
+              "producer_field": "argument:0",
+              "after": 3
+            }
+          ],
+          "numeric_constraint": {
+            "operator": ">=",
+            "observed_consumer_value": 3,
+            "satisfying_range": {
+              "minimum": 3,
+              "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+            },
+            "selected_boundary_value": 3
+          },
+          "producer_index": 2,
+          "consumer_index": 3,
+          "producer_signature": "configureTask(uint256)",
+          "consumer_signature": "executeTask(uint256)",
+          "runtime_trace": {
+            "index": 2,
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "status": "reverted",
+            "execution_class": "outer_revert",
+            "property_error": "tx_revert: ContractLogicError: ('execution reverted: TASK_NOT_CONFIGURED', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000135441534b5f4e4f545f434f4e4649475552454400000000000000000000000000')",
+            "state_fingerprint_before": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970",
+            "state_fingerprint_after": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970"
+          }
+        },
+        "alternative_count": 1,
+        "candidate_limit": 1
+      },
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": "applied",
+        "constraint_binding_evidence": {
+          "state": "WorkflowHarness.executionLimit",
+          "read_state_expression": "executionLimit",
+          "writer_expression": "executionLimit = maxAmount",
+          "consumer_guard": "require(bool,string)(amount > 0 && amount <= executionLimit,LIMIT_EXCEEDED)",
+          "writer_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#18",
+          "guard_source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#24",
+          "consumer_effect_writer": "WorkflowHarness.executeTask(uint256)",
+          "bindings": [
+            {
+              "producer_field": "argument:0",
+              "before": 1,
+              "after": 3,
+              "relation": "writer value satisfies consumer guard",
+              "consumer_expression": "amount",
+              "consumer_value_source": "consumer.arguments[0]",
+              "guard_operator": ">=",
+              "numeric_constraint": {
+                "operator": ">=",
+                "observed_consumer_value": 3,
+                "satisfying_range": {
+                  "minimum": 3,
+                  "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+                },
+                "selected_boundary_value": 3
+              }
+            }
+          ],
+          "field_updates": [
+            {
+              "producer_field": "argument:0",
+              "after": 3
+            }
+          ],
+          "numeric_constraint": {
+            "operator": ">=",
+            "observed_consumer_value": 3,
+            "satisfying_range": {
+              "minimum": 3,
+              "maximum": 115792089237316195423570985008687907853269984665640564039457584007913129639935
+            },
+            "selected_boundary_value": 3
+          },
+          "producer_index": 2,
+          "consumer_index": 3,
+          "producer_signature": "configureTask(uint256)",
+          "consumer_signature": "executeTask(uint256)",
+          "runtime_trace": {
+            "index": 2,
+            "function": "executeTask(uint256)",
+            "arguments": [
+              3
+            ],
+            "sender": "0x0000000000000000000000000000000000020000",
+            "status": "reverted",
+            "execution_class": "outer_revert",
+            "property_error": "tx_revert: ContractLogicError: ('execution reverted: TASK_NOT_CONFIGURED', '0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000135441534b5f4e4f545f434f4e4649475552454400000000000000000000000000')",
+            "state_fingerprint_before": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970",
+            "state_fingerprint_after": "0x06a2bfb3f870a481b696bec7b2ad859a40331395857c693adb462064c395c970"
+          }
+        },
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 14,
+      "proposal_no": 17,
+      "origin": "static_dependency_insertion",
+      "proposal_evidence": {
+        "matched_states": [
+          "WorkflowHarness.executionLimit",
+          "WorkflowHarness.stage"
+        ],
+        "position": 4
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 15,
+      "proposal_no": 18,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 16,
+      "proposal_no": 19,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 17,
+      "proposal_no": 20,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "executionLimit()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 18,
+      "proposal_no": 21,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 3,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "completedAmount()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 19,
+      "proposal_no": 22,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 20,
+      "proposal_no": 23,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "executionLimit()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    },
+    {
+      "candidate_no": 21,
+      "proposal_no": 24,
+      "origin": "state_supported_repetition",
+      "proposal_evidence": {
+        "source_transaction": 3,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "completedAmount()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 3
+          }
+        ],
+        "balance_changes": []
+      },
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": true,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": false,
+        "target_state_reached": false,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": false,
+          "goal_state_values": {
+            "stage": null,
+            "completed": 0
+          },
+          "property_value": null,
+          "replay_status": "replay_failed"
+        },
+        "security_property_counterexample": false
+      }
+    }
+  ]
+}

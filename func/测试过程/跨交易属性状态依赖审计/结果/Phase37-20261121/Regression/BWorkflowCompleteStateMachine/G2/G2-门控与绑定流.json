@@ -1,0 +1,171 @@
+{
+  "gate_records": [
+    {
+      "proposal_no": 1,
+      "iteration": 1,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "8a1ff20efa321e6ce536d8654931a2295bf4e39775dc9879e33e22146314e087",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 1,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 1
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "skip",
+      "action": "skip",
+      "reason": "appended transaction is predicted to revert from the parent state",
+      "evidence": {
+        "kind": "observed_static_guard_is_false",
+        "function": "createTask()",
+        "failed_guard": {
+          "variable": "stage",
+          "observed": 3,
+          "operator": "==",
+          "bound": 0,
+          "satisfied": false,
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#11",
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ]
+        },
+        "conclusion": "appended transaction is predicted to revert from the parent state"
+      },
+      "elapsed_seconds": 3.112900049018208e-05
+    },
+    {
+      "proposal_no": 2,
+      "iteration": 1,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "1b6664d7bc3aa07bfb5393796c0e6e7f5e76e7d6b83174b3b84f2236a97d0dbb",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 2,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 1,
+            "after": 2
+          },
+          {
+            "signature": "executionLimit()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 100
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "skip",
+      "action": "skip",
+      "reason": "appended transaction is predicted to revert from the parent state",
+      "evidence": {
+        "kind": "observed_static_guard_is_false",
+        "function": "configureTask(uint256)",
+        "failed_guard": {
+          "variable": "stage",
+          "observed": 3,
+          "operator": "==",
+          "bound": 1,
+          "satisfied": false,
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#16",
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ]
+        },
+        "conclusion": "appended transaction is predicted to revert from the parent state"
+      },
+      "elapsed_seconds": 1.3904999832448084e-05
+    },
+    {
+      "proposal_no": 3,
+      "iteration": 1,
+      "operator": "state_supported_repetition",
+      "sequence_fingerprint": "c0d18aadbda3577dfe506118e9b7e53021638167dba0fcdf52444528364be7b3",
+      "proposal_reason": "repeat a successful property-relevant state transition with observed state/resource effect",
+      "proposal_evidence": {
+        "source_transaction": 3,
+        "changed_predicate_getters": [
+          {
+            "signature": "stage()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 2,
+            "after": 3
+          },
+          {
+            "signature": "completedAmount()",
+            "receiver": null,
+            "receiver_address": null,
+            "arguments": [],
+            "before": 0,
+            "after": 100
+          }
+        ],
+        "balance_changes": []
+      },
+      "decision": "skip",
+      "action": "skip",
+      "reason": "appended transaction is predicted to revert from the parent state",
+      "evidence": {
+        "kind": "observed_static_guard_is_false",
+        "function": "executeTask(uint256)",
+        "failed_guard": {
+          "variable": "stage",
+          "observed": 3,
+          "operator": "==",
+          "bound": 2,
+          "satisfied": false,
+          "source": "sol/单合约测试/StateDependencyAuditBWorkflow/WorkflowHarness.sol#23",
+          "state_reads": [
+            "WorkflowHarness.stage"
+          ]
+        },
+        "conclusion": "appended transaction is predicted to revert from the parent state"
+      },
+      "elapsed_seconds": 1.1496999832161237e-05
+    }
+  ],
+  "candidate_records": [
+    {
+      "candidate_no": 0,
+      "proposal_no": 0,
+      "origin": "frozen_base_replay",
+      "proposal_evidence": null,
+      "constraint_binding": null,
+      "post_repair_binding_preserved": null,
+      "phase37_evaluation": {
+        "correct_prerequisite_operation_before_consumer": false,
+        "binding_status": null,
+        "constraint_binding_evidence": null,
+        "full_sequence_executed": true,
+        "target_state_reached": true,
+        "target_state": {
+          "goal_kind": "workflow_stage",
+          "reached": true,
+          "goal_state_values": {
+            "stage": 3,
+            "completed": 100
+          },
+          "property_value": true,
+          "replay_status": "executable"
+        },
+        "security_property_counterexample": false
+      }
+    }
+  ]
+}

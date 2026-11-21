@@ -73,8 +73,13 @@ def _resolve_source(project: str, reference: str) -> Path | None:
     if not path.is_absolute():
         choices.append(ROOT / PROJECTS[project]["source_root"] / path)
     for candidate in choices:
-        if candidate.is_file():
-            return candidate
+        try:
+            if candidate.is_file():
+                return candidate
+        except OSError:
+            # An inaccessible repository-root mirror can still have a readable
+            # project-local copy under source_root (for example on mounted WSL paths).
+            continue
     return None
 
 
