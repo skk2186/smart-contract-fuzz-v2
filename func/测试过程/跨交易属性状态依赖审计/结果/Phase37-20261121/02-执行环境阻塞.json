@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "phase": "Phase37",
+  "formal_g1_g2_status": "not_started",
+  "reason": "The available execution surface is Windows PowerShell. Starting Ubuntu-20.04 via wsl.exe returned WSL/E_ACCESSDENIED; the Codex app terminal reader also failed. Windows Python is 3.8.8 and has no web3; anvil, echidna and solc are not available on PATH.",
+  "attempts": [
+    {
+      "operation": "wsl.exe -d Ubuntu-20.04 -- bash -lc ...",
+      "result": "WSL/E_ACCESSDENIED"
+    },
+    {
+      "operation": "read current Codex thread terminal",
+      "result": "tool request failed; no terminal output returned"
+    },
+    {
+      "operation": "check host executables anvil/echidna/solc",
+      "result": "none found on PATH"
+    },
+    {
+      "operation": "check Windows Python web3 import",
+      "result": "ModuleNotFoundError: No module named web3"
+    }
+  ],
+  "not_run": [
+    "G1/G2 Anvil comparison",
+    "Wallet Anvil regression",
+    "Wallet Echidna seed-only regression",
+    "Phase36 ordinary state-machine regression",
+    "Pigfox invalid-expansion regression",
+    "held-out tasks"
+  ],
+  "costs": {
+    "new_anvil_replays": 0,
+    "new_echidna_runs": 0,
+    "candidate_replays": 0,
+    "elapsed_seconds": null
+  },
+  "interpretation": "No completed-sequence result can be attributed to Phase37. The formal comparison remains pending; static constraint derivation evidence is non-execution evidence."
+}

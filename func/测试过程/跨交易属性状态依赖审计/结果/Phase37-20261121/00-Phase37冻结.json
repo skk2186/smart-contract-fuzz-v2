@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "phase": "Phase37",
+  "frozen_at_utc": "2026-11-21T04:18:00.494044+00:00",
+  "head": "f809887cff7d17c307c982dd054b4cd2ba21c5df",
+  "remote_main_head_verified": "f809887cff7d17c307c982dd054b4cd2ba21c5df",
+  "remote_head_source": "GitHub REST refs/heads/main, read-only lookup during this task",
+  "formal_comparison_status": "not_started_environment_blocked",
+  "formal_comparison": {
+    "G1": "Phase36 AdaptiveGate enabled; prerequisite binding disabled",
+    "G2": "same Phase36 AdaptiveGate and E3 path; bind_inserted_prerequisite enabled before Anvil replay",
+    "controlled_variables": [
+      "same Phase36 deleted-step inputs",
+      "same Phase36 candidate templates and ordering",
+      "same 24 candidate consideration budget",
+      "same max sequence length 8",
+      "same frozen senders and Anvil environment",
+      "same adaptive gate",
+      "no Agent/API calls",
+      "no Oracle success sequence passed to E3 or binder"
+    ],
+    "tasks": {
+      "BWorkflow": {
+        "deleted": "configureTask(uint256)",
+        "consumer": "executeTask(3)",
+        "required_relation": "configured limit >= 3; successful target execution advances stage and records amount 3"
+      },
+      "CMsgSender": {
+        "deleted": "authorizeOperator(address)",
+        "consumer": "executeFor(owner,1) from operator",
+        "required_relation": "mapping owner key equals consumer owner; stored operator equals consumer msg.sender"
+      },
+      "DAllowance": {
+        "deleted": "approve(address,uint256)",
+        "consumer": "transferFrom(owner,recipient,4) from spender",
+        "required_relation": "allowance owner key and spender key match consumer; approved amount >= 4"
+      }
+    }
+  },
+  "algorithm_version": {
+    "candidate_source": "existing Phase36 code at frozen HEAD; no code mutation before formal comparison",
+    "binding_function": "func/功能/跨交易状态约束.py::bind_inserted_prerequisite",
+    "binding_enabled_via": "func/测试过程/跨交易属性状态依赖审计/Phase36自适应扩展.py::_run_g2(binding_enabled=True)",
+    "mechanism_is_separately_disableable": true,
+    "max_binding_solutions_per_inserted_writer_consumer_pair": 1,
+    "core_sha256": {
+      "func/功能/跨交易状态约束.py": "c28bd5cfda2872ef3041a400a481c1c264b4e6c27c7b75815aa770408c507298",
+      "func/功能/状态反馈序列扩展.py": "f2e2552d4eeb49d58343a2b41a940e2764ba8c4e617235785d1d2d3d2f91f197",
+      "func/功能/属性分析适配器.py": "471364b2deea55ea3dead8a8c2084de49251186a6366e364a86b0fd842b8965f",
+      "func/功能/种子验证.py": "4e9ba0142bba7051f423455cce39c59d590670e20b8dd65e55e8ed483260514d",
+      "func/测试过程/跨交易属性状态依赖审计/Phase36自适应扩展.py": "09f77784895c59b7f6042bad6a8c581e5fb3efba79ef056addce2d127cd0eacc",
+      "func/测试过程/跨交易属性状态依赖审计/Phase36属性状态感知门控.py": "6420d2ce3cdbd97091c6ce4b701bd01f7f4fad0ddfd5f9e3d550e80b69f0386c"
+    },
+    "phase36_freeze_sha256": "7fad47d221aeb5c92f02962ef5cf5e4edb7b1310ebfd193468b530ec18751b92",
+    "deleted_step_inputs_sha256": "890bde0fa16a21d01a993b46ffc0c8b1494ef06dfb9d254508dae40fef6fd808"
+  },
+  "budget": {
+    "max_sequence_length": 8,
+    "candidate_consideration_budget_per_arm": 24,
+    "retained_prefixes": 4,
+    "extension_random_seed_base": 20261120,
+    "agent_calls": 0,
+    "echidna_campaign": false
+  },
+  "acceptance": {
+    "at_least_two_of_B_C_D_complete_and_execute_successfully": true,
+    "success_must_depend_on_guard_state_abi_binding_not_oracle_answers": true,
+    "Wallet_counterexample_and_Echidna_seed_only_regression_required": true,
+    "Phase36_state_machine_and_Pigfox_gate_savings_regression_required": true,
+    "record_candidate_counts_replays_elapsed_and_goal_state": true,
+    "do_not_equate_prerequisite_state_with_property_counterexample": true,
+    "one_common_cause_fix_maximum_no_contract_name_special_cases": true
+  },
+  "frozen_inputs_sha256": {
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/00-Phase36冻结.json": "7fad47d221aeb5c92f02962ef5cf5e4edb7b1310ebfd193468b530ec18751b92",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/00-缺失前置步骤删减输入.json": "890bde0fa16a21d01a993b46ffc0c8b1494ef06dfb9d254508dae40fef6fd808",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/SafetyMissingPrerequisite/BWorkflow/G1/E3-扩展回放.json": "66cd2d4a85d3af02f8e8cd8a39605992c30fd4babb66dc2a1448f4cd4a512f2c",
+    "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/BWorkflow/属性分析.json": "3d534f96069aae27a7c0abd030c022aa86026f1f17fb97849ae2e1b0ab9e7d69",
+    "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/BWorkflow/编译产物.json": "b36723f739b95ce12ea30402beb7dfa3f4bd1d334891305cb6f71860d06fae1a",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/SafetyMissingPrerequisite/CMsgSender/G1/E3-扩展回放.json": "24ef869e7fbc6d682cb5229db3cd4e6d9ed5bf10a092d1c967275c861ea941a1",
+    "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/CMsgSender/属性分析.json": "c7e200af15595d5a5b00c0716616c6ba11fad9b43fc335374bbf2d65c5367ea1",
+    "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/CMsgSender/编译产物.json": "9c03533d2bf4a0332b05ccb144b1b503123edc534c3d4a18260626aade2e5b5f",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/SafetyMissingPrerequisite/DAllowance/G1/E3-扩展回放.json": "31295ce9864fe14aaadc99fcb11397830077c4255a9c1da731142da6bac1838f",
+    "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/DAllowance/属性分析.json": "d828b320fed4dbdfe1b4495b53f9382f4dddec16b48ee8953d30d6d969f02fcf",
+    "func/测试过程/跨交易属性状态依赖审计/结果/20261120/01-编译与静态分析/DAllowance/编译产物.json": "916209dfb075c509aca66ea0885cd1989c31c6feabd54b46f29f81de44e44cf7"
+  },
+  "pre_freeze_code_path_check": {
+    "classification": "exploratory inspection only; excluded from G1/G2 success and cost counts",
+    "description": "A preliminary local call exercised the existing binder on hand-assembled examples before this formal comparison freeze. The later retained static evidence will use Phase36 G1 logged candidates and remains non-execution evidence."
+  },
+  "environment_at_freeze": {
+    "host_python": "3.8.8",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "anvil_on_host_path": null,
+    "echidna_on_host_path": null,
+    "solc_on_host_path": null,
+    "wsl_launch_result": "WSL/E_ACCESSDENIED from the provided PowerShell execution surface; no WSL terminal available to Codex terminal reader"
+  }
+}
