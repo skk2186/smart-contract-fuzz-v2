@@ -2,7 +2,7 @@
   "schema_version": 1,
   "phase": "Phase37",
   "formal_g1_g2_status": "not_started",
-  "reason": "The available execution surface is Windows PowerShell. Starting Ubuntu-20.04 via wsl.exe returned WSL/E_ACCESSDENIED; the Codex app terminal reader also failed. Windows Python is 3.8.8 and has no web3; anvil, echidna and solc are not available on PATH.",
+  "reason": "The available execution surface is Windows PowerShell. Starting Ubuntu-20.04 via wsl.exe returned WSL/E_ACCESSDENIED; the Codex app terminal reader also failed. A request for unsandboxed WSL execution was rejected by the managed approval policy (sandbox_approval=false). Windows Python is 3.8.8 and has no web3; anvil, echidna and solc are not available on PATH.",
   "attempts": [
     {
       "operation": "wsl.exe -d Ubuntu-20.04 -- bash -lc ...",
@@ -19,6 +19,14 @@
     {
       "operation": "check Windows Python web3 import",
       "result": "ModuleNotFoundError: No module named web3"
+    },
+    {
+      "operation": "retry direct WSL access from this explicitly authorized window",
+      "result": "WSL/E_ACCESSDENIED for wsl.exe --status and Ubuntu-20.04 --exec"
+    },
+    {
+      "operation": "request unsandboxed WSL execution after explicit user authorization",
+      "result": "Rejected before execution by managed approval policy: sandbox_approval=false; unsandboxed execution unavailable"
     }
   ],
   "not_run": [
