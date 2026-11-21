@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "phase": "Phase38",
+  "kind": "independent_project_screening",
+  "frozen_order": [
+    "Hokusai",
+    "Kink",
+    "Strata",
+    "DODOCrossChain"
+  ],
+  "inspected_project_count": 4,
+  "eligible_project_count": 0,
+  "formal_run_project_count": 0,
+  "stopped_at_candidate_limit": true,
+  "no_candidate_replacement_after_g1_g2": true,
+  "candidates": [
+    {
+      "order": 1,
+      "project": "Hokusai",
+      "path": "sol/真实项目/Hokusai/",
+      "upstream_origin": null,
+      "upstream_commit": null,
+      "repository_import_commit": "528d3a7ce961bd55542ced4b3670820b052f97e0",
+      "license_evidence": "各 Solidity 文件含 SPDX MIT；项目级 LICENSE 未发现；副本无独立 .git/origin，无法将源码映射到上游 commit。",
+      "native_echidna_entry": "contracts/echidna/EchidnaHokusaiToken.sol; defines echidna_* Boolean properties.",
+      "multi_transaction_state_dependency": "审查到 cap/mint 累积与 supplier distribution 状态，但没有明确缺少另一类 writer 前置步骤的冻结目标；初始状态及账户由 harness constructor 设置。",
+      "development_independence": "该项目和 echidna harness 与 slither 环境/属性分析器初版同一个 V2 引入提交，无法满足未参与方法开发的留出要求。",
+      "source_sha256": {
+        "contracts/HokusaiToken.sol": "09f14f397871110d9909e3fe0e9e32873d57d0ffca4519c1d8c0cbcdb4718d73",
+        "contracts/HokusaiParams.sol": "c1b2becf0cc1ee52a1be0aad9e7e1b5691ccc3d8d008283d22b170ca596fabd2",
+        "contracts/echidna/EchidnaHokusaiToken.sol": "85852a055504d2ed6c07b366ea9a982b7dbd3c15645093af35b3c1c1312019eb",
+        "contracts/interfaces/IHokusaiParams.sol": "9f9bbb3dc46f718ba8a8d0e74423a89556a57567831eaf37a7f2911de3496654"
+      },
+      "eligible": false,
+      "reasons": [
+        "来源/上游版本不可核验",
+        "方法开发独立性不成立或无法证明",
+        "未冻结出具有不同前置 writer/consumer 的实际多交易依赖任务"
+      ]
+    },
+    {
+      "order": 2,
+      "project": "Kink",
+      "path": "sol/真实项目/Kink/",
+      "upstream_origin": null,
+      "upstream_commit": null,
+      "repository_import_commit": "528d3a7ce961bd55542ced4b3670820b052f97e0",
+      "license_evidence": "Harness 声明 SPDX MIT；项目级 LICENSE 未发现；副本无独立 .git/origin，无法将源码映射到上游 commit。",
+      "native_echidna_entry": "echidna/KinkPoolEchidna.sol; defines echidna_* Boolean properties.",
+      "multi_transaction_state_dependency": "Harness constructor 内创建 registry/factory/pool 并立即注入 seed liquidity；fuzz action 在此完整初始状态上执行，未找到可冻结的缺失前置交易与消费者目标。",
+      "development_independence": "该项目和 Echidna harness 与 slither 环境/属性分析器初版同一个 V2 引入提交，属于方法开发期资源，不能做留出样本。",
+      "source_sha256": {
+        "KinkPool.sol": "6bd3434cf14cee41115b4e0ebf0f0b0eb42f0aceab517777786fe4af4e25070a",
+        "KinkFactory.sol": "860f5f2bba10c248e27c3f24812ea8841fa6338a9e3c01801f2394cfaaad6fcf",
+        "PoolRegistry.sol": "e746fcf43854c1cbd918be97f8c67e50dd242f38a4d86e407322287ec7046f08",
+        "libraries/CurveMath.sol": "54c9003df6fd994ab4c8ed56d30e30ec73842e0eaae2c0b21fd875a79b5e8fd2",
+        "mocks/MockERC20.sol": "334b6978f0ac00a9165ff71d975bb17493e1e0f248e37f68b60f52ee512ccbab",
+        "mocks/FeeOnTransferToken.sol": "0c81135a417e3ce269c3d29ebd91c0c1897779bbf4dcebeb5198f681f5e5e975",
+        "echidna/KinkPoolEchidna.sol": "33fdef4ff4d79fdf21f6c73c480f1a639f8ca044755461775e4ba2fdfae3723c"
+      },
+      "eligible": false,
+      "reasons": [
+        "来源/上游版本不可核验",
+        "方法开发独立性不成立或无法证明",
+        "Harness 在构造期间已完成关键初始配置与流动性，未发现合适的缺步骤属性任务"
+      ]
+    },
+    {
+      "order": 3,
+      "project": "Strata",
+      "path": "sol/真实项目/Strata/",
+      "upstream_origin": "https://github.com/Strata-Money/contracts.git",
+      "upstream_commit": "51ad892ed5a7c73df8b64e5a11c6c5371037b2d6",
+      "license_evidence": "test/recon/Properties.sol 标记 SPDX GPL-2.0；本地根目录未发现 LICENSE 文件。",
+      "native_echidna_entry": "echidna.yaml testMode=assertion; test/recon/Properties.sol contains property_* assertions.",
+      "multi_transaction_state_dependency": "pUSDe deposit writers update pUSDe_totalDepositedUSDe[actor]; redeem/withdraw consumers update pUSDe_totalWithdrawnUSDe[actor], and withdrawal property is checked on remove.",
+      "execution_compatibility": "TargetFunctions actor wrappers use vm.prank. The same harness/account semantics cannot be replayed as ordinary Anvil transactions; replacing prank/actor behavior would change harness execution semantics. Earlier Phase31 frozen precheck also records build failure for missing @openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol import.",
+      "local_preexisting_status_observed": "?? foundry.lock",
+      "source_sha256": {
+        "echidna.yaml": "47635b1d67f505d6a98867225c0ff6e49a98fd6ce1fc92d8835d22163f8dd61e",
+        "test/recon/Properties.sol": "f9ea078ce652586ebbee5d19e9ae18f386f23b2f8486341fc431d51e41bb3f10"
+      },
+      "eligible": false,
+      "reasons": [
+        "Anvil 与 Echidna 无法维持相同原生 Harness actor 语义",
+        "历史冻结接入预检存在构建依赖失败"
+      ]
+    },
+    {
+      "order": 4,
+      "project": "DODOCrossChain",
+      "path": "sol/真实项目/DODOCrossChain/",
+      "upstream_origin": "https://github.com/pyk/dodocc-fuzz.git",
+      "upstream_commit": "0042646b1b541a2b3adb13205cb4b15e054ce05e",
+      "license_evidence": "test/fuzzing/Fuzz.sol SPDX MIT；项目级 LICENSE 未发现；来源 remote 为 fuzzing fork pyk/dodocc-fuzz。",
+      "native_echidna_entry": null,
+      "native_property_evidence": "test/fuzzing/Fuzz.sol is a Foundry fuzz harness; source/test tree has no echidna_* property entry and repository contains medusa.json but no echidna config.",
+      "multi_transaction_state_dependency": "Foundry fuzz properties exist, but no unmodified Echidna entry point for a matching G0/G1/G2 comparison.",
+      "execution_compatibility": "Phase31 frozen screening log records offline build probe fetching nested dependencies and aborting before compile.",
+      "local_preexisting_status_observed": "m lib/openzeppelin-contracts-upgradeable",
+      "source_sha256": {
+        "test/fuzzing/Fuzz.sol": "8deb8fc7a96d33c918648a420da8b90fdc2608f060c27e26921c69a81666415a",
+        "foundry.toml": "2376799f13986670de4b734bdbca748c8af70c91ed83b53b7f73af9cd2641726"
+      },
+      "eligible": false,
+      "reasons": [
+        "没有原生 Echidna 属性入口",
+        "既有离线构建预检在嵌套依赖获取阶段中止"
+      ]
+    }
+  ],
+  "phase31_precheck_reference": "docs/32_属性状态反馈与有界序列扩展.md, table 'candidate screening' lists Strata commit 51ad892..., DODO commit 0042646...",
+  "formal_runs": {
+    "agent_api_calls": 0,
+    "anvil_deployments": 0,
+    "echidna_seed_only_runs": 0,
+    "echidna_fuzz_runs": 0
+  },
+  "stop_reason": "四项候选已按预先冻结顺序检查，合格项目为 0；按用户停止规则不追加候选、不改 Harness/算法、不运行正式对照。"
+}

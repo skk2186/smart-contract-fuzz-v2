@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "phase": "Phase38",
+  "kind": "tool_and_environment_preflight",
+  "checked": true,
+  "commands": [
+    {
+      "command": ".tools/foundry/bin/anvil --version",
+      "result": "anvil Version 1.9.0-dev; Commit SHA 6056c5845d34205a83cf7108042adb137325c9df"
+    },
+    {
+      "command": "/usr/local/bin/echidna --version",
+      "result": "Echidna 2.3.2"
+    },
+    {
+      "command": "/home/skk/.solc-select/artifacts/solc-0.8.28/solc-0.8.28 --version",
+      "result": "solc 0.8.28+commit.7893614a.Linux.g++"
+    },
+    {
+      "command": "PYTHONPATH=/home/skk/smart-contract-fuzz-v2/.tools/python /usr/bin/python3 -c 'import web3'",
+      "result": "Python 3.8.10; web3 6.20.4"
+    }
+  ],
+  "paths_sha256": {
+    ".tools/foundry/bin/anvil": "f8117dc6dc61bc5cc9e40a0f619be52bef6d4ba395bcd68d09cd1979c91c5656",
+    "/usr/local/bin/echidna": "3a337e4d99850367f64cbfc15c0894438baa986c6134b919075cd838a80e0cca",
+    "/home/skk/.solc-select/artifacts/solc-0.8.28/solc-0.8.28": "9a0fb7e0db2c0641dbae1c5cc645dc686820c83af516226abb1c0a2f76636f25"
+  },
+  "notes": [
+    "初次在非登录 shell 直接调用 anvil 返回 command not found；依据 Phase37 记录定位仓库本地固定二进制，绝对路径复核通过。",
+    "此记录是版本/环境核验，不表示 Anvil 部署或 Echidna 运行已经发生。",
+    "Echidna 语料和 fuzz 结果均为 N/A，因为无合格留出项目。"
+  ]
+}
