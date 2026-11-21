@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "project_root": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/wallet_02_refund_nosub/test",
+  "artifact": "/home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/Wallet02Refund/foundry-build/out/WalletHarness.sol/WalletHarness.json",
+  "anvil": {
+    "binary": "/home/skk/smart-contract-fuzz-v2/.tools/foundry/versions/foundry-rs/foundry/v1.9.0/anvil",
+    "host": "127.0.0.1",
+    "port": 18552,
+    "chain_id": 1,
+    "accounts": 10,
+    "balance_eth": 10000,
+    "block_gas_limit": 100000000,
+    "timestamp": 1524785992,
+    "silent": true,
+    "hardfork": "shanghai"
+  },
+  "deployment": {
+    "sender_index": 0,
+    "gas": 95000000,
+    "timeout": 90
+  },
+  "transactions": [
+    {
+      "function": "deposit(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender_index": 0,
+      "value_wei": "1000000000000000",
+      "delay_seconds": 0,
+      "gas": 12500000
+    },
+    {
+      "function": "refund(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender_index": 0,
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "gas": 12500000
+    }
+  ],
+  "state_reads_before": [
+    {
+      "label": "property_before",
+      "function": "echidna_wallet_accounting_respected()"
+    },
+    {
+      "label": "deposits_before",
+      "function": "cumulativeDeposits(uint8)",
+      "arguments": [
+        0
+      ]
+    },
+    {
+      "label": "payout_before",
+      "function": "cumulativePayout(uint8)",
+      "arguments": [
+        0
+      ]
+    }
+  ],
+  "state_reads_after": [
+    {
+      "label": "property_after",
+      "function": "echidna_wallet_accounting_respected()"
+    },
+    {
+      "label": "deposits_after",
+      "function": "cumulativeDeposits(uint8)",
+      "arguments": [
+        0
+      ]
+    },
+    {
+      "label": "payout_after",
+      "function": "cumulativePayout(uint8)",
+      "arguments": [
+        0
+      ]
+    }
+  ],
+  "continue_after_failure": false
+}

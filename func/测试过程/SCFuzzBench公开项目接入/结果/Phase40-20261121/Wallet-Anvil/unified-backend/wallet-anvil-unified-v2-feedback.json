@@ -1,0 +1,126 @@
+{
+  "backend": "anvil-rpc",
+  "deployment": {
+    "tx_hash": "e30c4ecd71125becced2c6d44987cd8c49af5d19c37a6fa0c619766e2402ee21",
+    "status": 1,
+    "gas_used": 1662634,
+    "contract_address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "block_number": 1,
+    "sender": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+  },
+  "transactions": [
+    {
+      "transaction_index": 1,
+      "function": "deposit(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "value_wei": "1000000000000000",
+      "status": "success",
+      "revert_data": null,
+      "revert_reason": null,
+      "gas_used": 90098,
+      "gas_used_estimate": null,
+      "block_number": 2,
+      "origin": null,
+      "timestamp_before": null,
+      "timestamp_at_call": null,
+      "timestamp_after": null,
+      "observations_before": [],
+      "observations_after": [],
+      "property_checks": [],
+      "target_property": null
+    },
+    {
+      "transaction_index": 2,
+      "function": "refund(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "value_wei": "0",
+      "status": "success",
+      "revert_data": null,
+      "revert_reason": null,
+      "gas_used": 63693,
+      "gas_used_estimate": null,
+      "block_number": 3,
+      "origin": null,
+      "timestamp_before": null,
+      "timestamp_at_call": null,
+      "timestamp_after": null,
+      "observations_before": [],
+      "observations_after": [],
+      "property_checks": [],
+      "target_property": null
+    }
+  ],
+  "sequence_success": true,
+  "property_checks_passed": null,
+  "state_before": [
+    {
+      "label": "property_before",
+      "function": "echidna_wallet_accounting_respected()",
+      "arguments": [],
+      "value": "True",
+      "status": "success"
+    },
+    {
+      "label": "deposits_before",
+      "function": "cumulativeDeposits(uint8)",
+      "arguments": [
+        0
+      ],
+      "value": "0",
+      "status": "success"
+    },
+    {
+      "label": "payout_before",
+      "function": "cumulativePayout(uint8)",
+      "arguments": [
+        0
+      ],
+      "value": "0",
+      "status": "success"
+    }
+  ],
+  "state_after": [
+    {
+      "label": "property_after",
+      "function": "echidna_wallet_accounting_respected()",
+      "arguments": [],
+      "value": "True",
+      "status": "success"
+    },
+    {
+      "label": "deposits_after",
+      "function": "cumulativeDeposits(uint8)",
+      "arguments": [
+        0
+      ],
+      "value": "1000000000000000",
+      "status": "success"
+    },
+    {
+      "label": "payout_after",
+      "function": "cumulativePayout(uint8)",
+      "arguments": [
+        0
+      ],
+      "value": "1000000000000000",
+      "status": "success"
+    }
+  ],
+  "capabilities": {
+    "msg_sender": true,
+    "internal_prank": false,
+    "internal_warp": false,
+    "mined_transaction_receipts": true,
+    "revert_data": false,
+    "state_observation": true,
+    "rpc_impersonation_used": false
+  },
+  "status": "replay_completed",
+  "limitation": "Ordinary RPC sender selection does not implement HEVM calls from inside the Harness."
+}

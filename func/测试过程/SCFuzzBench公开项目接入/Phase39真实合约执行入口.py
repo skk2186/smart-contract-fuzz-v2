@@ -24,7 +24,10 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / ".tools/python"))
+# Prefer the active pinned virtualenv wheels; keep the repository vendor tree
+# as a fallback because it may contain partial native packages that shadow
+# complete wheels when placed first (for example pydantic_core).
+sys.path.append(str(ROOT / ".tools/python"))
 
 
 def utc_now() -> str:
@@ -142,6 +145,8 @@ def _anvil_args(config: dict[str, Any]) -> list[str]:
         command.append("--disable-code-size-limit")
     if config.get("timestamp") is not None:
         command.extend(["--timestamp", str(config["timestamp"])])
+    if config.get("hardfork"):
+        command.extend(["--hardfork", str(config["hardfork"])])
     if config.get("silent", True):
         command.append("--silent")
     return command

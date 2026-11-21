@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "project": {
+    "id": "DripsSCFuzzBench",
+    "source_root": "sol/真实项目/DripsSCFuzzBench",
+    "upstream_url": "https://github.com/scfuzzbench/drips-fuzzing-scfuzzbench.git",
+    "commit": "c50d160ead6bf82b1d1071e853dc74da0b23f595",
+    "source_tree_sha256": "fc1b15ff0b5caa5ea2aa624f8d6cf0c51354ca87402891288921b6d2e809f0a0",
+    "hash_scope": "all git-tracked files from the project commit and its recursive pinned submodules"
+  },
+  "build": {
+    "system": "foundry",
+    "solc_version": "0.8.20",
+    "profile": "default",
+    "artifact": "out/Echidna.sol/Echidna.json",
+    "offline": true,
+    "remappings_source": "remappings.txt"
+  },
+  "toolchain": {
+    "forge": ".tools/foundry/bin/forge",
+    "echidna": "echidna"
+  },
+  "dependencies": [
+    {
+      "path": "lib/forge-std",
+      "url": "https://github.com/foundry-rs/forge-std",
+      "commit": "f73c73d2018eb6a111f35e4dae7b4f27401e9421",
+      "version": "v1.7.1"
+    },
+    {
+      "path": "lib/forge-std/lib/ds-test",
+      "url": "https://github.com/dapphub/ds-test",
+      "commit": "e282159d5170298eb2455a6c05280ab5a73a4ef0",
+      "version": "heads/master at pinned gitlink"
+    },
+    {
+      "path": "lib/openzeppelin-contracts",
+      "url": "https://github.com/OpenZeppelin/openzeppelin-contracts",
+      "commit": "e50c24f5839db17f46991478384bfda14acfb830",
+      "version": "v4.9.2"
+    },
+    {
+      "path": "lib/openzeppelin-contracts/lib/erc4626-tests",
+      "url": "https://github.com/OpenZeppelin/erc4626-tests",
+      "commit": "8b1d7c2ac248c33c3506b1bff8321758943c5e11",
+      "version": "v0.1.0"
+    },
+    {
+      "path": "lib/openzeppelin-contracts/lib/forge-std",
+      "url": "https://github.com/foundry-rs/forge-std",
+      "commit": "c2236853aadb8e2d9909bbecdc490099519b70a4",
+      "version": "v1.5.0"
+    },
+    {
+      "path": "lib/openzeppelin-contracts/lib/forge-std/lib/ds-test",
+      "url": "https://github.com/dapphub/ds-test",
+      "commit": "6da7dd8f7395f83e1fb6fa88a64ba9a030f85d4f",
+      "version": "pinned gitlink"
+    }
+  ],
+  "harness": {
+    "source": "src/echidna/Echidna.sol",
+    "import_path": "phase40-source/echidna/Echidna.sol",
+    "contract": "Echidna",
+    "property_mode": "assertion",
+    "native_config": "echidna.yaml",
+    "properties": [
+      "invariantAccountingVsTokenBalance()"
+    ],
+    "original_harness_required": true
+  },
+  "accounts": [
+    {
+      "name": "user0",
+      "address": "0x0000000000000000000000000000000000010000",
+      "role": "stream sender and prank actor"
+    },
+    {
+      "name": "user1",
+      "address": "0x0000000000000000000000000000000000020000",
+      "role": "stream receiver and second sequence sender"
+    },
+    {
+      "name": "user2",
+      "address": "0x0000000000000000000000000000000000030000",
+      "role": "configured actor"
+    },
+    {
+      "name": "user3",
+      "address": "0x0000000000000000000000000000000000040000",
+      "role": "configured actor"
+    }
+  ],
+  "deployment": {
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "contract_address": "0x00a329c0648769a73afac7f9381e08fb43dbea72",
+    "constructor_types": [],
+    "constructor_arguments": [],
+    "artifact": "out/Echidna.sol/Echidna.json"
+  },
+  "remappings": [
+    "phase40-source/=src/",
+    "openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/",
+    "forge-std/=lib/forge-std/src/"
+  ],
+  "observers": [
+    {
+      "name": "user0_token_balance",
+      "target": {
+        "storage_address_slot": 4
+      },
+      "signature": "balanceOf(address)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000"
+      ],
+      "output_type": "uint256"
+    },
+    {
+      "name": "user1_token_balance",
+      "target": {
+        "storage_address_slot": 4
+      },
+      "signature": "balanceOf(address)",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000"
+      ],
+      "output_type": "uint256"
+    },
+    {
+      "name": "drips_token_balance",
+      "target": {
+        "storage_address_slot": 4
+      },
+      "signature": "balanceOf(address)",
+      "arguments": [
+        {
+          "storage_address_slot": 5
+        }
+      ],
+      "output_type": "uint256"
+    },
+    {
+      "name": "receiver_splittable",
+      "target": {
+        "storage_address_slot": 5
+      },
+      "signature": "splittable(uint256,address)",
+      "arguments": [
+        131072,
+        {
+          "storage_address_slot": 4
+        }
+      ],
+      "output_type": "uint128",
+      "note": "ADDRESS_USER1 maps to account id 0x20000; the constructor registers the only driver as id 0."
+    }
+  ],
+  "properties": [
+    {
+      "name": "invariantAccountingVsTokenBalance",
+      "signature": "invariantAccountingVsTokenBalance()",
+      "arguments": [],
+      "kind": "assertion"
+    }
+  ],
+  "backends": {
+    "foundry-cheatcode": {
+      "supports_internal_prank": true,
+      "supports_internal_warp": true,
+      "supports_receipts_per_nested_call": false
+    },
+    "anvil-rpc": {
+      "supports_internal_prank": false,
+      "supports_internal_warp": false,
+      "supports_receipts_per_transaction": true
+    },
+    "echidna-native": {
+      "property_mode": "assertion",
+      "test_limit": 0,
+      "workers": 1
+    }
+  },
+  "sequences": [
+    {
+      "id": "drips-prank-warp-squeeze",
+      "description": "同一原生 Harness 中先给账户 1 转入 Drips，再创建流并由 hevm.warp 推进 1 秒，最后由接收方挤出可领取金额。",
+      "continue_after_failure": false,
+      "echidna_seed": 4040,
+      "transactions": [
+        {
+          "signature": "give(uint8,uint8,uint128)",
+          "arguments": [
+            0,
+            64,
+            "1000000000000000000"
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0"
+        },
+        {
+          "signature": "addStreamImmediatelySqueezable(uint8,uint8,uint160)",
+          "arguments": [
+            0,
+            64,
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0"
+        },
+        {
+          "signature": "testSqueeze(uint8,uint8)",
+          "arguments": [
+            64,
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0"
+        }
+      ]
+    }
+  ],
+  "native_assertions": [
+    "testSqueeze(uint8,uint8)"
+  ],
+  "semantic_checks": [
+    {
+      "kind": "timestamp_delta",
+      "transaction_index": 2,
+      "expected_delta_seconds": 1,
+      "evidence": "internal hevm.warp in addStreamImmediatelySqueezable"
+    },
+    {
+      "kind": "state_increase",
+      "transaction_index": 3,
+      "observer": "receiver_splittable",
+      "evidence": "successful testSqueeze changes receiver Drips splittable balance"
+    }
+  ]
+}
