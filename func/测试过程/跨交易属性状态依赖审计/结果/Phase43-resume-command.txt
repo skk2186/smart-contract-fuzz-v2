@@ -1,0 +1,15 @@
+Phase43 恢复入口（本轮未运行实验）
+
+1. 在可执行的 Ubuntu-20.04 WSL 会话中：
+   cd /home/skk/smart-contract-fuzz-v2
+   git rev-parse HEAD
+   git status --short --branch
+
+2. 保留并审阅工作区已有的 Phase32 未提交结果，不要 reset、clean 或覆盖它们。
+
+3. 确认官方 Echidna 2.2.3、solc 0.8.26、Foundry 和 Python 3.11 运行时可调用。然后运行官方 Olympia wrapper；保持可达性检查开启：
+   python3 .tools/olympia-upstream/olympia/olympia_wrapper.py -o .tools/olympia-generated-phase43-20261123 -d 5 10 15 20 -i 25 -s 20261123
+
+4. 先归档生成源码、programs.list、reproducible_generation.sh、可达性证明和源码 SHA-256；任何 sol_tx / sln 标准解答都不得提供给 Agent。完成每档前5个样本的20样本工程预检后，才继续余下队列。
+
+仓库当前没有 Phase43 全批量 runner。本轮没有新建实验框架，也没有可诚实提供的一条命令完成全部104目标的恢复方式。后续需复用 Phase42 冻结算法及 Phase40/41 执行适配入口，逐任务执行一次 Agent A/B，按 E1/E2/G0/G1/G2 和配对随机种子续跑，并保存独立 corpus、断点、日志与成本。
