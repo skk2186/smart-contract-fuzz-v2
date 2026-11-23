@@ -1006,14 +1006,15 @@ def _target_result(row: dict[str, Any], signature: str | None) -> tuple[Any, str
     if not signature:
         return None, "unknown", None
     checks = [item for item in row.get("property_checks", [])
-              if item.get("signature") == signature]
+              if str(item.get("signature", "")).rsplit(".", 1)[-1] ==
+              str(signature).rsplit(".", 1)[-1]]
     if checks:
         check = checks[-1]
         value = bool(check.get("success"))
         return value, "passed" if value else "failed", {
             "source": "backend_property_check", "signature": signature,
             "return_data": check.get("return_data") or check.get("revert_data")}
-    if row.get("function") != signature:
+    if str(row.get("function", "")).rsplit(".", 1)[-1] != str(signature).rsplit(".", 1)[-1]:
         return None, "not_checked", None
     success = row.get("status") in (1, "success", "passed")
     data = row.get("return_data") or row.get("revert_data")
@@ -1179,7 +1180,8 @@ def execution_feedback_to_v2(raw: dict[str, Any], manifest: dict[str, Any], *,
                        "kind": "sequence_before_after_getter_diff"}})
     state_changes.extend(sequence_state_changes)
     final_property_row = next((item for item in reversed(sequence_after)
-                               if item.get("signature") == target_property_signature and
+                               if str(item.get("signature", "")).rsplit(".", 1)[-1] ==
+                               str(target_property_signature or "").rsplit(".", 1)[-1] and
                                item.get("status") == "observed"), None)
     final_property_value = None
     if final_property_row is not None:
@@ -1192,7 +1194,8 @@ def execution_feedback_to_v2(raw: dict[str, Any], manifest: dict[str, Any], *,
             else:
                 final_property_value = None
         initial_property_row = next((item for item in initial
-                                     if item.get("signature") == target_property_signature and
+                                     if str(item.get("signature", "")).rsplit(".", 1)[-1] ==
+                                     str(target_property_signature or "").rsplit(".", 1)[-1] and
                                      item.get("status") == "observed"), None)
         if initial_property_row is not None:
             initial_value = initial_property_row.get("value")
@@ -1256,7 +1259,8 @@ def execution_feedback_to_v2(raw: dict[str, Any], manifest: dict[str, Any], *,
         target_status = "no_observed_property_related_state_change"
     property_rows = execution.get("properties", [])
     target_checks = [item for item in property_rows
-                     if item.get("signature") == target_property_signature]
+                     if str(item.get("signature", "")).rsplit(".", 1)[-1] ==
+                     str(target_property_signature or "").rsplit(".", 1)[-1]]
     foundry = backend_name == "foundry-cheatcode"
     capabilities = ({"msg_sender": True, "tx_origin": True, "internal_prank": True,
                      "internal_warp": True, "internal_roll": True,
@@ -1343,10 +1347,9 @@ def execution_feedback_to_v2(raw: dict[str, Any], manifest: dict[str, Any], *,
             "property_checks_passed": (
                 all(item.get("success") is True for item in target_checks)
                 if target_checks else
+                target_value if target_property_signature else
                 all(item.get("success") is True for item in property_rows)
-                if property_rows else
-                True if target_value is True else
-                False if target_value is False else None),
+                if property_rows else None),
             "target_property_violation": next((
                 {"transaction_index": entry.get("transaction_index"),
                  "property": target_property_signature}

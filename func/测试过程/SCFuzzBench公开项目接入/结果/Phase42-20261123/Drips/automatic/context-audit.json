@@ -1,0 +1,120 @@
+{
+  "agent_was_not_called": true,
+  "frozen_agent_output_sha256": "3cafa84fc5ea0143c80424e50821f3c6e422940f7f6ceef6e01b0a0c95cf2cd0",
+  "original_candidate_action_count": 48,
+  "focused_candidate_action_count": 15,
+  "context_focus": {
+    "method": "exact_effect_state_excluding_frequent_shared_matches",
+    "before": 48,
+    "after": 15,
+    "focused_states": [
+      "EchidnaConfig.ADDRESS_USER0",
+      "EchidnaConfig.ADDRESS_USER1",
+      "EchidnaConfig.ADDRESS_USER2",
+      "EchidnaConfig.ADDRESS_USER3",
+      "EchidnaSetup.drips",
+      "EchidnaSetup.driver",
+      "EchidnaSetup.hevm",
+      "EchidnaSetup.token",
+      "EchidnaStorage.userToStreamReceivers",
+      "EchidnaStorage.userToStreamsHistory",
+      "EchidnaStorage.userToStreamsHistoryHashes",
+      "EchidnaStreamsHelpers.maxEndHint1",
+      "EchidnaStreamsHelpers.maxEndHint2"
+    ],
+    "frequent_shared_states_not_used_for_action_selection": [
+      "EchidnaConfig.ADDRESS_TO_DRIPS_ACCOUNT_ID"
+    ],
+    "excluded_signatures": [
+      "give(uint8,uint8,uint128)",
+      "giveClampedAmount(uint8,uint8,uint128)",
+      "receiveStreams(uint8,uint32)",
+      "receiveStreamsAllCycles(uint8)",
+      "receiveStreamsSplitAndCollectToSelf(uint8)",
+      "split(uint8)",
+      "splitAndCollectToSelf(uint8)",
+      "testCollect(uint8,uint8)",
+      "testGiveShouldNotRevert(uint8,uint8,uint128)",
+      "testReceiveStreams(uint8,uint32)",
+      "testReceiveStreamsShouldNotRevert(uint8)",
+      "testReceiveStreamsViewConsistency(uint8,uint32)",
+      "testReceiveStreamsViewVsActual(uint8,uint32)",
+      "invariantAccountingVsTokenBalance()",
+      "invariantSumAmtDeltaIsZero(uint8)",
+      "addSplitsReceiver(uint8,uint8,uint32)",
+      "addSplitsReceiverWithClamping(uint8,uint8,uint32)",
+      "setSplits(uint8,uint8,uint32)",
+      "setSplitsWithClamping(uint8,uint8,uint32)",
+      "testCollectableAfterSplit(uint8)",
+      "testReceiversReceivedSplit(uint8)",
+      "testSplitShouldNotRevert(uint8)",
+      "testSplitViewVsActual(uint8)",
+      "testSplittableAfterSplit(uint8)",
+      "squeezeAllAndReceiveAndSplitAndCollectToSelf(uint8)",
+      "squeezeAllSenders(uint8)",
+      "squeezeToSelf(uint8)",
+      "squeezeWithDefaultHistory(uint8,uint8)",
+      "squeezeWithFuzzedHistory(uint8,uint8,uint256,bytes32)",
+      "testSqueeze(uint8,uint8)",
+      "testSqueezeTwice(uint8,uint8,uint256,bytes32)",
+      "testSqueezeViewVsActual(uint8,uint8)",
+      "testSqueezeWithFullyHashedHistory(uint8,uint8)"
+    ],
+    "unknowns_preserved": [
+      "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128): 部分外部属性读取无法解析到目标状态",
+      "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128): 部分外部状态读取未找到解析后的写入入口",
+      "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选",
+      "候选调用链含外部调用；静态输出未证明其返回值或副作用",
+      "候选调用链含循环；CFG 仅枚举无重复节点的路径",
+      "属性函数自身写入状态；检查属性可能改变后续测试状态",
+      "属性自身含外部调用；其读取结果取决于实际部署与调用环境",
+      "属性自身含无法静态解析的调用；状态依赖可能不完整",
+      "调用路径受深度或数量上限截断",
+      "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+    ]
+  },
+  "direct_internal_helpers": [
+    "EchidnaSplitsHelpers.removeAllSplits(uint8)",
+    "EchidnaSqueezeHelpers.squeezeAllSenders(uint8)",
+    "EchidnaBasicHelpers.receiveStreamsSplitAndCollectToSelf(uint8)",
+    "EchidnaStreamsHelpers.setStreamBalanceWithdrawAll(uint8)",
+    "EchidnaConfig.getAccount(uint8)",
+    "EchidnaAccounting.getSqueezableAmount(address,address)",
+    "EchidnaAccounting.getTotalSqueezableAmountForUser(address)",
+    "EchidnaAccounting.getReceivableAmountForUser(address)",
+    "EchidnaAccounting.getCurrentCycleEnd()",
+    "EchidnaStorage.getStreamReceivers(address)",
+    "EchidnaStorage.getDripsAccountId(address)",
+    "EchidnaStreamsHelpers.addStream(uint8,uint8,uint160,uint32,uint32,int128)"
+  ],
+  "runtime_numeric_observations": [
+    {
+      "name": "minAmtPerSec",
+      "value": "100000000",
+      "status": "observed"
+    },
+    {
+      "name": "cycleSecs",
+      "value": "10",
+      "status": "observed"
+    }
+  ],
+  "source_guard_evidence_for_target_action": [
+    {
+      "kind": "source_require_numeric_bound",
+      "expression": "amtPerSec >= _minAmtPerSec",
+      "left_identifier": "amtPerSec",
+      "operator": ">=",
+      "right_identifier": "_minAmtPerSec",
+      "parameter_indices": [
+        2
+      ],
+      "variables_read": [
+        "amtPerSec",
+        "_minAmtPerSec"
+      ],
+      "source": "sol/真实项目/DripsSCFuzzBench/src/Streams.sol",
+      "line": 921
+    }
+  ]
+}

@@ -1,0 +1,1469 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "328530091fb85c864eeff8cae81e2d6273d1eada",
+  "project": "Drips",
+  "property_id": "6e7899beaef22d4a3a87",
+  "property_signature": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+  "classification": "manual_engineering_diagnostic_oracle_not_v2_discovery_or_paper_gain",
+  "source_evidence": {
+    "cycleSecs": 10,
+    "multiplier": 1000000000,
+    "formula": "ceil(multiplier/cycleSecs)",
+    "proved_minAmtPerSec": 100000000,
+    "account_mapping": "uint256(rawId)/64; 0 and 1 -> USER0; 64 -> USER1"
+  },
+  "tool_versions": {
+    "forge": "forge Version: 1.9.0-dev\nCommit SHA: 6056c5845d34205a83cf7108042adb137325c9df\nBuild Timestamp: 2026-11-02T20:11:04.198713475Z (1793650264)\nBuild Profile: dist",
+    "echidna": "Echidna 2.3.2",
+    "solc": "solc, the solidity compiler commandline interface\nVersion: 0.8.20+commit.a1b79de6.Linux.g++"
+  },
+  "runs": [
+    {
+      "scenario": "01-original-e1",
+      "change": "frozen Agent B sequence; no changes",
+      "sequence": [
+        {
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0,
+            1,
+            1000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            1,
+            0,
+            1000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "relation": "reuse_same_accounts_and_stream_params",
+              "fields": [
+                "fromAccId->senderAccId",
+                "toAccId->receiverAccId",
+                "amountPerSec",
+                "startTime",
+                "duration",
+                "balanceDelta"
+              ]
+            }
+          ]
+        }
+      ],
+      "backend_status": "execution_failed",
+      "replay_status": "target_property_not_reached",
+      "transactions": [
+        {
+          "index": 1,
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            0,
+            1,
+            1000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "status": "reverted",
+          "revert_reason": "Stream receiver amtPerSec too low",
+          "revert_data": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002153747265616d20726563656976657220616d7450657253656320746f6f206c6f7700000000000000000000000000000000000000000000000000000000000000",
+          "timestamp_before": 1524785992,
+          "timestamp_at_call": 1524785992,
+          "timestamp_after": 1524785992
+        }
+      ],
+      "properties": [
+        {
+          "after_transaction": 1,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        }
+      ],
+      "property_checks": [],
+      "state_changes": [
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "before": "0",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "before": "10",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "before": "100000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "before": "0",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        }
+      ],
+      "state_before": [
+        {
+          "name": "user0_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "user1_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "drips_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "output_type": "uint256",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "receiver_splittable",
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "output_type": "uint128",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "minAmtPerSec",
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint160",
+          "value": "100000000",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "cycleSecs",
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint32",
+          "value": "10",
+          "raw": "0x000000000000000000000000000000000000000000000000000000000000000a",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        }
+      ],
+      "state_after": [
+        {
+          "name": "user0_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 1
+          }
+        },
+        {
+          "name": "user1_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 1
+          }
+        },
+        {
+          "name": "drips_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "output_type": "uint256",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 1
+          }
+        },
+        {
+          "name": "receiver_splittable",
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "output_type": "uint128",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 1
+          }
+        },
+        {
+          "name": "minAmtPerSec",
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint160",
+          "value": "100000000",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 1
+          }
+        },
+        {
+          "name": "cycleSecs",
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint32",
+          "value": "10",
+          "raw": "0x000000000000000000000000000000000000000000000000000000000000000a",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 1
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "02-lower-bound-repaired",
+      "change": "both linked amountPerSec arguments changed 1000 -> observed/static-proved 100000000; all other fields unchanged",
+      "sequence": [
+        {
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0,
+            1,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            1,
+            0,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "relation": "reuse_same_accounts_and_stream_params",
+              "fields": [
+                "fromAccId->senderAccId",
+                "toAccId->receiverAccId",
+                "amountPerSec",
+                "startTime",
+                "duration",
+                "balanceDelta"
+              ]
+            }
+          ]
+        }
+      ],
+      "backend_status": "passed",
+      "replay_status": "target_property_not_reached",
+      "transactions": [
+        {
+          "index": 1,
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            0,
+            1,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "status": "success",
+          "revert_reason": "CustomError(0x00000000)",
+          "revert_data": "0x00000000000000000000000000000000000000000000000000000000000f4240",
+          "timestamp_before": 1524785992,
+          "timestamp_at_call": 1524785992,
+          "timestamp_after": 1524785992
+        },
+        {
+          "index": 2,
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            1,
+            0,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "status": "success",
+          "revert_reason": null,
+          "revert_data": "0x",
+          "timestamp_before": 1524785992,
+          "timestamp_at_call": 1524785992,
+          "timestamp_after": 1524785992
+        }
+      ],
+      "properties": [
+        {
+          "after_transaction": 1,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        },
+        {
+          "after_transaction": 2,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        }
+      ],
+      "property_checks": [],
+      "state_changes": [
+        {
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "before": "0",
+          "after": "1000000",
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "before_after_getter_diff"
+          }
+        },
+        {
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": "999999999999999999999000000",
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "before_after_getter_diff"
+          }
+        },
+        {
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "before": "1000000",
+          "after": "2000000",
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "before_after_getter_diff"
+          }
+        },
+        {
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "before": "999999999999999999999000000",
+          "after": "999999999999999999998000000",
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "before": "0",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "before": "10",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "before": "100000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "before": "0",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        }
+      ],
+      "state_before": [
+        {
+          "name": "user0_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "user1_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "drips_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "output_type": "uint256",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "receiver_splittable",
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "output_type": "uint128",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "minAmtPerSec",
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint160",
+          "value": "100000000",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "cycleSecs",
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint32",
+          "value": "10",
+          "raw": "0x000000000000000000000000000000000000000000000000000000000000000a",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        }
+      ],
+      "state_after": [
+        {
+          "name": "user0_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "output_type": "uint256",
+          "value": "999999999999999999998000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce7e17b80",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "user1_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "drips_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "output_type": "uint256",
+          "value": "2000000",
+          "raw": "0x00000000000000000000000000000000000000000000000000000000001e8480",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "receiver_splittable",
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "output_type": "uint128",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "minAmtPerSec",
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint160",
+          "value": "100000000",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "cycleSecs",
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint32",
+          "value": "10",
+          "raw": "0x000000000000000000000000000000000000000000000000000000000000000a",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "03-account-id-mapping-repaired",
+      "change": "in addition, receiver rawId changed 1 -> 64 in setStreams and target assertion; getAccount(rawId) maps rawId/64",
+      "sequence": [
+        {
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0,
+            64,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            64,
+            0,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "relation": "reuse_same_accounts_and_stream_params",
+              "fields": [
+                "fromAccId->senderAccId",
+                "toAccId->receiverAccId",
+                "amountPerSec",
+                "startTime",
+                "duration",
+                "balanceDelta"
+              ]
+            }
+          ]
+        }
+      ],
+      "backend_status": "passed",
+      "replay_status": "target_property_not_reached",
+      "transactions": [
+        {
+          "index": 1,
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            0,
+            64,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "status": "success",
+          "revert_reason": "CustomError(0x00000000)",
+          "revert_data": "0x00000000000000000000000000000000000000000000000000000000000f4240",
+          "timestamp_before": 1524785992,
+          "timestamp_at_call": 1524785992,
+          "timestamp_after": 1524785992
+        },
+        {
+          "index": 2,
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            64,
+            0,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "status": "success",
+          "revert_reason": null,
+          "revert_data": "0x",
+          "timestamp_before": 1524785992,
+          "timestamp_at_call": 1524785992,
+          "timestamp_after": 1524785992
+        }
+      ],
+      "properties": [
+        {
+          "after_transaction": 1,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        },
+        {
+          "after_transaction": 2,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        }
+      ],
+      "property_checks": [],
+      "state_changes": [
+        {
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "before": "0",
+          "after": "1000000",
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "before_after_getter_diff"
+          }
+        },
+        {
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": "999999999999999999999000000",
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "before_after_getter_diff"
+          }
+        },
+        {
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "before": "1000000",
+          "after": "2000000",
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "before_after_getter_diff"
+          }
+        },
+        {
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": "999999999999999999999000000",
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "before": "0",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "before": "1000000000000000000000000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "before": "10",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "before": "100000000",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        },
+        {
+          "transaction_index": null,
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "before": "0",
+          "after": null,
+          "status": "partially_observed",
+          "observation_scope": "whole_sequence_endpoints",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "kind": "sequence_before_after_getter_diff"
+          }
+        }
+      ],
+      "state_before": [
+        {
+          "name": "user0_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "user1_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "output_type": "uint256",
+          "value": "1000000000000000000000000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "drips_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "output_type": "uint256",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "receiver_splittable",
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "output_type": "uint128",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "minAmtPerSec",
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint160",
+          "value": "100000000",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        },
+        {
+          "name": "cycleSecs",
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint32",
+          "value": "10",
+          "raw": "0x000000000000000000000000000000000000000000000000000000000000000a",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "initial",
+            "transaction_index": 0
+          }
+        }
+      ],
+      "state_after": [
+        {
+          "name": "user0_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user0_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000"
+          ],
+          "output_type": "uint256",
+          "value": "999999999999999999999000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce7f0bdc0",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "user1_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "user1_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            "0x0000000000000000000000000000000000020000"
+          ],
+          "output_type": "uint256",
+          "value": "999999999999999999999000000",
+          "raw": "0x0000000000000000000000000000000000000000033b2e3c9fd0803ce7f0bdc0",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "drips_token_balance",
+          "signature": "balanceOf(address)",
+          "receiver": "drips_token_balance",
+          "receiver_address": "0x54919a19522ce7c842e25735a9cfecef1c0a06da",
+          "arguments": [
+            {
+              "storage_address_slot": 5
+            }
+          ],
+          "output_type": "uint256",
+          "value": "2000000",
+          "raw": "0x00000000000000000000000000000000000000000000000000000000001e8480",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "receiver_splittable",
+          "signature": "splittable(uint256,address)",
+          "receiver": "receiver_splittable",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [
+            131072,
+            {
+              "storage_address_slot": 4
+            }
+          ],
+          "output_type": "uint128",
+          "value": "0",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "minAmtPerSec",
+          "signature": "minAmtPerSec()",
+          "receiver": "minAmtPerSec",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint160",
+          "value": "100000000",
+          "raw": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        },
+        {
+          "name": "cycleSecs",
+          "signature": "cycleSecs()",
+          "receiver": "cycleSecs",
+          "receiver_address": "0x01375317aa980daabf22f990a378eccad9b40dc0",
+          "arguments": [],
+          "output_type": "uint32",
+          "value": "10",
+          "raw": "0x000000000000000000000000000000000000000000000000000000000000000a",
+          "success": true,
+          "status": "observed",
+          "source": {
+            "backend": "foundry-cheatcode",
+            "phase": "after",
+            "transaction_index": 2
+          }
+        }
+      ]
+    }
+  ]
+}

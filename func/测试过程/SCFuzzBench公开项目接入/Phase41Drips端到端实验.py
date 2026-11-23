@@ -19,7 +19,10 @@ sys.path[:0] = [str(ROOT / "func/功能"), str(ROOT / "deepseek"),
                 str(ROOT / "deepseek/实验过程")]
 
 import 真实合约统一执行适配器 as adapter
-from 跨交易状态约束 import bind_inserted_prerequisite, propose_numeric_repair
+from 跨交易状态约束 import (bind_inserted_prerequisite,
+                           cross_transaction_write_read_matches,
+                           extract_numeric_guard_evidence,
+                           propose_numeric_repair, propagate_argument_updates)
 from 状态反馈序列扩展 import (build_action_templates, feedback_vector,
                            propose_extensions, retain_diverse_prefixes,
                            sequence_fingerprint)
@@ -71,6 +74,15 @@ def _context_for_agent(manifest: dict[str, Any], deployment_state: dict[str, Any
     prop = full["properties"][0]
     if prop.get("property") != PROPERTY_SIGNATURE:
         raise RuntimeError("冻结属性与已有 Drips Slither 属性报告不一致")
+    source_guard_documents = []
+    for source in manifest.get("numeric_guard_sources", []):
+        path = ROOT / str(source)
+        if path.is_file():
+            source_guard_documents.append({"source": str(source),
+                                           "text": path.read_text(encoding="utf-8")})
+    for action in prop.get("candidate_actions", []):
+        action["numeric_guard_evidence"] = extract_numeric_guard_evidence(
+            source_guard_documents, action.get("abi_inputs", []))
     senders = [item["address"] for item in manifest.get("accounts", [])]
     context = {**full, "deployment_state": deployment_state,
                "sender_pool": senders, "agent_environment": _runtime(manifest)}
@@ -247,7 +259,8 @@ def _replay(backend: adapter.FoundryCheatcodeBackend, manifest: dict[str, Any],
 
 
 def _e2_repair(context: dict[str, Any], sequence: list[dict[str, Any]],
-               feedback: dict[str, Any]) -> dict[str, Any]:
+               feedback: dict[str, Any], *,
+               source_guard_documents: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     prop = context["properties"][0]
     action_by_signature = {item.get("abi_signature"): item
                            for item in prop.get("candidate_actions", [])}
@@ -258,6 +271,9 @@ def _e2_repair(context: dict[str, Any], sequence: list[dict[str, Any]],
         action = action_by_signature.get(row.get("function"), {})
         guards = [guard for effect in action.get("effect_evidence", [])
                   for guard in effect.get("guards", [])]
+        source_guards = (action.get("numeric_guard_evidence") or
+                         extract_numeric_guard_evidence(source_guard_documents or [],
+                                                        action.get("abi_inputs", [])))
         observations = []
         for item in row.get("state_getter_values", []):
             if item.get("status") != "observed":
@@ -273,26 +289,30 @@ def _e2_repair(context: dict[str, Any], sequence: list[dict[str, Any]],
         proposal = propose_numeric_repair(
             action.get("abi_inputs", []), row.get("arguments", []), observations,
             [str(row.get("revert_reason") or "")],
-            static_guards=guards, source_excerpt=str(action.get("source_excerpt") or ""))
+            static_guards=[*guards, *source_guards],
+            source_excerpt=str(action.get("source_excerpt") or ""))
         proposals.append({"transaction_index": row.get("transaction_index"),
-                          "function": row.get("function"), "proposal": proposal})
+                          "function": row.get("function"), "proposal": proposal,
+                          "source_guard_evidence": source_guards})
     chosen = next((item for item in proposals if item.get("proposal")), None)
     repaired = [dict(item) for item in sequence]
+    propagated = []
     if chosen:
         index = int(chosen["transaction_index"]) - 1
         proposal = chosen["proposal"]
-        updates = proposal.get("argument_updates") or [{
-            "argument_index": proposal["argument_index"],
-            "repaired_value": proposal["repaired_value"],
-        }]
-        arguments = list(repaired[index].get("arguments", []))
-        for update in updates:
-            arg_index = int(update["argument_index"])
-            if 0 <= arg_index < len(arguments):
-                arguments[arg_index] = update["repaired_value"]
-        repaired[index]["arguments"] = arguments
+        abi_by_signature = {
+            str(action.get("abi_signature", "")).rsplit(".", 1)[-1]: {
+                "inputs": action.get("abi_inputs", [])}
+            for action in prop.get("candidate_actions", []) if action.get("abi_signature")}
+        trigger = prop.get("assertion_trigger") or {}
+        if trigger.get("abi_signature"):
+            abi_by_signature[str(trigger["abi_signature"]).rsplit(".", 1)[-1]] = {
+                "inputs": trigger.get("abi_inputs", [])}
+        repaired, propagated = propagate_argument_updates(
+            repaired, index, proposal, abi_by_signature)
     return {"proposals": proposals, "applied": chosen is not None,
-            "sequence": repaired if chosen else sequence}
+            "sequence": repaired if chosen else sequence,
+            "propagated_argument_updates": propagated}
 
 
 def _action_evidence(prop: dict[str, Any]) -> tuple[list[dict[str, Any]],
@@ -361,16 +381,25 @@ def _run_e3_group(group: str, base_sequence: list[dict[str, Any]],
                     continue
                 seen.add(fingerprint)
                 binding = None
+                binding_matches = []
+                binding_status = "disabled_in_G1" if not bind_phase37 else "not_evaluated"
                 if bind_phase37:
-                    binding = bind_inserted_prerequisite(
-                        parent["sequence"], sequence, report.get("effect_catalog", {}),
-                        abi_by_signature, parent_replay=parent["feedback"])
-                    if binding:
-                        sequence = binding["sequence"]
-                        fingerprint = sequence_fingerprint(sequence)
-                        if fingerprint in seen:
-                            continue
-                        seen.add(fingerprint)
+                    binding_matches = cross_transaction_write_read_matches(
+                        parent["sequence"], sequence, report.get("effect_catalog", {}))
+                    if binding_matches:
+                        binding = bind_inserted_prerequisite(
+                            parent["sequence"], sequence, report.get("effect_catalog", {}),
+                            abi_by_signature, parent_replay=parent["feedback"])
+                        binding_status = ("applied" if binding and binding.get("status") == "applied"
+                                          else "matched_but_unresolved")
+                        if binding:
+                            sequence = binding["sequence"]
+                            fingerprint = sequence_fingerprint(sequence)
+                            if fingerprint in seen:
+                                continue
+                            seen.add(fingerprint)
+                    else:
+                        binding_status = "not_applicable_no_matching_cross_transaction_constraint"
                 index = E3_CANDIDATE_BUDGET - budget_left + 1
                 scenario_id = "%s-e3-%02d" % (group, index)
                 raw, feedback = _replay(backend, manifest, sequence, scenario_id, group_root,
@@ -382,6 +411,8 @@ def _run_e3_group(group: str, base_sequence: list[dict[str, Any]],
                           "proposal_reason": proposal.get("proposal_reason"),
                           "proposal_evidence": proposal.get("evidence"),
                           "phase37_binding": binding,
+                          "phase37_binding_status": binding_status,
+                          "phase37_matching_constraints": binding_matches,
                           "sequence": sequence, "backend_status": raw.get("status"),
                           "replay_status": feedback.get("replay_status"),
                           "feedback": vector, "raw_log": raw.get("log")}

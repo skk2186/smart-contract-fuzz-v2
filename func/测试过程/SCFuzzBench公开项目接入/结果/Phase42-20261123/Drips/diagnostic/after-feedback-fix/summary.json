@@ -1,0 +1,425 @@
+{
+  "classification": "manual engineering diagnostic only; never V2 discovery or paper gain",
+  "source_proof": {
+    "getAccount": "uint256(rawId)/64; 0 and 1 resolve to the same user; 64 resolves to the next user",
+    "min_bound": "ceil(1_000_000_000/10)=100_000_000; runtime getter minAmtPerSec=100000000; cycleSecs=10"
+  },
+  "tool_versions": {
+    "forge": "forge Version: 1.9.0-dev\nCommit SHA: 6056c5845d34205a83cf7108042adb137325c9df\nBuild Timestamp: 2026-11-02T20:11:04.198713475Z (1793650264)\nBuild Profile: dist",
+    "echidna": "Echidna 2.3.2",
+    "solc": "solc, the solidity compiler commandline interface\nVersion: 0.8.20+commit.a1b79de6.Linux.g++"
+  },
+  "runs": [
+    {
+      "name": "original",
+      "change": "unchanged frozen Agent sequence",
+      "sequence": [
+        {
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0,
+            1,
+            1000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            1,
+            0,
+            1000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "relation": "reuse_same_accounts_and_stream_params",
+              "fields": [
+                "fromAccId->senderAccId",
+                "toAccId->receiverAccId",
+                "amountPerSec",
+                "startTime",
+                "duration",
+                "balanceDelta"
+              ]
+            }
+          ]
+        }
+      ],
+      "backend_status": "execution_failed",
+      "replay_status": "target_property_not_reached",
+      "transactions": [
+        {
+          "index": 1,
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            0,
+            1,
+            1000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "status": "reverted",
+          "revert_reason": "Stream receiver amtPerSec too low",
+          "target_property": null,
+          "target_property_status": "not_checked",
+          "property_result_evidence": null
+        }
+      ],
+      "target_property_state": {
+        "property": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+        "status": "property_state_unobservable",
+        "semantics": "Only explicit predicate getter bindings and exact assertion outcomes are used; unavailable operands remain unknown.",
+        "predicate_observation_completeness": "unobservable",
+        "unobservable_predicate_operands": [],
+        "target_property_state_established": false,
+        "counterexample_state_established": false,
+        "property_related_state_changed": null,
+        "first_established_transaction_index": null,
+        "first_property_related_change_transaction_index": null,
+        "first_counterexample_transaction_index": null,
+        "trajectory": [
+          {
+            "transaction_index": 0,
+            "value": null,
+            "status": "not_checked",
+            "predicate_getters": [],
+            "changed_predicate_getters": []
+          },
+          {
+            "transaction_index": 1,
+            "value": null,
+            "status": "not_checked",
+            "predicate_getters": [],
+            "changed_predicate_getters": [],
+            "property_result_evidence": null
+          }
+        ]
+      },
+      "properties": [
+        {
+          "after_transaction": 1,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        }
+      ]
+    },
+    {
+      "name": "manual-lower-bound",
+      "change": "both amountPerSec values: 1000 -> observed minAmtPerSec=100000000",
+      "sequence": [
+        {
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0,
+            1,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            1,
+            0,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "relation": "reuse_same_accounts_and_stream_params",
+              "fields": [
+                "fromAccId->senderAccId",
+                "toAccId->receiverAccId",
+                "amountPerSec",
+                "startTime",
+                "duration",
+                "balanceDelta"
+              ]
+            }
+          ]
+        }
+      ],
+      "backend_status": "passed",
+      "replay_status": "executable",
+      "transactions": [
+        {
+          "index": 1,
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            0,
+            1,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "status": "success",
+          "revert_reason": "CustomError(0x00000000)",
+          "target_property": null,
+          "target_property_status": "not_checked",
+          "property_result_evidence": null
+        },
+        {
+          "index": 2,
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            1,
+            0,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "status": "success",
+          "revert_reason": null,
+          "target_property": true,
+          "target_property_status": "passed",
+          "property_result_evidence": {
+            "source": "assertion_transaction_success",
+            "signature": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+            "return_data": "0x"
+          }
+        }
+      ],
+      "target_property_state": {
+        "property": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+        "status": "property_check_passed",
+        "semantics": "Only explicit predicate getter bindings and exact assertion outcomes are used; unavailable operands remain unknown.",
+        "predicate_observation_completeness": "unobservable",
+        "unobservable_predicate_operands": [],
+        "target_property_state_established": false,
+        "counterexample_state_established": false,
+        "property_related_state_changed": null,
+        "first_established_transaction_index": null,
+        "first_property_related_change_transaction_index": null,
+        "first_counterexample_transaction_index": null,
+        "trajectory": [
+          {
+            "transaction_index": 0,
+            "value": null,
+            "status": "not_checked",
+            "predicate_getters": [],
+            "changed_predicate_getters": []
+          },
+          {
+            "transaction_index": 1,
+            "value": null,
+            "status": "not_checked",
+            "predicate_getters": [],
+            "changed_predicate_getters": [],
+            "property_result_evidence": null
+          },
+          {
+            "transaction_index": 2,
+            "value": true,
+            "status": "passed",
+            "predicate_getters": [],
+            "changed_predicate_getters": [],
+            "property_result_evidence": {
+              "source": "assertion_transaction_success",
+              "signature": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+              "return_data": "0x"
+            }
+          }
+        ]
+      },
+      "properties": [
+        {
+          "after_transaction": 1,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        },
+        {
+          "after_transaction": 2,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        }
+      ]
+    },
+    {
+      "name": "manual-account-map",
+      "change": "also receiver rawId 1 -> 64 in producer and assertion calls",
+      "sequence": [
+        {
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            0,
+            64,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "sender": "0x0000000000000000000000000000000000010000",
+          "arguments": [
+            64,
+            0,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "relation": "reuse_same_accounts_and_stream_params",
+              "fields": [
+                "fromAccId->senderAccId",
+                "toAccId->receiverAccId",
+                "amountPerSec",
+                "startTime",
+                "duration",
+                "balanceDelta"
+              ]
+            }
+          ]
+        }
+      ],
+      "backend_status": "passed",
+      "replay_status": "executable",
+      "transactions": [
+        {
+          "index": 1,
+          "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            0,
+            64,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "status": "success",
+          "revert_reason": "CustomError(0x00000000)",
+          "target_property": null,
+          "target_property_status": "not_checked",
+          "property_result_evidence": null
+        },
+        {
+          "index": 2,
+          "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+          "arguments": [
+            64,
+            0,
+            100000000,
+            1524785992,
+            1000,
+            1000000
+          ],
+          "status": "success",
+          "revert_reason": null,
+          "target_property": true,
+          "target_property_status": "passed",
+          "property_result_evidence": {
+            "source": "assertion_transaction_success",
+            "signature": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+            "return_data": "0x"
+          }
+        }
+      ],
+      "target_property_state": {
+        "property": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+        "status": "property_check_passed",
+        "semantics": "Only explicit predicate getter bindings and exact assertion outcomes are used; unavailable operands remain unknown.",
+        "predicate_observation_completeness": "unobservable",
+        "unobservable_predicate_operands": [],
+        "target_property_state_established": false,
+        "counterexample_state_established": false,
+        "property_related_state_changed": null,
+        "first_established_transaction_index": null,
+        "first_property_related_change_transaction_index": null,
+        "first_counterexample_transaction_index": null,
+        "trajectory": [
+          {
+            "transaction_index": 0,
+            "value": null,
+            "status": "not_checked",
+            "predicate_getters": [],
+            "changed_predicate_getters": []
+          },
+          {
+            "transaction_index": 1,
+            "value": null,
+            "status": "not_checked",
+            "predicate_getters": [],
+            "changed_predicate_getters": [],
+            "property_result_evidence": null
+          },
+          {
+            "transaction_index": 2,
+            "value": true,
+            "status": "passed",
+            "predicate_getters": [],
+            "changed_predicate_getters": [],
+            "property_result_evidence": {
+              "source": "assertion_transaction_success",
+              "signature": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+              "return_data": "0x"
+            }
+          }
+        ]
+      },
+      "properties": [
+        {
+          "after_transaction": 1,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        },
+        {
+          "after_transaction": 2,
+          "signature": "invariantAccountingVsTokenBalance()",
+          "success": true,
+          "return_data": "0x"
+        }
+      ]
+    }
+  ]
+}

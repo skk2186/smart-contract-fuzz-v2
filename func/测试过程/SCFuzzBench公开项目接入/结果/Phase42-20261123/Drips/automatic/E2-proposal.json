@@ -1,0 +1,164 @@
+{
+  "proposals": [
+    {
+      "transaction_index": 1,
+      "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+      "proposal": {
+        "argument_index": 2,
+        "argument_name": "amountPerSec",
+        "current_value": 1000,
+        "repaired_value": 100000000,
+        "argument_updates": [
+          {
+            "argument_index": 2,
+            "argument_name": "amountPerSec",
+            "original_value": 1000,
+            "repaired_value": 100000000,
+            "reason": "getter_observed_numeric_lower_bound",
+            "bound_value": 100000000,
+            "guard_operator": ">="
+          }
+        ],
+        "constraint_source": [
+          {
+            "outputs": [
+              {
+                "name": "minAmtPerSec",
+                "type": "uint160",
+                "value": 100000000
+              }
+            ],
+            "source": {
+              "backend": "foundry-cheatcode",
+              "phase": "after",
+              "transaction_index": 1
+            }
+          }
+        ],
+        "constraint_output_name": "minAmtPerSec",
+        "failure_texts": [
+          "Stream receiver amtPerSec too low"
+        ],
+        "slither_guards": [
+          {
+            "kind": "source_require_numeric_bound",
+            "expression": "amtPerSec >= _minAmtPerSec",
+            "left_identifier": "amtPerSec",
+            "operator": ">=",
+            "right_identifier": "_minAmtPerSec",
+            "parameter_indices": [
+              2
+            ],
+            "variables_read": [
+              "amtPerSec",
+              "_minAmtPerSec"
+            ],
+            "source": "sol/真实项目/DripsSCFuzzBench/src/Streams.sol",
+            "line": 921
+          }
+        ],
+        "slither_index_mapping_detected": false,
+        "slither_source_excerpt": "66: function setStreams(\n67:         uint8 fromAccId,\n68:         uint8 toAccId,\n69:         uint160 amountPerSec,\n70:         uint32 startTime,\n71:         uint32 duration,\n72:         int128 balanceDelta\n73:     ) public returns (int128) {\n74:         address from = getAccount(fromAccId);\n75:         address to = getAccount(toAccId);\n76: \n77:         StreamReceiver[] memory receivers = new StreamReceiver[](1);\n78:         receivers[0] = StreamReceiver(\n79:             getDripsAccountId(to),\n80:             StreamConfigImpl.create(\n81:                 0, // streamId is arbitrary and can be ignored\n82:                 amountPerSec,\n83:                 startTime,\n84:                 duration\n85:             )\n86:         );\n87: \n88:         int128 realBalanceDelta = _setStreams(\n89:             from,\n90:             getStreamReceivers(from),\n91:             balanceDelta,\n92:             receivers\n93:         );\n94: \n95:         return realBalanceDelta;\n96:     }",
+        "repair_mode": "observed_numeric_lower_bound"
+      },
+      "source_guard_evidence": [
+        {
+          "kind": "source_require_numeric_bound",
+          "expression": "amtPerSec >= _minAmtPerSec",
+          "left_identifier": "amtPerSec",
+          "operator": ">=",
+          "right_identifier": "_minAmtPerSec",
+          "parameter_indices": [
+            2
+          ],
+          "variables_read": [
+            "amtPerSec",
+            "_minAmtPerSec"
+          ],
+          "source": "sol/真实项目/DripsSCFuzzBench/src/Streams.sol",
+          "line": 921
+        }
+      ]
+    }
+  ],
+  "applied": true,
+  "sequence": [
+    {
+      "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        0,
+        1,
+        100000000,
+        1524785992,
+        1000,
+        1000000
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        1,
+        0,
+        100000000,
+        1524785992,
+        1000,
+        1000000
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "from_transaction": 1,
+          "relation": "reuse_same_accounts_and_stream_params",
+          "fields": [
+            "fromAccId->senderAccId",
+            "toAccId->receiverAccId",
+            "amountPerSec",
+            "startTime",
+            "duration",
+            "balanceDelta"
+          ]
+        }
+      ]
+    }
+  ],
+  "propagated_argument_updates": [
+    {
+      "transaction_index": 1,
+      "argument_name": "amountPerSec",
+      "argument_index": 2,
+      "before": 1000,
+      "after": 100000000,
+      "evidence": "direct_numeric_repair"
+    },
+    {
+      "transaction_index": 2,
+      "argument_name": "amountPerSec",
+      "argument_index": 2,
+      "before": 1000,
+      "after": 100000000,
+      "evidence": "explicit_data_dependency_fields",
+      "source_argument_name": "amountPerSec",
+      "dependency": {
+        "from_transaction": 1,
+        "relation": "reuse_same_accounts_and_stream_params",
+        "fields": [
+          "fromAccId->senderAccId",
+          "toAccId->receiverAccId",
+          "amountPerSec",
+          "startTime",
+          "duration",
+          "balanceDelta"
+        ]
+      }
+    }
+  ]
+}

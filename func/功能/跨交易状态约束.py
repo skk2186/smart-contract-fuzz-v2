@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import copy
 import re
 from typing import Any
 
@@ -18,8 +19,110 @@ def _semantic_tokens(value: str) -> set[str]:
     spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", value.lstrip("_"))
     tokens = set(re.findall(r"[a-z]+|[0-9]+", spaced.lower()))
     # 轻量处理常见英语派生形式，让 refundable 与 refund 保持可比较。
-    return {token[:-4] if token.endswith("able") and len(token) > 5 else token
-            for token in tokens}
+    normalized = {token[:-4] if token.endswith("able") and len(token) > 5 else token
+                  for token in tokens}
+    aliases = {"amt": "amount", "qty": "quantity", "sec": "second",
+               "secs": "second", "minimum": "min"}
+    return {aliases.get(token, token) for token in normalized}
+
+
+def extract_numeric_guard_evidence(source_documents: list[dict[str, Any]],
+                                   abi_inputs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Extract source-level require bounds tied to a numeric ABI parameter.
+
+    This is intentionally a small, evidence-preserving Solidity scanner. It only
+    emits simple identifier comparisons found in a require condition; it does
+    not evaluate arbitrary expressions or claim that a guard is reachable.
+    """
+    parameter_tokens = [_semantic_tokens(str(item.get("name") or ""))
+                        for item in abi_inputs]
+    rows: list[dict[str, Any]] = []
+    for document in source_documents:
+        text = str(document.get("text") or "")
+        source = str(document.get("source") or "unknown")
+        for match in re.finditer(r"\brequire\s*\(", text):
+            opening = text.find("(", match.start())
+            depth = 0
+            end = None
+            for index in range(opening, len(text)):
+                if text[index] == "(":
+                    depth += 1
+                elif text[index] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        end = index
+                        break
+            if end is None:
+                continue
+            body = text[opening + 1:end]
+            depth = 0
+            condition_end = len(body)
+            for index, char in enumerate(body):
+                if char in "([{":
+                    depth += 1
+                elif char in ")]}":
+                    depth = max(0, depth - 1)
+                elif char == "," and depth == 0:
+                    condition_end = index
+                    break
+            condition = body[:condition_end].strip()
+            for comparison in re.finditer(
+                    r"(?<![A-Za-z0-9_])([A-Za-z_]\w*)\s*(>=|>|<=|<)\s*"
+                    r"([A-Za-z_]\w*)(?![A-Za-z0-9_])", condition):
+                left, operator, right = comparison.groups()
+                left_tokens, right_tokens = _semantic_tokens(left), _semantic_tokens(right)
+                matched = [index for index, tokens in enumerate(parameter_tokens)
+                           if tokens and (tokens <= left_tokens or
+                                          len(tokens & left_tokens) == len(tokens))]
+                if not matched:
+                    continue
+                rows.append({"kind": "source_require_numeric_bound",
+                             "expression": condition,
+                             "left_identifier": left, "operator": operator,
+                             "right_identifier": right,
+                             "parameter_indices": matched,
+                             "variables_read": [left, right],
+                             "source": source,
+                             "line": text.count("\n", 0, match.start()) + 1})
+    return rows
+
+
+def _guarded_lower_bound(guards: list[dict[str, Any]], parameter_name: str,
+                         output_name: str) -> list[dict[str, Any]]:
+    parameter = _semantic_tokens(parameter_name)
+    output = _semantic_tokens(output_name)
+    matched = []
+    for guard in guards:
+        expression = str(guard.get("expression") or "")
+        left = str(guard.get("left_identifier") or "")
+        right = str(guard.get("right_identifier") or "")
+        operator = str(guard.get("operator") or "")
+        if not left or not right:
+            for item in re.finditer(
+                    r"(?<![A-Za-z0-9_])([A-Za-z_]\w*)\s*(>=|>|<=|<)\s*"
+                    r"([A-Za-z_]\w*)(?![A-Za-z0-9_])", expression):
+                lhs, op, rhs = item.groups()
+                if _semantic_tokens(lhs) == parameter and _semantic_tokens(rhs) == output:
+                    left, right, operator = lhs, rhs, op
+                    break
+                if _semantic_tokens(rhs) == parameter and _semantic_tokens(lhs) == output:
+                    left, right, operator = rhs, lhs, {">=": "<=", ">": "<",
+                                                       "<=": ">=", "<": ">"}[op]
+                    break
+        if not left or not right:
+            continue
+        left_tokens, right_tokens = _semantic_tokens(left), _semantic_tokens(right)
+        if left_tokens == parameter and right_tokens == output and operator in {">=", ">"}:
+            matched.append(guard)
+        elif left_tokens == output and right_tokens == parameter and operator in {"<=", "<"}:
+            matched.append(guard)
+    return matched
+
+
+def _failure_indicates_lower_bound(failure_texts: list[str]) -> bool:
+    text = " ".join(failure_texts).lower()
+    return bool(re.search(r"\b(?:too\s+low|below|under\s+(?:the\s+)?minimum|"
+                          r"less\s+than\s+(?:the\s+)?minimum|minimum\s+(?:not\s+met|violation))\b", text))
 
 
 def _normalize_argument(kind: str, value: Any) -> Any | None:
@@ -157,6 +260,7 @@ def propose_numeric_repair(abi_inputs: list[dict[str, Any]], arguments: list[Any
     output_rows = [row for row in best_outputs if row["name"] == output_name]
 
     candidates = []
+    lower_failure = _failure_indicates_lower_bound(failure_texts)
     for index, param in enumerate(abi_inputs):
         kind = str(param.get("type", ""))
         param_name = str(param.get("name") or "")
@@ -170,19 +274,26 @@ def propose_numeric_repair(abi_inputs: list[dict[str, Any]], arguments: list[Any
         bounds = [row for row in output_rows
                   if isinstance(row.get("value"), int) and not isinstance(row.get("value"), bool)]
         distinct_bounds = {row["value"] for row in bounds}
-        if overlap and bounds and any(0 < value <= current for value in distinct_bounds):
+        lower_guards = (_guarded_lower_bound(static_guards or [], param_name, output_name)
+                        if lower_failure else [])
+        lower_bound_available = bool(lower_guards) and any(
+            row["value"] > current for row in bounds)
+        upper_bound_available = any(0 < value <= current for value in distinct_bounds)
+        if overlap and bounds and (upper_bound_available or lower_bound_available):
             relevant_guards = [guard for guard in (static_guards or [])
-                               if (param_name.lower() in str(guard.get("expression", "")).lower() or
-                                   any(param_name.lower() in str(variable).lower()
-                                       for variable in (guard.get("variables_read") or [])) or
-                                   param_name.lower() in json_compact(
-                                       guard.get("data_dependencies", {})).lower())]
+                               if guard in lower_guards or
+                               param_name.lower() in str(guard.get("expression", "")).lower() or
+                               any(param_name.lower() in str(variable).lower()
+                                   for variable in (guard.get("variables_read") or [])) or
+                               param_name.lower() in json_compact(
+                                   guard.get("data_dependencies", {})).lower()]
             candidates.append({"argument_index": index,
                                "argument_name": param.get("name"),
                                "current_value": current,
                                "semantic_score": len(overlap),
                                "slither_guards": relevant_guards,
-                               "bounds": bounds})
+                               "bounds": bounds,
+                               "lower_guards": lower_guards})
     if not candidates:
         return None
     best_score = max(row["semantic_score"] for row in candidates)
@@ -192,8 +303,27 @@ def propose_numeric_repair(abi_inputs: list[dict[str, Any]], arguments: list[Any
     selected = best_candidates[0]
     distinct_bounds = {row["value"] for row in selected["bounds"]}
     updates = []
+    lower_bound_applied = False
+    if selected["lower_guards"] and lower_failure:
+        viable_lower = sorted({row["value"] for row in selected["bounds"]
+                               if row["value"] > selected["current_value"]})
+        if len(viable_lower) == 1:
+            boundary = viable_lower[0]
+            strict = any(guard.get("operator") in {">", "<"}
+                         for guard in selected["lower_guards"])
+            repaired = boundary + 1 if strict else boundary
+            if _numeric_type_fits(str(abi_inputs[selected["argument_index"]].get("type", "")),
+                                  repaired):
+                updates.append({"argument_index": selected["argument_index"],
+                                "argument_name": selected["argument_name"],
+                                "original_value": selected["current_value"],
+                                "repaired_value": repaired,
+                                "reason": "getter_observed_numeric_lower_bound",
+                                "bound_value": boundary,
+                                "guard_operator": ">" if strict else ">="})
+                lower_bound_applied = True
     index_argument = _zero_based_event_index(source_excerpt, abi_inputs)
-    if len(distinct_bounds) == 1:
+    if not lower_bound_applied and len(distinct_bounds) == 1:
         bound = next(iter(distinct_bounds))
         if 0 < bound < selected["current_value"]:
             updates.append({"argument_index": selected["argument_index"],
@@ -201,7 +331,7 @@ def propose_numeric_repair(abi_inputs: list[dict[str, Any]], arguments: list[Any
                             "original_value": selected["current_value"],
                             "repaired_value": bound,
                             "reason": "getter_observed_numeric_upper_bound"})
-    elif index_argument is not None and index_argument < len(arguments):
+    elif not lower_bound_applied and index_argument is not None and index_argument < len(arguments):
         try:
             current_index = int(arguments[index_argument])
         except (TypeError, ValueError):
@@ -259,12 +389,87 @@ def propose_numeric_repair(abi_inputs: list[dict[str, Any]], arguments: list[Any
             "slither_guards": selected["slither_guards"],
             "slither_index_mapping_detected": index_argument is not None,
             "slither_source_excerpt": source_excerpt,
-            "repair_mode": ("observed_keyed_numeric_constraint" if index_argument is not None
+            "repair_mode": ("observed_numeric_lower_bound" if lower_bound_applied else
+                            "observed_keyed_numeric_constraint" if index_argument is not None
                             else "observed_numeric_upper_bound")}
 
 
 def _short_signature(value: Any) -> str:
     return str(value or "").rsplit(".", 1)[-1]
+
+
+def propagate_argument_updates(sequence: list[dict[str, Any]], source_index: int,
+                               proposal: dict[str, Any],
+                               abi_by_signature: dict[str, dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Apply a proved parameter repair to explicitly linked later arguments only."""
+    repaired = copy.deepcopy(sequence)
+    propagation: list[dict[str, Any]] = []
+    updates = proposal.get("argument_updates") or [{
+        "argument_index": proposal.get("argument_index"),
+        "argument_name": proposal.get("argument_name"),
+        "repaired_value": proposal.get("repaired_value"),
+    }]
+    if not 0 <= source_index < len(repaired):
+        return repaired, propagation
+    for update in updates:
+        name = str(update.get("argument_name") or "")
+        value = update.get("repaired_value")
+        argument_index = update.get("argument_index")
+        if not name or argument_index is None:
+            continue
+        args = list(repaired[source_index].get("arguments", []))
+        if 0 <= int(argument_index) < len(args):
+            old = args[int(argument_index)]
+            args[int(argument_index)] = value
+            repaired[source_index]["arguments"] = args
+            propagation.append({"transaction_index": source_index + 1,
+                                "argument_name": name, "argument_index": int(argument_index),
+                                "before": old, "after": value,
+                                "evidence": "direct_numeric_repair"})
+        source_name = _canonical_name(name)
+        for consumer_index in range(source_index + 1, len(repaired)):
+            consumer = repaired[consumer_index]
+            dependencies = consumer.get("data_dependencies", []) or []
+            for dependency in dependencies:
+                try:
+                    from_transaction = int(dependency.get("from_transaction", 0))
+                except (TypeError, ValueError):
+                    continue
+                if from_transaction != source_index + 1:
+                    continue
+                fields = dependency.get("fields", []) or []
+                consumer_name = None
+                for field in fields:
+                    parts = [part.strip() for part in str(field).split("->")]
+                    if parts and _canonical_name(parts[0]) == source_name:
+                        consumer_name = parts[-1] if len(parts) > 1 else parts[0]
+                        break
+                    if len(parts) > 1 and _canonical_name(parts[-1]) == source_name:
+                        consumer_name = parts[0]
+                        break
+                if not consumer_name:
+                    continue
+                signature = _short_signature(consumer.get("function"))
+                abi = (abi_by_signature.get(signature) or
+                       abi_by_signature.get(str(consumer.get("function"))))
+                inputs = abi.get("inputs", []) if isinstance(abi, dict) else []
+                matches = [index for index, item in enumerate(inputs)
+                           if _canonical_name(str(item.get("name") or "")) ==
+                           _canonical_name(consumer_name)]
+                if len(matches) != 1 or matches[0] >= len(consumer.get("arguments", [])):
+                    continue
+                consumer_args = list(consumer.get("arguments", []))
+                old = consumer_args[matches[0]]
+                consumer_args[matches[0]] = value
+                consumer["arguments"] = consumer_args
+                propagation.append({"transaction_index": consumer_index + 1,
+                                    "argument_name": inputs[matches[0]].get("name"),
+                                    "argument_index": matches[0], "before": old,
+                                    "after": value,
+                                    "evidence": "explicit_data_dependency_fields",
+                                    "source_argument_name": name,
+                                    "dependency": dependency})
+    return repaired, propagation
 
 
 def _effect_values(effect_catalog: Any) -> list[dict[str, Any]]:
@@ -564,6 +769,40 @@ def _derive_writer_binding(writer_effect: dict[str, Any],
                                   for field, value in changes.items()],
                 "numeric_constraint": numeric_constraint}
     return None
+
+
+def cross_transaction_write_read_matches(parent_sequence: list[dict[str, Any]],
+                                        candidate_sequence: list[dict[str, Any]],
+                                        effect_catalog: Any) -> list[dict[str, Any]]:
+    """Report exact inserted-writer/later-guard state matches before binding."""
+    inserted = _inserted_positions(parent_sequence, candidate_sequence)
+    rows = _effect_values(effect_catalog)
+    matches = []
+    for producer_index in inserted:
+        producer_signature = _short_signature(candidate_sequence[producer_index].get("function"))
+        writer_effects = _effects_for_transaction(rows, producer_signature)
+        for consumer_index in range(producer_index + 1, len(candidate_sequence)):
+            consumer_signature = _short_signature(
+                candidate_sequence[consumer_index].get("function"))
+            consumer_effects = _effects_for_transaction(rows, consumer_signature)
+            for writer_effect in writer_effects:
+                state = str(writer_effect.get("state") or "")
+                if not state:
+                    continue
+                for consumer_effect in consumer_effects:
+                    for guard in consumer_effect.get("guards", []) or []:
+                        if state not in set(guard.get("state_reads") or []):
+                            continue
+                        matches.append({"state": state,
+                                        "producer_index": producer_index + 1,
+                                        "producer_signature": producer_signature,
+                                        "consumer_index": consumer_index + 1,
+                                        "consumer_signature": consumer_signature,
+                                        "writer_expression": writer_effect.get("expression"),
+                                        "guard_expression": guard.get("expression"),
+                                        "writer_source": writer_effect.get("source"),
+                                        "guard_source": guard.get("source")})
+    return matches
 
 
 def bind_inserted_prerequisite(parent_sequence: list[dict[str, Any]],

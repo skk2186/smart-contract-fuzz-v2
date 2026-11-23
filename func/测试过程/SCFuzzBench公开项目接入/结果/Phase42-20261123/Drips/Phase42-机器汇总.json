@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "phase": "Phase42",
+  "baseline_head": "328530091fb85c864eeff8cae81e2d6273d1eada",
+  "project": "Drips",
+  "upstream_commit": "c50d160ead6bf82b1d1071e853dc74da0b23f595",
+  "source_tree_sha256": "fc1b15ff0b5caa5ea2aa624f8d6cf0c51354ca87402891288921b6d2e809f0a0",
+  "source_integrity": {
+    "submodules_match": 6,
+    "worktree_clean": true,
+    "critical_file_sha256": {
+      "src/Streams.sol": "9de9ee3c2bb6747e0fa38c77b4cf90eed6d650ad27882ac0afa097ffd3b978c4",
+      "src/echidna/base/EchidnaConfig.sol": "a084be70ec79b5ef4ba1d8bda5d4751b67f85d2efc4082377da7a20a4019bb66",
+      "src/echidna/EchidnaSqueezeTests.sol": "7303f74588d2e65b0e61ed62835eb62b50345e1530af364cc006108be24603c2"
+    },
+    "business_harness_property_modified": false
+  },
+  "property": {
+    "id": "6e7899beaef22d4a3a87",
+    "signature": "EchidnaSqueezeTests.testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)"
+  },
+  "tool_versions": {
+    "foundry": "1.9.0-dev",
+    "echidna": "2.3.2",
+    "solc": "0.8.20"
+  },
+  "root_cause": {
+    "cycleSecs": 10,
+    "min_amount_per_sec_formula": "ceil(1000000000 / cycleSecs)",
+    "observed_minAmtPerSec": 100000000,
+    "agent_amountPerSec": 1000,
+    "guard": "amtPerSec >= _minAmtPerSec",
+    "revert_reason": "Stream receiver amtPerSec too low",
+    "raw_account_id_mapping": "uint256(rawId) / 64",
+    "raw_ids_0_and_1_same_account": true,
+    "user1_raw_id": 64
+  },
+  "phase41_baseline": {
+    "agent_output_sha256": "3cafa84fc5ea0143c80424e50821f3c6e422940f7f6ceef6e01b0a0c95cf2cd0",
+    "E1": "first_transaction_reverted_target_not_reached",
+    "E2": "no_evidence_based_parameter_repair",
+    "G1": {"candidate_budget": 24, "candidate_count": 24, "valid_sequence_count": 0},
+    "G2": {"candidate_budget": 24, "candidate_count": 24, "valid_sequence_count": 0}
+  },
+  "agent_context_audit": {
+    "agent_rerun": false,
+    "frozen_context_bytes": 958499,
+    "frozen_action_context_count": 48,
+    "focused_context_bytes": 400502,
+    "focused_action_context_count": 15,
+    "old_context_has_getAccount_signature": true,
+    "old_context_has_division_by_64_mapping": false,
+    "old_context_has_minimum_guard_or_minAmtPerSec_getter": false,
+    "focused_context_has_account_mapping_and_numeric_guard": true
+  },
+  "manual_engineering_diagnostics": {
+    "classification": "engineering_oracle_only_not_v2_discovery_or_paper_gain",
+    "original_e1": {
+      "first_transaction": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+      "status": "reverted",
+      "target_assertion_called": false
+    },
+    "manual_lower_bound_repair": {
+      "amountPerSec_changes": [
+        {"transaction_index": 1, "before": 1000, "after": 100000000},
+        {"transaction_index": 2, "before": 1000, "after": 100000000}
+      ],
+      "all_transactions_succeeded": true,
+      "target_assertion_transaction_succeeded": true,
+      "native_assertion": "passing"
+    },
+    "manual_account_mapping_repair": {
+      "additional_raw_id_change": {"transaction_indexes": [1, 2], "before": 1, "after": 64},
+      "all_transactions_succeeded": true,
+      "target_assertion_transaction_succeeded": true,
+      "native_assertion": "passing"
+    }
+  },
+  "automatic_results": {
+    "agent_rerun": false,
+    "E1": {"first_transaction_reverted": true, "target_property_reached": false},
+    "E2": {
+      "repair": {
+        "argument": "amountPerSec",
+        "before": 1000,
+        "after": 100000000,
+        "evidence": ["source_guard", "runtime_minAmtPerSec_getter", "original_revert_reason"],
+        "dependent_argument_propagated": true
+      },
+      "transactions_succeeded": 2,
+      "target_assertion_called": true,
+      "native_assertion": "passing",
+      "counterexample": false,
+      "target_state_established": false,
+      "manual_account_id_repair_applied": false
+    },
+    "G1": {
+      "budget": 24,
+      "executable_candidates": 24,
+      "target_property_checks_passed": 24,
+      "target_property_checks_failed": 0,
+      "unknown_target_property_checks": 0,
+      "counterexamples": 0,
+      "phase37_binding": "disabled",
+      "corrected_result": "automatic/G1-result-feedback-corrected.json"
+    },
+    "G2": {
+      "budget": 24,
+      "executable_candidates": 24,
+      "target_property_checks_passed": 24,
+      "target_property_checks_failed": 0,
+      "unknown_target_property_checks": 0,
+      "counterexamples": 0,
+      "phase37_binding_status": "not_applicable_no_matching_cross_transaction_constraint",
+      "corrected_result": "automatic/G2-result-feedback-corrected.json"
+    },
+    "G1_G2_same_starting_fingerprint": true,
+    "G1_G2_candidate_sequences_identical": true,
+    "G2_observed_gain_over_G1": false
+  },
+  "echidna_seed_only": {
+    "test_limit": 0,
+    "workers": 1,
+    "loaded_seeds": 1,
+    "replayed_sequences": 1,
+    "target_assertion": "passing",
+    "assertion_failures": 0,
+    "unique_instructions": 17163,
+    "formal_test_limit_500_fuzz_run": false,
+    "counterexample": false,
+    "raw_result": "automatic/echidna-seed-only/result.json"
+  },
+  "regression": {
+    "phase37_B_C_D": "passed",
+    "wallet_known_counterexample_unified_anvil": "reproduced",
+    "phase40_drips_fixed_cheatcode_sequence": "passed",
+    "pigfox_gate_regression": "preserved_not_fixed",
+    "phase37_mechanism_unit_tests": {"passed": 7, "failed": 0},
+    "generic_unit_tests": {"passed": 11, "failed": 0},
+    "python_compile": "passed"
+  },
+  "conclusion": {
+    "automatic_executable_seed": true,
+    "automatic_counterexample": false,
+    "formal_fuzz_coverage_gain": "not_measured",
+    "independent_project_experiment_ready": false,
+    "remaining_limits": [
+      "Agent was not rerun after context changes",
+      "target property's internal squeezable amount operands are not observable",
+      "no formal Echidna 500-budget seed comparison in Phase42",
+      "G2 has no exact cross-transaction state write/read match on this task"
+    ]
+  },
+  "raw_result_root": "func/测试过程/SCFuzzBench公开项目接入/结果/Phase42-20261123/Drips/"
+}

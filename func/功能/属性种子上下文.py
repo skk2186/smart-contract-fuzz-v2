@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -174,10 +175,13 @@ def _canonical_source_type(parameter: str) -> str:
     return raw
 
 
-def _source_functions(project: str) -> list[dict[str, Any]]:
+@lru_cache(maxsize=16)
+def _source_functions(project: str, *, include_dependencies: bool = True) -> list[dict[str, Any]]:
     """提取源码中的合约函数；保留合约边界，避免同名函数误匹配。"""
     root = ROOT / PROJECTS[project]["source_root"]
     excluded = {"node_modules", "vendor", ".git", "out", "cache"}
+    if not include_dependencies:
+        excluded |= {"lib", "lib64", "dependencies", "deps"}
     found: list[dict[str, Any]] = []
     for path in sorted(root.rglob("*.sol")):
         if any(part in excluded for part in path.parts):
@@ -376,6 +380,22 @@ def _seed_abi_supported(entry: dict[str, Any]) -> tuple[bool, str | None]:
     return True, None
 
 
+def _abi_argument_ranges(entry: dict[str, Any] | None) -> list[dict[str, Any]]:
+    rows = []
+    for item in (entry or {}).get("inputs", []):
+        kind = str(item.get("type") or "")
+        match = re.fullmatch(r"(u?)int([0-9]*)", kind)
+        if not match:
+            continue
+        bits = int(match.group(2) or 256)
+        signed = not bool(match.group(1))
+        rows.append({"name": item.get("name"), "type": kind,
+                     "minimum": -(1 << (bits - 1)) if signed else 0,
+                     "maximum": (1 << (bits - 1)) - 1 if signed else (1 << bits) - 1,
+                     "source": "ABI integer type"})
+    return rows
+
+
 def _all_actions(prop: dict[str, Any]) -> list[dict[str, Any]]:
     out = list(prop.get("candidate_actions", []))
     out += list(prop.get("cross_contract", {}).get("candidate_actions", []))
@@ -431,6 +451,7 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
             "abi_signature": _abi_signature(abi_entry) if abi_entry else None,
             "abi_inputs": [{"name": x.get("name", ""), "type": x["type"]}
                            for x in abi_entry.get("inputs", [])] if abi_entry else [],
+            "argument_ranges": _abi_argument_ranges(abi_entry),
             "state_mutability": abi_entry.get("stateMutability") if abi_entry else None,
             "payable": bool(action.get("payable", False)),
             "matched_states": action.get("matched_states", []),
@@ -565,6 +586,7 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
             "abi_signature": _abi_signature(property_abi),
             "abi_inputs": [{"name": item.get("name", ""), "type": item["type"]}
                            for item in property_abi.get("inputs", [])],
+            "argument_ranges": _abi_argument_ranges(property_abi),
             "payable": property_abi.get("stateMutability") == "payable",
             "seed_compatible": trigger_supported,
             "seed_limitation": trigger_limitation,
@@ -643,20 +665,115 @@ def compact_effect_evidence(effects: list[dict[str, Any]]) -> dict[str, list[dic
             "action_guard_evidence": list(unique_guards.values())}
 
 
+def _focused_actions(prop: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    actions = list(prop.get("candidate_actions", []))
+    if not actions:
+        return actions, {"method": "no_candidate_actions", "before": 0, "after": 0}
+    target_states = set(prop.get("read_states", [])) | set(prop.get("property_write_states", []))
+    action_states = {
+        str(action.get("abi_signature") or action.get("function")): {
+            str(effect.get("state")) for effect in action.get("effect_evidence", [])
+            if effect.get("state")}
+        for action in actions}
+    frequency: dict[str, int] = {}
+    for states in action_states.values():
+        for state in states:
+            frequency[state] = frequency.get(state, 0) + 1
+    common_threshold = max(3, (len(actions) + 1) // 2)
+    common_states = {state for state, count in frequency.items()
+                     if count >= common_threshold}
+    focused_states = target_states - common_states
+    if not focused_states:
+        return actions, {"method": "evidence_not_selective_keep_all",
+                         "before": len(actions), "after": len(actions),
+                         "common_state_threshold": common_threshold,
+                         "common_states": sorted(common_states),
+                         "unknown": "no state was selective enough to safely prune actions"}
+    trigger = (prop.get("assertion_trigger") or {}).get("abi_signature")
+    kept = [action for action in actions
+            if action_states.get(str(action.get("abi_signature") or action.get("function")), set())
+            & focused_states or action.get("abi_signature") == trigger]
+    if not kept:
+        kept = actions
+        method = "evidence_not_selective_keep_all"
+    else:
+        method = "exact_effect_state_excluding_frequent_shared_matches"
+    property_name = str(prop.get("property") or "").rsplit(".", 1)[-1]
+    kept.sort(key=lambda action: 0 if action.get("abi_signature") == property_name else 1)
+    return kept, {"method": method, "before": len(actions), "after": len(kept),
+                  "focused_states": sorted(focused_states),
+                  "frequent_shared_states_not_used_for_action_selection": sorted(common_states),
+                  "excluded_signatures": [str(action.get("abi_signature") or action.get("function"))
+                                          for action in actions if action not in kept],
+                  "unknowns_preserved": list(prop.get("unknowns", []))}
+
+
+def _internal_helper_contexts(project: str, actions: list[dict[str, Any]], *,
+                              max_helpers: int = 12, max_depth: int = 2) -> list[dict[str, Any]]:
+    """Resolve directly called local helpers while preserving source provenance."""
+    if project not in PROJECTS:
+        return []
+    functions = _source_functions(project, include_dependencies=False)
+    queue: list[tuple[dict[str, Any], int, str]] = []
+    for action in actions:
+        full = str(action.get("function") or "")
+        parts = full.split(".")
+        contract = parts[-2] if len(parts) > 1 else None
+        signature = action.get("abi_signature") or parts[-1]
+        root = _resolve_source_function(functions, contract, str(signature))
+        if root:
+            queue.append((root, 0, str(signature)))
+    helpers = []
+    seen = set()
+    reserved = {"if", "for", "while", "require", "assert", "revert", "return",
+                "emit", "new", "delete", "keccak256", "abi", "type", "unchecked"}
+    while queue and len(helpers) < max_helpers:
+        current, depth, root_signature = queue.pop(0)
+        if depth >= max_depth:
+            continue
+        names = []
+        for call in re.finditer(r"(?<![.A-Za-z0-9_])([A-Za-z_]\w*)\s*\(", current["body"]):
+            name = call.group(1)
+            if name not in reserved and name not in names:
+                names.append(name)
+        for name in names:
+            candidates = [item for item in functions if item["name"] == name]
+            if len(candidates) != 1:
+                continue
+            helper = candidates[0]
+            key = (helper["contract"], helper["signature"])
+            if key in seen or (helper["contract"], helper["signature"]) == (
+                    current["contract"], current["signature"]):
+                continue
+            seen.add(key)
+            helpers.append({"function": helper["contract"] + "." + helper["signature"],
+                            "called_from": current["contract"] + "." + current["signature"],
+                            "root_action": root_signature,
+                            "source": helper["source"][:1800],
+                            "source_path": helper.get("path")})
+            queue.append((helper, depth + 1, root_signature))
+            if len(helpers) >= max_helpers:
+                break
+    return helpers
+
+
 def compact_for_agent(context: dict[str, Any]) -> dict[str, Any]:
-    """在请求内对重复 ABI 与函数源码做上下文去重，不改变属性或交易序列。"""
+    """Deduplicate repeated source and omit noisy actions without direct state evidence."""
     shared: dict[str, dict[str, Any]] = {}
     compact_properties = []
-    common_fields = ("abi_inputs", "state_mutability", "payable", "seed_compatible",
+    common_fields = ("abi_inputs", "argument_ranges", "numeric_guard_evidence",
+                     "state_mutability", "payable", "seed_compatible",
                      "seed_limitation", "source_excerpt", "prerequisite_dependencies",
                      "related_helper_effects", "source_call_chain")
     property_fields = ("function", "abi_signature", "matched_states", "environment_reads",
                        "static_status", "seed_compatible", "effect_evidence",
+                       "numeric_guard_evidence",
                        "prerequisite_dependencies", "related_helper_effects",
                        "source_call_chain")
     for prop in context["properties"]:
+        focused_actions, focus_metadata = _focused_actions(prop)
         actions = []
-        for action in prop.get("candidate_actions", []):
+        for action in focused_actions:
             key = action["function"]
             if key not in shared:
                 shared[key] = {field: action.get(field) for field in common_fields}
@@ -665,9 +782,14 @@ def compact_for_agent(context: dict[str, Any]) -> dict[str, Any]:
             item["source_context_id"] = key
             item.update(compact_effect_evidence(action.get("effect_evidence", [])))
             actions.append(item)
-        compact_properties.append({**{key: value for key, value in prop.items()
-                                    if key != "candidate_actions"},
-                                   "candidate_actions": actions})
+        compact_property = {**{key: value for key, value in prop.items()
+                               if key != "candidate_actions"},
+                            "candidate_actions": actions,
+                            "context_focus": focus_metadata}
+        helpers = _internal_helper_contexts(str(context.get("project") or ""), focused_actions)
+        if helpers:
+            compact_property["direct_internal_helper_contexts"] = helpers
+        compact_properties.append(compact_property)
     compact_context = {key: value for key, value in context.items()
                        if key != "properties"}
     compact_context["shared_function_contexts"] = shared

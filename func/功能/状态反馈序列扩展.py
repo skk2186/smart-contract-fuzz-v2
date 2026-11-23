@@ -309,9 +309,22 @@ def feedback_vector(replay: dict[str, Any], *, property_source: str = "",
     prior_seen = seen_states or set()
     related_changes = sum(len(row.get("changed_predicate_getters", []))
                           for row in replay.get("target_property_state", {}).get("trajectory", []))
-    property_value = rows[-1].get("target_property") if rows else next(
-        iter(replay.get("initial_property_values", {}).values()), None)
+    property_rows = [(index + 1, row) for index, row in enumerate(rows)
+                     if row.get("target_property") is not None]
+    property_check_index, property_check_row = property_rows[-1] if property_rows else (None, None)
     target_state = replay.get("target_property_state", {})
+    initial_values = replay.get("initial_property_values", {})
+    target_signature = str(target_state.get("property") or "")
+    initial_matches = [value for signature, value in initial_values.items()
+                       if target_signature and
+                       str(signature).rsplit(".", 1)[-1] == target_signature.rsplit(".", 1)[-1]]
+    property_value = (property_check_row.get("target_property") if property_check_row else
+                      initial_matches[0] if len(initial_matches) == 1 else None)
+    property_check_status = (property_check_row.get("target_property_status")
+                             if property_check_row else None)
+    property_check_status = property_check_status or (
+        "passed" if property_value is True else
+        "failed" if property_value is False else "unknown")
     final_getters = rows[-1].get("predicate_getter_values", []) if rows else prior
     distance = numeric_violation_distance(property_source, final_getters)
     dependent_successors = sum(
@@ -328,6 +341,8 @@ def feedback_vector(replay: dict[str, Any], *, property_source: str = "",
             "numeric_target_distance": distance,
             "counterexample_reached": property_value is False or bool(target_state.get("counterexample_state_established")),
             "property_value": property_value,
+            "property_check_transaction_index": property_check_index,
+            "property_check_status": property_check_status,
             "shared_resource_edges": shared_resource_edges(replay),
             "getter_state_fingerprints": sorted(fingerprints)}
 
@@ -388,15 +403,67 @@ def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[di
                 break
         return proposals[:max_proposals]
 
-    # Static and full modes may add a missing action only when static property-action
-    # evidence ties it to a target state read/written by the property.
+    present_functions = {str(tx.get("function", "")) for tx in sequence}
+    # A failed operation is handled first. Precondition insertion is allowed only
+    # when a concrete state written by an available action is read by an explicit
+    # guard on the failed operation. Numeric lower-bound failures belong to E2.
+    tx_feedback = replay.get("transactions", []) if replay else []
+    failed = next((row for row in tx_feedback if row.get("status") != "success" or
+                   row.get("execution_class") in {"unexpected_internal_revert", "outer_revert"}), None)
+    if mode == "state_feedback" and failed is not None:
+        reason = str(failed.get("revert_reason") or failed.get("property_error") or "").lower()
+        if re.search(r"too\s+low|below|under\s+(?:the\s+)?minimum|less\s+than\s+(?:the\s+)?minimum", reason):
+            return []
+        failed_index = max(0, int(failed.get("index", failed.get("transaction_index", 1))) - 1)
+        failed_signature = str(failed.get("function", ""))
+        consumer_evidence = action_evidence.get(failed_signature, {})
+        consumer_reads = set(consumer_evidence.get("read_states", []))
+        for effect in consumer_evidence.get("effect_evidence", []) or []:
+            for guard in effect.get("guards", []) or []:
+                consumer_reads.update(guard.get("state_reads", []) or [])
+        guards = [guard for effect in consumer_evidence.get("effect_evidence", []) or []
+                  for guard in effect.get("guards", []) or []]
+        guards.extend(consumer_evidence.get("action_guard_evidence", []) or [])
+        failure_is_state_related = bool(re.search(
+            r"not\s+found|unknown\s+(?:account|object|key)|missing|not\s+initiali[sz]ed|"
+            r"does\s+not\s+exist|unauthori[sz]ed|insufficient|not\s+registered", reason))
+        if failure_is_state_related and consumer_reads:
+            for template in action_templates:
+                signature = str(template.get("function", ""))
+                if signature in present_functions:
+                    continue
+                evidence = action_evidence.get(signature, {})
+                producer_writes = set(evidence.get("write_states", []))
+                for effect in evidence.get("effect_evidence", []) or []:
+                    if effect.get("state"):
+                        producer_writes.add(str(effect["state"]))
+                matched = producer_writes & consumer_reads
+                if not matched:
+                    continue
+                add(_insert(sequence, template, failed_index),
+                    "evidence_backed_failed_prerequisite_insertion",
+                    "insert a producer immediately before the earliest failed transaction",
+                    {"failed_transaction": failed_index + 1,
+                     "failed_function": failed_signature,
+                     "matched_states": sorted(matched),
+                     "guard_sources": [guard.get("source") for guard in guards
+                                       if set(guard.get("state_reads", []) or []) & matched],
+                     "failure_reason": reason})
+                if len(proposals) >= max_proposals:
+                    break
+        # Do not fill a failed replay's budget with unrelated property-state calls.
+        return proposals[:max_proposals]
+
+    # Static and full modes may add a missing action only when a concrete write
+    # overlaps a property state. Broad matched_states alone is correlation, not a
+    # producer/consumer proof, and cannot consume the candidate budget.
     present_functions = {str(tx.get("function", "")) for tx in sequence}
     for template in action_templates:
         signature = str(template.get("function", ""))
         if signature in present_functions:
             continue
         evidence = action_evidence.get(signature, {})
-        relevant = set(evidence.get("matched_states", [])) | set(evidence.get("read_states", [])) | set(evidence.get("write_states", []))
+        relevant = set(evidence.get("write_states", []))
         if target_states and not (relevant & target_states):
             continue
         template_fp = transaction_fingerprint(template)
