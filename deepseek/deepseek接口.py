@@ -117,8 +117,9 @@ def call_json(*, system: str, user: str, tag: str, model: str = "deepseek-flash"
               validator: Callable[[dict[str, Any]], None] | None = None,
               log_path: Path = DEFAULT_LOG, timeout: int = 120,
               max_retries: int = 1,
-              budget: CallBudget | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
-    """返回已校验 JSON 与本次成功用量；所有尝试都写日志，不记录密钥/请求正文。"""
+              budget: CallBudget | None = None,
+              record_request_body: bool = False) -> tuple[dict[str, Any], dict[str, Any]]:
+    """返回已校验 JSON 与本次成功用量；请求正文仅在显式开启时留存。"""
     if "json" not in (system + user).lower():
         raise ValueError("JSON 模式提示必须明确包含 JSON")
     key = load_key()
@@ -138,6 +139,10 @@ def call_json(*, system: str, user: str, tag: str, model: str = "deepseek-flash"
                                   "tag": tag, "model_requested": model,
                                   "thinking": thinking, "request_sha256": request_hash,
                                   "attempt": attempt + 1, "max_tokens": max_tokens}
+        if record_request_body:
+            # The payload contains prompts and model options only, never the
+            # Authorization header or local API key.
+            event["request_body"] = payload
         if budget:
             try:
                 budget.admit(request_upper_bound)

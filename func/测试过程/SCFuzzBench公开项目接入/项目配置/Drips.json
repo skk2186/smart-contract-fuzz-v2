@@ -98,6 +98,16 @@
     "constructor_arguments": [],
     "artifact": "out/Echidna.sol/Echidna.json"
   },
+  "execution": {
+    "chain_id": 1,
+    "deployment_timestamp": 1524785992,
+    "deployment_block_number": 4370000,
+    "hardfork": "shanghai",
+    "gas_price": 0,
+    "initial_balance": 4294967295,
+    "max_transaction_gas": 12500000,
+    "block_gas_limit": 100000000
+  },
   "remappings": [
     "phase40-source/=src/",
     "openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/",
@@ -163,6 +173,26 @@
       "kind": "assertion"
     }
   ],
+  "property_observation": {
+    "testSqueeze(uint8,uint8)": {
+      "predicate_observers": [
+        "receiver_splittable"
+      ],
+      "completeness": "partial",
+      "unobservable_operands": [
+        "EchidnaAccounting.getSqueezableAmount(address,address) is internal and depends on private stream-history state."
+      ],
+      "unknown_reason": "The public splittable getter covers one assertion operand; the internal squeezable amount cannot be read without changing the Harness."
+    },
+    "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)": {
+      "predicate_observers": [],
+      "completeness": "unobservable",
+      "unobservable_operands": [
+        "Both squeezableBefore and squeezableAfter are calculated by internal getSqueezableAmount(address,address) over private stream-history state."
+      ],
+      "unknown_reason": "The target assertion's operands are internal and unavailable through the unchanged Harness ABI."
+    }
+  },
   "backends": {
     "foundry-cheatcode": {
       "supports_internal_prank": true,
