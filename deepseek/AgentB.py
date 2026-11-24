@@ -19,6 +19,12 @@ PROPERTY_SENDER = "0x0000000000000000000000000000000000010000"
 
 
 def normalize_argument(kind: str, value: Any) -> Any:
+    array_match = re.fullmatch(r"(.+)\[\]", kind)
+    if array_match:
+        if not isinstance(value, list):
+            raise ValueError(f"{kind} 参数必须是 JSON 数组：{value!r}")
+        element_kind = array_match.group(1)
+        return [normalize_argument(element_kind, item) for item in value]
     if kind == "string":
         if not isinstance(value, str):
             raise ValueError(f"string 参数必须是 JSON 字符串：{value!r}")
@@ -60,6 +66,17 @@ def normalize_argument(kind: str, value: Any) -> Any:
 
 def _abi_value(kind: str, value: Any) -> dict[str, Any]:
     normalized = normalize_argument(kind, value)
+    array_match = re.fullmatch(r"(.+)\[\]", kind)
+    if array_match:
+        element_kind = array_match.group(1)
+        integer_match = re.fullmatch(r"(u?int)([0-9]*)", element_kind)
+        if not integer_match:
+            raise ValueError(f"Echidna 动态数组原生语料暂不支持元素类型：{element_kind}")
+        bits = int(integer_match.group(2) or "256")
+        type_tag = "AbiUIntType" if integer_match.group(1) == "uint" else "AbiIntType"
+        return {"tag": "AbiArrayDynamic",
+                "contents": [{"tag": type_tag, "contents": bits},
+                             [_abi_value(element_kind, item) for item in normalized]]}
     if kind == "string":
         escaped = '"'
         for byte in normalized.encode("utf-8"):
@@ -284,6 +301,9 @@ def to_echidna_sequence(candidate: dict[str, Any], transactions: list[dict[str, 
     if trigger and trigger.get("seed_compatible"):
         actions[trigger["abi_signature"]] = trigger
     sequence = []
+    def word_hex(value: Any) -> str:
+        return "0x" + int(value).to_bytes(32, byteorder="big", signed=False).hex()
+
     for tx in transactions:
         action = actions[tx["function"]]
         short_signature = tx["function"]
@@ -292,12 +312,12 @@ def to_echidna_sequence(candidate: dict[str, Any], transactions: list[dict[str, 
                 for item, value in zip(action["abi_inputs"], tx["arguments"])]
         sequence.append({
             "call": {"tag": "SolCall", "contents": [name, args]},
-            "delay": [hex(tx["delay_seconds"]), hex(tx["delay_blocks"])],
+            "delay": [word_hex(tx["delay_seconds"]), word_hex(tx["delay_blocks"])],
             "dst": contract_address,
             "gas": 12500000,
-            "gasprice": "0x0",
+            "gasprice": word_hex(0),
             "src": tx["sender"],
-            "value": hex(int(tx["value_wei"])),
+            "value": word_hex(tx["value_wei"]),
         })
     return sequence
 

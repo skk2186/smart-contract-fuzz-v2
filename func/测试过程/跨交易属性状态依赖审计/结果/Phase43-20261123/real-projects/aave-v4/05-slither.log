@@ -1,0 +1,33 @@
+Traceback (most recent call last):
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/bin/slither", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/slither/__main__.py", line 815, in main
+    main_impl(all_detector_classes=detectors, all_printer_classes=printers)
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/slither/__main__.py", line 936, in main_impl
+    ) = process_all(filename, args, detector_classes, printer_classes)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/slither/__main__.py", line 100, in process_all
+    compilations = compile_all(target, **vars(args))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 870, in compile_all
+    compilations.append(CryticCompile(target, **kwargs))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 279, in __init__
+    self._compile(**kwargs)
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 725, in _compile
+    self._platform.compile(self, **kwargs)
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/platform/foundry.py", line 145, in compile
+    hardhat_like_parsing(
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/platform/hardhat.py", line 116, in hardhat_like_parsing
+    path = convert_filename(
+           ^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/utils/naming.py", line 224, in convert_filename
+    filename = _verify_filename_existence(filename, cwd)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/utils/naming.py", line 121, in _verify_filename_existence
+    raise InvalidCompilation(_unknown_file_message(filename, cwd))
+crytic_compile.platform.exceptions.InvalidCompilation: Unknown file: foundry-pp/DeployHelper06f1c6fee5c4b9f6caeef62c8420404240fc50db2a03f31d72dbfd7e8d4b012d.sol
+  - Verify the path exists (e.g. `ls foundry-pp/DeployHelper06f1c6fee5c4b9f6caeef62c8420404240fc50db2a03f31d72dbfd7e8d4b012d.sol`).
+  - If this is an npm/yarn dependency, install project dependencies first (e.g. `npm install` or `yarn install` in `/home/skk/smart-contract-fuzz-v2/.tools/cache/real-contracts/phase43-20261123/aave-v4-scfuzzbench`).
+--ignore-compile used, if something goes wrong, consider removing the ignore compile flag

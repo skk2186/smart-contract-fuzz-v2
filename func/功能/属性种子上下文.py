@@ -369,12 +369,17 @@ def _abi_signature(entry: dict[str, Any]) -> str:
 
 
 def _seed_abi_supported(entry: dict[str, Any]) -> tuple[bool, str | None]:
+    def supported_type(kind: str) -> bool:
+        array_match = re.fullmatch(r"(.+)\[\]", kind)
+        if array_match:
+            return bool(SEED_TYPES.fullmatch(array_match.group(1)))
+        return (kind == "string" or kind == "address" or kind == "bool" or
+                bool(SEED_TYPES.fullmatch(kind)) or
+                bool(FIXED_BYTES_TYPES.fullmatch(kind)))
+
     for item in entry.get("inputs", []):
         kind = item["type"]
-        if kind == "string":
-            continue
-        if (kind == "address" or kind == "bool" or SEED_TYPES.fullmatch(kind) or
-                FIXED_BYTES_TYPES.fullmatch(kind)):
+        if supported_type(kind):
             continue
         return False, f"Echidna 原生序列化器暂未接入 ABI 类型 {kind}"
     return True, None

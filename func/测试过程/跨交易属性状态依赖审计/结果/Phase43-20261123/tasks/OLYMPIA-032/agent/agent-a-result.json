@@ -1,0 +1,149 @@
+{
+  "events": [
+    {
+      "at_utc": "2026-11-23T17:36:15.724675+00:00",
+      "tag": "Phase43_OLYMPIA-032_AgentA_plan1",
+      "model_requested": "deepseek-flash",
+      "thinking": "disabled",
+      "request_sha256": "fbc18a410b72a959107bbda67ba3bbfbdc1ae8ebf378c539ee5ca8f7a0d798dc",
+      "attempt": 1,
+      "max_tokens": 4096,
+      "request_body": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是智能合约测试序列规划器。只根据给定 Slither 证据和源码作答，必须输出合法 JSON。"
+          },
+          {
+            "role": "user",
+            "content": "{\"task\":\"为每条目标安全属性规划可执行的多交易准备序列。\",\"rules\":[\"每条输出必须绑定自己的 property_id，不能把组内属性合并成一个谓词。\",\"只使用 candidate_actions 中 seed_compatible=true 的 abi_signature。\",\"结合 Slither 的 prerequisite_state_closure、read_states、property_write_states、matched_states、effect_evidence、action_guard_evidence、函数源码与守卫推断顺序；状态生产操作应先于依赖它的消费操作，不要把静态候选当成已证明可行。\",\"沿 source_call_chain 检查声明类型明确的跨合约调用，以及它们触及的状态和构造函数关系；只对源码直接支持的调用关系作结论，不得把同类型合约实例自动视为同一对象。\",\"先检查 deployment_state、constructor_excerpt 和 constructor_actions。部署时已建立的状态不得重复初始化；实际 getter/守卫探测表明对象不存在时，规划候选必须先创建对象，再授权/配置，再执行依赖对象的目标操作。\",\"使用 prerequisite_dependencies 连接守卫读取状态与候选生产动作；每条链区分部署时已满足、候选前序可满足和静态未知。不要把 getter 探测失败以外的猜测写成事实。\",\"sender_pool 可能包含从部署后 owner/admin 等公开角色 getter 观察到的真实地址。需要权限时可安排该角色发送交易；不得假定普通测试账户就是 owner。\",\"如果 previous_attempt_feedback 指出缺少前置交易、部署身份或数值关系，请允许改变顺序、插入现有 candidate_actions 中的准备交易或改选候选；优先修复失败类别所指出的缺口。\",\"若 action_inventory_source 标记为 generic_abi_fallback_slither_relation_unresolved，candidate_actions 只是 Harness ABI 的通用状态变更入口；必须结合 read_states 和函数源码自行判断相关性，不得声称 Slither 已证明该入口写入目标状态。\",\"若源码显示某操作可能保留可重复使用的调用者状态、而实际效果还受另一合约或共享资源余额约束，应在 max_steps 内考虑跨调用者供给、前置操作或重复调用；仅当状态读写和调用链证据支持时这样规划，并在 assumptions 中标明尚未由执行验证的条件。\",\"每条属性至多给出指定数量的不同序列；避免仅重排同一交易的重复候选。\",\"shared_prefixes 必须为空；不要为候选序列设计跨属性共享前缀。\",\"不负责参数具体化；step 只含 function 与简短 rationale。\",\"每条候选最终至少 1 笔交易；共享前缀应与各属性候选的前导步骤一致。\",\"无法判断时通过 assumptions 说明，不得杜撰约束。\",\"严格输出 JSON 对象，property_sequences 为扁平数组，每个元素只代表一条候选，包含 property_id、candidate_id、steps。\",\"每个 steps 元素包含 function（完整 abi_signature）和 rationale。shared_prefixes 元素包含 property_ids 与 steps。\",\"输出形状示例：{\\\"property_sequences\\\":[{\\\"property_id\\\":\\\"...\\\",\\\"candidate_id\\\":\\\"...\\\",\\\"steps\\\":[{\\\"function\\\":\\\"mint(uint256)\\\",\\\"rationale\\\":\\\"...\\\"}]}],\\\"shared_prefixes\\\":[],\\\"assumptions\\\":[]}\"],\"max_candidates_per_property\":1,\"max_steps_per_sequence\":8,\"shared_prefix_hint\":null,\"sample_constraints\":[],\"previous_attempt_feedback\":null,\"deployment_state\":null,\"context\":{\"project\":\"OLYMPIA_032\",\"contract\":\"Maze\",\"target\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/tasks/OLYMPIA-032/analysis/property-analysis.json\",\"compiler\":{\"version\":\"0.8.26\",\"via_ir\":true,\"optimize_yul\":true,\"optimize\":true},\"property_count\":1,\"sender_pool\":[\"0x0000000000000000000000000000000000010000\",\"0x0000000000000000000000000000000000020000\",\"0x0000000000000000000000000000000000030000\",\"0x0000000000000000000000000000000000040000\",\"0x0000000000000000000000000000000000050000\"],\"agent_environment\":{\"chain_id\":1,\"initial_timestamp\":0,\"initial_block_number\":0,\"evm_revision\":\"shanghai\",\"harness_address\":\"0x00a329c0648769A73afAc7F9381E08FB43dBEA72\",\"property_sender\":\"0x0000000000000000000000000000000000010000\",\"gas_price_wei\":0,\"gas_limit_per_transaction\":12500000},\"shared_function_contexts\":{\"Maze.step(int8[])\":{\"abi_inputs\":[{\"name\":\"inp\",\"type\":\"int8[]\"}],\"argument_ranges\":[],\"numeric_guard_evidence\":null,\"state_mutability\":\"nonpayable\",\"payable\":false,\"seed_compatible\":true,\"seed_limitation\":null,\"source_excerpt\":null,\"prerequisite_dependencies\":[{\"required_state\":\"Maze.bug\",\"guard_evidence\":[{\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1295\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"},{\"required_state\":\"Maze.stop\",\"guard_evidence\":[{\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1295\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"},{\"required_state\":\"Maze.next_cell\",\"guard_evidence\":[{\"expression\":\"next_cell == - 2\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1297\"},{\"expression\":\"next_cell == - 1\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1301\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"}],\"related_helper_effects\":[],\"source_call_chain\":[],\"function\":\"Maze.step(int8[])\"}},\"properties\":[{\"property_id\":\"a96de88ce37c9ff01929\",\"property\":\"Maze.echidna_noBug()\",\"property_abi\":\"echidna_noBug()\",\"property_abi_inputs\":[],\"property_kind\":\"boolean_property\",\"assertion_sites\":[],\"assertion_trigger\":null,\"property_source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1706\",\"constructor_excerpt\":null,\"constructor_actions\":[],\"property_predicate\":\"1706: \\tfunction echidna_noBug() external returns (bool) {return !bug;}\",\"analysis_contract\":\"Maze\",\"analysis_status\":\"analyzed\",\"context_status\":\"candidate_with_write_site\",\"dependency_status\":\"statically_closed\",\"read_states\":[\"Maze.bug\"],\"property_write_states\":[],\"environment_reads\":[],\"read_sites\":[{\"function\":\"Maze.echidna_noBug()\",\"states\":[\"Maze.bug\"],\"expression\":\"! bug\",\"index_accesses\":[],\"source_index_accesses\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1706\"}],\"action_inventory_source\":\"slither_dependency_candidates\",\"slither_action_count\":1,\"abi_fallback_action_count\":0,\"prerequisite_state_closure\":[{\"state\":\"Maze.bug\",\"depth\":0,\"declaration_initializer\":\"false\",\"constructor_writers\":[],\"possible_setup_actions\":[{\"function\":\"Maze.step(int8[])\",\"effect_ids\":[\"767b7046c4cfcfc3\"]}],\"note\":\"当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。\"},{\"state\":\"Maze.stop\",\"depth\":0,\"declaration_initializer\":\"false\",\"constructor_writers\":[],\"possible_setup_actions\":[{\"function\":\"Maze.step(int8[])\",\"effect_ids\":[\"2da3989e52c2d11a\",\"2476936afed864b5\",\"05aea1935b45f3fa\",\"b75d9514187e1572\",\"cd8039789ddbb549\",\"80b2124d38f080f5\",\"4502c5917faa16d8\",\"6b5758da1bb532ff\",\"126ac7347939d18d\",\"d8065b5d69a11233\",\"c4c248502a49f046\",\"f92be76091707cdc\",\"9eea555973fdb883\",\"a321c2585c74c3bb\",\"e1ccba3081f5b5cf\",\"50b772572a56a735\",\"a7f40136158081ea\",\"d21c00c45612d107\",\"db2dc1e121298a9b\",\"06f465a1035d1575\",\"8d768c5f785fc78c\",\"2f26bd5b5a40b5c7\",\"86ce9bfb02dfc2e0\",\"4391b6112cbc91e1\",\"d521c0cecf2b201f\",\"0a607c51552035e2\",\"f9bbb71886dbbdbf\",\"bcb3ea64906e039d\",\"f2423ab261f90934\",\"1229485134f73ca1\",\"5baae3318e600f20\",\"ea77ec7e04c13cd7\",\"5d80ce880d7ec9c4\",\"45287376e424fede\",\"8561946019f2f9df\",\"9b1480d28e4e8000\",\"25bb80f2c09bf983\",\"963cc54a47cbba25\",\"c8d16c622ad34e45\",\"ad20b852d1b5fa1d\",\"fd7b29341f558c75\",\"a805bee7a077705f\",\"fbe2154870660a0d\",\"d9a3941d5ef817f2\",\"aa20dbc934265406\",\"7d3e8f385221a029\",\"30576cece97f1367\",\"758f727e5685bfef\",\"03ad5d7625f0d754\",\"2966c1353406b8ae\",\"10b23dc531fe7bd3\",\"fa3f0a9dde8514d9\",\"b271a8ff469ef49e\",\"fd984d87f1aa350c\",\"d6e4e7119f3cf2b4\",\"9b23f5e08d483bfa\",\"8f1a07c334cd26a6\",\"fa7a58b326ede6e9\",\"f8433b73e270994c\",\"7141662e0a6bfaba\",\"611098bdd3592e82\",\"8b62410627fe1e92\",\"ff02953555075c22\",\"7ba989b576bc4a83\",\"76f84c64cd6a6126\",\"9fa024d1677d4039\",\"e3345a2eac384521\",\"a4b4df22ec8464b5\",\"4cae5667ad1801df\",\"3a05e1bfaa05ad38\",\"d107391ba705fa1d\",\"50c2f62668d6efe5\",\"6aaae00dedadc3f0\",\"e3d1a23321cc167b\",\"b472fdca852945bd\",\"093d8014d487b14e\",\"9ab524cb4b1a39b0\",\"8b0675458a55844a\",\"eb80a30371d6a5fe\",\"add6e18cd02fac5e\",\"292cfc58d2a1ca59\",\"9fcc576d266e78de\",\"7c6f709215676311\",\"3d09e799a788981b\",\"255fb42bef08d5fc\",\"88f41c32907fc3df\",\"50c577ddffd05e1a\",\"91365b201a3bc7c9\",\"0062a52a0918cfac\",\"0cde50757043e9c3\",\"2a4ea9a1bebac4bd\"]}],\"note\":\"当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。\"},{\"state\":\"Maze.next_cell\",\"depth\":0,\"declaration_initializer\":\"0\",\"constructor_writers\":[],\"possible_setup_actions\":[{\"function\":\"Maze.step(int8[])\",\"effect_ids\":[\"cab1aee3c8810b34\",\"3be1181303221b6e\",\"5d7c590b88a41e72\",\"d3051a04efa82d74\",\"4b32e1533253de19\",\"5de6694945b968e0\",\"e13b1a35543f74ab\",\"8f232517f79e8278\",\"742363fa9c54984e\",\"f36e14ea6d5dff27\",\"56db64f06f5b0f08\",\"a7ac403e89975877\",\"511b8e3b106c085b\",\"31dcdd8f1c2a29d9\",\"95de1fdfebc55c5c\",\"d1596f4b7962fefb\",\"094eef9791326117\",\"0c486aa7d7a9ef62\",\"c93d4f8101f71de9\",\"e5d221d533aae4aa\",\"22495a7263263ca6\",\"cd3924f7938cd5ed\",\"60a362fd5bfddaad\",\"aa3ea979e20736f1\",\"29f605dbb3bdce57\",\"5fdcbecf552a5335\",\"21726661cd841e97\",\"0e8062b6220c5fb2\",\"de9c965dae5a82de\",\"7133955fb778784e\",\"40c7598fbef4e2c3\",\"1725e2bccda43c06\",\"674d939a313a2e3b\",\"e2218ff6767dd22b\",\"87b3af650b044722\",\"d9e715f424f6c326\",\"4ecf473a2389a36e\",\"0b05935ecb0d93f7\",\"5289997fe495b0d2\",\"1fd36a36e0a37f0c\",\"ab7b0f7f8b70f6aa\",\"41a3d3dd2611060d\",\"5d5d8ace2f144a68\",\"7044add325cff322\",\"f4c72b7b03f32141\",\"1335c2ad8753c00e\",\"afcfec44efcb4153\",\"f7f46c708c364ba4\",\"250275e3b7a7d95d\",\"642a3b2aca504610\",\"ec208b89750319a1\",\"df0d563d8e325947\",\"fff841b610be9398\",\"8618b6c116e05617\",\"d3c8a72959b9bf78\",\"6e19946ca8f5a206\",\"84771dbc93396702\",\"30c9bbd397e53829\",\"d9bed9cadd4c21cc\",\"a14f32abeedff8bd\",\"0d93ef7ae3f68518\",\"76c95cfc628476d7\",\"7658ea9ec2cee1fd\",\"65770d9453443e50\",\"376e70f429ec7124\",\"31f84e4810d86674\",\"c0ba8d20e8e5ac65\",\"ee02566bdfc7b23c\",\"dd36b06ff0b31020\",\"476e56fb5213e256\",\"7dbae74ecfdffc44\",\"d45be16b6edbdda8\",\"af93c1aa0b87ec0e\",\"84147ceee984f969\",\"f3aed5bd674c37b4\",\"8e1200a636013206\",\"885c66e54b42ad45\",\"4a145775d3c5aae4\",\"4f6f084fc8d6aa1b\",\"cddd808f557623bd\",\"ac9b7c78fac1a1d4\",\"0ed41ec504c342f0\",\"952ae9ed64d73263\",\"08d8be140b5ebb87\",\"37ca7d91727a2177\",\"9f41cddcf7b13584\",\"5dd614902756f61d\",\"812eda34f4e1b0a6\",\"9a206fc1f5d0f65c\",\"5d8bb767c1dc1c10\",\"74085e8433475340\",\"6ed9d208d3eb0362\",\"67bbc17cb7ea323d\",\"eb190e7fcf8959ed\",\"e5e92221276531c4\",\"eac498f840eaf4d3\",\"b883fdcd2c24778b\",\"944c0db310144048\",\"03534c20fb0b7e02\",\"b97455dab208ebad\",\"8baa49e7cdf9d477\",\"eabf7b8662973198\",\"ab0664d450440fa6\",\"013d7dc478a1b27b\",\"a2605cfc2de95397\",\"679760e05cdd53e2\",\"1cad3208a768ed82\",\"94e54107fa34eba8\",\"88716524d52a91dd\",\"330bbfc5a52c3a49\",\"b11145f70f195623\",\"e0b86cc0de0912f6\",\"c46d1f7c67791feb\",\"94f48501a53d112b\",\"2d6604a076cfc2ed\",\"07167ce2c57e8e82\",\"c95bb75eb6fec7bd\",\"695be11dd26e68e5\",\"f6f6b165636a5ee4\",\"42f67dcde52be852\",\"86ba3aa5f75711aa\",\"f05f1ec175eb918f\",\"8a0b897c46fa5e12\",\"f7c8b8cd70809c6f\",\"a43aa78012a296a4\",\"a7960bd866642948\"]}],\"note\":\"当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。\"}],\"unknowns\":[],\"unresolved_effect_actions\":[],\"interpretation\":\"静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。\",\"candidate_actions\":[{\"function\":\"Maze.step(int8[])\",\"abi_signature\":\"step(int8[])\",\"matched_states\":[\"Maze.bug\"],\"environment_reads\":[],\"static_status\":\"candidate_only\",\"seed_compatible\":true,\"effect_evidence\":[{\"state\":\"Maze.bug\",\"writer\":\"Maze.func_bug(int8[])\",\"expression\":\"bug = true\",\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#8\"}],\"numeric_guard_evidence\":null,\"prerequisite_dependencies\":[{\"required_state\":\"Maze.bug\",\"guard_evidence\":[{\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1295\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"},{\"required_state\":\"Maze.stop\",\"guard_evidence\":[{\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1295\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"},{\"required_state\":\"Maze.next_cell\",\"guard_evidence\":[{\"expression\":\"next_cell == - 2\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1297\"},{\"expression\":\"next_cell == - 1\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1301\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"}],\"related_helper_effects\":[],\"source_call_chain\":[],\"source_context_id\":\"Maze.step(int8[])\",\"action_guard_evidence\":[{\"kind\":\"require_or_assert\",\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"branch\":null,\"variables_read\":[\"bug\",\"stop\"],\"state_reads\":[\"Maze.bug\",\"Maze.stop\"],\"data_dependencies\":{\"bug\":[\"bug\"],\"stop\":[\"stop\"]},\"predicate_calls\":[],\"predicate_logic\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1295\"},{\"kind\":\"control_branch\",\"expression\":\"next_cell == - 2\",\"branch\":\"false\",\"variables_read\":[\"next_cell\"],\"state_reads\":[\"Maze.next_cell\"],\"data_dependencies\":{\"next_cell\":[\"next_cell\"]},\"predicate_calls\":[],\"predicate_logic\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1297\"},{\"kind\":\"control_branch\",\"expression\":\"next_cell == - 1\",\"branch\":\"true\",\"variables_read\":[\"next_cell\"],\"state_reads\":[\"Maze.next_cell\"],\"data_dependencies\":{\"next_cell\":[\"next_cell\"]},\"predicate_calls\":[],\"predicate_logic\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_5006138_1_25percent_CVE-2016-4492_gen.sol#1301\"}]}],\"context_focus\":{\"method\":\"exact_effect_state_excluding_frequent_shared_matches\",\"before\":1,\"after\":1,\"focused_states\":[\"Maze.bug\"],\"frequent_shared_states_not_used_for_action_selection\":[],\"excluded_signatures\":[],\"unknowns_preserved\":[]}}]}}"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "thinking": {
+          "type": "disabled"
+        },
+        "max_tokens": 4096,
+        "temperature": 0,
+        "stream": false
+      },
+      "budget_preflight_upper_bound": 20032,
+      "budget_remaining_before_call": 1500000,
+      "http_status": 200,
+      "response_id": "9fafe33b-fb62-4b96-ac68-efc6456e9c5e",
+      "model_returned": "deepseek-flash",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5594,
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 4954,
+        "completion_tokens": 293,
+        "total_tokens": 5887,
+        "estimated_cost_usd": {
+          "offpeak": "0.00092082",
+          "peak": "0.00184164"
+        },
+        "pricing_date": "2026-11-13",
+        "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+        "cost_is_estimate": true
+      },
+      "finish_reason": "stop",
+      "response_json": {
+        "property_sequences": [
+          {
+            "property_id": "a96de88ce37c9ff01929",
+            "candidate_id": "a96de88ce37c9ff01929-c1",
+            "steps": [
+              {
+                "function": "step(int8[])",
+                "rationale": "唯一 seed_compatible 候选；其 effect_evidence 显示内部 func_bug 可写 Maze.bug=true，从而可能使 echidna_noBug 返回 false。守卫要求 !stop && !bug，部署初始 stop=false、bug=false，故首笔可执行；需提供使 next_cell 分支进入 bug 写入路径的 int8[] 参数（参数具体化不在本规划范围）。"
+              }
+            ]
+          }
+        ],
+        "shared_prefixes": [],
+        "assumptions": [
+          "Maze.bug 与 Maze.stop 声明初始化为 false，部署后守卫 !stop && !bug 初始满足，无需前置初始化交易。",
+          "step(int8[]) 的 bug 写入位于 func_bug 内部，是否可达取决于传入 int8[] 参数与 next_cell 分支（next_cell==-2/-1 等）；静态证据未证明存在可达参数，需执行验证。",
+          "未发现构造函数写入 bug/stop/next_cell，故不存在部署时已建立需避免重复初始化的状态。",
+          "sender_pool 中无 owner/admin 角色证据，step 未显示权限守卫，普通账户可发送。"
+        ],
+        "shared_prefixes_ignored": true,
+        "applied_shared_prefixes": [],
+        "invalid_records": [],
+        "canonicalized_signatures": [],
+        "recovery_summary": {
+          "valid_candidate_count": 1,
+          "invalid_record_count": 0,
+          "applied_shared_prefix_count": 0
+        }
+      },
+      "ok": true,
+      "elapsed_seconds": 2.489,
+      "budget": {
+        "max_tokens": 1500000,
+        "spent_tokens": 5887,
+        "charged_tokens": 5887,
+        "charge_source": "api_usage"
+      },
+      "invalid_record_count": 0,
+      "applied_shared_prefix_count": 0,
+      "local_context_dedup_seconds": 3.540503471,
+      "prompt_json_encoding_seconds": 0.00015552,
+      "prompt_utf8_bytes": 15820
+    }
+  ],
+  "planning": {
+    "status": "planned",
+    "plans": [
+      {
+        "property_sequences": [
+          {
+            "property_id": "a96de88ce37c9ff01929",
+            "candidate_id": "a96de88ce37c9ff01929-c1",
+            "steps": [
+              {
+                "function": "step(int8[])",
+                "rationale": "唯一 seed_compatible 候选；其 effect_evidence 显示内部 func_bug 可写 Maze.bug=true，从而可能使 echidna_noBug 返回 false。守卫要求 !stop && !bug，部署初始 stop=false、bug=false，故首笔可执行；需提供使 next_cell 分支进入 bug 写入路径的 int8[] 参数（参数具体化不在本规划范围）。"
+              }
+            ]
+          }
+        ],
+        "shared_prefixes": [],
+        "assumptions": [
+          "Maze.bug 与 Maze.stop 声明初始化为 false，部署后守卫 !stop && !bug 初始满足，无需前置初始化交易。",
+          "step(int8[]) 的 bug 写入位于 func_bug 内部，是否可达取决于传入 int8[] 参数与 next_cell 分支（next_cell==-2/-1 等）；静态证据未证明存在可达参数，需执行验证。",
+          "未发现构造函数写入 bug/stop/next_cell，故不存在部署时已建立需避免重复初始化的状态。",
+          "sender_pool 中无 owner/admin 角色证据，step 未显示权限守卫，普通账户可发送。"
+        ],
+        "shared_prefixes_ignored": true,
+        "applied_shared_prefixes": [],
+        "invalid_records": [],
+        "canonicalized_signatures": [],
+        "recovery_summary": {
+          "valid_candidate_count": 1,
+          "invalid_record_count": 0,
+          "applied_shared_prefix_count": 0
+        }
+      }
+    ],
+    "fixed_prefix_transactions": []
+  },
+  "candidates": [
+    {
+      "property_id": "a96de88ce37c9ff01929",
+      "candidate_id": "a96de88ce37c9ff01929-c1",
+      "steps": [
+        {
+          "function": "step(int8[])",
+          "rationale": "唯一 seed_compatible 候选；其 effect_evidence 显示内部 func_bug 可写 Maze.bug=true，从而可能使 echidna_noBug 返回 false。守卫要求 !stop && !bug，部署初始 stop=false、bug=false，故首笔可执行；需提供使 next_cell 分支进入 bug 写入路径的 int8[] 参数（参数具体化不在本规划范围）。"
+        }
+      ]
+    }
+  ],
+  "calls": 1,
+  "sequence_length_max": 8
+}

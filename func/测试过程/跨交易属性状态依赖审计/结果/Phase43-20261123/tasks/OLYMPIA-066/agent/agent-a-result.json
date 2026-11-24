@@ -1,0 +1,149 @@
+{
+  "events": [
+    {
+      "at_utc": "2026-11-23T19:37:56.464554+00:00",
+      "tag": "Phase43_OLYMPIA-066_AgentA_plan1",
+      "model_requested": "deepseek-flash",
+      "thinking": "disabled",
+      "request_sha256": "20db4eaf93ee09e7ffdf9e6a51fc9c9f40db5df4dc8f3fb9d572a2419b2073ae",
+      "attempt": 1,
+      "max_tokens": 4096,
+      "request_body": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是智能合约测试序列规划器。只根据给定 Slither 证据和源码作答，必须输出合法 JSON。"
+          },
+          {
+            "role": "user",
+            "content": "{\"task\":\"为每条目标安全属性规划可执行的多交易准备序列。\",\"rules\":[\"每条输出必须绑定自己的 property_id，不能把组内属性合并成一个谓词。\",\"只使用 candidate_actions 中 seed_compatible=true 的 abi_signature。\",\"结合 Slither 的 prerequisite_state_closure、read_states、property_write_states、matched_states、effect_evidence、action_guard_evidence、函数源码与守卫推断顺序；状态生产操作应先于依赖它的消费操作，不要把静态候选当成已证明可行。\",\"沿 source_call_chain 检查声明类型明确的跨合约调用，以及它们触及的状态和构造函数关系；只对源码直接支持的调用关系作结论，不得把同类型合约实例自动视为同一对象。\",\"先检查 deployment_state、constructor_excerpt 和 constructor_actions。部署时已建立的状态不得重复初始化；实际 getter/守卫探测表明对象不存在时，规划候选必须先创建对象，再授权/配置，再执行依赖对象的目标操作。\",\"使用 prerequisite_dependencies 连接守卫读取状态与候选生产动作；每条链区分部署时已满足、候选前序可满足和静态未知。不要把 getter 探测失败以外的猜测写成事实。\",\"sender_pool 可能包含从部署后 owner/admin 等公开角色 getter 观察到的真实地址。需要权限时可安排该角色发送交易；不得假定普通测试账户就是 owner。\",\"如果 previous_attempt_feedback 指出缺少前置交易、部署身份或数值关系，请允许改变顺序、插入现有 candidate_actions 中的准备交易或改选候选；优先修复失败类别所指出的缺口。\",\"若 action_inventory_source 标记为 generic_abi_fallback_slither_relation_unresolved，candidate_actions 只是 Harness ABI 的通用状态变更入口；必须结合 read_states 和函数源码自行判断相关性，不得声称 Slither 已证明该入口写入目标状态。\",\"若源码显示某操作可能保留可重复使用的调用者状态、而实际效果还受另一合约或共享资源余额约束，应在 max_steps 内考虑跨调用者供给、前置操作或重复调用；仅当状态读写和调用链证据支持时这样规划，并在 assumptions 中标明尚未由执行验证的条件。\",\"每条属性至多给出指定数量的不同序列；避免仅重排同一交易的重复候选。\",\"shared_prefixes 必须为空；不要为候选序列设计跨属性共享前缀。\",\"不负责参数具体化；step 只含 function 与简短 rationale。\",\"每条候选最终至少 1 笔交易；共享前缀应与各属性候选的前导步骤一致。\",\"无法判断时通过 assumptions 说明，不得杜撰约束。\",\"严格输出 JSON 对象，property_sequences 为扁平数组，每个元素只代表一条候选，包含 property_id、candidate_id、steps。\",\"每个 steps 元素包含 function（完整 abi_signature）和 rationale。shared_prefixes 元素包含 property_ids 与 steps。\",\"输出形状示例：{\\\"property_sequences\\\":[{\\\"property_id\\\":\\\"...\\\",\\\"candidate_id\\\":\\\"...\\\",\\\"steps\\\":[{\\\"function\\\":\\\"mint(uint256)\\\",\\\"rationale\\\":\\\"...\\\"}]}],\\\"shared_prefixes\\\":[],\\\"assumptions\\\":[]}\"],\"max_candidates_per_property\":1,\"max_steps_per_sequence\":8,\"shared_prefix_hint\":null,\"sample_constraints\":[],\"previous_attempt_feedback\":null,\"deployment_state\":null,\"context\":{\"project\":\"OLYMPIA_066\",\"contract\":\"Maze\",\"target\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/tasks/OLYMPIA-066/analysis/property-analysis.json\",\"compiler\":{\"version\":\"0.8.26\",\"via_ir\":true,\"optimize_yul\":true,\"optimize\":true},\"property_count\":1,\"sender_pool\":[\"0x0000000000000000000000000000000000010000\",\"0x0000000000000000000000000000000000020000\",\"0x0000000000000000000000000000000000030000\",\"0x0000000000000000000000000000000000040000\",\"0x0000000000000000000000000000000000050000\"],\"agent_environment\":{\"chain_id\":1,\"initial_timestamp\":0,\"initial_block_number\":0,\"evm_revision\":\"shanghai\",\"harness_address\":\"0x00a329c0648769A73afAc7F9381E08FB43dBEA72\",\"property_sender\":\"0x0000000000000000000000000000000000010000\",\"gas_price_wei\":0,\"gas_limit_per_transaction\":12500000},\"shared_function_contexts\":{\"Maze.step(int8[])\":{\"abi_inputs\":[{\"name\":\"inp\",\"type\":\"int8[]\"}],\"argument_ranges\":[],\"numeric_guard_evidence\":null,\"state_mutability\":\"nonpayable\",\"payable\":false,\"seed_compatible\":true,\"seed_limitation\":null,\"source_excerpt\":null,\"prerequisite_dependencies\":[{\"required_state\":\"Maze.bug\",\"guard_evidence\":[{\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2741\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"},{\"required_state\":\"Maze.stop\",\"guard_evidence\":[{\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2741\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"},{\"required_state\":\"Maze.next_cell\",\"guard_evidence\":[{\"expression\":\"next_cell == - 2\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2743\"},{\"expression\":\"next_cell == - 1\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2747\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"}],\"related_helper_effects\":[],\"source_call_chain\":[],\"function\":\"Maze.step(int8[])\"}},\"properties\":[{\"property_id\":\"472e1eb4a211b52252aa\",\"property\":\"Maze.echidna_noBug()\",\"property_abi\":\"echidna_noBug()\",\"property_abi_inputs\":[],\"property_kind\":\"boolean_property\",\"assertion_sites\":[],\"assertion_trigger\":null,\"property_source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#3652\",\"constructor_excerpt\":null,\"constructor_actions\":[],\"property_predicate\":\"3652: \\tfunction echidna_noBug() external returns (bool) {return !bug;}\",\"analysis_contract\":\"Maze\",\"analysis_status\":\"analyzed\",\"context_status\":\"candidate_with_write_site\",\"dependency_status\":\"statically_closed\",\"read_states\":[\"Maze.bug\"],\"property_write_states\":[],\"environment_reads\":[],\"read_sites\":[{\"function\":\"Maze.echidna_noBug()\",\"states\":[\"Maze.bug\"],\"expression\":\"! bug\",\"index_accesses\":[],\"source_index_accesses\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#3652\"}],\"action_inventory_source\":\"slither_dependency_candidates\",\"slither_action_count\":1,\"abi_fallback_action_count\":0,\"prerequisite_state_closure\":[{\"state\":\"Maze.bug\",\"depth\":0,\"declaration_initializer\":\"false\",\"constructor_writers\":[],\"possible_setup_actions\":[{\"function\":\"Maze.step(int8[])\",\"effect_ids\":[\"07c4d135b0277839\"]}],\"note\":\"当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。\"},{\"state\":\"Maze.stop\",\"depth\":0,\"declaration_initializer\":\"false\",\"constructor_writers\":[],\"possible_setup_actions\":[{\"function\":\"Maze.step(int8[])\",\"effect_ids\":[\"9726dbf93b4b4314\",\"43109c7d80d68e5a\",\"5ce4c784c3255724\",\"d87a69e3a9921dd4\",\"dccc833fe7886394\",\"40aceb8ae14c2752\",\"063e263006b701b1\",\"57b48a7ef1e22019\",\"0c8eeb77e9eede47\",\"2883c14e1255e61d\",\"0e04370ec76e58ba\",\"1f731c7766e00c62\",\"408c1d7e6feebbb7\",\"7f719d0b7604b4f5\",\"f468d97aea4bdbce\",\"9abb936f8f833445\",\"ba19c318e9132331\",\"22549a0c1beaac66\",\"a635b7347c8b94b0\",\"681d1104f0221aa6\",\"0d1f1dd46bfba90f\",\"8a64d6c348015b6c\",\"21091fe8b1f7669f\",\"15077692cb027ab9\",\"997db9662029569b\",\"0a20eed66bae4424\",\"c1e1bc32cc7db0af\",\"cbfb4a04dc6a5bd4\",\"8c1da7c6207bb814\",\"9b2add4847506dde\",\"f3b1536033c85254\",\"0b149b416e82e65c\",\"ec189eb97aece43c\",\"c46b120fe1f613f3\",\"01a3f0d0efd7dd8c\",\"aab66ee32e65f2ec\",\"261a10ec355979ad\",\"81e9352106db50ec\",\"0b66acf5058c6a87\",\"887fc073b711c3c5\",\"ec642085452a399a\",\"ab1fd8d23a114350\",\"6b17c9ff73f707e3\",\"127e18e7bb5ec183\",\"f231451a242157d8\",\"ca699e98285a691e\",\"5061a1dbcfe3d1a6\",\"6d75e166ae7c3125\",\"89df4250789ac36e\",\"024457e0a5eae9ac\",\"0ff6ecd82162d286\",\"bd4be328d55077fe\",\"d3c346731083d4fe\",\"d15231c0b84e2d91\",\"71bd4a9176f848ff\",\"ddcac5cded38e9ae\",\"2dbecb2c67a66386\",\"df8c259924221271\",\"bd09e1f3770634f9\",\"2baf67255438a0e1\",\"4c6747f9dde29012\",\"5448a0054794954b\",\"4e2f4fe3c2d37211\",\"4262fb804aea380b\",\"f7ce6c19979f1ce5\",\"c0288e6a895267ec\",\"50d1742ea0d304ad\",\"77f9bd691a4a8714\",\"3fab5beff6f10ab6\",\"66043c2aac719f18\",\"6c7309ba6a2c1b0c\",\"79ae070b52824c65\",\"109f15dbc44a0295\",\"eebabe73d3451b04\",\"53b947fc8a44ed4d\",\"8e132ad1b5074664\",\"420eae983778c0ad\",\"a0503ea904d4fab8\",\"17887056a201a90e\",\"453156cd877985ca\",\"273b71a150bea4f7\",\"5050a68d358b8054\",\"7079c46cf8bfbd0b\",\"0cfd1056b3158527\",\"063afd7e48c07a48\",\"a491b0b6e6a5e9a1\",\"2b975e53509f0764\",\"701f00542788602c\",\"5b57c5e83ef0a69d\",\"75a82fd9e17ccb10\",\"26b09211b52104e7\",\"bf8b8c4bf1c4f09e\",\"fd679edafe59f301\",\"a630106d97c1277f\",\"a1fc5f78c00659ac\",\"d8d34052c7cd0212\",\"37ee18a7613bef33\",\"0b4a7c408c8fd2ba\",\"d2e4b2c3fa0fefa0\",\"a4cad6a6a957f84c\",\"796cce78e2073e3b\",\"78cdc2786d985b92\",\"1e6e049721e919f3\",\"cd7c4b55fe41148a\",\"a283089fb94beb98\",\"2226a4f5042aa5ea\",\"c763862340a021c1\",\"3c891b70d2376cd1\",\"ea9e5b717aeedbbc\",\"22f8b7a7579106f1\",\"dc41c5eeb8fd4f82\",\"78836d6041e81212\",\"f4169110e99c5f34\",\"cbc7c4b5a86c413b\",\"ffe66190f3bdbb27\",\"2625f3362d8bff87\",\"52a95df8eb1a9d36\",\"b8fe3ba627340867\",\"f0d89560f8586a0d\",\"62cb31d2e9511eb5\",\"8e372f24990d7d1d\",\"b8cad19faab284e2\",\"26aae51c03f85773\",\"7d3e0e2f4c534937\",\"17ffdd5709167da8\",\"721d72beb5791d95\",\"c22a65b9196361bc\",\"b8ab59800b451bdc\",\"29cf6c775c3f02b9\",\"d2832a3cb0cc1924\",\"c5ffa5afce11dde8\",\"96920cb3d1331c1b\",\"92cff874be91417d\",\"99bcad93ebd789c8\",\"0487db844029d983\",\"a24ecf0dd44bdbb1\",\"b66585551099bb5e\",\"10601dcd2cfe6a2d\",\"c374ef0e56a2a9c9\",\"6f1bd983c00e2814\",\"5c0cd2af4678c642\",\"66812b51657a2c68\",\"bf96a847e91f3942\",\"ddcd10af11fd6f8b\",\"127a187be9c71989\",\"1f6a77d0a4c1e1d0\",\"7711d2f09a7402b7\",\"3726445cd815dc61\",\"0dd12a1aa1ff36cc\",\"ba4820b3348785d6\",\"19dbe6152af1908e\",\"db8ac07b7ed2e381\",\"a8c2ec4546eff69b\",\"4dc04952b8cc14f5\",\"c5cacb4f463afc8c\",\"c5f2585a64b07fab\",\"848d508552ff71d5\",\"6e30aa2c9d1d053b\",\"42a9ddbf0226e88f\",\"c4e945ee9e43caf8\",\"dcfb3e6ac7f30df6\",\"9bf405ea066faeef\",\"6b438fc86e9410e8\",\"2d61be4142a25073\",\"ce07dd907e8d6914\",\"3d8650d0666f658c\",\"5e74ecccb8e34c41\",\"0ba8dc9b204612e7\",\"80cd7ec39939d74e\",\"5d0beb3beedd67d2\",\"b7b1295d10ab07fb\",\"e4bbd1cd46242b44\",\"11c43d735cd4c619\",\"bf70a6a1e7f6ecb0\",\"225b8e90a3f7689f\",\"653f354a7af7e118\",\"14f4eadd750d376b\",\"26cd8e9095aa83dc\",\"5d1548a68d64bf33\",\"59e0900ce19e7592\",\"7c9c5ad9694d89cd\",\"9902a33ad47ac21a\"]}],\"note\":\"当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。\"},{\"state\":\"Maze.next_cell\",\"depth\":0,\"declaration_initializer\":\"0\",\"constructor_writers\":[],\"possible_setup_actions\":[{\"function\":\"Maze.step(int8[])\",\"effect_ids\":[\"f7b1b7d7e3da9753\",\"8b1e5f5d6e0d7e2f\",\"6cbd89ea890cfe4a\",\"ce4e8d96d8ff244a\",\"203ed5acb831cd91\",\"ca7d3566f75f0baa\",\"ff99060aed70419e\",\"4f957b81ff436e4b\",\"a0c7e9f30d7ed93d\",\"2dfea878aaed325a\",\"7bf7e4c391b4bf20\",\"0fc312321ccfb698\",\"ba92768f2bce567b\",\"d494139a23cb7a0f\",\"4b2ea5ebfa49b071\",\"735742bb8b904fb6\",\"8baba8035150c637\",\"0f83d0ab5eef9705\",\"a297c8785b23ceb3\",\"e36875b5cd4097d8\",\"e7e2c261b4ba6fef\",\"3c8c45c2553e7d73\",\"e80a0332c07bcf8a\",\"33dd017fef3fbb2a\",\"7e7858450cb4b1c2\",\"6db5f723983928a1\",\"4c9a868bc06b159f\",\"d8127ead3a3f13a9\",\"a110fc5a7c5a3955\",\"f983ac370a0f1a29\",\"7c06e727d0fb6b86\",\"911a4793b215ab74\",\"591b1fd57f9a112d\",\"93130ea0956edc94\",\"3e16082507348c05\",\"f9a91611366ee26c\",\"9fe328841509c62e\",\"a1f16abbe26b2f70\",\"656772ed815186c7\",\"41824d0aa1391d44\",\"fb2c2916a3c88941\",\"698f359c1905ebd5\",\"e7088faf26326688\",\"d129bda160f4ff40\",\"2a66dac6b0b7ee9f\",\"c8dfa369f073ae98\",\"662cbbd1b4d9a291\",\"e44452fbe0646900\",\"8880f547a725f4cf\",\"d4abc18587d5120e\",\"e007fbf580eaf7ca\",\"3ee5adb9eaae8cd9\",\"e6eb93d6c4582f6c\",\"fc67c204f1adf7ee\",\"f2658fb99072c5d8\",\"747bafb235d9f459\",\"e84dfff74ed388b9\",\"b57fae99e0667313\",\"74ddf0fa25caa7d3\",\"604b157a2529a6da\",\"326c68e73671aa69\",\"8f475fd2d67dab29\",\"272bbddfc2c24ad1\",\"bfd159f1cb385183\",\"47ae85e23469f432\",\"ccc3033e6bd6ecc5\",\"a9446251de3e31df\",\"7288ed3ee198274e\",\"cb1fb9e8e250542f\",\"d8de5dcadf34d52f\",\"0724f84db94cae6a\",\"bb3d368e16e621ad\",\"83be90c482e0ee21\",\"7c3449f27fe71e53\",\"9537f77fc3da8084\",\"2e665a197ef17196\",\"615d34378efb4c8c\",\"00c1b709e4b1362b\",\"6545ae097930a018\",\"30ffb2c45bab9e4f\",\"cbb3769917ce4c7d\",\"c1d7c3f0eefe6fa3\",\"0b1651685c1e1f88\",\"162fb40a41775166\",\"3d829793ddf9a505\",\"a0acf10274bbc368\",\"c3144009f0578926\",\"a49f9beadfaf57e7\",\"11b51eed318d2902\",\"16bc11ef2b630fa3\",\"f49385787ecae8d7\",\"b79c81fc8fdb8f6e\",\"d538f7269a6160be\",\"10ded6cdf88c60d1\",\"e4f87013059c4e38\",\"0091a8bbbaca9231\",\"7a39eeba07bd1b09\",\"aac3717844c5a87c\",\"0991ad4715fff3be\",\"a683f8ba8dcf921d\",\"e4d9320719ea19f1\",\"d2e51aca4d47c76b\",\"952e6ca8543dc47a\",\"2bb0f9c8a7dfa1fc\",\"77cf9f201237de6f\",\"872b5099772d0598\",\"53a082f78f8db2c2\",\"d50d1f533a693a08\",\"acee7fec48f40b00\",\"6e2649a230888865\",\"6c4cc905358f5c7a\",\"fd16c5529386ce2d\",\"4b851d682e639a59\",\"d17a1f93c7b376f9\",\"8d7f51697aa546e0\",\"5149b798b7067c58\",\"30d455f6c953a5a2\",\"c2ee64ddc8f348e8\",\"81744fd6f82dec4e\",\"1411656cf0fb2d1b\",\"53eca1e0db47f4f7\",\"cecc63f4425b7294\",\"9719e1782cbe3171\",\"9f9a48c46fac2d35\",\"551e1f7508d63a5d\",\"f2ed421f489d4113\",\"40bb36ceb4426024\",\"124df20517f711a5\",\"183b633443b99db3\",\"5bb5cd0cedf09b40\",\"5c9e7f8c2fd594bf\",\"ac8bc770a8b6a3fe\",\"699526892bbeed94\",\"5c77dab2b7ab33f7\",\"4210a44274d8fbee\",\"4ac538810561fe30\",\"326e46a2bd34276e\",\"0ab4d44c5d0692c5\",\"c5770b327d666800\",\"5f291d11ddbbb9dd\",\"c86b78720cb69eed\",\"08aa1ed7f98c2e9d\",\"aafc7070cea41b55\",\"4bc01f2dfa4ee4ea\",\"191d025df6a26f9f\",\"2d929b251e096b01\",\"35c17675c5c5614f\",\"3f40cb5561040c7d\",\"3b6afd40edc526cb\",\"b8d2150d7cf5e6a7\",\"c24d2d7f007a7224\",\"b28bd89d0b4290c2\",\"004f08942d739f86\",\"7a016e63d2e1c534\",\"220726c06a9aff24\",\"0f4ae220d951b229\",\"def4c8503047ed15\",\"ea9037c4e13af3b1\",\"4566f356b30f1c55\",\"e4e0a11daf28f88d\",\"4f8444332a2d608e\",\"e2949a9e4aa2e357\",\"523160d0e48b36a1\",\"4b4d1cf971884dbd\",\"a9d0ca2e1d83e8ad\",\"b7cca40038b0c139\",\"64a313079aa9c24e\",\"742547c05657d061\",\"0c9ba7ab13342c68\",\"0c05a3e36b709ae8\",\"a44c62a3484b209b\",\"3029f530131cc76a\",\"13d7d535bd5d9e69\",\"de65f925b54e6edd\",\"97f57331c5083576\",\"aff160f665e224d1\",\"2fef040f41f9c390\",\"a84d0faa3b8c5336\",\"bb51aa0c7ef3102f\",\"8334784745f0384e\",\"fcdd442cc60b2cbb\",\"1cb1c44a3aee2eea\",\"567e5f01c8e3ba33\",\"2d28aca392cb1808\",\"408f7406bf03b7db\",\"d08c86c98c85652f\",\"7f088dc76989dfd8\",\"27ea7c727a00c3b5\",\"a8d539c7a3d8e183\",\"574071705b5f74bc\",\"eab4ed4420d66dfa\",\"8250bd631bb52d7c\",\"74a8ca68cf746f6f\",\"59cde49fc271c8a5\",\"d5733dbfd9bef532\",\"44222eb73fef86b4\",\"5aeaaec34e76205c\",\"6b1cfcfacd6fc724\",\"b0ad93b423544c38\",\"71c4301b3cc89a08\",\"e0c15f88f609192f\",\"7fd3b94cd044705a\",\"b246635c29af865c\",\"de9123a043d9c6e4\",\"cc2eda3eea3b1b5c\",\"c5b6f31693f86bdf\",\"f9b11d76e685b847\",\"9690899f3f4f59aa\",\"c6b0e163541788fe\",\"454cb492e8452fc9\",\"fb1c15270b2955d9\",\"f89eee2aab17053b\",\"8a7d6c57d51bcd07\",\"3e4325a55fe37857\",\"96fe99d62e8a38e7\",\"139cc37282e46651\",\"7f3626435992c439\",\"922520d56e086726\",\"434d955964c16a15\",\"99968263ea9c6932\",\"c91e865002d90206\",\"63a70e7b3002f286\",\"b15f3b372f0d88cb\",\"15e149da4105ebdc\",\"658a7bf0ee3f5dbd\",\"184a9b75c3a251ca\",\"4d55e81a3a9e716e\",\"43dafba95f29ef68\",\"bad0398cdc13571d\",\"e2968314d5d3d598\",\"5051a6edc1e035a9\",\"534d88bbba9fe4ec\",\"abf3c4b520d602d9\",\"a0202f918b6abf0e\",\"da383e66876a5c5b\",\"f332b5ed6c141758\",\"c778d9545057c4df\",\"4345a3d05be9cce8\",\"5ed7a78c48b7be60\",\"6d0dd5967ad54dab\",\"3c8e0dcf8f1e1bff\",\"8d4d63ff6aff7b46\",\"355f882ec909d20b\",\"6e9b158ffca8a25f\",\"5360c77d72e1cf2b\",\"2589abe998608b22\",\"289ec40fe4028517\",\"01034cf9b1b6b78a\",\"56c277ae3aac6901\",\"e205fdba597756ae\",\"8b6bf009698e0a8f\",\"eecc7e34c9bcec7e\",\"3308ac1ade2861ef\",\"b623d596447d2733\",\"15fb14998cb8ac33\",\"05455a29bd4ed8d8\",\"2803fa47fc6d08bf\",\"816fd9bf16a2d704\",\"23f3ed983b590ce8\",\"193875ca37c32614\",\"0cebb365eb66ee35\",\"7cef0d7cfdf386d2\",\"054465b58b47147d\",\"d30dff3269e5b126\",\"bfb4c40b216e4006\",\"0b6aa9f6c38b1a2c\",\"1b3a213693efc59e\",\"61524088b25fc54d\",\"80aaff4e7f5fcc38\",\"e8915c8ca6e03e10\",\"4ab4a693d3fe75cc\",\"c096ca24dad9b91a\",\"3497a530e0e60fd6\",\"23e390c4238de01a\",\"ae997384439f6d4f\",\"4fffa9deebe8558b\",\"5738cf09e6b96876\",\"8ba881e69dde07e8\",\"899f854bb5a02434\",\"51060f605d3672bd\",\"004e149089f5dbe0\",\"888d40147fefff30\",\"c30d2c446cd4462f\",\"391d1f92aa0b4810\",\"c52946147192192e\",\"5b19f1601784d6f3\",\"493d06c92d99c641\",\"1382b8df59a2ac5a\",\"d7a25613d0bfa49e\",\"0ebdc44aa97efe1e\",\"b7e0acf179eaa355\",\"12c5d97043fbcbc9\",\"c2f604c6e55b46ac\",\"0ed13a88f2e23686\",\"c83c9471788c5c13\",\"d1d4adba9c27eb08\",\"71b53d0b826c7084\",\"316ed30fbe165c6b\",\"47d194956668dda4\",\"42c12b7de414ab86\",\"7e59fa644b793112\",\"e1fe653e5e148d5f\",\"945ac15a091251f4\",\"37a297c38bb24d5b\",\"2f9d5e6bf46a5a2a\",\"1be772ab74cdc832\",\"20b9a35168293e85\",\"0ec168620b6e61df\",\"d697c619a9b39bd7\",\"43dc2918ec4b83b7\",\"36542e017e8c4ef1\",\"3f6c90170168bf74\",\"7b07ea9686a38ee0\",\"0f9549907aea3b19\",\"a02681345f00c816\",\"ea7f65800d8e86f2\",\"f1f620bfed90f944\",\"5d62df57f856ad2f\",\"5170f29fac2c78ff\",\"e2ada633f2258c7f\",\"af630af41458b67b\",\"38516eafd66bfe7a\",\"d8d7c6d02500b23a\",\"394626e3f6e9ca18\",\"9c5128ad75cb3ac2\",\"91dbd03b80fb3732\",\"2badf5eaf49e5392\",\"638d500a39dc4f67\",\"54de3b1d74fb8ee3\",\"c281e7504bf23d6d\",\"0cca9ecc5567e58f\",\"22bec5d96f3a0f4d\",\"5f22cc4af0e5b51a\",\"c0b5d9cddc58de98\",\"c9a584a3e69d8047\",\"8a6e24e3a0ee4f9f\",\"d82810ef02bb942a\",\"c6f67c4065c94d55\"]}],\"note\":\"当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。\"}],\"unknowns\":[],\"unresolved_effect_actions\":[],\"interpretation\":\"静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。\",\"candidate_actions\":[{\"function\":\"Maze.step(int8[])\",\"abi_signature\":\"step(int8[])\",\"matched_states\":[\"Maze.bug\"],\"environment_reads\":[],\"static_status\":\"candidate_only\",\"seed_compatible\":true,\"effect_evidence\":[{\"state\":\"Maze.bug\",\"writer\":\"Maze.func_bug(int8[])\",\"expression\":\"bug = true\",\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#8\"}],\"numeric_guard_evidence\":null,\"prerequisite_dependencies\":[{\"required_state\":\"Maze.bug\",\"guard_evidence\":[{\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2741\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"},{\"required_state\":\"Maze.stop\",\"guard_evidence\":[{\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2741\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"},{\"required_state\":\"Maze.next_cell\",\"guard_evidence\":[{\"expression\":\"next_cell == - 2\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2743\"},{\"expression\":\"next_cell == - 1\",\"predicate_calls\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2747\"}],\"candidate_producers\":[],\"resolution\":\"static_candidate_only\"}],\"related_helper_effects\":[],\"source_call_chain\":[],\"source_context_id\":\"Maze.step(int8[])\",\"action_guard_evidence\":[{\"kind\":\"require_or_assert\",\"expression\":\"require(bool,string)(! stop && ! bug,unable to take any further steps)\",\"branch\":null,\"variables_read\":[\"bug\",\"stop\"],\"state_reads\":[\"Maze.bug\",\"Maze.stop\"],\"data_dependencies\":{\"bug\":[\"bug\"],\"stop\":[\"stop\"]},\"predicate_calls\":[],\"predicate_logic\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2741\"},{\"kind\":\"control_branch\",\"expression\":\"next_cell == - 2\",\"branch\":\"false\",\"variables_read\":[\"next_cell\"],\"state_reads\":[\"Maze.next_cell\"],\"data_dependencies\":{\"next_cell\":[\"next_cell\"]},\"predicate_calls\":[],\"predicate_logic\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2743\"},{\"kind\":\"control_branch\",\"expression\":\"next_cell == - 1\",\"branch\":\"true\",\"variables_read\":[\"next_cell\"],\"state_reads\":[\"Maze.next_cell\"],\"data_dependencies\":{\"next_cell\":[\"next_cell\"]},\"predicate_calls\":[],\"predicate_logic\":[],\"source\":\"func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_15x15_5575700_1_50percent_equality75_gen.sol#2747\"}]}],\"context_focus\":{\"method\":\"exact_effect_state_excluding_frequent_shared_matches\",\"before\":1,\"after\":1,\"focused_states\":[\"Maze.bug\"],\"frequent_shared_states_not_used_for_action_selection\":[],\"excluded_signatures\":[],\"unknowns_preserved\":[]}}]}}"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "thinking": {
+          "type": "disabled"
+        },
+        "max_tokens": 4096,
+        "temperature": 0,
+        "stream": false
+      },
+      "budget_preflight_upper_bound": 25649,
+      "budget_remaining_before_call": 1500000,
+      "http_status": 200,
+      "response_id": "e70ea0d2-8031-4aae-b3bb-53c8fdc47b8e",
+      "model_returned": "deepseek-flash",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 8824,
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 8184,
+        "completion_tokens": 287,
+        "total_tokens": 9111,
+        "estimated_cost_usd": {
+          "offpeak": "0.00140172",
+          "peak": "0.00280344"
+        },
+        "pricing_date": "2026-11-13",
+        "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+        "cost_is_estimate": true
+      },
+      "finish_reason": "stop",
+      "response_json": {
+        "property_sequences": [
+          {
+            "property_id": "472e1eb4a211b52252aa",
+            "candidate_id": "seq-472e1eb4a211b52252aa-1",
+            "steps": [
+              {
+                "function": "step(int8[])",
+                "rationale": "唯一 seed_compatible 候选；其 effect_evidence 显示内部 func_bug 可写 Maze.bug=true，从而可能使 echidna_noBug() 返回 false。守卫要求 !stop && !bug，部署时 bug=false、stop=false 已满足，故先执行该步尝试触发 bug 写入；参数需满足 next_cell 分支条件，未具体化。"
+              }
+            ]
+          }
+        ],
+        "shared_prefixes": [],
+        "assumptions": [
+          "Maze.bug 与 Maze.stop 声明初始化为 false，部署后守卫 !stop && !bug 已满足，无需前置初始化交易。",
+          "step(int8[]) 的 effect_evidence 仅表明内部 func_bug 存在 bug=true 写入路径；未证明给定 int8[] 参数能到达该写入，也未证明 next_cell 分支条件可满足。",
+          "未提供 getter 探测结果，无法确认 bug 当前值；若已为 true 则属性已可能被违反，无需额外交易。",
+          "参数具体化不在本规划职责内，step 的 int8[] 取值需由执行器搜索。"
+        ],
+        "shared_prefixes_ignored": true,
+        "applied_shared_prefixes": [],
+        "invalid_records": [],
+        "canonicalized_signatures": [],
+        "recovery_summary": {
+          "valid_candidate_count": 1,
+          "invalid_record_count": 0,
+          "applied_shared_prefix_count": 0
+        }
+      },
+      "ok": true,
+      "elapsed_seconds": 2.254,
+      "budget": {
+        "max_tokens": 1500000,
+        "spent_tokens": 9111,
+        "charged_tokens": 9111,
+        "charge_source": "api_usage"
+      },
+      "invalid_record_count": 0,
+      "applied_shared_prefix_count": 0,
+      "local_context_dedup_seconds": 3.672936838,
+      "prompt_json_encoding_seconds": 0.000206219,
+      "prompt_utf8_bytes": 21437
+    }
+  ],
+  "planning": {
+    "status": "planned",
+    "plans": [
+      {
+        "property_sequences": [
+          {
+            "property_id": "472e1eb4a211b52252aa",
+            "candidate_id": "seq-472e1eb4a211b52252aa-1",
+            "steps": [
+              {
+                "function": "step(int8[])",
+                "rationale": "唯一 seed_compatible 候选；其 effect_evidence 显示内部 func_bug 可写 Maze.bug=true，从而可能使 echidna_noBug() 返回 false。守卫要求 !stop && !bug，部署时 bug=false、stop=false 已满足，故先执行该步尝试触发 bug 写入；参数需满足 next_cell 分支条件，未具体化。"
+              }
+            ]
+          }
+        ],
+        "shared_prefixes": [],
+        "assumptions": [
+          "Maze.bug 与 Maze.stop 声明初始化为 false，部署后守卫 !stop && !bug 已满足，无需前置初始化交易。",
+          "step(int8[]) 的 effect_evidence 仅表明内部 func_bug 存在 bug=true 写入路径；未证明给定 int8[] 参数能到达该写入，也未证明 next_cell 分支条件可满足。",
+          "未提供 getter 探测结果，无法确认 bug 当前值；若已为 true 则属性已可能被违反，无需额外交易。",
+          "参数具体化不在本规划职责内，step 的 int8[] 取值需由执行器搜索。"
+        ],
+        "shared_prefixes_ignored": true,
+        "applied_shared_prefixes": [],
+        "invalid_records": [],
+        "canonicalized_signatures": [],
+        "recovery_summary": {
+          "valid_candidate_count": 1,
+          "invalid_record_count": 0,
+          "applied_shared_prefix_count": 0
+        }
+      }
+    ],
+    "fixed_prefix_transactions": []
+  },
+  "candidates": [
+    {
+      "property_id": "472e1eb4a211b52252aa",
+      "candidate_id": "seq-472e1eb4a211b52252aa-1",
+      "steps": [
+        {
+          "function": "step(int8[])",
+          "rationale": "唯一 seed_compatible 候选；其 effect_evidence 显示内部 func_bug 可写 Maze.bug=true，从而可能使 echidna_noBug() 返回 false。守卫要求 !stop && !bug，部署时 bug=false、stop=false 已满足，故先执行该步尝试触发 bug 写入；参数需满足 next_cell 分支条件，未具体化。"
+        }
+      ]
+    }
+  ],
+  "calls": 1,
+  "sequence_length_max": 8
+}

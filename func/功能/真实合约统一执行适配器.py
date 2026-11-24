@@ -400,9 +400,12 @@ def tool_environment(manifest: dict[str, Any], output: Path) -> tuple[dict[str, 
     if version not in versions["solc"]:
         raise RuntimeError("selected solc version does not match " + version)
     env = os.environ.copy()
-    env["PATH"] = os.pathsep.join([str(ROOT / ".tools/foundry/bin"),
-                                   str(ROOT / ".tools/olympia-venv/bin"), env.get("PATH", "")])
-    env["PYTHONPATH"] = os.pathsep.join([str(ROOT / ".tools/python"), env.get("PYTHONPATH", "")]).rstrip(os.pathsep)
+    # In isolated worktrees ROOT may be nested under .tools, so sibling
+    # executables must be resolved from the configured forge binary.
+    tool_home = Path(tools["forge"]).resolve().parents[2]
+    env["PATH"] = os.pathsep.join([str(Path(tools["forge"]).resolve().parent),
+                                   str(tool_home / "olympia-venv/bin"), env.get("PATH", "")])
+    env["PYTHONPATH"] = os.pathsep.join([str(tool_home / "python"), env.get("PYTHONPATH", "")]).rstrip(os.pathsep)
     shim_dir = output / "tool-shim"
     shim_dir.mkdir(parents=True, exist_ok=True)
     shim = shim_dir / "solc"
@@ -1386,7 +1389,9 @@ def fixed_echidna_corpus(sequence: dict[str, Any], target_address: str, output: 
     corpus.mkdir(parents=True, exist_ok=True)
     transactions = []
     for tx in sequence["transactions"]:
-        signature = tx["signature"]
+        signature = tx.get("signature") or tx.get("abi_signature") or tx.get("function")
+        if not signature:
+            raise ValueError("transaction is missing an ABI signature")
         args = tx.get("arguments", [])
         encoded = []
         for index, value in enumerate(args):
@@ -1433,7 +1438,10 @@ def run_echidna_sequence(manifest: dict[str, Any], workspace: Path, sequence: di
         properties = re.findall(r"^([^\n:]+): (passing|failing|failed)$", text, re.MULTILINE)
         loaded = [int(value) for value in re.findall(r"Loaded\s+(\d+)\s+transaction sequences", text)]
         replayed = "Sequence replayed from corpus file" in text
-        failed = bool(re.search(r"\b(?:falsified|failed)\b", text, re.IGNORECASE))
+        # Match property outcome tokens, not words inside property names such as
+        # `failed()` or `assertionFailed()`, which Echidna reports as passing.
+        failed = bool(re.search(r"\bfalsified\b", text, re.IGNORECASE)
+                      or re.search(r"^[^\n:]+: (?:failing|failed)$", text, re.MULTILINE))
         raw = {"backend": "echidna-native", "command": command, "returncode": completed.returncode,
                "corpus_file": str(corpus_file), "corpus_sha256": sha256_file(corpus_file),
                "log": str(log), "log_sha256": sha256_file(log),

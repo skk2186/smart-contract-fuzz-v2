@@ -1,0 +1,324 @@
+{
+  "project": "OLYMPIA_011",
+  "contract": "Maze",
+  "target": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/tasks/OLYMPIA-011/analysis/property-analysis.json",
+  "compiler": {
+    "version": "0.8.26",
+    "via_ir": true,
+    "optimize_yul": true,
+    "optimize": true
+  },
+  "property_count": 1,
+  "properties": [
+    {
+      "property_id": "2e906658141e5430adee",
+      "property": "Maze.echidna_noBug()",
+      "property_abi": "echidna_noBug()",
+      "property_abi_inputs": [],
+      "property_kind": "boolean_property",
+      "assertion_sites": [],
+      "assertion_trigger": null,
+      "property_source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#570",
+      "constructor_excerpt": null,
+      "constructor_actions": [],
+      "property_predicate": "570: \tfunction echidna_noBug() external returns (bool) {return !bug;}",
+      "analysis_contract": "Maze",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "read_states": [
+        "Maze.bug"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "read_sites": [
+        {
+          "function": "Maze.echidna_noBug()",
+          "states": [
+            "Maze.bug"
+          ],
+          "expression": "! bug",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#570"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "Maze.step(int8[])",
+          "abi_signature": "step(int8[])",
+          "abi_inputs": [
+            {
+              "name": "inp",
+              "type": "int8[]"
+            }
+          ],
+          "argument_ranges": [],
+          "state_mutability": "nonpayable",
+          "payable": false,
+          "matched_states": [
+            "Maze.bug"
+          ],
+          "environment_reads": [],
+          "static_status": "candidate_only",
+          "seed_compatible": true,
+          "seed_limitation": null,
+          "source_excerpt": null,
+          "source_call_chain": [],
+          "effect_evidence": [
+            {
+              "state": "Maze.bug",
+              "writer": "Maze.func_bug(int8[])",
+              "expression": "bug = true",
+              "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#8",
+              "guards": [
+                {
+                  "kind": "require_or_assert",
+                  "expression": "require(bool,string)(! stop && ! bug,unable to take any further steps)",
+                  "branch": null,
+                  "variables_read": [
+                    "bug",
+                    "stop"
+                  ],
+                  "state_reads": [
+                    "Maze.bug",
+                    "Maze.stop"
+                  ],
+                  "data_dependencies": {
+                    "bug": [
+                      "bug"
+                    ],
+                    "stop": [
+                      "stop"
+                    ]
+                  },
+                  "predicate_calls": [],
+                  "predicate_logic": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#459"
+                },
+                {
+                  "kind": "control_branch",
+                  "expression": "next_cell == - 2",
+                  "branch": "false",
+                  "variables_read": [
+                    "next_cell"
+                  ],
+                  "state_reads": [
+                    "Maze.next_cell"
+                  ],
+                  "data_dependencies": {
+                    "next_cell": [
+                      "next_cell"
+                    ]
+                  },
+                  "predicate_calls": [],
+                  "predicate_logic": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#461"
+                },
+                {
+                  "kind": "control_branch",
+                  "expression": "next_cell == - 1",
+                  "branch": "true",
+                  "variables_read": [
+                    "next_cell"
+                  ],
+                  "state_reads": [
+                    "Maze.next_cell"
+                  ],
+                  "data_dependencies": {
+                    "next_cell": [
+                      "next_cell"
+                    ]
+                  },
+                  "predicate_calls": [],
+                  "predicate_logic": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#465"
+                }
+              ]
+            }
+          ],
+          "related_helper_effects": [],
+          "prerequisite_dependencies": [
+            {
+              "required_state": "Maze.bug",
+              "guard_evidence": [
+                {
+                  "expression": "require(bool,string)(! stop && ! bug,unable to take any further steps)",
+                  "predicate_calls": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#459"
+                }
+              ],
+              "candidate_producers": [],
+              "resolution": "static_candidate_only"
+            },
+            {
+              "required_state": "Maze.stop",
+              "guard_evidence": [
+                {
+                  "expression": "require(bool,string)(! stop && ! bug,unable to take any further steps)",
+                  "predicate_calls": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#459"
+                }
+              ],
+              "candidate_producers": [],
+              "resolution": "static_candidate_only"
+            },
+            {
+              "required_state": "Maze.next_cell",
+              "guard_evidence": [
+                {
+                  "expression": "next_cell == - 2",
+                  "predicate_calls": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#461"
+                },
+                {
+                  "expression": "next_cell == - 1",
+                  "predicate_calls": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Prims_5x5_7614203_1_75percent_CVE-2016-4489_gen.sol#465"
+                }
+              ],
+              "candidate_producers": [],
+              "resolution": "static_candidate_only"
+            }
+          ]
+        }
+      ],
+      "action_inventory_source": "slither_dependency_candidates",
+      "slither_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "prerequisite_state_closure": [
+        {
+          "state": "Maze.bug",
+          "depth": 0,
+          "declaration_initializer": "false",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "Maze.step(int8[])",
+              "effect_ids": [
+                "802e8f7cacb6bd24"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "Maze.stop",
+          "depth": 0,
+          "declaration_initializer": "false",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "Maze.step(int8[])",
+              "effect_ids": [
+                "a469eb963fed0fe7",
+                "80c38b90a6a6a3c5",
+                "2d6d485be73c290a",
+                "5f306ab977239860",
+                "e1312a26cd1e5050",
+                "0bfeadaed2ce1f41",
+                "ff2069862eb15e6b",
+                "d1aa1097e9758e06",
+                "135ece06859471c2",
+                "f3f2e632176db22e",
+                "eebe9f0dc9cdbf8b",
+                "19a470c5f531f90f",
+                "262952d1583d3fde",
+                "391ccd18b5d2eb7e",
+                "f6a4ced4cafd399a",
+                "a1e94240583f9a7a",
+                "c85116c8d1dc1a35",
+                "5d9405105b8f5e37",
+                "b4793f51f32d5861",
+                "af32b01c7e479123",
+                "c228dff5479a9341",
+                "392563d42606d2e1",
+                "8d4dc1a3dda62bc9",
+                "e95b1f1e014112bf"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "Maze.next_cell",
+          "depth": 0,
+          "declaration_initializer": "0",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "Maze.step(int8[])",
+              "effect_ids": [
+                "1cd45083ac4a40fa",
+                "71be0a9900bb8826",
+                "8d492c572d3ea95c",
+                "690b22f3d9cbbf31",
+                "394df50e78c05eae",
+                "28b4dbfb93756d94",
+                "9ab16260a7196468",
+                "c6ae425036c88861",
+                "7dc9ec729d2b5996",
+                "3ddd71ab34d53aff",
+                "eb934715492b0f19",
+                "0b25052c79711383",
+                "83b5fede7ccd538e",
+                "a196adcdb45688f4",
+                "032a04c3429d04c4",
+                "9b12401a4db7d89b",
+                "8cec945283b92c51",
+                "3c16df0106047e13",
+                "c815e2aef9710721",
+                "9709f72a7f6a0136",
+                "367120814d02edbb",
+                "ef5370a8db00f713",
+                "d6b4e66809ca6d24",
+                "d45821823bbb6613",
+                "bee6fd911364f4a0",
+                "25d2d247ce612b23",
+                "d27186c7b971d36c",
+                "cf5e78921bd72553",
+                "0153951835e26c76",
+                "dc044df20d4c7cb3",
+                "ee3a49d4deb8d36e",
+                "0a44a6742fac5c4a",
+                "fe80aba324478564",
+                "84ecd21e4d42b0b4",
+                "cb302c862b419afc",
+                "f77496d551867da8",
+                "dd7d789cf51ac698",
+                "900117476141da5b",
+                "21453c90c8e33e00",
+                "6189f15d69efe541",
+                "cfaa02f98268c701",
+                "44fd0ab62c853c8b",
+                "c923d59e51754695",
+                "757289749049d90a"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "unresolved_effect_actions": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "sender_pool": [
+    "0x0000000000000000000000000000000000010000",
+    "0x0000000000000000000000000000000000020000",
+    "0x0000000000000000000000000000000000030000",
+    "0x0000000000000000000000000000000000040000",
+    "0x0000000000000000000000000000000000050000"
+  ],
+  "agent_environment": {
+    "chain_id": 1,
+    "initial_timestamp": 0,
+    "initial_block_number": 0,
+    "evm_revision": "shanghai",
+    "harness_address": "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "gas_price_wei": 0,
+    "gas_limit_per_transaction": 12500000
+  }
+}

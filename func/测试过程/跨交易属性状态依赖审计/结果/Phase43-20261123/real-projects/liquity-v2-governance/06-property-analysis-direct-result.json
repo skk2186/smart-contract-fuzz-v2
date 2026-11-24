@@ -1,0 +1,175 @@
+{
+  "status": "passed",
+  "returncode": 0,
+  "start_utc": "2026-11-24T02:44:17Z",
+  "end_utc": "2026-11-24T02:44:44.196263+00:00",
+  "report": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-worktree/func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/real-projects/liquity-v2-governance/06-property-analysis-direct.json",
+  "report_bytes": 3273899,
+  "summary": {
+    "status": "complete",
+    "contract_count": 1,
+    "property_count": 7,
+    "properties": [
+      {
+        "property_id": "adc8ee4740d26f3266c5",
+        "property": "BribeInitiativeProperties.invariant_BI01()",
+        "analysis_class": "stateful_context_available",
+        "dependency_status": "incomplete",
+        "candidate_actions": [
+          "BribeInitiativeTargets.initiative_claimBribes(uint16,uint16,uint16,uint8)",
+          "BribeInitiativeTargets.initiative_depositBribe(uint128,uint128,uint16,uint8)",
+          "GovernanceTargets.governance_allocateLQTY(int88[],int88[])",
+          "GovernanceTargets.governance_allocateLQTY_clamped_single_initiative(uint8,uint96,uint96)",
+          "GovernanceTargets.governance_claimForInitiative(uint8)",
+          "GovernanceTargets.governance_claimFromStakingV1(uint8)",
+          "GovernanceTargets.governance_deployUserProxy()",
+          "GovernanceTargets.governance_depositLQTY(uint88)",
+          "GovernanceTargets.governance_depositLQTYViaPermit(uint88)",
+          "GovernanceTargets.governance_registerInitiative(uint8)",
+          "GovernanceTargets.governance_snapshotVotesForInitiative(address)",
+          "GovernanceTargets.governance_unregisterInitiative(uint8)",
+          "GovernanceTargets.governance_withdrawLQTY(uint88)",
+          "TargetFunctions.helper_accrueBold(uint88)",
+          "TargetFunctions.helper_deployInitiative()"
+        ],
+        "unknowns": [
+          "BribeInitiativeProperties.invariant_BI01(): 部分外部属性读取无法解析到目标状态",
+          "BribeInitiativeProperties.invariant_BI01(): 部分外部状态读取未找到解析后的写入入口",
+          "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选",
+          "候选调用链含外部调用；静态输出未证明其返回值或副作用",
+          "候选调用链含循环；CFG 仅枚举无重复节点的路径",
+          "属性自身含外部调用；其读取结果取决于实际部署与调用环境",
+          "属性自身含无法静态解析的调用；状态依赖可能不完整"
+        ]
+      },
+      {
+        "property_id": "810adc04be69f38411c9",
+        "property": "BribeInitiativeProperties.invariant_BI02()",
+        "analysis_class": "stateful_context_available",
+        "dependency_status": "statically_supported_with_limits",
+        "candidate_actions": [
+          "BribeInitiativeTargets.initiative_claimBribes(uint16,uint16,uint16,uint8)"
+        ],
+        "unknowns": [
+          "候选调用链含外部调用；静态输出未证明其返回值或副作用",
+          "候选调用链含循环；CFG 仅枚举无重复节点的路径",
+          "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+        ]
+      },
+      {
+        "property_id": "645a4faf10805c6f05b3",
+        "property": "BribeInitiativeProperties.invariant_BI03()",
+        "analysis_class": "stateful_context_available",
+        "dependency_status": "incomplete",
+        "candidate_actions": [
+          "GovernanceTargets.governance_allocateLQTY_clamped_single_initiative(uint8,uint96,uint96)",
+          "TargetFunctions.helper_deployInitiative()"
+        ],
+        "unknowns": [
+          "BribeInitiativeProperties.invariant_BI03(): 部分外部属性读取无法解析到目标状态",
+          "BribeInitiativeProperties.invariant_BI03(): 部分外部状态读取未找到解析后的写入入口",
+          "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选",
+          "候选调用链含外部调用；静态输出未证明其返回值或副作用",
+          "候选调用链含循环；CFG 仅枚举无重复节点的路径",
+          "属性自身含外部调用；其读取结果取决于实际部署与调用环境",
+          "属性自身含无法静态解析的调用；状态依赖可能不完整",
+          "数据依赖无法判断: ?.add(uint88,int88) b",
+          "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+        ]
+      },
+      {
+        "property_id": "093fa3f23cadf8c4623e",
+        "property": "BribeInitiativeProperties.invariant_BI04()",
+        "analysis_class": "stateful_context_available",
+        "dependency_status": "incomplete",
+        "candidate_actions": [
+          "GovernanceTargets.governance_allocateLQTY_clamped_single_initiative(uint8,uint96,uint96)",
+          "TargetFunctions.helper_deployInitiative()"
+        ],
+        "unknowns": [
+          "BribeInitiativeProperties.invariant_BI04(): 部分外部属性读取无法解析到目标状态",
+          "BribeInitiativeProperties.invariant_BI04(): 部分外部状态读取未找到解析后的写入入口",
+          "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选",
+          "候选调用链含外部调用；静态输出未证明其返回值或副作用",
+          "候选调用链含循环；CFG 仅枚举无重复节点的路径",
+          "属性自身含外部调用；其读取结果取决于实际部署与调用环境",
+          "属性自身含无法静态解析的调用；状态依赖可能不完整",
+          "数据依赖无法判断: ?.add(uint88,int88) b",
+          "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+        ]
+      },
+      {
+        "property_id": "ebfa2aa4c9bfa0c798a0",
+        "property": "BribeInitiativeProperties.invariant_BI05()",
+        "analysis_class": "stateful_context_available",
+        "dependency_status": "incomplete",
+        "candidate_actions": [
+          "BribeInitiativeTargets.initiative_claimBribes(uint16,uint16,uint16,uint8)",
+          "BribeInitiativeTargets.initiative_depositBribe(uint128,uint128,uint16,uint8)",
+          "GovernanceTargets.governance_allocateLQTY(int88[],int88[])",
+          "GovernanceTargets.governance_allocateLQTY_clamped_single_initiative(uint8,uint96,uint96)",
+          "GovernanceTargets.governance_claimForInitiative(uint8)",
+          "GovernanceTargets.governance_claimFromStakingV1(uint8)",
+          "GovernanceTargets.governance_deployUserProxy()",
+          "GovernanceTargets.governance_depositLQTY(uint88)",
+          "GovernanceTargets.governance_depositLQTYViaPermit(uint88)",
+          "GovernanceTargets.governance_registerInitiative(uint8)",
+          "GovernanceTargets.governance_snapshotVotesForInitiative(address)",
+          "GovernanceTargets.governance_unregisterInitiative(uint8)",
+          "GovernanceTargets.governance_withdrawLQTY(uint88)",
+          "TargetFunctions.helper_accrueBold(uint88)",
+          "TargetFunctions.helper_deployInitiative()"
+        ],
+        "unknowns": [
+          "BribeInitiativeProperties.invariant_BI05(): 存在仅按状态变量重叠关联的候选，对象别名未证明",
+          "BribeInitiativeProperties.invariant_BI05(): 部分外部状态读取未找到解析后的写入入口",
+          "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选",
+          "候选调用链含外部调用；静态输出未证明其返回值或副作用",
+          "候选调用链含循环；CFG 仅枚举无重复节点的路径",
+          "属性自身含外部调用；其读取结果取决于实际部署与调用环境",
+          "跨合约候选的对象别名、调用结果和执行可达性仍需验证"
+        ]
+      },
+      {
+        "property_id": "dfb2424a270e98ccc137",
+        "property": "GovernanceProperties.invariant_GV01()",
+        "analysis_class": "stateful_context_available",
+        "dependency_status": "statically_supported_with_limits",
+        "candidate_actions": [
+          "BribeInitiativeTargets.initiative_claimBribes(uint16,uint16,uint16,uint8)",
+          "BribeInitiativeTargets.initiative_depositBribe(uint128,uint128,uint16,uint8)",
+          "GovernanceTargets.governance_allocateLQTY(int88[],int88[])",
+          "GovernanceTargets.governance_allocateLQTY_clamped_single_initiative(uint8,uint96,uint96)",
+          "GovernanceTargets.governance_claimForInitiative(uint8)",
+          "GovernanceTargets.governance_claimFromStakingV1(uint8)",
+          "GovernanceTargets.governance_deployUserProxy()",
+          "GovernanceTargets.governance_depositLQTY(uint88)",
+          "GovernanceTargets.governance_depositLQTYViaPermit(uint88)",
+          "GovernanceTargets.governance_registerInitiative(uint8)",
+          "GovernanceTargets.governance_snapshotVotesForInitiative(address)",
+          "GovernanceTargets.governance_unregisterInitiative(uint8)",
+          "GovernanceTargets.governance_withdrawLQTY(uint88)",
+          "TargetFunctions.helper_accrueBold(uint88)",
+          "TargetFunctions.helper_deployInitiative()"
+        ],
+        "unknowns": [
+          "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选",
+          "候选调用链含外部调用；静态输出未证明其返回值或副作用",
+          "候选调用链含循环；CFG 仅枚举无重复节点的路径"
+        ]
+      },
+      {
+        "property_id": "f0b8eee6822c15895d6f",
+        "property": "Properties.invariant_canary()",
+        "analysis_class": "stateful_dependency_unresolved",
+        "dependency_status": "incomplete",
+        "candidate_actions": [],
+        "unknowns": [
+          "Properties.invariant_canary(): 未找到可改变所读状态的已解析外部入口",
+          "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+        ]
+      }
+    ]
+  },
+  "log": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-worktree/func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/real-projects/liquity-v2-governance/06-property-analysis-direct.log"
+}

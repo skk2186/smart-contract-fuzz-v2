@@ -1,0 +1,478 @@
+/home/skk/smart-contract-fuzz-v2/.tools/phase43-worktree/func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Sidewinder_5x5_7147022_1_100percent_equality75_gen.sol
+   1 |     | pragma solidity 0.8.26;
+   2 | *r  | contract Maze { 
+   3 | *   | 	bool public bug = false;
+   4 | *   | 	bool private stop = false;
+   5 | *   | 	int64 next_cell = 0;
+   6 | *   | 	function func_start(int8[] memory inp) internal {}
+   7 |     | 	function func_bug(int8[] memory inp) internal {
+   8 |     | 		bug = true;
+   9 |     | 		return;
+  10 |     | 	}
+  11 | *   | 	function func_0(int8[] memory inp) internal {
+  12 |     | 	unchecked{
+  13 | *r  | 		require(inp.length >= 1);
+  14 | *   | 		if (inp[0] < 0) {
+  15 | *   | 			next_cell = -2;
+  16 |     | 		}
+  17 | *   | 		else if (inp[0] >= 0) {
+  18 | *   | 			next_cell = 1;
+  19 |     | 		}
+  20 |     | 		else {
+  21 |     | 			stop = true;
+  22 |     | 		}
+  23 |     | 	}
+  24 |     | 	}
+  25 | *   | 	function func_1(int8[] memory inp) internal {
+  26 |     | 	unchecked{
+  27 | *r  | 		require(inp.length >= 1);
+  28 | *   | 		if (inp[0] == -64) {
+  29 | *   | 			next_cell = 0;
+  30 |     | 		}
+  31 | *   | 		else if (inp[0] == 64) {
+  32 | *   | 			next_cell = 2;
+  33 |     | 		}
+  34 |     | 		else {
+  35 | *   | 			stop = true;
+  36 |     | 		}
+  37 |     | 	}
+  38 |     | 	}
+  39 | *   | 	function func_2(int8[] memory inp) internal {
+  40 |     | 	unchecked{
+  41 | *r  | 		require(inp.length >= 1);
+  42 | *   | 		if (inp[0] == -64) {
+  43 | *   | 			next_cell = 1;
+  44 |     | 		}
+  45 | *   | 		else if (inp[0] == 64) {
+  46 | *   | 			next_cell = 3;
+  47 |     | 		}
+  48 |     | 		else {
+  49 | *   | 			stop = true;
+  50 |     | 		}
+  51 |     | 	}
+  52 |     | 	}
+  53 | *   | 	function func_3(int8[] memory inp) internal {
+  54 |     | 	unchecked{
+  55 | *r  | 		require(inp.length >= 1);
+  56 | *   | 		if (inp[0] == -64) {
+  57 | *   | 			next_cell = 2;
+  58 |     | 		}
+  59 | *   | 		else if (inp[0] == 64) {
+  60 | *   | 			next_cell = 4;
+  61 |     | 		}
+  62 |     | 		else {
+  63 | *   | 			stop = true;
+  64 |     | 		}
+  65 |     | 	}
+  66 |     | 	}
+  67 | *   | 	function func_4(int8[] memory inp) internal {
+  68 |     | 	unchecked{
+  69 | *r  | 		require(inp.length >= 1);
+  70 | *   | 		if (inp[0] == -64) {
+  71 | *   | 			next_cell = 3;
+  72 |     | 		}
+  73 | *   | 		else if (inp[0] == 64) {
+  74 | *   | 			next_cell = 9;
+  75 |     | 		}
+  76 |     | 		else {
+  77 | *   | 			stop = true;
+  78 |     | 		}
+  79 |     | 	}
+  80 |     | 	}
+  81 |     | 	function func_5(int8[] memory inp) internal {
+  82 |     | 	unchecked{
+  83 |     | 		require(inp.length >= 1);
+  84 |     | 		if (inp[0] < 0) {
+  85 |     | 			next_cell = 10;
+  86 |     | 		}
+  87 |     | 		else if (inp[0] >= 0) {
+  88 |     | 			next_cell = 6;
+  89 |     | 		}
+  90 |     | 		else {
+  91 |     | 			stop = true;
+  92 |     | 		}
+  93 |     | 	}
+  94 |     | 	}
+  95 |     | 	function func_6(int8[] memory inp) internal {
+  96 |     | 	unchecked{
+  97 |     | 		require(inp.length >= 1);
+  98 |     | 		if (inp[0] == -64) {
+  99 |     | 			next_cell = 5;
+ 100 |     | 		}
+ 101 |     | 		else if (inp[0] == 64) {
+ 102 |     | 			next_cell = 7;
+ 103 |     | 		}
+ 104 |     | 		else {
+ 105 |     | 			stop = true;
+ 106 |     | 		}
+ 107 |     | 	}
+ 108 |     | 	}
+ 109 | *   | 	function func_7(int8[] memory inp) internal {
+ 110 |     | 	unchecked{
+ 111 | *r  | 		require(inp.length >= 1);
+ 112 | *   | 		if (inp[0] < -43) {
+ 113 | *   | 			next_cell = 6;
+ 114 |     | 		}
+ 115 | *   | 		else if (inp[0] < 42) {
+ 116 | *   | 			next_cell = 12;
+ 117 |     | 		}
+ 118 | *   | 		else if (inp[0] >= 42) {
+ 119 | *   | 			next_cell = 8;
+ 120 |     | 		}
+ 121 |     | 		else {
+ 122 |     | 			stop = true;
+ 123 |     | 		}
+ 124 |     | 	}
+ 125 |     | 	}
+ 126 | *   | 	function func_8(int8[] memory inp) internal {
+ 127 |     | 	unchecked{
+ 128 | *r  | 		require(inp.length >= 1);
+ 129 | *   | 		if (inp[0] == -85) {
+ 130 | *   | 			next_cell = 7;
+ 131 |     | 		}
+ 132 | *   | 		else if (inp[0] == 1) {
+ 133 | *   | 			next_cell = 13;
+ 134 |     | 		}
+ 135 | *   | 		else if (inp[0] == 87) {
+ 136 | *   | 			next_cell = 9;
+ 137 |     | 		}
+ 138 |     | 		else {
+ 139 | *   | 			stop = true;
+ 140 |     | 		}
+ 141 |     | 	}
+ 142 |     | 	}
+ 143 | *   | 	function func_9(int8[] memory inp) internal {
+ 144 |     | 	unchecked{
+ 145 | *r  | 		require(inp.length >= 1);
+ 146 | *   | 		if (inp[0] == -64) {
+ 147 | *   | 			next_cell = 4;
+ 148 |     | 		}
+ 149 | *   | 		else if (inp[0] == 64) {
+ 150 | *   | 			next_cell = 8;
+ 151 |     | 		}
+ 152 |     | 		else {
+ 153 | *   | 			stop = true;
+ 154 |     | 		}
+ 155 |     | 	}
+ 156 |     | 	}
+ 157 |     | 	function func_10(int8[] memory inp) internal {
+ 158 |     | 	unchecked{
+ 159 |     | 		require(inp.length >= 1);
+ 160 |     | 		if (inp[0] < -43) {
+ 161 |     | 			next_cell = 5;
+ 162 |     | 		}
+ 163 |     | 		else if (inp[0] < 42) {
+ 164 |     | 			next_cell = 15;
+ 165 |     | 		}
+ 166 |     | 		else if (inp[0] >= 42) {
+ 167 |     | 			next_cell = 11;
+ 168 |     | 		}
+ 169 |     | 		else {
+ 170 |     | 			stop = true;
+ 171 |     | 		}
+ 172 |     | 	}
+ 173 |     | 	}
+ 174 |     | 	function func_11(int8[] memory inp) internal {
+ 175 |     | 	unchecked{
+ 176 |     | 		require(inp.length >= 1);
+ 177 |     | 		if (inp[0] == 1) {
+ 178 |     | 			next_cell = 10;
+ 179 |     | 		}
+ 180 |     | 		else {
+ 181 |     | 			stop = true;
+ 182 |     | 		}
+ 183 |     | 	}
+ 184 |     | 	}
+ 185 |     | 	function func_12(int8[] memory inp) internal {
+ 186 |     | 	unchecked{
+ 187 |     | 		require(inp.length >= 1);
+ 188 |     | 		if (inp[0] == 1) {
+ 189 |     | 			next_cell = 7;
+ 190 |     | 		}
+ 191 |     | 		else {
+ 192 |     | 			stop = true;
+ 193 |     | 		}
+ 194 |     | 	}
+ 195 |     | 	}
+ 196 | *   | 	function func_13(int8[] memory inp) internal {
+ 197 |     | 	unchecked{
+ 198 | *r  | 		require(inp.length >= 1);
+ 199 | *   | 		if (inp[0] == -64) {
+ 200 | *   | 			next_cell = 8;
+ 201 |     | 		}
+ 202 | *   | 		else if (inp[0] == 64) {
+ 203 | *   | 			next_cell = 14;
+ 204 |     | 		}
+ 205 |     | 		else {
+ 206 | *   | 			stop = true;
+ 207 |     | 		}
+ 208 |     | 	}
+ 209 |     | 	}
+ 210 |     | 	function func_14(int8[] memory inp) internal {
+ 211 |     | 	unchecked{
+ 212 |     | 		require(inp.length >= 1);
+ 213 |     | 		if (inp[0] < 0) {
+ 214 |     | 			next_cell = 13;
+ 215 |     | 		}
+ 216 |     | 		else if (inp[0] >= 0) {
+ 217 |     | 			next_cell = 19;
+ 218 |     | 		}
+ 219 |     | 		else {
+ 220 |     | 			stop = true;
+ 221 |     | 		}
+ 222 |     | 	}
+ 223 |     | 	}
+ 224 |     | 	function func_15(int8[] memory inp) internal {
+ 225 |     | 	unchecked{
+ 226 |     | 		require(inp.length >= 1);
+ 227 |     | 		if (inp[0] == -64) {
+ 228 |     | 			next_cell = 10;
+ 229 |     | 		}
+ 230 |     | 		else if (inp[0] == 64) {
+ 231 |     | 			next_cell = 16;
+ 232 |     | 		}
+ 233 |     | 		else {
+ 234 |     | 			stop = true;
+ 235 |     | 		}
+ 236 |     | 	}
+ 237 |     | 	}
+ 238 |     | 	function func_16(int8[] memory inp) internal {
+ 239 |     | 	unchecked{
+ 240 |     | 		require(inp.length >= 1);
+ 241 |     | 		if (inp[0] == -64) {
+ 242 |     | 			next_cell = 15;
+ 243 |     | 		}
+ 244 |     | 		else if (inp[0] == 64) {
+ 245 |     | 			next_cell = 17;
+ 246 |     | 		}
+ 247 |     | 		else {
+ 248 |     | 			stop = true;
+ 249 |     | 		}
+ 250 |     | 	}
+ 251 |     | 	}
+ 252 |     | 	function func_17(int8[] memory inp) internal {
+ 253 |     | 	unchecked{
+ 254 |     | 		require(inp.length >= 1);
+ 255 |     | 		if (inp[0] == -85) {
+ 256 |     | 			next_cell = 16;
+ 257 |     | 		}
+ 258 |     | 		else if (inp[0] == 1) {
+ 259 |     | 			next_cell = 22;
+ 260 |     | 		}
+ 261 |     | 		else if (inp[0] == 87) {
+ 262 |     | 			next_cell = 18;
+ 263 |     | 		}
+ 264 |     | 		else {
+ 265 |     | 			stop = true;
+ 266 |     | 		}
+ 267 |     | 	}
+ 268 |     | 	}
+ 269 |     | 	function func_18(int8[] memory inp) internal {
+ 270 |     | 	unchecked{
+ 271 |     | 		require(inp.length >= 1);
+ 272 |     | 		if (inp[0] == -64) {
+ 273 |     | 			next_cell = 17;
+ 274 |     | 		}
+ 275 |     | 		else if (inp[0] == 64) {
+ 276 |     | 			next_cell = 23;
+ 277 |     | 		}
+ 278 |     | 		else {
+ 279 |     | 			stop = true;
+ 280 |     | 		}
+ 281 |     | 	}
+ 282 |     | 	}
+ 283 |     | 	function func_19(int8[] memory inp) internal {
+ 284 |     | 	unchecked{
+ 285 |     | 		require(inp.length >= 1);
+ 286 |     | 		if (inp[0] == 1) {
+ 287 |     | 			next_cell = 14;
+ 288 |     | 		}
+ 289 |     | 		else {
+ 290 |     | 			stop = true;
+ 291 |     | 		}
+ 292 |     | 	}
+ 293 |     | 	}
+ 294 |     | 	function func_20(int8[] memory inp) internal {
+ 295 |     | 	unchecked{
+ 296 |     | 		require(inp.length >= 1);
+ 297 |     | 		if (true) {
+ 298 |     | 			next_cell = 21;
+ 299 |     | 		}
+ 300 |     | 		else {
+ 301 |     | 			stop = true;
+ 302 |     | 		}
+ 303 |     | 	}
+ 304 |     | 	}
+ 305 |     | 	function func_21(int8[] memory inp) internal {
+ 306 |     | 	unchecked{
+ 307 |     | 		require(inp.length >= 1);
+ 308 |     | 		if (inp[0] == -64) {
+ 309 |     | 			next_cell = 20;
+ 310 |     | 		}
+ 311 |     | 		else if (inp[0] == 64) {
+ 312 |     | 			next_cell = 22;
+ 313 |     | 		}
+ 314 |     | 		else {
+ 315 |     | 			stop = true;
+ 316 |     | 		}
+ 317 |     | 	}
+ 318 |     | 	}
+ 319 |     | 	function func_22(int8[] memory inp) internal {
+ 320 |     | 	unchecked{
+ 321 |     | 		require(inp.length >= 1);
+ 322 |     | 		if (inp[0] == -64) {
+ 323 |     | 			next_cell = 17;
+ 324 |     | 		}
+ 325 |     | 		else if (inp[0] == 64) {
+ 326 |     | 			next_cell = 21;
+ 327 |     | 		}
+ 328 |     | 		else {
+ 329 |     | 			stop = true;
+ 330 |     | 		}
+ 331 |     | 	}
+ 332 |     | 	}
+ 333 |     | 	function func_23(int8[] memory inp) internal {
+ 334 |     | 	unchecked{
+ 335 |     | 		require(inp.length >= 1);
+ 336 |     | 		if (inp[0] == -64) {
+ 337 |     | 			next_cell = 18;
+ 338 |     | 		}
+ 339 |     | 		else if (inp[0] == 64) {
+ 340 |     | 			next_cell = 24;
+ 341 |     | 		}
+ 342 |     | 		else {
+ 343 |     | 			stop = true;
+ 344 |     | 		}
+ 345 |     | 	}
+ 346 |     | 	}
+ 347 |     | 	function func_24(int8[] memory inp) internal {
+ 348 |     | 	unchecked{
+ 349 |     | 		require(inp.length >= 1);
+ 350 |     | 		if (inp[0] == -64) {
+ 351 |     | 			next_cell = 23;
+ 352 |     | 		}
+ 353 |     | 		else if (inp[0] == 64) {
+ 354 |     | 			next_cell = -1;
+ 355 |     | 		}
+ 356 |     | 		else {
+ 357 |     | 			stop = true;
+ 358 |     | 		}
+ 359 |     | 	}
+ 360 |     | 	}
+ 361 | *   | 	function step(int8[] calldata inp) external {
+ 362 |     | 
+ 363 | *r  | 		require(!stop && !bug, "unable to take any further steps");
+ 364 |     | 
+ 365 | *   | 		if (next_cell == -2) {
+ 366 | *   | 			func_start(inp);
+ 367 | *   | 			return;
+ 368 |     | 		}
+ 369 | *   | 		if (next_cell == -1) {
+ 370 |     | 			func_bug(inp);
+ 371 |     | 			return;
+ 372 |     | 		}
+ 373 | *   | 		if (next_cell == 0) {
+ 374 | *   | 			func_0(inp);
+ 375 | *   | 			return;
+ 376 |     | 		}
+ 377 | *   | 		if (next_cell == 1) {
+ 378 | *   | 			func_1(inp);
+ 379 | *   | 			return;
+ 380 |     | 		}
+ 381 | *   | 		if (next_cell == 2) {
+ 382 | *   | 			func_2(inp);
+ 383 | *   | 			return;
+ 384 |     | 		}
+ 385 | *   | 		if (next_cell == 3) {
+ 386 | *   | 			func_3(inp);
+ 387 | *   | 			return;
+ 388 |     | 		}
+ 389 | *   | 		if (next_cell == 4) {
+ 390 | *   | 			func_4(inp);
+ 391 | *   | 			return;
+ 392 |     | 		}
+ 393 | *   | 		if (next_cell == 5) {
+ 394 |     | 			func_5(inp);
+ 395 |     | 			return;
+ 396 |     | 		}
+ 397 | *   | 		if (next_cell == 6) {
+ 398 |     | 			func_6(inp);
+ 399 |     | 			return;
+ 400 |     | 		}
+ 401 | *   | 		if (next_cell == 7) {
+ 402 | *   | 			func_7(inp);
+ 403 | *   | 			return;
+ 404 |     | 		}
+ 405 | *   | 		if (next_cell == 8) {
+ 406 | *   | 			func_8(inp);
+ 407 | *   | 			return;
+ 408 |     | 		}
+ 409 | *   | 		if (next_cell == 9) {
+ 410 | *   | 			func_9(inp);
+ 411 | *   | 			return;
+ 412 |     | 		}
+ 413 | *   | 		if (next_cell == 10) {
+ 414 |     | 			func_10(inp);
+ 415 |     | 			return;
+ 416 |     | 		}
+ 417 | *   | 		if (next_cell == 11) {
+ 418 |     | 			func_11(inp);
+ 419 |     | 			return;
+ 420 |     | 		}
+ 421 | *   | 		if (next_cell == 12) {
+ 422 |     | 			func_12(inp);
+ 423 |     | 			return;
+ 424 |     | 		}
+ 425 | *   | 		if (next_cell == 13) {
+ 426 | *   | 			func_13(inp);
+ 427 | *   | 			return;
+ 428 |     | 		}
+ 429 |     | 		if (next_cell == 14) {
+ 430 |     | 			func_14(inp);
+ 431 |     | 			return;
+ 432 |     | 		}
+ 433 |     | 		if (next_cell == 15) {
+ 434 |     | 			func_15(inp);
+ 435 |     | 			return;
+ 436 |     | 		}
+ 437 |     | 		if (next_cell == 16) {
+ 438 |     | 			func_16(inp);
+ 439 |     | 			return;
+ 440 |     | 		}
+ 441 |     | 		if (next_cell == 17) {
+ 442 |     | 			func_17(inp);
+ 443 |     | 			return;
+ 444 |     | 		}
+ 445 |     | 		if (next_cell == 18) {
+ 446 |     | 			func_18(inp);
+ 447 |     | 			return;
+ 448 |     | 		}
+ 449 |     | 		if (next_cell == 19) {
+ 450 |     | 			func_19(inp);
+ 451 |     | 			return;
+ 452 |     | 		}
+ 453 |     | 		if (next_cell == 20) {
+ 454 |     | 			func_20(inp);
+ 455 |     | 			return;
+ 456 |     | 		}
+ 457 |     | 		if (next_cell == 21) {
+ 458 |     | 			func_21(inp);
+ 459 |     | 			return;
+ 460 |     | 		}
+ 461 |     | 		if (next_cell == 22) {
+ 462 |     | 			func_22(inp);
+ 463 |     | 			return;
+ 464 |     | 		}
+ 465 |     | 		if (next_cell == 23) {
+ 466 |     | 			func_23(inp);
+ 467 |     | 			return;
+ 468 |     | 		}
+ 469 |     | 		if (next_cell == 24) {
+ 470 |     | 			func_24(inp);
+ 471 |     | 			return;
+ 472 |     | 		}
+ 473 |     | 	}
+ 474 |     | 	function echidna_noBug() external returns (bool) {return !bug;}
+ 475 |     | }
+ 476 |     | 
+

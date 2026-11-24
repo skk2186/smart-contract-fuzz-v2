@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/bin/slither", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/slither/__main__.py", line 815, in main
+    main_impl(all_detector_classes=detectors, all_printer_classes=printers)
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/slither/__main__.py", line 936, in main_impl
+    ) = process_all(filename, args, detector_classes, printer_classes)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/slither/__main__.py", line 100, in process_all
+    compilations = compile_all(target, **vars(args))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 870, in compile_all
+    compilations.append(CryticCompile(target, **kwargs))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 279, in __init__
+    self._compile(**kwargs)
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/crytic_compile.py", line 725, in _compile
+    self._platform.compile(self, **kwargs)
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/platform/foundry.py", line 145, in compile
+    hardhat_like_parsing(
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/platform/hardhat.py", line 77, in hardhat_like_parsing
+    targets_json = get_targets_json(loaded_json, build_directory, uniq_id)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages/crytic_compile/platform/hardhat.py", line 187, in get_targets_json
+    with open(output_file, encoding="utf8") as file_desc_output:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/skk/smart-contract-fuzz-v2/.tools/phase43-worktree/func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/real-projects/liquity-v2-governance/build-out/build-info/ad7dd4a1500cd157.output.json'
+--ignore-compile used, if something goes wrong, consider removing the ignore compile flag

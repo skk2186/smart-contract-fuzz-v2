@@ -1,0 +1,504 @@
+{
+  "project": "OLYMPIA_039",
+  "contract": "Maze",
+  "target": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/tasks/OLYMPIA-039/analysis/property-analysis.json",
+  "compiler": {
+    "version": "0.8.26",
+    "via_ir": true,
+    "optimize_yul": true,
+    "optimize": true
+  },
+  "property_count": 1,
+  "properties": [
+    {
+      "property_id": "e4ae757963a97161788f",
+      "property": "Maze.echidna_noBug()",
+      "property_abi": "echidna_noBug()",
+      "property_abi_inputs": [],
+      "property_kind": "boolean_property",
+      "assertion_sites": [],
+      "assertion_trigger": null,
+      "property_source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1671",
+      "constructor_excerpt": null,
+      "constructor_actions": [],
+      "property_predicate": "1671: \tfunction echidna_noBug() external returns (bool) {return !bug;}",
+      "analysis_contract": "Maze",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "read_states": [
+        "Maze.bug"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "read_sites": [
+        {
+          "function": "Maze.echidna_noBug()",
+          "states": [
+            "Maze.bug"
+          ],
+          "expression": "! bug",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1671"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "Maze.step(int8[])",
+          "abi_signature": "step(int8[])",
+          "abi_inputs": [
+            {
+              "name": "inp",
+              "type": "int8[]"
+            }
+          ],
+          "argument_ranges": [],
+          "state_mutability": "nonpayable",
+          "payable": false,
+          "matched_states": [
+            "Maze.bug"
+          ],
+          "environment_reads": [],
+          "static_status": "candidate_only",
+          "seed_compatible": true,
+          "seed_limitation": null,
+          "source_excerpt": null,
+          "source_call_chain": [],
+          "effect_evidence": [
+            {
+              "state": "Maze.bug",
+              "writer": "Maze.func_bug(int8[])",
+              "expression": "bug = true",
+              "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#8",
+              "guards": [
+                {
+                  "kind": "require_or_assert",
+                  "expression": "require(bool,string)(! stop && ! bug,unable to take any further steps)",
+                  "branch": null,
+                  "variables_read": [
+                    "bug",
+                    "stop"
+                  ],
+                  "state_reads": [
+                    "Maze.bug",
+                    "Maze.stop"
+                  ],
+                  "data_dependencies": {
+                    "bug": [
+                      "bug"
+                    ],
+                    "stop": [
+                      "stop"
+                    ]
+                  },
+                  "predicate_calls": [],
+                  "predicate_logic": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1260"
+                },
+                {
+                  "kind": "control_branch",
+                  "expression": "next_cell == - 2",
+                  "branch": "false",
+                  "variables_read": [
+                    "next_cell"
+                  ],
+                  "state_reads": [
+                    "Maze.next_cell"
+                  ],
+                  "data_dependencies": {
+                    "next_cell": [
+                      "next_cell"
+                    ]
+                  },
+                  "predicate_calls": [],
+                  "predicate_logic": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1262"
+                },
+                {
+                  "kind": "control_branch",
+                  "expression": "next_cell == - 1",
+                  "branch": "true",
+                  "variables_read": [
+                    "next_cell"
+                  ],
+                  "state_reads": [
+                    "Maze.next_cell"
+                  ],
+                  "data_dependencies": {
+                    "next_cell": [
+                      "next_cell"
+                    ]
+                  },
+                  "predicate_calls": [],
+                  "predicate_logic": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1266"
+                }
+              ]
+            }
+          ],
+          "related_helper_effects": [],
+          "prerequisite_dependencies": [
+            {
+              "required_state": "Maze.bug",
+              "guard_evidence": [
+                {
+                  "expression": "require(bool,string)(! stop && ! bug,unable to take any further steps)",
+                  "predicate_calls": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1260"
+                }
+              ],
+              "candidate_producers": [],
+              "resolution": "static_candidate_only"
+            },
+            {
+              "required_state": "Maze.stop",
+              "guard_evidence": [
+                {
+                  "expression": "require(bool,string)(! stop && ! bug,unable to take any further steps)",
+                  "predicate_calls": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1260"
+                }
+              ],
+              "candidate_producers": [],
+              "resolution": "static_candidate_only"
+            },
+            {
+              "required_state": "Maze.next_cell",
+              "guard_evidence": [
+                {
+                  "expression": "next_cell == - 2",
+                  "predicate_calls": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1262"
+                },
+                {
+                  "expression": "next_cell == - 1",
+                  "predicate_calls": [],
+                  "source": "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset/olympia/src/Backtracking_10x10_8598324_1_50percent_equality100_gen.sol#1266"
+                }
+              ],
+              "candidate_producers": [],
+              "resolution": "static_candidate_only"
+            }
+          ]
+        }
+      ],
+      "action_inventory_source": "slither_dependency_candidates",
+      "slither_action_count": 1,
+      "abi_fallback_action_count": 0,
+      "prerequisite_state_closure": [
+        {
+          "state": "Maze.bug",
+          "depth": 0,
+          "declaration_initializer": "false",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "Maze.step(int8[])",
+              "effect_ids": [
+                "74c200ba160a333c"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "Maze.next_cell",
+          "depth": 0,
+          "declaration_initializer": "0",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "Maze.step(int8[])",
+              "effect_ids": [
+                "32b47038ce8c59ad",
+                "f8af1f9e96959500",
+                "85fa20ab8e7bfda1",
+                "34d89700fe1a7b34",
+                "eee7e76d55cc8d94",
+                "ab584dc78cd93279",
+                "9a4abb979af35273",
+                "92d1a9d55aca1e3a",
+                "fa31e4678ae4035c",
+                "da619f4c62d678da",
+                "c27390e5e2c2db36",
+                "e9f079f05f07cb3a",
+                "438f56d19e066b6d",
+                "d3bcae5916ee2f21",
+                "9f518cc6a225ede4",
+                "69a7e34ad3f77a16",
+                "65dd946957cda6a9",
+                "511fe3db1a1d3ddd",
+                "602677929b2803f2",
+                "bcbc21f6a32f267b",
+                "af0a0cc9d839fee3",
+                "e7538d35a7b7bd5a",
+                "a0f7541db35f7d9e",
+                "4cd72acfe3cf05d0",
+                "068d957fa845dea0",
+                "fa856d0806520b9d",
+                "7ba6f245d0640998",
+                "769c20fab095bbdb",
+                "d6a5d18daccf34de",
+                "fc4981490af542f4",
+                "8b1608b97897d45b",
+                "d5e93f30587b5c62",
+                "65d48e86fff5655b",
+                "60d774a796779f59",
+                "83d4eb1d0e0fe983",
+                "01775ac8270b477c",
+                "248cb78a98ba7b85",
+                "c8b7a3cab7fb5d38",
+                "a604c8709a243614",
+                "b8192bacad9e76be",
+                "5fa5fc52b06b3ad6",
+                "3b10d5a9d6cb2b62",
+                "8e3602a0a79e08ad",
+                "c89dc83934dcda40",
+                "709c0ebc2c11999e",
+                "1654b580a5e50481",
+                "a8b5aa335e423c8d",
+                "1c8505129db82448",
+                "82f9340f52a5f2be",
+                "5c09a19368a3c9b3",
+                "3bd85ba3be889aad",
+                "2002e9f3bd143a88",
+                "28fcccf2af374eaf",
+                "34f6eb434e9817e4",
+                "545e63f826bfc44b",
+                "50d0a34af36fc841",
+                "8d5d198e2f7970ec",
+                "eca1c5bb2e6b1d3d",
+                "30cb1d33b198d068",
+                "f2c9b0c6422f91b8",
+                "1542303d77cceb2e",
+                "bb926dcc9175ed3e",
+                "fa4a92ea95d622d1",
+                "85f24b7370ca6b3a",
+                "a2c5064112a1d68a",
+                "d2a0391669372fc6",
+                "e00af9971103bd23",
+                "42439af68d4546bb",
+                "942d81719b4bdfe0",
+                "40edef3451caf6f6",
+                "5521dd32d004552c",
+                "f5288cbc5cca44e0",
+                "becc968b91fc5b70",
+                "f6e3df99640b4079",
+                "9a8114b019fa5733",
+                "915724e6cb2617d2",
+                "92516e8c0607083f",
+                "6284737549133585",
+                "cd54cadd6971055e",
+                "e25905a2d61d9356",
+                "b57c14e079f067ca",
+                "dbae69d05b771ac4",
+                "f0828bcc6fd6fa72",
+                "7d7dab081fe46d61",
+                "d3e8a06f0ffe5c1e",
+                "a9ca90bfc9f52868",
+                "a6aa5b0008356978",
+                "7dde93394658b8b4",
+                "4f16969f11ef995d",
+                "a062b410621971fa",
+                "cb836d3b07f937d1",
+                "c9d4543c79ca92c2",
+                "fdbdb49ac7846cc0",
+                "57fa165339f0938a",
+                "c130cdf9900d32b6",
+                "71fb0e7cfa56b260",
+                "d79365f2f64cea1a",
+                "430c1869285cd4c6",
+                "d2168ba82d0506d1",
+                "d92f6b7a0a11e282",
+                "f29766b6312a73cb",
+                "ea10890d4bc3bb0c",
+                "5e1316a9b4746843",
+                "c07411e099302561",
+                "76ce4df6a7a2e550",
+                "ab21a2a214c0293a",
+                "8dda20e02fb656bd",
+                "0a94deaea56051da",
+                "c79ebd82081fd06b",
+                "45fce34f017bd7a6",
+                "1483bf326196b560",
+                "8909a0ebd72c1dda",
+                "ba54b27eaf1b60d1",
+                "93736c7d5b83db24",
+                "e86a080a5f7ff0e2",
+                "5487ae0cdea268dd",
+                "8ecfb9c8f8c0ee1c",
+                "a7441648230dcad0",
+                "089126bad6fb8923",
+                "2a732c4f3cbfe130",
+                "93986b4340f0e0a8",
+                "b9257ca2c42efe23",
+                "15ec8741f4a3e2af",
+                "2926a64a25e2afbc",
+                "08cb63aa755354e0",
+                "0068dbf8832f7ca1",
+                "8c7de422082ad4d4",
+                "82aef3641503f586",
+                "31f8e0c2957d3b55",
+                "f4b4614a047856b0",
+                "b3dbc73c19995dbe",
+                "94d5483e90e3da79",
+                "567a8ad05c005865",
+                "5d04efd9a8e0afe1",
+                "bfd31d3b9a5e51cc",
+                "3555add644cff400",
+                "28720960f39860e2",
+                "8ee2f4cd157cecda",
+                "2a4923a9a761d39c",
+                "6043867559a4ed51",
+                "03d16614c43390d2",
+                "7aeff9c95841b3e9",
+                "fa9fcdad7caf806f",
+                "89dba35e912c0e61",
+                "e4b6c80d7539bb59",
+                "ee8e8fc999c72318",
+                "b34e3dff75eae5e8",
+                "6cc887c228a906ee",
+                "8e963de23116dd65",
+                "9675dcbde491af81",
+                "a652d718e568de0d"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "Maze.stop",
+          "depth": 0,
+          "declaration_initializer": "false",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "Maze.step(int8[])",
+              "effect_ids": [
+                "8e4d63b92ae3dae5",
+                "a69f43fcb11b8b17",
+                "1fbee218a6375dfd",
+                "b2c520dec9be326c",
+                "b16a0edbe768e797",
+                "216f48ef0b73f6db",
+                "07c3b7cd83ad7242",
+                "ee3734fdc129260c",
+                "a25fee110d57ed4d",
+                "8ec24cd3049ac184",
+                "137bc17c28fe2486",
+                "8cf990ad307e7080",
+                "29f26a38b58e1996",
+                "ddb637d68981704a",
+                "ae57b3d6ab32a514",
+                "a04d2fbb11a2ecc3",
+                "4667aa70a7f7a256",
+                "7158b164c13fea40",
+                "0db6296799cf6d2d",
+                "c4ae1e27f1fe394f",
+                "3b9bbde57c745566",
+                "0357ebbd44c949aa",
+                "a7bd7265044e0e39",
+                "b5a8e97a04c39b52",
+                "de0c3abade279309",
+                "844fa41611a0f9f6",
+                "f39a2d062c71f554",
+                "29ab7c951ad71704",
+                "5c2a3086ac2b8a7b",
+                "19537cd941dfad99",
+                "7fe557ce8f6398b5",
+                "dee5f1ded3bad732",
+                "0b54f62bd98e55c7",
+                "050555070f2c479c",
+                "9f7dd96c08ac42dd",
+                "cbe98630b2ac3841",
+                "95e729c7c9f3da55",
+                "3e355b69fdd90818",
+                "6df0fb0b4cf6679f",
+                "3ce6256b32dc2242",
+                "6dc590d28755a78c",
+                "8e1da2e8f1d55b72",
+                "8116c0d98bbafa0b",
+                "b1b99919f5086a82",
+                "03e206d811f86c59",
+                "2e027167917d73a8",
+                "aade805b6f22f0bb",
+                "8bc3bdd8d800a493",
+                "69425287cce9e558",
+                "10e96f81d3435515",
+                "4b277bda16c7a37f",
+                "65c484ac5c1ea0ad",
+                "5f68f28184c5fdd7",
+                "c52cb725b7d60006",
+                "3b8577dbb7494f0b",
+                "f38d667968f47af0",
+                "c863deeb387f12ce",
+                "5f8aefca0b7e3b4c",
+                "52cd0b4b983d69e2",
+                "b3a7fbd73d9768dd",
+                "318414d889b9b402",
+                "c3d712f4ccdb5934",
+                "5138d90272bda148",
+                "98ca0ff7d3cbe53e",
+                "0183762c748b3c2d",
+                "94f3c13139a44e10",
+                "ca6457d3ee2c98da",
+                "60468a886edb9a17",
+                "2967a7e7f9b5200e",
+                "690fbad7929bca56",
+                "d8fc1cbfc2d775f3",
+                "b4c9d55e0d893416",
+                "8a478cd0790f8fea",
+                "42e08806a36139a4",
+                "30be08e8c87dc20d",
+                "0a056b6771f4ba5e",
+                "05981271ead34181",
+                "a6abc4b3295e8312",
+                "3e30cbd223b42223",
+                "4a9e549abd4791c9",
+                "6a9654bc5274e155",
+                "6d7be24782c98b4d",
+                "1e7a5e6c6c293ec2",
+                "24d1784fbd119fd0",
+                "924ba9e49af390c5",
+                "e3f0eedd0ca4708c",
+                "c76aaed8b82ce083",
+                "4d4f93e2a9972d97",
+                "3c787261e288d01b",
+                "8a13f1c88d15ec1f",
+                "da002da7127be9fa",
+                "8de2fef0fcf3db05",
+                "beb2f92034ef96e8",
+                "933f30ffeb7f518c",
+                "a30fb3a10fe64957",
+                "08ed7fc927981add",
+                "f8cf636659a3d242"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "unresolved_effect_actions": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "sender_pool": [
+    "0x0000000000000000000000000000000000010000",
+    "0x0000000000000000000000000000000000020000",
+    "0x0000000000000000000000000000000000030000",
+    "0x0000000000000000000000000000000000040000",
+    "0x0000000000000000000000000000000000050000"
+  ],
+  "agent_environment": {
+    "chain_id": 1,
+    "initial_timestamp": 0,
+    "initial_block_number": 0,
+    "evm_revision": "shanghai",
+    "harness_address": "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
+    "property_sender": "0x0000000000000000000000000000000000010000",
+    "gas_price_wei": 0,
+    "gas_limit_per_transaction": 12500000
+  }
+}
