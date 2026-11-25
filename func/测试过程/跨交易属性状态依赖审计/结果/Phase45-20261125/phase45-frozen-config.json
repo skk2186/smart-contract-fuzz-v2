@@ -1,0 +1,33 @@
+{
+  "phase": "Phase45",
+  "frozen_at_utc": "2026-11-25T14:10:41Z",
+  "phase_start_utc": "2026-11-25T14:01:05Z",
+  "deadline_utc": "2026-11-25T15:01:05Z",
+  "scope": "offline-only; no new Agent API calls, no contract replay, no Echidna fuzz",
+  "historical_agent_recovery": {
+    "parser": "json.loads only for ABI array arguments represented as strings; require decoded top-level list; then run original recursive ABI element/range, sender, transaction-count and schema validation",
+    "unsafe_eval": false,
+    "semantic_parameter_rewrites": false,
+    "transaction_padding_or_truncation": false,
+    "execution_claim": "recovered sequences remain unexecuted; prior execution labels are read only from Phase43 ledger"
+  },
+  "paired_offline_selection": {
+    "input_pool": "all Phase44 development/evaluation candidate-ledger entries with existing replay feedback",
+    "control": "existing retain_diverse_prefixes feedback ranking",
+    "treatment": "categorical direct-state progress only when an observed property operand moves from safe to a source-proven violation; unknown/neutral candidates retain control ranking and diversity",
+    "boolean_distance": false,
+    "ordinary_coverage_as_target_progress": false,
+    "retention_count_per_task": "K=min(4, candidate pool size), fixed from the existing retain_diverse_prefixes default",
+    "independent_diagnosis": "after selection, verify direct target operand transitions from saved predicate getter rows and native Echidna corpus replay records; do not use official route/answer/reproducer inputs",
+    "quick_validation_gate": "only if historical data shows independently supported target progress selected better than control"
+  },
+  "metrics": [
+    "tasks_with_reliable_direct_attribute-progress evidence",
+    "selected-candidate attribute-progress fraction",
+    "observed target-state diversity",
+    "unknown target-state fraction",
+    "excluded candidates with explicit prerequisite-state evidence",
+    "paired change under identical candidate pool and K",
+    "coverage-only candidates reported separately"
+  ]
+}

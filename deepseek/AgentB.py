@@ -21,6 +21,14 @@ PROPERTY_SENDER = "0x0000000000000000000000000000000000010000"
 def normalize_argument(kind: str, value: Any) -> Any:
     array_match = re.fullmatch(r"(.+)\[\]", kind)
     if array_match:
+        # Some historical model responses encoded a JSON array inside a JSON
+        # string (for example, "[1, -1]"). Decode only valid JSON here; do not
+        # evaluate Python expressions or rewrite individual array elements.
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except (json.JSONDecodeError, TypeError) as exc:
+                raise ValueError(f"{kind} 参数字符串不是合法 JSON 数组：{value!r}") from exc
         if not isinstance(value, list):
             raise ValueError(f"{kind} 参数必须是 JSON 数组：{value!r}")
         element_kind = array_match.group(1)
