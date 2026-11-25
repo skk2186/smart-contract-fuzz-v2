@@ -1,0 +1,68 @@
+[
+  {
+    "function": "setStreams(uint8,uint8,uint160,uint32,uint32,int128)",
+    "sender": "0x0000000000000000000000000000000000010000",
+    "arguments": [
+      0,
+      1,
+      1000,
+      1524785992,
+      1000,
+      1000000
+    ],
+    "value_wei": "0",
+    "delay_seconds": 0,
+    "delay_blocks": 0,
+    "expected_outcome": "state_change"
+  },
+  {
+    "function": "receiveStreams(uint8,uint32)",
+    "arguments": [
+      1,
+      1
+    ],
+    "sender": "0x0000000000000000000000000000000000010000",
+    "value_wei": "0",
+    "delay_seconds": 0,
+    "delay_blocks": 0,
+    "expected_outcome": "state_change",
+    "sequence_extension_evidence": {
+      "matched_states": [
+        "EchidnaConfig.ADDRESS_TO_DRIPS_ACCOUNT_ID"
+      ],
+      "read_states": [],
+      "write_states": [],
+      "evidence_origin": "property_action_inventory"
+    }
+  },
+  {
+    "function": "testSqueezableAmountCantBeUndone(uint8,uint8,uint160,uint32,uint32,int128)",
+    "sender": "0x0000000000000000000000000000000000010000",
+    "arguments": [
+      1,
+      0,
+      1000,
+      1524785992,
+      1000,
+      1000000
+    ],
+    "value_wei": "0",
+    "delay_seconds": 0,
+    "delay_blocks": 0,
+    "expected_outcome": "state_change",
+    "data_dependencies": [
+      {
+        "from_transaction": 1,
+        "relation": "reuse_same_accounts_and_stream_params",
+        "fields": [
+          "fromAccId->senderAccId",
+          "toAccId->receiverAccId",
+          "amountPerSec",
+          "startTime",
+          "duration",
+          "balanceDelta"
+        ]
+      }
+    ]
+  }
+]

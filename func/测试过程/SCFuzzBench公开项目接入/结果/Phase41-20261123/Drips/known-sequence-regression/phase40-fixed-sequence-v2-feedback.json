@@ -1,0 +1,70 @@
+{
+  "feedback_schema_version": 2,
+  "backend": "foundry-cheatcode",
+  "deployment": {},
+  "deployment_status": "failed",
+  "replay_status": "target_property_not_reached",
+  "transactions": [],
+  "properties": [],
+  "resolved_transactions": [],
+  "state_changes": [],
+  "state_before": [],
+  "state_after": [],
+  "initial_predicate_getters": [],
+  "initial_property_values": {},
+  "initial_property_errors": {},
+  "target_property_state": {
+    "property": "testSqueeze(uint8,uint8)",
+    "status": "property_state_unobservable",
+    "semantics": "Only explicit predicate getter bindings and exact assertion outcomes are used; unavailable operands remain unknown.",
+    "predicate_observation_completeness": "partial",
+    "unobservable_predicate_operands": [
+      "EchidnaAccounting.getSqueezableAmount(address,address) is internal and depends on private stream-history state."
+    ],
+    "target_property_state_established": false,
+    "counterexample_state_established": false,
+    "property_related_state_changed": null,
+    "first_established_transaction_index": null,
+    "first_property_related_change_transaction_index": null,
+    "first_counterexample_transaction_index": null,
+    "trajectory": [
+      {
+        "transaction_index": 0,
+        "value": null,
+        "status": "not_checked",
+        "predicate_getters": [],
+        "changed_predicate_getters": []
+      }
+    ]
+  },
+  "sequence_success": false,
+  "property_checks_passed": null,
+  "target_property_violation": null,
+  "failure_evidence": [],
+  "unknown_fields": [
+    {
+      "field": "target_property_state.predicate_getter_values",
+      "status": "unknown",
+      "reason": "The public splittable getter covers one assertion operand; the internal squeezable amount cannot be read without changing the Harness.",
+      "unobservable_operands": [
+        "EchidnaAccounting.getSqueezableAmount(address,address) is internal and depends on private stream-history state."
+      ]
+    }
+  ],
+  "capabilities": {
+    "msg_sender": true,
+    "tx_origin": true,
+    "internal_prank": true,
+    "internal_warp": true,
+    "internal_roll": true,
+    "per_call_success_or_failure": true,
+    "revert_data": true,
+    "state_observation": false,
+    "mined_transaction_receipts": false,
+    "transaction_boundaries": false,
+    "gas_used_is_estimate": true,
+    "rpc_impersonation_used": false
+  },
+  "execution_semantics": "Foundry calls share one test transaction; vm.prank/vm.warp are native cheatcodes. Per-call status is observed, but independent mined receipts do not exist.",
+  "status": "execution_failed"
+}

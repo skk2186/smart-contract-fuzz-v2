@@ -1,0 +1,1574 @@
+Compiling 66 files with Solc 0.8.20
+Solc 0.8.20 finished in 2.15s
+Compiler run successful!
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/Streams.sol:96:16
+   │
+96 │         return uint32(StreamConfig.unwrap(config) >> 224);
+   │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'uint32' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:107:16
+    │
+107 │         return uint160(StreamConfig.unwrap(config) >> 64);
+    │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint160' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:118:16
+    │
+118 │         return uint32(StreamConfig.unwrap(config) >> 32);
+    │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:127:16
+    │
+127 │         return uint32(StreamConfig.unwrap(config));
+    │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:158:54
+    │
+158 │     uint128 internal constant _MAX_STREAMS_BALANCE = uint128(type(int128).max);
+    │                                                      ━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Streams.sol:315:9
+    │
+315 │         emit ReceivedStreams(accountId, erc20, receivedAmt, receivableCycles);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:353:32
+    │
+353 │                 receivedAmt += uint128(amtPerCycle);
+    │                                ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Streams.sol:438:13
+    │
+438 │             emit SqueezedStreams(accountId, erc20, senderId, amt, squeezedHistoryHashes);
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:436:53
+    │
+436 │                 state, cycleStart, cycleStart + 1, -int160(amt * _AMT_PER_SEC_MULTIPLIER)
+    │                                                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int160' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/Streams.sol:507:25
+    │
+507 │                     if (squeezeStartCap < squeezeEndCap) {
+    │                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ src/Streams.sol:538:17
+    │
+538 │                 require(streamsHash == 0, "Entry with hash and receivers");
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:586:20
+    │
+586 │             return uint128(amt);
+    │                    ━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:669:28
+    │
+669 │                 balance -= uint128(_streamedAmt(receiver.config.amtPerSec(), start, end));
+    │                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/Streams.sol:761:40
+    │
+761 │             if (streamsHistory != 0 && _cycleOf(lastUpdate) != _cycleOf(_currTimestamp())) {
+    │                                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Streams.sol:769:13
+    │
+769 │             emit StreamsSet(accountId, erc20, newStreamsHash, streamsHistory, newBalance, newMaxEnd);
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Streams.sol:775:21
+    │
+775 │                     emit StreamReceiverSeen(newStreamsHash, receiver.accountId, receiver.config);
+    │                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:733:38
+    │
+733 │                   int128 currBalance = int128(
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+734 │ ┃                     _calcBalance(
+735 │ ┃                         state.balance, lastUpdate, currMaxEnd, currReceivers, _currTimestamp()
+736 │ ┃                     )
+737 │ ┃                 );
+    │ ┗━━━━━━━━━━━━━━━━━┛
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:745:30
+    │
+745 │                 newBalance = uint128(currBalance + realBalanceDelta);
+    │                              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/Streams.sol:820:13
+    │
+820 │         if (hint1 > enoughEnd && hint1 < notEnoughEnd) {
+    │             ━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/Streams.sol:828:13
+    │
+828 │         if (hint2 > enoughEnd && hint2 < notEnoughEnd) {
+    │             ━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/Streams.sol:841:17
+    │
+841 │             if (end == enoughEnd) {
+    │                 ━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:812:20
+    │
+812 │             return uint32(enoughEnd);
+    │                    ━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:817:20
+    │
+817 │             return uint32(notEnoughEnd);
+    │                    ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:842:24
+    │
+842 │                 return uint32(end);
+    │                        ━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ src/Streams.sol:903:21
+    │
+903 │                     require(_isOrdered(receivers[i - 1], receiver), "Streams receivers not sorted");
+    │                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ src/Streams.sol:921:9
+    │
+921 │         require(amtPerSec >= _minAmtPerSec, "Stream receiver amtPerSec too low");
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:972:17
+    │
+972 │         start = uint32(config >> 32);
+    │                 ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Streams.sol:975:15
+    │
+975 │         end = uint32(config);
+    │               ━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+     ╭▸ src/Streams.sol:1174:24
+     │
+1174 │         return (start, uint32(end));
+     │                        ━━━━━━━━━━━
+     │
+     ├ note: consider disabling this lint if you're certain the cast is safe
+     │       
+     │       // casting to 'uint32' is safe because [explain why]
+     │       // forge-lint: disable-next-line(unsafe-typecast)
+     │       
+     │       
+     ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+     ╭▸ src/Streams.sol:1206:42
+     │
+1206 │             int256 amtPerSecMultiplier = int160(_AMT_PER_SEC_MULTIPLIER);
+     │                                          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     │
+     ├ note: consider disabling this lint if you're certain the cast is safe
+     │       
+     │       // casting to 'int160' is safe because [explain why]
+     │       // forge-lint: disable-next-line(unsafe-typecast)
+     │       
+     │       
+     ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+     ╭▸ src/Streams.sol:1209:33
+     │
+1209 │             int256 nextCycle = (int256(timestamp % _cycleSecs) * amtPerSec) / amtPerSecMultiplier;
+     │                                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     │
+     ├ note: consider disabling this lint if you're certain the cast is safe
+     │       
+     │       // casting to 'int256' is safe because [explain why]
+     │       // forge-lint: disable-next-line(unsafe-typecast)
+     │       
+     │       
+     ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+     ╭▸ src/Streams.sol:1210:60
+     │
+1210 │             AmtDelta storage amtDelta = amtDeltas[_cycleOf(uint32(timestamp))];
+     │                                                            ━━━━━━━━━━━━━━━━━
+     │
+     ├ note: consider disabling this lint if you're certain the cast is safe
+     │       
+     │       // casting to 'uint32' is safe because [explain why]
+     │       // forge-lint: disable-next-line(unsafe-typecast)
+     │       
+     │       
+     ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+     ╭▸ src/Streams.sol:1215:35
+     │
+1215 │             amtDelta.thisCycle += int128(fullCycle - nextCycle);
+     │                                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     │
+     ├ note: consider disabling this lint if you're certain the cast is safe
+     │       
+     │       // casting to 'int128' is safe because [explain why]
+     │       // forge-lint: disable-next-line(unsafe-typecast)
+     │       
+     │       
+     ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+     ╭▸ src/Streams.sol:1216:35
+     │
+1216 │             amtDelta.nextCycle += int128(nextCycle);
+     │                                   ━━━━━━━━━━━━━━━━━
+     │
+     ├ note: consider disabling this lint if you're certain the cast is safe
+     │       
+     │       // casting to 'int128' is safe because [explain why]
+     │       // forge-lint: disable-next-line(unsafe-typecast)
+     │       
+     │       
+     ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[divide-before-multiply]: division before multiplication may lose precision
+     ╭▸ src/Streams.sol:1270:20
+     │
+1270 │             amt := mul(endedCycles, amtPerCycle)
+     │                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     │
+     ╰ help: https://getfoundry.sh/forge/linting/divide-before-multiply
+
+warning[unsafe-typecast]: typecast can truncate values
+     ╭▸ src/Streams.sol:1292:16
+     │
+1292 │         return uint32(block.timestamp);
+     │                ━━━━━━━━━━━━━━━━━━━━━━━
+     │
+     ├ note: consider disabling this lint if you're certain the cast is safe
+     │       
+     │       // casting to 'uint32' is safe because [explain why]
+     │       // forge-lint: disable-next-line(unsafe-typecast)
+     │       
+     │       
+     ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[uninitialized-local]: local variable is read before being initialized
+   ╭▸ src/echidna/EchidnaSplitsTests.sol:31:17
+   │
+31 │                 splitToSelfWeight += receivers[i].weight;
+   │                 ━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/uninitialized-local
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaSplitsTests.sol:68:32
+   │
+68 │                 difference >= -int256(SPLIT_ROUNDING_TOLERANCE) &&
+   │                                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int256' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaSplitsTests.sol:69:35
+   │
+69 │                     difference <= int256(SPLIT_ROUNDING_TOLERANCE)
+   │                                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int256' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[calls-loop]: external call inside a loop
+    ╭▸ src/echidna/EchidnaSplitsTests.sol:109:35
+    │
+109 │               splittableBefore[i] = drips.splittable(
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+110 │ ┃                 receivers[i].accountId,
+111 │ ┃                 token
+112 │ ┃             );
+    │ ┗━━━━━━━━━━━━━┛
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/calls-loop
+
+warning[calls-loop]: external call inside a loop
+    ╭▸ src/echidna/EchidnaSplitsTests.sol:117:50
+    │
+117 │                 (amountToBeSplit * weights[i]) / drips.TOTAL_SPLITS_WEIGHT()
+    │                                                  ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/calls-loop
+
+warning[calls-loop]: external call inside a loop
+    ╭▸ src/echidna/EchidnaSplitsTests.sol:126:34
+    │
+126 │               splittableAfter[i] = drips.splittable(
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+127 │ ┃                 receivers[i].accountId,
+128 │ ┃                 token
+129 │ ┃             );
+    │ ┗━━━━━━━━━━━━━┛
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/calls-loop
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaSplitsTests.sol:155:32
+    │
+155 │                 difference >= -int256(SPLIT_ROUNDING_TOLERANCE) &&
+    │                                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaSplitsTests.sol:156:35
+    │
+156 │                     difference <= int256(SPLIT_ROUNDING_TOLERANCE)
+    │                                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int256' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaSplitsTests.sol:238:36
+    │
+238 │             bytes4 errorSelector = bytes4(reason);
+    │                                    ━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'bytes4' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaBasicHelpers.sol:44:23
+   │
+44 │         uint128 max = uint128(token.balanceOf(from));
+   │                       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'uint128' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+   ╭▸ src/echidna/EchidnaBasicHelpers.sol:65:31
+   │
+65 │           uint128 receivedAmt = drips.receiveStreams(
+   │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+66 │ ┃             targetDripsAccId,
+67 │ ┃             token,
+68 │ ┃             maxCycles
+69 │ ┃         );
+   │ ┗━━━━━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[boolean-cst]: misuse of a boolean constant
+    ╭▸ src/echidna/EchidnaSqueezeHelpers.sol:178:19
+    │
+178 │                 ? false
+    │                   ━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/boolean-cst
+
+warning[boolean-cst]: misuse of a boolean constant
+    ╭▸ src/echidna/EchidnaSqueezeHelpers.sol:179:19
+    │
+179 │                 : true;
+    │                   ━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/boolean-cst
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+   ╭▸ src/echidna/EchidnaSqueezeHelpers.sol:30:26
+   │
+30 │           uint128 amount = drips.squeezeStreams(
+   │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+31 │ ┃             receiverDripsAccId,
+32 │ ┃             token,
+33 │ ┃             senderDripsAccId,
+34 │ ┃             historyHash,
+35 │ ┃             history
+36 │ ┃         );
+   │ ┗━━━━━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[calls-loop]: external call inside a loop
+    ╭▸ src/echidna/EchidnaSqueezeHelpers.sol:182:42
+    │
+182 │                   history[i].streamsHash = drips.hashStreams(
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+183 │ ┃                     history[i].receivers
+184 │ ┃                 );
+    │ ┗━━━━━━━━━━━━━━━━━┛
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/calls-loop
+
+warning[uninitialized-local]: local variable is read before being initialized
+    ╭▸ src/echidna/EchidnaSplitsHelpers.sol:127:13
+    │
+127 │             existingWeights += receivers[i].weight;
+    │             ━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/uninitialized-local
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+   ╭▸ src/echidna/tools/ManagedEchidna.sol:16:9
+   │
+16 │         emit Unpaused(msg.sender);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[erc20-unchecked-transfer]: ERC20 `transfer` or `transferFrom` call does not check the return value
+   ╭▸ src/echidna/base/EchidnaSetup.sol:41:9
+   │
+41 │         token.transfer(ADDRESS_USER0, STARTING_BALANCE);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/erc20-unchecked-transfer
+
+warning[unused-return]: return value of an external call is not used
+   ╭▸ src/echidna/base/EchidnaSetup.sol:43:9
+   │
+43 │         token.approve(address(driver), type(uint256).max);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[erc20-unchecked-transfer]: ERC20 `transfer` or `transferFrom` call does not check the return value
+   ╭▸ src/echidna/base/EchidnaSetup.sol:44:9
+   │
+44 │         token.transfer(ADDRESS_USER1, STARTING_BALANCE);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/erc20-unchecked-transfer
+
+warning[unused-return]: return value of an external call is not used
+   ╭▸ src/echidna/base/EchidnaSetup.sol:46:9
+   │
+46 │         token.approve(address(driver), type(uint256).max);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[erc20-unchecked-transfer]: ERC20 `transfer` or `transferFrom` call does not check the return value
+   ╭▸ src/echidna/base/EchidnaSetup.sol:47:9
+   │
+47 │         token.transfer(ADDRESS_USER2, STARTING_BALANCE);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/erc20-unchecked-transfer
+
+warning[unused-return]: return value of an external call is not used
+   ╭▸ src/echidna/base/EchidnaSetup.sol:49:9
+   │
+49 │         token.approve(address(driver), type(uint256).max);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[erc20-unchecked-transfer]: ERC20 `transfer` or `transferFrom` call does not check the return value
+   ╭▸ src/echidna/base/EchidnaSetup.sol:50:9
+   │
+50 │         token.transfer(ADDRESS_USER3, STARTING_BALANCE);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/erc20-unchecked-transfer
+
+warning[unused-return]: return value of an external call is not used
+   ╭▸ src/echidna/base/EchidnaSetup.sol:52:9
+   │
+52 │         token.approve(address(driver), type(uint256).max);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[uninitialized-local]: local variable is read before being initialized
+   ╭▸ src/echidna/base/EchidnaAccounting.sol:78:16
+   │
+78 │         return balance;
+   │                ━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/uninitialized-local
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/base/EchidnaAccounting.sol:90:48
+   │
+90 │         return getStreamBalanceForUser(target, uint32(block.timestamp));
+   │                                                ━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'uint32' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[uninitialized-local]: local variable is read before being initialized
+    ╭▸ src/echidna/base/EchidnaAccounting.sol:101:9
+    │
+101 │         receivable += getReceivableAmountForUser(ADDRESS_USER0);
+    │         ━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/uninitialized-local
+
+warning[uninitialized-local]: local variable is read before being initialized
+    ╭▸ src/echidna/base/EchidnaAccounting.sol:185:27
+    │
+185 │         if (maxEndUser0 > maxMaxEnd) maxMaxEnd = maxEndUser0;
+    │                           ━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/uninitialized-local
+
+warning[unused-return]: return value of an external call is not used
+    ╭▸ src/echidna/base/EchidnaAccounting.sol:203:35
+    │
+203 │         (, , , , uint32 maxEnd) = drips.streamsState(targetDripsAccId, token);
+    │                                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/base/EchidnaAccounting.sol:212:32
+    │
+212 │         uint32 currTimestamp = uint32(block.timestamp);
+    │                                ━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/base/EchidnaAccounting.sol:233:16
+    │
+233 │         return uint32(timestamp / SECONDS_PER_CYCLE + 1);
+    │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unused-return]: return value of an external call is not used
+   ╭▸ src/echidna/base/EchidnaStorage.sol:52:52
+   │
+52 │           (, , uint32 updateTime, , uint32 maxEnd) = drips.streamsState(
+   │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+53 │ ┃             getDripsAccountId(sender),
+54 │ ┃             token
+55 │ ┃         );
+   │ ┗━━━━━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ src/echidna/base/EchidnaStorage.sol:212:9
+    │
+212 │         revert DuplicateError();
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ src/echidna/base/EchidnaStorage.sol:230:9
+    │
+230 │         revert DuplicateError();
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/base/EchidnaConfig.sol:45:10
+   │
+45 │         (uint160(STARTING_BALANCE) / uint160(SECONDS_PER_CYCLE)) * 1e9;
+   │          ━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'uint160' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[incorrect-modifier]: modifier can finish without executing the modified function
+   ╭▸ src/echidna/base/EchidnaConfig.sol:61:5
+   │
+61 │ ┏     modifier experimental() {
+62 │ ┃         if (!TOGGLE_EXPERIMENTAL_TESTS_ENABLED) return;
+63 │ ┃         _;
+64 │ ┃     }
+   │ ┗━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/incorrect-modifier
+
+warning[incorrect-modifier]: modifier can finish without executing the modified function
+   ╭▸ src/echidna/base/EchidnaConfig.sol:67:5
+   │
+67 │ ┏     modifier heavy() {
+68 │ ┃         if (!TOGGLE_HEAVY_TESTS_ENABLED) return;
+69 │ ┃         _;
+70 │ ┃     }
+   │ ┗━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/incorrect-modifier
+
+warning[reentrancy-no-eth]: external call can be reentered before `userToStreamReceivers` is updated
+   ╭▸ src/echidna/EchidnaStreamsHelpers.sol:40:9
+   │
+40 │         hevm.prank(from);
+   │         ━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `userToStreamReceivers` is updated
+   ╭▸ src/echidna/EchidnaStreamsHelpers.sol:41:35
+   │
+41 │           int128 realBalanceDelta = driver.setStreams(
+   │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+42 │ ┃             token,
+43 │ ┃             currReceivers,
+44 │ ┃             balanceDelta,
+   ‡ ┃
+48 │ ┃             from
+49 │ ┃         );
+   │ ┗━━━━━━━━━┛
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:250:32
+    │
+250 │         int128 balanceDelta = (int128(uint128(amountPerSec)) * 100) / 1e9;
+    │                                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:250:39
+    │
+250 │         int128 balanceDelta = (int128(uint128(amountPerSec)) * 100) / 1e9;
+    │                                       ━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:251:13
+    │
+251 │         if (uint128(balanceDelta) > token.balanceOf(sender)) {
+    │             ━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:252:28
+    │
+252 │             balanceDelta = int128(uint128(token.balanceOf(sender)));
+    │                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:252:35
+    │
+252 │             balanceDelta = int128(uint128(token.balanceOf(sender)));
+    │                                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:385:13
+    │
+385 │         if (CYCLE_FUZZING_BUFFER_SECONDS >= block.timestamp) {
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:389:17
+    │
+389 │                 uint32(block.timestamp) -
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:393:31
+    │
+393 │         uint32 maxStartTime = uint32(block.timestamp) +
+    │                               ━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:423:18
+    │
+423 │                 (int128(uint128(token.balanceOf(from))) + 1);
+    │                  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:423:25
+    │
+423 │                 (int128(uint128(token.balanceOf(from))) + 1);
+    │                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:425:43
+    │
+425 │             balanceDelta = balanceDelta % int128(uint128(STARTING_BALANCE));
+    │                                           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsHelpers.sol:425:50
+    │
+425 │             balanceDelta = balanceDelta % int128(uint128(STARTING_BALANCE));
+    │                                                  ━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:27:13
+   │
+27 │             uint32(block.timestamp)
+   │             ━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'uint32' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:37:13
+   │
+37 │             uint32(block.timestamp)
+   │             ━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'uint32' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:48:13
+   │
+48 │             int256(tokenBalanceAfter) ==
+   │             ━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int256' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:49:17
+   │
+49 │                 int256(tokenBalanceBefore) - realBalanceDelta
+   │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int256' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:52:13
+   │
+52 │             int128(streamBalanceAfter) ==
+   │             ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int128' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:53:17
+   │
+53 │                 int128(streamBalanceBefore) + realBalanceDelta
+   │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'int128' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:90:9
+   │
+90 │         hevm.warp(futureTimestamp);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:96:9
+   │
+96 │         hevm.warp(currentTimestamp);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+    ╭▸ src/echidna/EchidnaStreamsTests.sol:120:9
+    │
+120 │         hevm.warp(futureTimestamp);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:85:13
+   │
+85 │             uint32(block.timestamp)
+   │             ━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'uint32' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ src/echidna/EchidnaStreamsTests.sol:93:13
+   │
+93 │             uint32(block.timestamp)
+   │             ━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'uint32' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsTests.sol:100:32
+    │
+100 │         uint128 balanceAdded = uint128(amtPerSecAdded) * SECONDS_PER_CYCLE;
+    │                                ━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsTests.sol:101:24
+    │
+101 │         balanceAdded = uint128(clampBalanceDelta(int128(balanceAdded), from));
+    │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsTests.sol:101:50
+    │
+101 │         balanceAdded = uint128(clampBalanceDelta(int128(balanceAdded), from));
+    │                                                  ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsTests.sol:109:13
+    │
+109 │             int128(balanceAdded)
+    │             ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'int128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsTests.sol:115:13
+    │
+115 │             uint32(block.timestamp)
+    │             ━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsTests.sol:125:13
+    │
+125 │             uint32(block.timestamp)
+    │             ━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/echidna/EchidnaStreamsTests.sol:205:36
+    │
+205 │             bytes4 errorSelector = bytes4(reason);
+    │                                    ━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'bytes4' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+   ╭▸ src/echidna/EchidnaSqueezeTests.sol:91:9
+   │
+91 │         hevm.warp(getCurrentCycleEnd() + 1);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[calls-loop]: external call inside a loop
+    ╭▸ src/echidna/EchidnaSqueezeTests.sol:120:38
+    │
+120 │             history[i].streamsHash = drips.hashStreams(history[i].receivers);
+    │                                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/calls-loop
+
+warning[reentrancy-no-eth]: external call can be reentered before `userToSplitsReceivers` is updated
+   ╭▸ src/echidna/EchidnaSplitsHelpers.sol:28:9
+   │
+28 │         hevm.prank(sender);
+   │         ━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `userToSplitsReceivers` is updated
+   ╭▸ src/echidna/EchidnaSplitsHelpers.sol:29:9
+   │
+29 │         driver.setSplits(newReceivers);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+    ╭▸ src/echidna/EchidnaBasicHelpers.sol:98:54
+    │
+ 98 │           (uint128 collectableAmt, uint128 splitAmt) = drips.split(
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ 99 │ ┃             targetDripsAccId,
+100 │ ┃             token,
+101 │ ┃             getSplitsReceivers(target)
+102 │ ┃         );
+    │ ┗━━━━━━━━━┛
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+    ╭▸ src/echidna/EchidnaBasicHelpers.sol:119:9
+    │
+119 │         hevm.prank(from);
+    │         ━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `ADDRESS_TO_DRIPS_ACCOUNT_ID` is updated
+    ╭▸ src/echidna/EchidnaBasicHelpers.sol:120:29
+    │
+120 │         uint128 collected = driver.collect(token, to);
+    │                             ━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[calls-loop]: external call inside a loop
+    ╭▸ src/echidna/EchidnaInvariantTests.sol:143:52
+    │
+143 │               (int128 thisCycle, int128 nextCycle) = drips.getAmtDeltaForCycle(
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+144 │ ┃                 targetDripsAccId,
+145 │ ┃                 token,
+146 │ ┃                 cycle
+147 │ ┃             );
+    │ ┗━━━━━━━━━━━━━┛
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/calls-loop
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Managed.sol:103:9
+    │
+103 │         emit NewAdminProposed(msg.sender, newAdmin);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Managed.sol:125:9
+    │
+125 │         emit AdminChanged(admin(), newAdmin);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Managed.sol:134:9
+    │
+134 │         emit PauserGranted(pauser, msg.sender);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Managed.sol:141:9
+    │
+141 │         emit PauserRevoked(pauser, msg.sender);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Managed.sol:166:9
+    │
+166 │         emit Paused(msg.sender);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Managed.sol:172:9
+    │
+172 │         emit Unpaused(msg.sender);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/DriverTransferUtils.sol:119:65
+    │
+119 │         if (balanceDelta > 0) _transferFromCaller(drips, erc20, uint128(balanceDelta));
+    │                                                                 ━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/DriverTransferUtils.sol:123:69
+    │
+123 │         if (realBalanceDelta < 0) drips.withdraw(erc20, transferTo, uint128(-realBalanceDelta));
+    │                                                                     ━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[arbitrary-send-erc20]: `transferFrom` uses an arbitrary `from`; require it to equal `msg.sender` or `address(this)`
+    ╭▸ src/DriverTransferUtils.sol:131:9
+    │
+131 │         SafeERC20.safeTransferFrom(erc20, _msgSender(), address(drips), amt);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/arbitrary-send-erc20
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Drips.sol:155:27
+    │
+155 │         uint32 driverId = uint32(accountId >> DRIVER_ID_OFFSET);
+    │                           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint32' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Drips.sol:182:9
+    │
+182 │         emit DriverRegistered(driverId, driverAddr);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Drips.sol:201:9
+    │
+201 │         emit DriverAddressUpdated(driverId, msg.sender, newDriverAddr);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Drips.sol:315:9
+    │
+315 │         emit Withdrawn(erc20, receiver, amt);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Splits.sol:178:17
+    │
+178 │                 emit Split(accountId, receiver, erc20, currSplitAmt);
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Splits.sol:185:9
+    │
+185 │         emit Collectable(accountId, erc20, collectableAmt);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Splits.sol:204:9
+    │
+204 │         emit Collected(accountId, erc20, amt);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Splits.sol:215:9
+    │
+215 │         emit Given(accountId, receiver, erc20, amt);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Drips.sol:679:62
+    │
+679 │         if (balanceDelta > 0) _increaseStreamsBalance(erc20, uint128(balanceDelta));
+    │                                                              ━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Drips.sol:683:66
+    │
+683 │         if (realBalanceDelta < 0) _decreaseStreamsBalance(erc20, uint128(-realBalanceDelta));
+    │                                                                  ━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Splits.sol:240:9
+    │
+240 │         emit SplitsSet(accountId, newSplitsHash);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Splits.sol:262:17
+    │
+262 │                 emit SplitsReceiverSeen(receiversHash, accountId, weight);
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ src/Drips.sol:779:17
+    │
+779 │                 emit AccountMetadataEmitted(accountId, metadata.key, metadata.value);
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Splits.sol:140:24
+    │
+140 │             splitAmt = uint128(amount * splitsWeight / _TOTAL_SPLITS_WEIGHT);
+    │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ src/Splits.sol:174:28
+    │
+174 │                 splitAmt = uint128(collectableAmt * splitsWeight / _TOTAL_SPLITS_WEIGHT);
+    │                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ src/Splits.sol:257:17
+    │
+257 │                 require(weight != 0, "Splits receiver weight is zero");
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ src/Splits.sol:260:49
+    │
+260 │                 if (accountId <= prevAccountId) require(i == 0, "Splits receivers not sorted");
+    │                                                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
