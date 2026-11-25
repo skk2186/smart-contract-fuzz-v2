@@ -197,6 +197,13 @@ def parse_echidna_log(log: str, elapsed: float, return_code: int | None,
                       timed_out: bool) -> dict[str, Any]:
     target_match = re.search(r"echidna_noBug:\s*(passing|falsified|failed)", log, re.I)
     status_text = target_match.group(1).lower() if target_match else "unknown"
+    # Echidna 2.3.2 prints a worker-level "Test ... falsified!" marker and a
+    # final "property: failed!" line for a real counterexample. Treating that
+    # terminal word as an execution failure silently loses native findings.
+    worker_falsification = re.search(
+        r"\bTest\s+echidna_noBug\s+falsified!", log, re.IGNORECASE) is not None
+    if status_text == "failed" and worker_falsification:
+        status_text = "falsified"
     unique = re.findall(r"Unique instructions:\s*([0-9,]+)", log)
     corpus = re.findall(r"Corpus size:\s*([0-9,]+)", log)
     calls = re.findall(r"Total calls:\s*([0-9,]+)", log)
@@ -225,12 +232,15 @@ def run_echidna(sample: dict[str, Any], source: Path, run_dir: Path, *,
                 seed: int, timeout: int, test_limit: int,
                 seed_sequences: list[list[dict[str, Any]]] | None = None,
                 candidate: dict[str, Any] | None = None,
-                context: dict[str, Any] | None = None) -> dict[str, Any]:
+                context: dict[str, Any] | None = None,
+                working_directory: Path | None = None) -> dict[str, Any]:
     if run_dir.exists():
         completed_result = read_json(run_dir / "result.json")
-        if (completed_result is not None and
-                not (completed_result.get("status") == "failed" and
-                     completed_result.get("exit_code") not in (None, 0))):
+        retryable = (completed_result is not None and
+                     (completed_result.get("status") == "timed_out" or
+                      (completed_result.get("status") == "failed" and
+                       completed_result.get("exit_code") not in (None, 0))))
+        if completed_result is not None and not retryable:
             return completed_result
         prior_root = run_dir.parent / "prior-attempts"
         prior_root.mkdir(parents=True, exist_ok=True)
@@ -259,14 +269,17 @@ def run_echidna(sample: dict[str, Any], source: Path, run_dir: Path, *,
         command.extend(["--sender", sender])
     command.extend(["--corpus-dir", str(corpus), "--coverage-dir", str(corpus),
                     "--disable-onchain-sources", "--format", "text"])
+    echidna_cwd = working_directory or ROOT
+    echidna_cwd.mkdir(parents=True, exist_ok=True)
     write_json(run_dir / "run-config.json", {
         "command": command, "seed": seed, "timeout_seconds": timeout,
         "test_limit": test_limit, "workers": 1, "sequence_length": MAX_SEQUENCE_LENGTH,
         "native_property": "echidna_noBug", "seed_files": written,
+        "working_directory": str(echidna_cwd),
         "fresh_corpus": True})
     started = time.monotonic()
     try:
-        completed = subprocess.run(command, cwd=ROOT, env=runtime_env(),
+        completed = subprocess.run(command, cwd=echidna_cwd, env=runtime_env(),
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                    text=True, timeout=timeout + 120, check=False)
         elapsed = time.monotonic() - started

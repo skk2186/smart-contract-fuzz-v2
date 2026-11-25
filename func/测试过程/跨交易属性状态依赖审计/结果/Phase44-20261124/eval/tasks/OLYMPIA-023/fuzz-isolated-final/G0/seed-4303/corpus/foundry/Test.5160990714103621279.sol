@@ -1,0 +1,228 @@
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.0;
+
+import "forge-std/Test.sol";
+
+contract FoundryTest is Test {
+    address constant USER1 = address(0x40000);
+    address constant USER2 = address(0x30000);
+    address constant USER3 = address(0x10000);
+    address constant USER4 = address(0x50000);
+    address constant USER5 = address(0x20000);
+
+    // TODO: Replace with your actual contract instance
+    Maze Target;
+
+  function setUp() public {
+      // TODO: Initialize your contract here
+      Target = new Maze();
+  }
+
+  function test_replay() public {
+        _delay(0x6d828, 0x9cf);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x5caa0, 0x2422);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x2e, 0x20ff);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x2, 0x9c1);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x10978, 0x12);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x27, 0x7660);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x3256a, 0x1396);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x6ae4e, 0xd0cb);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x77bd0, 0xd619);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x66815, 0x7fff);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x4eb3e, 0x139a);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x5408b, 0x1376);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x4a9a4, 0xe4d);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x103ef, 0x30cd);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x4eb3c, 0xea4f);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4eb34, 0x1386);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x576ad, 0x9);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x6b504, 0x1393);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x142ee, 0xd13a);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x189e3, 0x3c08);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x6b721, 0xea4e);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x1f113, 0x27);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x7b6a, 0x6b0c);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0xc247, 0xd0cb);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x6ae4e, 0xebcc);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x77bd0, 0x6);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x4eb3b, 0x85e0);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x4eb38, 0x26ee);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x3340a, 0x552);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x6b721, 0x1372);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x62123, 0x1399);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x7f7c2, 0xb2fb);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x81f7, 0x6a00);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x11, 0xb0cd);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0xff, 0x619b);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x7f, 0x1c9b);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x1051, 0x138f);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x4eb19, 0x5);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4eac7, 0xb7e3);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x142ee, 0x7f);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x14, 0x12);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x433c2, 0x5c65);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x4eb37, 0x320);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x16, 0x2f15);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0xff, 0x9cf);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x13, 0x1375);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x81f7, 0xab9);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x2c, 0xea96);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x4a9a4, 0xe4d);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x103ef, 0x30cd);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x4eb3c, 0xea4f);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4eb34, 0x1386);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x576ad, 0x9);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x6b504, 0x1393);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x142ee, 0xd13a);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x189e3, 0x3c08);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x6b721, 0xea4e);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x1f113, 0x27);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x7b6a, 0x6b0c);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0xc247, 0xd0cb);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x6ae4e, 0xebcc);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x77bd0, 0x6);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x4eb3b, 0x85e0);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x4eb38, 0x26ee);
+    _setUpActor(USER1);
+        Target.step();
+        vm.stopPrank();
+        vm.prank(address(0x10000));
+        assertFalse(Target.echidna_noBug());
+  }
+
+  function _setUpActor(address actor) internal {
+      vm.startPrank(actor);
+      // Add any additional actor setup here if needed
+  }
+
+  function _delay(uint256 timeInSeconds, uint256 numBlocks) internal {
+      vm.warp(block.timestamp + timeInSeconds);
+      vm.roll(block.number + numBlocks);
+  }
+}

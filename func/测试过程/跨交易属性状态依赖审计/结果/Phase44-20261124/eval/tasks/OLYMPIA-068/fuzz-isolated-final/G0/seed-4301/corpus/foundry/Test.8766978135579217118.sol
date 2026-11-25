@@ -1,0 +1,221 @@
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.0;
+
+import "forge-std/Test.sol";
+
+contract FoundryTest is Test {
+    address constant USER1 = address(0x10000);
+    address constant USER2 = address(0x20000);
+    address constant USER3 = address(0x30000);
+    address constant USER4 = address(0x40000);
+    address constant USER5 = address(0x50000);
+
+    // TODO: Replace with your actual contract instance
+    Maze Target;
+
+  function setUp() public {
+      // TODO: Initialize your contract here
+      Target = new Maze();
+  }
+
+  function test_replay() public {
+        _delay(0x66815, 0xd204);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x3c, 0x1393);
+    _setUpActor(USER2);
+        Target.step();
+        _setUpActor(USER3);
+        Target.step();
+        _delay(0x54, 0x57);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x4ea68, 0xa4);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x5a, 0x1313);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x4eb42, 0x1334);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x4eaeb, 0x4e);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x81f7, 0x1306);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x67f51, 0x12ca);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0xac, 0xe59f);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x142ee, 0x1306);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x4eadf, 0x12f4);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x57, 0x139f);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x8f, 0x58);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x142ee, 0x12c6);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x3bcc0, 0x1349);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0xb0, 0x2a);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x3e, 0x12c2);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4eb3e, 0xd13a);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0xa1, 0x26c0);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4eab1, 0x12d6);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x6123, 0x377a);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x576ad, 0x72);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x475d0, 0x134f);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x2b, 0x2f15);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4d, 0x5caa);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x55, 0x8980);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0xe087, 0x1330);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x14dce, 0x1376);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x46b47, 0x1361);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0xae, 0x49);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x4eb0a, 0x133e);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x4ea78, 0x55);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x1f113, 0x7f);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x3256a, 0x134e);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x22, 0xb3);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x4eab1, 0x1414);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4ea81, 0x77);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x4d, 0x3c08);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x1b, 0x94d4);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x37272, 0x1344);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x75, 0xea4f);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x4eb3e, 0xa);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0xa6, 0x1333);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x4ea74, 0x37);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x4eb1d, 0x2a2f);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x98, 0x137b);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x68, 0xd38b);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4eaf1, 0x26);
+    _setUpActor(USER5);
+        Target.step();
+        _delay(0x4ea74, 0x12cf);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x77, 0x1);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x4eac9, 0x132e);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0x4eb13, 0x131e);
+    _setUpActor(USER1);
+        Target.step();
+        _delay(0xa2, 0xb9fe);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x56, 0xb556);
+    _setUpActor(USER3);
+        Target.step();
+        _delay(0x4eaff, 0x63);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0x4c, 0x1332);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x4eaf7, 0x1322);
+    _setUpActor(USER4);
+        Target.step();
+        _delay(0xaf, 0x2f);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0xdf, 0x1312);
+    _setUpActor(USER2);
+        Target.step();
+        _delay(0x4eb10, 0x12de);
+    _setUpActor(USER4);
+        Target.step();
+        vm.stopPrank();
+        vm.prank(address(0x10000));
+        assertFalse(Target.echidna_noBug());
+  }
+
+  function _setUpActor(address actor) internal {
+      vm.startPrank(actor);
+      // Add any additional actor setup here if needed
+  }
+
+  function _delay(uint256 timeInSeconds, uint256 numBlocks) internal {
+      vm.warp(block.timestamp + timeInSeconds);
+      vm.roll(block.number + numBlocks);
+  }
+}

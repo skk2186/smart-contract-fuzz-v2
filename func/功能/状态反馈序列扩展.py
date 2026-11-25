@@ -20,7 +20,10 @@ ROLE_TOKENS = {"actor", "account", "user", "caller", "owner", "sender",
                "recipient", "spender", "operator", "index", "participant"}
 _UINT = re.compile(r"^uint([0-9]*)$")
 _INT = re.compile(r"^int([0-9]*)$")
+_DYNAMIC_INT_ARRAY = re.compile(r"^(uint|int)([0-9]*)\[\]$")
 _BYTES = re.compile(r"^bytes([1-9]|[12][0-9]|3[0-2])$")
+MAX_DYNAMIC_ARRAY_ELEMENTS = 16
+MAX_DYNAMIC_ARRAY_HINTS = 12
 
 
 def _json_key(value: Any) -> str:
@@ -67,6 +70,10 @@ def _type_default(item: dict[str, Any], senders: list[str],
         return False
     if _UINT.fullmatch(kind) or _INT.fullmatch(kind):
         return 0 if role else 1
+    if _DYNAMIC_INT_ARRAY.fullmatch(kind):
+        # Zero is ABI-valid for every signed/unsigned integer element type and
+        # a one-element default also satisfies common non-empty array guards.
+        return [0]
     match = _BYTES.fullmatch(kind)
     if match:
         return "0x" + "00" * int(match.group(1))
@@ -88,6 +95,12 @@ def _value_fits(kind: str, value: Any) -> bool:
         number = _safe_int(value)
         bits = int(kind[3:] or "256")
         return number is not None and -(2 ** (bits - 1)) <= number < 2 ** (bits - 1)
+    array_match = _DYNAMIC_INT_ARRAY.fullmatch(kind)
+    if array_match:
+        if not isinstance(value, list):
+            return False
+        element_type = array_match.group(1) + array_match.group(2)
+        return all(_value_fits(element_type, item) for item in value)
     match = _BYTES.fullmatch(kind)
     if match:
         return isinstance(value, str) and re.fullmatch(
@@ -351,6 +364,177 @@ def _insert(sequence: list[dict[str, Any]], tx: dict[str, Any], index: int) -> l
     return [*copy.deepcopy(sequence[:index]), copy.deepcopy(tx), *copy.deepcopy(sequence[index:])]
 
 
+def _dynamic_array_domain(kind: str) -> tuple[str, int, int] | None:
+    match = _DYNAMIC_INT_ARRAY.fullmatch(kind)
+    if not match:
+        return None
+    bits = int(match.group(2) or "256")
+    if match.group(1) == "uint":
+        return "uint" + match.group(2), 0, 2 ** bits - 1
+    return "int" + match.group(2), -(2 ** (bits - 1)), 2 ** (bits - 1) - 1
+
+
+def _feedback_integer_hints(replay: dict[str, Any] | None) -> tuple[list[tuple[int, str, dict[str, Any]]], int | None]:
+    """Extract bounded numeric hints from generic execution/error observations."""
+    if not replay:
+        return [], None
+    hints: list[tuple[int, str, dict[str, Any]]] = []
+    seen: set[tuple[int, str]] = set()
+    required_length = None
+
+    def add(value: Any, source: str, evidence: dict[str, Any]) -> None:
+        if isinstance(value, bool) or not isinstance(value, int):
+            return
+        key = (value, source)
+        if key not in seen:
+            seen.add(key)
+            hints.append((value, source, evidence))
+
+    def walk_numeric(value: Any, source: str, evidence: dict[str, Any]) -> None:
+        if isinstance(value, bool):
+            return
+        if isinstance(value, int):
+            add(value, source, evidence)
+        elif isinstance(value, str) and re.fullmatch(r"[-+]?\d+", value.strip()):
+            add(int(value.strip()), source, evidence)
+        elif isinstance(value, dict):
+            for child in value.values():
+                walk_numeric(child, source, evidence)
+        elif isinstance(value, list):
+            for child in value:
+                walk_numeric(child, source, evidence)
+
+    state_tokens = ("observation", "getter", "state", "balance", "effect", "amount")
+    error_keys = {"revert_reason", "failure_reason", "property_error", "error", "message"}
+    for tx_index, row in enumerate(replay.get("transactions", []) or [], 1):
+        if not isinstance(row, dict):
+            continue
+        for key, value in row.items():
+            normalized = str(key).lower()
+            if normalized in error_keys and isinstance(value, str):
+                evidence = {"transaction_index": tx_index, "feedback_field": str(key)}
+                numbers = [int(token) for token in re.findall(r"(?<![A-Za-z_])[-+]?\d+", value)]
+                for number in numbers:
+                    add(number, "execution_failure_detail", evidence)
+                    # A value adjacent to a reported bound is a generic repair
+                    # candidate; ABI checks below discard out-of-range values.
+                    add(number - 1, "neighbor_of_execution_failure_value", evidence)
+                    add(number + 1, "neighbor_of_execution_failure_value", evidence)
+                if re.search(r"length|size|elements?|items?", value, re.IGNORECASE):
+                    required = re.search(
+                        r"(?:at\s+least|minimum(?:\s+of)?|(?:length|size)\s*(?:>=|>|must\s+be|is|of))\s*(\d+)",
+                        value, re.IGNORECASE)
+                    if required:
+                        candidate = int(required.group(1))
+                        required_length = max(required_length or 0, candidate)
+            elif any(token in normalized for token in state_tokens):
+                walk_numeric(value, "observed_execution_state", {
+                    "transaction_index": tx_index, "feedback_field": str(key)})
+    return hints[:MAX_DYNAMIC_ARRAY_HINTS], required_length
+
+
+def _sequence_array_hints(sequence: list[dict[str, Any]],
+                          abi_by_signature: dict[str, dict[str, Any]],
+                          element_type: str) -> list[tuple[int, dict[str, Any]]]:
+    values: list[tuple[int, dict[str, Any]]] = []
+    seen = set()
+    for tx_index, tx in enumerate(sequence, 1):
+        abi = abi_by_signature.get(str(tx.get("function", "")), {})
+        for argument_index, item in enumerate(abi.get("inputs", [])):
+            kind = str(item.get("type", ""))
+            domain = _dynamic_array_domain(kind)
+            arguments = tx.get("arguments", [])
+            if not domain or domain[0] != element_type or argument_index >= len(arguments):
+                continue
+            array = arguments[argument_index]
+            if not isinstance(array, list):
+                continue
+            for element_index, value in enumerate(array):
+                number = _safe_int(value)
+                if number is None or not _value_fits(element_type, number) or number in seen:
+                    continue
+                seen.add(number)
+                values.append((number, {"transaction_index": tx_index,
+                                        "argument_index": argument_index,
+                                        "element_index": element_index}))
+    return values
+
+
+def _dynamic_array_variants(kind: str, value: Any,
+                            sequence_hints: list[tuple[int, dict[str, Any]]],
+                            feedback_hints: list[tuple[int, str, dict[str, Any]]],
+                            required_length: int | None) -> list[tuple[list[int], str, dict[str, Any]]]:
+    domain = _dynamic_array_domain(kind)
+    if not domain or not _value_fits(kind, value):
+        return []
+    element_type, lower, upper = domain
+    values: list[tuple[int, str, dict[str, Any]]] = []
+    value_sources: dict[int, tuple[str, dict[str, Any]]] = {}
+
+    def add_value(number: int, source: str, evidence: dict[str, Any]) -> None:
+        if not _value_fits(element_type, number):
+            return
+        if number not in value_sources:
+            value_sources[number] = (source, evidence)
+            values.append((number, source, evidence))
+
+    add_value(lower, "ABI lower bound", {"abi_minimum": str(lower)})
+    add_value(upper, "ABI upper bound", {"abi_maximum": str(upper)})
+    add_value(0, "ABI-valid zero element", {"abi_range": [str(lower), str(upper)]})
+    if element_type.startswith("int"):
+        add_value(-1, "ABI-valid negative element", {"abi_range": [str(lower), str(upper)]})
+    add_value(1, "ABI-valid positive element", {"abi_range": [str(lower), str(upper)]})
+    for number, evidence in sequence_hints:
+        add_value(number, "copied from a valid sequence array element", evidence)
+    for number, source, evidence in feedback_hints:
+        add_value(number, source, evidence)
+
+    current = list(value)
+    variants: list[tuple[list[int], str, dict[str, Any]]] = []
+    seen: set[tuple[int, ...]] = set()
+
+    def add_variant(candidate: list[int], reason: str, evidence: dict[str, Any]) -> None:
+        if len(candidate) > MAX_DYNAMIC_ARRAY_ELEMENTS or not _value_fits(kind, candidate):
+            return
+        key = tuple(candidate)
+        if key not in seen and candidate != current:
+            seen.add(key)
+            variants.append((candidate, reason, evidence))
+
+    for number, source, source_evidence in values:
+        if not current:
+            add_variant([number], "create a one-element dynamic integer array from " + source,
+                        {"value_source": source, "source_evidence": source_evidence,
+                         "abi_element_range": [str(lower), str(upper)]})
+        else:
+            for element_index, old_value in enumerate(current):
+                if _safe_int(old_value) == number:
+                    continue
+                candidate = list(current)
+                candidate[element_index] = number
+                add_variant(candidate, "adjust an array element using " + source,
+                            {"element_index": element_index, "old_value": str(old_value),
+                             "new_value": str(number), "value_source": source,
+                             "source_evidence": source_evidence,
+                             "abi_element_range": [str(lower), str(upper)]})
+        if len(current) < MAX_DYNAMIC_ARRAY_ELEMENTS:
+            add_variant([*current, number], "append an ABI-valid element from " + source,
+                        {"element_index": len(current), "new_value": str(number),
+                         "value_source": source, "source_evidence": source_evidence,
+                         "abi_element_range": [str(lower), str(upper)]})
+
+    if len(current) > 1:
+        add_variant(current[:-1], "shorten the dynamic array by one element",
+                    {"old_length": len(current), "new_length": len(current) - 1,
+                     "value_source": "existing valid sequence parameter"})
+    if required_length and len(current) < required_length <= MAX_DYNAMIC_ARRAY_ELEMENTS:
+        candidate = current + [0] * (required_length - len(current))
+        add_variant(candidate, "extend the array to the minimum length indicated by execution failure feedback",
+                    {"old_length": len(current), "required_length": required_length,
+                     "value_source": "execution failure detail"})
+    return variants
+
+
 def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[dict[str, Any]],
                        action_evidence: dict[str, dict[str, Any]],
                        abi_by_signature: dict[str, dict[str, Any]],
@@ -363,7 +547,7 @@ def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[di
     """Generate one bounded layer of candidates; caller executes and feeds back each result."""
     if mode not in {"random", "static", "state_feedback"}:
         raise ValueError(f"unsupported extension mode: {mode}")
-    if len(sequence) >= max_sequence_length:
+    if max_proposals <= 0 or len(sequence) > max_sequence_length:
         return []
     senders = list(senders or [])
     target_states = target_states or set()
@@ -381,6 +565,118 @@ def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[di
         proposals.append({"sequence": candidate, "fingerprint": fp,
                           "operator": operator, "proposal_reason": reason,
                           "evidence": evidence})
+
+    def add_dynamic_array_candidates() -> None:
+        # Reserve half of the shared proposal budget for array operations. The
+        # remaining budget stays available to the existing Phase36/E3 operators.
+        array_budget = min(max_proposals, max(1, max_proposals // 2))
+        has_array_transaction = any(
+            any(_DYNAMIC_INT_ARRAY.fullmatch(str(item.get("type", "")))
+                for item in abi_by_signature.get(str(tx.get("function", "")), {}).get("inputs", []))
+            for tx in sequence)
+        copy_reserve = (min(4, len(sequence) + 1) if
+                        has_array_transaction and len(sequence) < max_sequence_length else 0)
+        adjustment_budget = max(1, array_budget - copy_reserve)
+        feedback_hints, required_length = _feedback_integer_hints(replay)
+        sequence_hints_by_type: dict[str, list[tuple[int, dict[str, Any]]]] = {}
+
+        def array_hints_for(kind: str) -> list[tuple[int, dict[str, Any]]]:
+            domain = _dynamic_array_domain(kind)
+            if not domain:
+                return []
+            element_type = domain[0]
+            if element_type not in sequence_hints_by_type:
+                sequence_hints_by_type[element_type] = _sequence_array_hints(
+                    sequence, abi_by_signature, element_type)
+            return sequence_hints_by_type[element_type]
+
+        def replace_array_argument(tx_index: int, argument_index: int,
+                                   kind: str, value: Any) -> None:
+            if len(proposals) >= adjustment_budget:
+                return
+            for candidate_value, reason, evidence in _dynamic_array_variants(
+                    kind, value, array_hints_for(kind), feedback_hints, required_length):
+                candidate = copy.deepcopy(sequence)
+                candidate[tx_index]["arguments"][argument_index] = candidate_value
+                add(candidate, "dynamic_array_argument_adjustment", reason,
+                    {"transaction_index": tx_index + 1,
+                     "argument_index": argument_index,
+                     "abi_type": kind,
+                     "before": copy.deepcopy(value),
+                     "after": candidate_value,
+                     **evidence})
+                if len(proposals) >= adjustment_budget:
+                    return
+
+        for tx_index, tx in enumerate(sequence):
+            abi = abi_by_signature.get(str(tx.get("function", "")), {})
+            arguments = tx.get("arguments", [])
+            for argument_index, item in enumerate(abi.get("inputs", [])):
+                kind = str(item.get("type", ""))
+                if (_DYNAMIC_INT_ARRAY.fullmatch(kind) and
+                        argument_index < len(arguments) and
+                        isinstance(arguments[argument_index], list)):
+                    replace_array_argument(tx_index, argument_index, kind,
+                                           arguments[argument_index])
+
+        if len(sequence) < max_sequence_length:
+            for tx_index, tx in enumerate(sequence):
+                abi = abi_by_signature.get(str(tx.get("function", "")), {})
+                if not any(_DYNAMIC_INT_ARRAY.fullmatch(str(item.get("type", "")))
+                           for item in abi.get("inputs", [])):
+                    continue
+                for position in range(len(sequence) + 1):
+                    add(_insert(sequence, tx, position), "dynamic_array_transaction_copy",
+                        "copy an existing ABI-valid dynamic-array transaction at a new sequence position",
+                        {"source_transaction_index": tx_index + 1,
+                         "insertion_position": position,
+                         "abi_types": [item.get("type") for item in abi.get("inputs", [])
+                                       if _DYNAMIC_INT_ARRAY.fullmatch(str(item.get("type", "")))],
+                         "value_source": "existing valid sequence transaction"})
+                    if len(proposals) >= array_budget:
+                        return
+
+            # Action templates are already restricted to property/action
+            # evidence. Dynamic arrays may be inserted even when the same
+            # function occurs in the seed because only the input sequence is
+            # copied; ABI and candidate budgets remain enforced here.
+            for template in action_templates:
+                signature = str(template.get("function", ""))
+                abi = abi_by_signature.get(signature, {})
+                arguments = template.get("arguments", [])
+                for argument_index, item in enumerate(abi.get("inputs", [])):
+                    kind = str(item.get("type", ""))
+                    if (not _DYNAMIC_INT_ARRAY.fullmatch(kind) or
+                            argument_index >= len(arguments) or
+                            not isinstance(arguments[argument_index], list)):
+                        continue
+                    array_values = [(copy.deepcopy(arguments[argument_index]),
+                                     "insert an evidence-linked dynamic-array action template",
+                                     {"value_source": "ABI-valid action template"})]
+                    array_values.extend(_dynamic_array_variants(
+                        kind, arguments[argument_index], array_hints_for(kind),
+                        feedback_hints, required_length))
+                    seen_arguments = set()
+                    for value, reason, evidence in array_values:
+                        value_key = _json_key(value)
+                        if value_key in seen_arguments:
+                            continue
+                        seen_arguments.add(value_key)
+                        candidate_tx = copy.deepcopy(template)
+                        candidate_tx["arguments"][argument_index] = value
+                        for position in range(len(sequence) + 1):
+                            add(_insert(sequence, candidate_tx, position),
+                                "dynamic_array_action_insertion", reason,
+                                {"function": signature,
+                                 "argument_index": argument_index,
+                                 "abi_type": kind,
+                                 "insertion_position": position,
+                                 **evidence})
+                            if len(proposals) >= array_budget:
+                                return
+
+    if mode == "state_feedback":
+        add_dynamic_array_candidates()
 
     if mode == "random":
         operations = []

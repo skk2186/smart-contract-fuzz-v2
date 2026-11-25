@@ -1396,7 +1396,31 @@ def fixed_echidna_corpus(sequence: dict[str, Any], target_address: str, output: 
         encoded = []
         for index, value in enumerate(args):
             abi_type = _abi_type(signature, index)
-            if abi_type.startswith(("uint", "int")):
+            dynamic_integer_array = re.fullmatch(r"(uint|int)([0-9]*)\[\]", abi_type)
+            if dynamic_integer_array:
+                if not isinstance(value, list):
+                    raise ValueError("dynamic integer array argument must be a list: " + abi_type)
+                integer_kind, width_text = dynamic_integer_array.groups()
+                bits = int(width_text or "256")
+                if integer_kind == "uint":
+                    lower, upper = 0, 2 ** bits - 1
+                    element_tag, type_tag = "AbiUInt", "AbiUIntType"
+                else:
+                    lower, upper = -(2 ** (bits - 1)), 2 ** (bits - 1) - 1
+                    element_tag, type_tag = "AbiInt", "AbiIntType"
+                elements = []
+                for element in value:
+                    if isinstance(element, bool) or not isinstance(element, (int, str)):
+                        raise ValueError("dynamic integer array contains a non-integer value: " + abi_type)
+                    if isinstance(element, str) and not re.fullmatch(r"[-+]?\d+", element.strip()):
+                        raise ValueError("dynamic integer array contains a non-decimal value: " + abi_type)
+                    number = int(element)
+                    if not lower <= number <= upper:
+                        raise ValueError("dynamic integer array element is outside ABI range: " + abi_type)
+                    elements.append({"contents": [bits, str(number)], "tag": element_tag})
+                encoded.append({"contents": [{"contents": bits, "tag": type_tag}, elements],
+                                "tag": "AbiArrayDynamic"})
+            elif abi_type.startswith(("uint", "int")):
                 bits = int(re.sub(r"\D", "", abi_type) or "256")
                 encoded.append({"contents": [bits, str(value)], "tag": "AbiUInt" if abi_type.startswith("uint") else "AbiInt"})
             elif abi_type == "address":
