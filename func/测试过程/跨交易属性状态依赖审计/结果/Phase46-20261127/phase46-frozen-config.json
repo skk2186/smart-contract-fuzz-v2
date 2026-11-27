@@ -1,0 +1,91 @@
+{
+  "phase": "Phase46",
+  "frozen_at_utc": "2026-11-27T04:50:28.564959+00:00",
+  "phase_start_utc": "2026-11-27T04:29:20Z",
+  "deadline_utc": "2026-11-27T05:29:20Z",
+  "verified_head": "af2a688d3e67b00c62f78ad9c2eef2b13dda48c6",
+  "branch": "main",
+  "case_selection_rule": "two fixed first-per-dimension Phase44 development samples, plus the existing Phase37 DAllowance incomplete input and Phase36 Wallet E2 regression input; no outcome-based selection",
+  "cases": {
+    "OLYMPIA-001": {
+      "source": "Phase44 frozen development input; first 5x5 task in manifest order",
+      "input_path": "func/测试过程/跨交易属性状态依赖审计/结果/Phase44-20261124/dev/tasks/OLYMPIA-001/inputs.json",
+      "input_sha256": "e4a9215c1a662140c5e6dc41aaf6cb949aadd56015e4a3fff7ec65a2f7337e68",
+      "sequence_sha256": "b3da3d06674a2cb705e8acbb4f51e6b1fd1cb7383273eca333759722cd64db4c",
+      "input_rule": "reuse frozen E1 exactly; same empty-sequence fallback if absent"
+    },
+    "OLYMPIA-076": {
+      "source": "Phase44 frozen development input; first 20x20 task in manifest order",
+      "input_path": "func/测试过程/跨交易属性状态依赖审计/结果/Phase44-20261124/dev/tasks/OLYMPIA-076/inputs.json",
+      "input_sha256": "9f736a292f2c1dba0c6a183c2296f6b6dccdeb0f09f89b1b0316115a31623068",
+      "sequence_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_rule": "reuse frozen E1 exactly; same empty-sequence fallback if absent"
+    },
+    "DAllowance": {
+      "source": "existing Phase37 isolated missing-prerequisite input; complete route excluded",
+      "input_path": "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/00-缺失前置步骤删减输入.json",
+      "input_sha256": "890bde0fa16a21d01a993b46ffc0c8b1494ef06dfb9d254508dae40fef6fd808",
+      "sequence_sha256": "8d8a9c5e6f874ad6274b73a61f8c1013131f8983901e77914888fb2c2f0e1bf3",
+      "input_rule": "only frozen incomplete sequence passed; full reference route is not loaded"
+    },
+    "Wallet02Refund": {
+      "source": "Phase36 frozen E2 input only; independent Wallet oracle excluded",
+      "input_path": "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/00-Phase36冻结.json",
+      "input_sha256": "7fad47d221aeb5c92f02962ef5cf5e4edb7b1310ebfd193468b530ec18751b92",
+      "sequence_sha256": "d06c0ff8a2766343c0854086a8a706ab6940a73624677c460827f2043dba41bb",
+      "input_rule": "reuse frozen E2 sequence; known counterexample is not passed to the algorithm"
+    }
+  },
+  "arms": {
+    "baseline": "legacy feedback, legacy retention, no repeated prerequisite insertion",
+    "guided": "target-direction scoring, observed precondition transitions, retain executable prefixes, permit statically matched prerequisite repetition"
+  },
+  "controls": {
+    "same_initial_sequence": true,
+    "same_action_inventory": true,
+    "same_max_sequence_length": 64,
+    "candidate_execution_budget_per_arm_per_case": 12,
+    "retained_prefix_limit": 4,
+    "algorithm_seed": 4101,
+    "echidna_seed": 4301,
+    "fuzz_seconds_per_arm_per_case": 30,
+    "echidna_configuration_shared": true,
+    "phase37_parameter_binding_enabled_in_both_arms": true,
+    "parameter_repair_enabled_in_both_arms": true,
+    "candidate_templates_shared": true,
+    "agent_calls": 0,
+    "official_oracle_or_route_passed_to_algorithm": false
+  },
+  "frozen_file_sha256": {
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/00-Phase36冻结.json": "7fad47d221aeb5c92f02962ef5cf5e4edb7b1310ebfd193468b530ec18751b92",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase36-20261120/00-缺失前置步骤删减输入.json": "890bde0fa16a21d01a993b46ffc0c8b1494ef06dfb9d254508dae40fef6fd808",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase44-20261124/dev/tasks/OLYMPIA-001/inputs.json": "e4a9215c1a662140c5e6dc41aaf6cb949aadd56015e4a3fff7ec65a2f7337e68",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase44-20261124/dev/tasks/OLYMPIA-076/inputs.json": "9f736a292f2c1dba0c6a183c2296f6b6dccdeb0f09f89b1b0316115a31623068",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase44-20261124/dev/experiment-config.json": "f754664085444d84bb51c24dfef9b52a3f53321a841997b5f17bec326f7febe1",
+    "func/测试过程/跨交易属性状态依赖审计/结果/Phase43-20261123/dataset-manifest.json": "bfa47015903456d99f948d942387151c00bf46bc26b3d4fd6274985548d24fc2",
+    "func/功能/状态反馈序列扩展.py": "9579a8322ad9df9de89c7f177d2c5a7a1ee2e098cc3d34161513da125f6269ee",
+    "func/功能/跨交易状态约束.py": "da5aeca087ae2ebb83907c6657c685c18b11f7e309a592d9bc351ee2ae463df4",
+    "func/功能/种子验证.py": "4e9ba0142bba7051f423455cce39c59d590670e20b8dd65e55e8ed483260514d",
+    "func/测试过程/跨交易属性状态依赖审计/Phase43批量实验.py": "c2361d3f49cd4e398b8d241468ce5f0f2c077f36f6c74b9520a963447d2da7ac",
+    "func/测试过程/跨交易属性状态依赖审计/Phase36自适应扩展.py": "aef6dd6c7841d296b01e099ac4cf88973e648d9fa0cb362c84afa2482c31f48d",
+    "func/测试过程/跨交易属性状态依赖审计/Phase36属性状态感知门控.py": "6420d2ce3cdbd97091c6ce4b701bd01f7f4fad0ddfd5f9e3d550e80b69f0386c",
+    "func/测试过程/跨交易属性状态依赖审计/Phase37前置约束绑定验证.py": "304f88efed1d2f5d5e9a1a1e2faf4934e3c9980b2c601c19f63bbde930155b46",
+    "func/测试过程/跨交易属性状态依赖审计/Phase46目标状态反馈配对实验.py": "1493f54dbaeaf011984b663864ec2aaa380ddb0f7bd76d6fb0a433e593771cfd"
+  },
+  "metrics": [
+    "complete_executable_sequences",
+    "reliably_observed_target_or_prerequisite_progress",
+    "target_state_reached",
+    "native_echidna_counterexamples",
+    "time_to_first_counterexample",
+    "seed_only_coverage",
+    "final_fuzz_coverage",
+    "candidate_replays",
+    "execution_seconds",
+    "compile_seconds",
+    "wall_seconds",
+    "failure_reason"
+  ],
+  "fuzz_gate": "Only run after guided arm yields an independently evidenced target-direction change or a same-consumer state-revert-to-success transition with an observed preceding writer change to the statically read guard state.",
+  "fallback": "When no retained candidate is executable, both arms use the same executable frozen starting sequence; if absent, no seed-based fuzz is run."
+}

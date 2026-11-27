@@ -1,0 +1,38 @@
+{
+  "sequence": [
+    {
+      "function": "deposit(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "1000000000000000000",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "withdraw(uint8,uint256)",
+      "arguments": [
+        0,
+        1000000000000000000
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "from_transaction": 1,
+          "field": "account",
+          "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+        }
+      ]
+    }
+  ],
+  "sequence_sha256": "d06c0ff8a2766343c0854086a8a706ab6940a73624677c460827f2043dba41bb",
+  "source": "Phase36 frozen E2 input only; independent Wallet oracle excluded",
+  "profile_report_sha256": "593bedad2dfbcf7fa97236ab3dcbc0cfc9e3ecac6471a50312201b9ba0e87bb3",
+  "artifact_sha256": "a013430bc63655b774de667654efc7bf2414679e0c95f222330bd3d68a119639"
+}

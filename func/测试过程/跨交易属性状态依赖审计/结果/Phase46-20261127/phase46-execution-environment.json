@@ -1,0 +1,27 @@
+{
+  "phase": "Phase46",
+  "candidate_stage_end_utc": "2026-11-27T04:54:17.143776Z",
+  "fuzz_started": false,
+  "agent_api_calls": 0,
+  "olympia_candidate_failure": {
+    "status": "deployment_failed",
+    "exception": "ModuleNotFoundError: No module named 'eth_account._utils.typed_transactions'",
+    "affected_cases": ["OLYMPIA-001", "OLYMPIA-076"],
+    "effect": "No candidate transaction was executed and no target-state feedback was observed.",
+    "evidence": "Olympia/*/*/*-e3-*.feedback.json"
+  },
+  "execution_environment_recording_gap": "The frozen configuration does not preserve the actual candidate subprocess Python path ordering, so the exact import-precedence cause cannot be reconstructed from the frozen machine record.",
+  "postrun_unit_test_environment": {
+    "os": "WSL Ubuntu-20.04",
+    "python": "/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11-linux-x86_64-gnu/bin/python",
+    "pythonpath": "/home/skk/smart-contract-fuzz-v2/.tools/olympia-venv/lib/python3.11/site-packages",
+    "evidence": "phase46-validation.log"
+  },
+  "echidna": {
+    "campaign_count": 0,
+    "counterexample_count": null,
+    "first_counterexample_time_seconds": null,
+    "coverage": null,
+    "interpretation": "Not run because the candidate-stage gate was not met; null means unmeasured, not zero discoveries."
+  }
+}

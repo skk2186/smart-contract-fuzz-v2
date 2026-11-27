@@ -307,8 +307,21 @@ def numeric_violation_distance(property_source: str,
                                              item["right_getter"]))
 
 
+def _matches_explicit_guard_error(reason: str, guards: list[dict[str, Any]]) -> bool:
+    """Match a revert identifier only when it appears in an evidenced source guard."""
+    observed_codes = set(re.findall(r"\b[A-Z][A-Z0-9_]{2,}\b", reason.upper()))
+    guard_codes = set()
+    for guard in guards:
+        guard_codes.update(re.findall(r"\b[A-Z][A-Z0-9_]{2,}\b",
+                                     str(guard.get("expression", "")).upper()))
+    return bool(observed_codes & guard_codes)
+
+
 def feedback_vector(replay: dict[str, Any], *, property_source: str = "",
-                    seen_states: set[str] | None = None) -> dict[str, Any]:
+                    seen_states: set[str] | None = None,
+                    action_evidence: dict[str, dict[str, Any]] | None = None,
+                    parent_vector: dict[str, Any] | None = None,
+                    target_states: set[str] | None = None) -> dict[str, Any]:
     rows = replay.get("transactions", [])
     getter_states = []
     prior = replay.get("initial_predicate_getters", [])
@@ -340,6 +353,107 @@ def feedback_vector(replay: dict[str, Any], *, property_source: str = "",
         "failed" if property_value is False else "unknown")
     final_getters = rows[-1].get("predicate_getter_values", []) if rows else prior
     distance = numeric_violation_distance(property_source, final_getters)
+    target_progress = {"status": "unknown", "direction": "unknown", "evidence": None}
+    if property_value is False:
+        target_progress = {"status": "goal_reached", "direction": "violation_observed",
+                           "evidence": "original target property evaluated false"}
+    elif distance is not None and parent_vector and parent_vector.get("numeric_target_distance"):
+        parent_distance = parent_vector["numeric_target_distance"]
+        same_operands = all(distance.get(key) == parent_distance.get(key)
+                            for key in ("left_getter", "right_getter", "operator", "arguments"))
+        if same_operands and distance["distance"] < parent_distance["distance"]:
+            target_progress = {"status": "directional_progress", "direction": "toward_violation",
+                               "evidence": {"previous_distance": parent_distance["distance"],
+                                            "current_distance": distance["distance"],
+                                            "operand_evidence": distance}}
+        elif same_operands:
+            target_progress = {"status": "observed_no_directional_progress",
+                               "direction": "unchanged_or_away_from_violation",
+                               "evidence": {"previous_distance": parent_distance["distance"],
+                                            "current_distance": distance["distance"],
+                                            "operand_evidence": distance}}
+    elif property_value is True:
+        # A passing Boolean or relational property has no scalar distance. Keep it
+        # observed, but do not turn True/False into an invented numeric score.
+        target_progress = {"status": "observed_safe_no_directional_progress",
+                           "direction": "unknown", "evidence": "original property evaluated true"}
+    prerequisite_conditions = []
+    evidence_by_action = action_evidence or {}
+    observed_target_state_changes = []
+    target_state_names = set(target_states or [])
+    for index, row in enumerate(rows, start=1):
+        changed_effects = {str(item.get("state") if isinstance(item, dict) else item)
+                           for item in (row.get("changed_effect_states") or [])}
+        matched_target_changes = sorted(changed_effects & target_state_names)
+        if matched_target_changes:
+            observed_target_state_changes.append({"transaction_index": index,
+                "function": row.get("function"), "changed_states": matched_target_changes,
+                "evidence": "execution backend reported changed_effect_states"})
+        if row.get("changed_predicate_getters"):
+            observed_target_state_changes.append({"transaction_index": index,
+                "function": row.get("function"),
+                "changed_predicate_getters": copy.deepcopy(row.get("changed_predicate_getters")),
+                "evidence": "execution backend reported changed predicate getter values",
+                "direction": "unknown unless property comparison supplies a boundary"})
+        signature = str(row.get("function", ""))
+        action = evidence_by_action.get(signature, {})
+        guards = [guard for effect in action.get("effect_evidence", []) or []
+                  for guard in effect.get("guards", []) or []]
+        guards.extend(action.get("action_guard_evidence", []) or [])
+        evidenced_guards = [guard for guard in guards
+                            if guard.get("source") and guard.get("state_reads")]
+        if not evidenced_guards:
+            continue
+        failed_reason = str(row.get("revert_reason") or row.get("property_error") or "")
+        normalized_reason = failed_reason.replace("_", " ")
+        state_related_failure = (_matches_explicit_guard_error(failed_reason, evidenced_guards) or
+            bool(re.search(r"not\s+found|unknown\s+(?:account|object|key)|missing|not\s+initiali[sz]ed|"
+                r"does\s+not\s+exist|unauthori[sz]ed|insufficient|not\s+registered|"
+                r"too\s+low|below|under\s+(?:the\s+)?minimum", normalized_reason, re.I)))
+        guard_states = sorted({str(state) for guard in evidenced_guards
+                               for state in guard.get("state_reads", []) or []})
+        preceding_writers = []
+        for prior_index, prior_row in enumerate(rows[:index - 1], start=1):
+            if prior_row.get("status") != "success":
+                continue
+            prior_signature = str(prior_row.get("function", ""))
+            prior_action = evidence_by_action.get(prior_signature, {})
+            actual_changes = {str(item.get("state") if isinstance(item, dict) else item)
+                              for item in (prior_row.get("changed_effect_states") or [])}
+            matched = actual_changes & set(guard_states)
+            if matched:
+                preceding_writers.append({"transaction_index": prior_index,
+                    "function": prior_signature, "changed_guard_states": sorted(matched),
+                    "static_write_states": sorted(set(prior_action.get("write_states", [])) & matched)})
+        if row.get("status") == "success" and preceding_writers:
+            status = "precondition_established"
+        elif row.get("status") == "success":
+            status = "consumer_succeeded_state_unobserved"
+        elif state_related_failure:
+            status = "state_prerequisite_unmet"
+        else:
+            status = "unknown"
+        prerequisite_conditions.append({"transaction_index": index,
+            "consumer_function": signature, "status": status,
+            "consumer_arguments": copy.deepcopy(row.get("arguments", [])),
+            "consumer_sender": row.get("sender"),
+            "guard_sources": sorted({str(guard["source"]) for guard in evidenced_guards}),
+            "guard_states": guard_states, "preceding_writers": preceding_writers,
+            "failure_evidence": failed_reason if state_related_failure else None})
+    parent_conditions = {(item.get("consumer_function"), _json_key(item.get("consumer_arguments", [])),
+                          item.get("consumer_sender"), tuple(item.get("guard_states", []))):
+                         item.get("status") for item in (parent_vector or {}).get("precondition_conditions", [])}
+    prerequisite_progress = []
+    for condition in prerequisite_conditions:
+        key = (condition.get("consumer_function"), _json_key(condition.get("consumer_arguments", [])),
+               condition.get("consumer_sender"), tuple(condition.get("guard_states", [])))
+        if (parent_conditions.get(key) == "state_prerequisite_unmet" and
+                condition.get("status") == "precondition_established"):
+            prerequisite_progress.append({"consumer_function": key[0],
+                "guard_states": key[3], "consumer_arguments": condition.get("consumer_arguments"),
+                "consumer_sender": condition.get("consumer_sender"),
+                "preceding_writers": condition.get("preceding_writers"),
+                "evidence": "same consumer changed from a state-related revert to success after an observed change to its statically read guard state"})
     dependent_successors = sum(
         1 for index, row in enumerate(rows)
         if row.get("status") == "success" and (row.get("changed_effect_states") or
@@ -352,6 +466,10 @@ def feedback_vector(replay: dict[str, Any], *, property_source: str = "",
             "new_relevant_state_count": len(fingerprints - prior_seen),
             "next_step_dependency_evidence_count": dependent_successors,
             "numeric_target_distance": distance,
+            "target_progress": target_progress,
+            "precondition_conditions": prerequisite_conditions,
+            "precondition_progress": prerequisite_progress,
+            "observed_target_state_changes": observed_target_state_changes,
             "counterexample_reached": property_value is False or bool(target_state.get("counterexample_state_established")),
             "property_value": property_value,
             "property_check_transaction_index": property_check_index,
@@ -543,7 +661,8 @@ def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[di
                        senders: list[str] | None = None,
                        max_sequence_length: int = 8,
                        max_proposals: int = 24,
-                       random_seed: int = 0) -> list[dict[str, Any]]:
+                       random_seed: int = 0,
+                       allow_repeated_prerequisite: bool = False) -> list[dict[str, Any]]:
     """Generate one bounded layer of candidates; caller executes and feeds back each result."""
     if mode not in {"random", "static", "state_feedback"}:
         raise ValueError(f"unsupported extension mode: {mode}")
@@ -707,9 +826,8 @@ def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[di
     failed = next((row for row in tx_feedback if row.get("status") != "success" or
                    row.get("execution_class") in {"unexpected_internal_revert", "outer_revert"}), None)
     if mode == "state_feedback" and failed is not None:
-        reason = str(failed.get("revert_reason") or failed.get("property_error") or "").lower()
-        if re.search(r"too\s+low|below|under\s+(?:the\s+)?minimum|less\s+than\s+(?:the\s+)?minimum", reason):
-            return []
+        raw_reason = str(failed.get("revert_reason") or failed.get("property_error") or "")
+        reason = raw_reason.lower().replace("_", " ")
         failed_index = max(0, int(failed.get("index", failed.get("transaction_index", 1))) - 1)
         failed_signature = str(failed.get("function", ""))
         consumer_evidence = action_evidence.get(failed_signature, {})
@@ -720,13 +838,19 @@ def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[di
         guards = [guard for effect in consumer_evidence.get("effect_evidence", []) or []
                   for guard in effect.get("guards", []) or []]
         guards.extend(consumer_evidence.get("action_guard_evidence", []) or [])
-        failure_is_state_related = bool(re.search(
+        explicit_guard_error = _matches_explicit_guard_error(raw_reason, guards)
+        if (not explicit_guard_error and re.search(
+                r"too\s+low|below|under\s+(?:the\s+)?minimum|less\s+than\s+(?:the\s+)?minimum",
+                reason)):
+            return []
+        failure_is_state_related = (explicit_guard_error or bool(re.search(
             r"not\s+found|unknown\s+(?:account|object|key)|missing|not\s+initiali[sz]ed|"
-            r"does\s+not\s+exist|unauthori[sz]ed|insufficient|not\s+registered", reason))
+            r"does\s+not\s+exist|unauthori[sz]ed|insufficient|not\s+registered|"
+            r"too\s+low|below|under\s+(?:the\s+)?minimum", reason)))
         if failure_is_state_related and consumer_reads:
             for template in action_templates:
                 signature = str(template.get("function", ""))
-                if signature in present_functions:
+                if signature in present_functions and not allow_repeated_prerequisite:
                     continue
                 evidence = action_evidence.get(signature, {})
                 producer_writes = set(evidence.get("write_states", []))
@@ -737,8 +861,9 @@ def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[di
                 if not matched:
                     continue
                 add(_insert(sequence, template, failed_index),
-                    "evidence_backed_failed_prerequisite_insertion",
-                    "insert a producer immediately before the earliest failed transaction",
+                    ("evidence_backed_repeated_prerequisite_insertion" if signature in present_functions else
+                     "evidence_backed_failed_prerequisite_insertion"),
+                    "insert a statically evidenced state producer before the earliest failed transaction",
                     {"failed_transaction": failed_index + 1,
                      "failed_function": failed_signature,
                      "matched_states": sorted(matched),
@@ -844,7 +969,8 @@ def propose_extensions(sequence: list[dict[str, Any]], action_templates: list[di
     return proposals[:max_proposals]
 
 
-def retain_diverse_prefixes(scored: list[dict[str, Any]], limit: int = 4) -> list[dict[str, Any]]:
+def retain_diverse_prefixes(scored: list[dict[str, Any]], limit: int = 4, *,
+                            target_state_guided: bool = False) -> list[dict[str, Any]]:
     """Keep up to `limit` prefixes across outcome, role, sequence, and state dimensions."""
     if limit <= 0:
         return []
@@ -865,13 +991,26 @@ def retain_diverse_prefixes(scored: list[dict[str, Any]], limit: int = 4) -> lis
                           "roles:" + hashlib.sha256(roles.encode()).hexdigest()[:12],
                           "shape:" + hashlib.sha256(shape.encode()).hexdigest()[:12],
                           "state:" + hashlib.sha256(states.encode()).hexdigest()[:12]}
-            score = (int(vector.get("counterexample_reached", False)),
+            legacy_score = (int(vector.get("counterexample_reached", False)),
                      int(vector.get("replay_complete", False)),
                      int(vector.get("property_related_state_changed", False)),
                      int(vector.get("new_relevant_state_count", 0)),
                      int(vector.get("next_step_dependency_evidence_count", 0)),
                      -float((vector.get("numeric_target_distance") or {}).get("distance", 1.0)),
                      int(vector.get("transactions_succeeded", 0)))
+            if target_state_guided:
+                progress = vector.get("target_progress", {})
+                goal_score = int(progress.get("status") == "goal_reached")
+                directional_score = int(progress.get("status") == "directional_progress")
+                prerequisite_score = len(vector.get("precondition_progress", []))
+                observed_satisfied = sum(item.get("status") == "consumer_call_succeeded"
+                                         for item in vector.get("precondition_conditions", []))
+                score = (goal_score, directional_score, prerequisite_score,
+                         observed_satisfied, *legacy_score)
+                categories.add("target-progress:" + str(progress.get("status", "unknown")))
+                categories.add("prerequisite-progress:" + str(prerequisite_score))
+            else:
+                score = legacy_score
             diversity = len(categories - covered)
             key = (score, diversity)
             if best_key is None or key > best_key:

@@ -460,7 +460,7 @@ def seed_only_metrics(metrics: dict[str, Any] | None) -> tuple[bool, int | None]
 def e3_group(group: str, sample: dict[str, Any], base_sequence: list[dict[str, Any]],
              base_feedback: dict[str, Any], context: dict[str, Any],
              artifact: dict[str, Any], analysis: dict[str, Any], task_dir: Path,
-             *, bind: bool) -> dict[str, Any]:
+             *, bind: bool, target_guided: bool = False) -> dict[str, Any]:
     prop = context["properties"][0]
     abi_by_signature = {entry["name"] + "(" + ",".join(
         arg["type"] for arg in entry.get("inputs", [])) + ")": entry
@@ -496,7 +496,11 @@ def e3_group(group: str, sample: dict[str, Any], base_sequence: list[dict[str, A
                 mode="state_feedback", replay=parent["feedback"], target_states=target_states,
                 senders=SENDERS, max_sequence_length=MAX_SEQUENCE_LENGTH,
                 max_proposals=min(E3_CANDIDATE_BUDGET, budget_left),
-                random_seed=4100 + parent_index)
+                random_seed=4100 + parent_index,
+                allow_repeated_prerequisite=target_guided)
+            parent_vector = feedback_vector(parent["feedback"],
+                property_source=prop.get("property_predicate") or "",
+                action_evidence=action_evidence, target_states=target_states)
             scored = []
             for proposal in proposals:
                 sequence = proposal["sequence"]
@@ -531,20 +535,38 @@ def e3_group(group: str, sample: dict[str, Any], base_sequence: list[dict[str, A
                 write_json(output / f"{group}-e3-{index:02d}.sequence.json", sequence)
                 write_json(output / f"{group}-e3-{index:02d}.feedback.json", feedback)
                 budget_left -= 1
-                vector = feedback_vector(feedback, property_source=prop.get("property_predicate") or "")
+                vector = feedback_vector(feedback, property_source=prop.get("property_predicate") or "",
+                                         action_evidence=action_evidence,
+                                         parent_vector=parent_vector,
+                                         target_states=target_states)
                 record = {"candidate_index": index, "operator": proposal.get("operator"),
                     "proposal_reason": proposal.get("proposal_reason"), "proposal_evidence": proposal.get("evidence"),
                     "phase37_binding": binding, "phase37_binding_status": binding_status,
                     "phase37_matching_constraints": binding_matches, "sequence": sequence,
                     "replay_status": feedback.get("replay_status"), "feedback": vector,
+                    "parent_feedback": parent_vector,
+                    "selection_mode": "target_state_progress" if target_guided else "legacy_feedback",
                     "raw_feedback_file": str((output / f"{group}-e3-{index:02d}.feedback.json").relative_to(ROOT))}
                 records.append(record)
                 scored.append({"sequence": sequence, "feedback": vector,
                                "replay_feedback": feedback, "record": record})
             if scored:
-                for retained in retain_diverse_prefixes(scored, limit=4):
+                for retained in retain_diverse_prefixes(scored, limit=4,
+                                                        target_state_guided=target_guided):
                     row = retained["record"]
-                    if (row.get("replay_status") != "executable" and
+                    vector = retained.get("feedback", {})
+                    has_successful_prefix = int(vector.get("transactions_succeeded", 0)) > 0
+                    has_pending_guard = any(item.get("status") == "state_prerequisite_unmet"
+                                            for item in vector.get("precondition_conditions", []))
+                    keep_frontier = (row.get("replay_status") == "executable" or
+                                     has_successful_prefix or has_pending_guard or
+                                     bool(vector.get("precondition_progress")) or
+                                     vector.get("target_progress", {}).get("status") == "directional_progress")
+                    if (target_guided and keep_frontier and
+                            len(retained["sequence"]) < MAX_SEQUENCE_LENGTH):
+                        next_frontier.append({"sequence": retained["sequence"],
+                                              "feedback": retained["replay_feedback"]})
+                    elif (not target_guided and row.get("replay_status") != "executable" and
                             len(retained["sequence"]) < MAX_SEQUENCE_LENGTH):
                         next_frontier.append({"sequence": retained["sequence"],
                                               "feedback": retained["replay_feedback"]})
@@ -554,6 +576,7 @@ def e3_group(group: str, sample: dict[str, Any], base_sequence: list[dict[str, A
         "starting_sequence_fingerprint": sequence_fingerprint(base_sequence),
         "starting_sequence": base_sequence, "action_template_count": len(templates),
         "template_decisions": decisions, "candidate_budget": E3_CANDIDATE_BUDGET,
+        "selection_mode": "target_state_progress" if target_guided else "legacy_feedback",
         "candidate_count": len(records), "candidates": records,
         "valid_sequence_count": len(valid), "valid_sequences": valid,
         "replay_seconds": round(replay_seconds, 6)}

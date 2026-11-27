@@ -201,10 +201,16 @@ def _fingerprint(sequence: list[dict[str, Any]]) -> str:
     return sequence_fingerprint(sequence)
 
 
+def _property_source_for_feedback(prop: dict[str, Any]) -> str:
+    """Prefer the source excerpt over an analyzer source-location reference."""
+    return str(prop.get("property_predicate") or prop.get("property_source") or "")
+
+
 def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
             abi_by_signature: dict[str, dict[str, Any]], sequence: list[dict[str, Any]],
             senders: list[str], output: Path, gate_module, *,
-            binding_enabled: bool = False, effect_catalog: dict[str, Any] | None = None
+            binding_enabled: bool = False, effect_catalog: dict[str, Any] | None = None,
+            target_guided: bool = False
             ) -> dict[str, Any]:
     import Phase32有限扩展与对照 as extension_driver
     from 种子验证 import AnvilSession, replay_seed
@@ -236,9 +242,12 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
         total_replays += 1 + base_repair_count
         repair_replays += base_repair_count
         base_prep, _ = extension_driver._split_trigger(prop, base_sequence, senders[0])
+        property_predicate = _property_source_for_feedback(prop)
+        base_vector = feedback_vector(base_replay, property_source=property_predicate,
+                                      action_evidence=evidence, target_states=target_states)
         records.append({"candidate_no": 0, "proposal_no": 0, "origin": "frozen_base_replay",
             "sequence": base_sequence, "replay": base_replay, "parameter_repair": base_repair,
-            "feedback": feedback_vector(base_replay, property_source=str(prop.get("property_source", "")))} )
+            "feedback": base_vector, "selection_mode": "target_state_progress" if target_guided else "legacy_feedback"} )
         frontier = [{"sequence": base_prep, "replay": base_replay, "depth": 0}]
         seen_sequences = {_fingerprint(base_prep)}
         iteration = 0
@@ -251,7 +260,11 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
                     abi_by_signature, mode="state_feedback", replay=parent["replay"],
                     target_states=target_states, senders=senders,
                     max_sequence_length=max_preparation_length, max_proposals=remaining,
-                    random_seed=SEED_BASE + iteration + parent["depth"])
+                    random_seed=SEED_BASE + iteration + parent["depth"],
+                    allow_repeated_prerequisite=target_guided)
+                parent_vector = feedback_vector(parent["replay"],
+                    property_source=property_predicate,
+                    action_evidence=evidence, target_states=target_states)
                 for proposal in proposals:
                     preparation = proposal["sequence"]
                     fingerprint = proposal["fingerprint"]
@@ -332,8 +345,9 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
                     total_replays += 1 + repair_count + binding_replay_count
                     repair_replays += repair_count
                     binding_replays += binding_replay_count
-                    vector = feedback_vector(replay, property_source=str(prop.get("property_source", "")),
-                                             seen_states=seen_states)
+                    vector = feedback_vector(replay, property_source=property_predicate,
+                                             seen_states=seen_states, action_evidence=evidence,
+                                             parent_vector=parent_vector, target_states=target_states)
                     seen_states.update(vector.get("getter_state_fingerprints", []))
                     proof = gate.observe(gate_decision.get("repeat_key"), parent_replay, replay,
                                          parent_sequence, _fingerprint_sequence(repaired, prop, senders))
@@ -347,6 +361,8 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
                         "post_repair_binding_preserved": repair_preserved_binding,
                         "binding_replay_count": binding_replay_count,
                         "elapsed_seconds": round(elapsed, 6), "feedback": vector,
+                        "parent_feedback": parent_vector,
+                        "selection_mode": "target_state_progress" if target_guided else "legacy_feedback",
                         "adaptive_relation_probe": proof, "retention_decision": "pending"}
                     records.append(record)
                     if vector["counterexample_reached"] and replay.get("replay_status") == "executable":
@@ -364,7 +380,8 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
             if target_candidate:
                 target_candidate["retention_decision"] = "target_reached_stop"
                 break
-            retained = retain_diverse_prefixes(pool, RETAINED_PREFIXES)
+            retained = retain_diverse_prefixes(pool, RETAINED_PREFIXES,
+                                               target_state_guided=target_guided)
             for node in pool:
                 node["record"]["retention_decision"] = (
                     "retained_diverse_prefix" if node in retained else
@@ -378,6 +395,7 @@ def _run_g2(project: str, candidate: dict[str, Any], prop: dict[str, Any],
         "base_sequence": base_sequence, "base_replay": base_replay,
         "base_parameter_repair": base_repair, "max_sequence_length": MAX_LENGTH,
         "retained_prefixes": RETAINED_PREFIXES, "candidate_execution_budget": MAX_EXECUTIONS,
+        "selection_mode": "target_state_progress" if target_guided else "legacy_feedback",
         "candidate_proposals_considered": considered, "candidate_executions": executed,
         "base_replay_executions": 1, "parameter_repair_replays": repair_replays,
         "binding_replays": binding_replays, "constraint_binding_enabled": binding_enabled,
