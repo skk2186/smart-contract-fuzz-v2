@@ -1,0 +1,128 @@
+{
+  "phase": "Phase47",
+  "frozen_at_utc": "2026-11-27T13:12:17.202885+00:00",
+  "baseline_head": "6071484006f27fb559da18095739064e98eb25a6",
+  "phase46_freeze_sha256": "5892a4fd50ef6ea5209abc3f8e3e36fc0610a7634171c34ae9f77cd91b2c67a2",
+  "case_order": [
+    "DAllowance",
+    "Wallet02Refund",
+    "OLYMPIA-001"
+  ],
+  "cases": {
+    "DAllowance": {
+      "project": "AuditDAllowance",
+      "sequence_sha256": "8d8a9c5e6f874ad6274b73a61f8c1013131f8983901e77914888fb2c2f0e1bf3",
+      "sequence": [
+        {
+          "function": "mint(address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            10
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0"
+        },
+        {
+          "function": "transferFrom(address,address,uint256)",
+          "arguments": [
+            "0x0000000000000000000000000000000000010000",
+            "0x0000000000000000000000000000000000030000",
+            4
+          ],
+          "sender": "0x0000000000000000000000000000000000020000",
+          "value_wei": "0"
+        }
+      ],
+      "input_artifact_sha256": "890bde0fa16a21d01a993b46ffc0c8b1494ef06dfb9d254508dae40fef6fd808"
+    },
+    "Wallet02Refund": {
+      "project": "Wallet02Refund",
+      "sequence_sha256": "d06c0ff8a2766343c0854086a8a706ab6940a73624677c460827f2043dba41bb",
+      "sequence": [
+        {
+          "function": "deposit(uint8)",
+          "arguments": [
+            0
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "1000000000000000000",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change"
+        },
+        {
+          "function": "withdraw(uint8,uint256)",
+          "arguments": [
+            0,
+            1000000000000000000
+          ],
+          "sender": "0x0000000000000000000000000000000000010000",
+          "value_wei": "0",
+          "delay_seconds": 0,
+          "delay_blocks": 0,
+          "expected_outcome": "state_change",
+          "data_dependencies": [
+            {
+              "from_transaction": 1,
+              "field": "account",
+              "relation": "same account index used for deposit so actor = account % ACCOUNT_COUNT matches"
+            }
+          ]
+        }
+      ],
+      "input_artifact_sha256": "7fad47d221aeb5c92f02962ef5cf5e4edb7b1310ebfd193468b530ec18751b92"
+    },
+    "OLYMPIA-001": {
+      "input_path": "func/测试过程/跨交易属性状态依赖审计/结果/Phase44-20261124/dev/tasks/OLYMPIA-001/inputs.json",
+      "input_sha256": "e4a9215c1a662140c5e6dc41aaf6cb949aadd56015e4a3fff7ec65a2f7337e68",
+      "sequence_sha256": "b3da3d06674a2cb705e8acbb4f51e6b1fd1cb7383273eca333759722cd64db4c",
+      "source_sha256": "67290f2b80cd306b049cc80cb7dc26458501850e64978529b22e03068e6a809e"
+    }
+  },
+  "controls": {
+    "max_sequence_length": 64,
+    "candidate_budget_per_arm": 12,
+    "retained_prefixes": 4,
+    "algorithm_seed": 4701,
+    "echidna_seed": 4702,
+    "phase37_binding_both_arms": true,
+    "parameter_repair_both_arms": true,
+    "agent_calls": 0,
+    "oracle_or_reference_route_passed_to_generator": false
+  },
+  "runtime": {
+    "executable": "/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11-linux-x86_64-gnu/bin/python",
+    "prefix": "/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11.18-linux-x86_64-gnu",
+    "versions": {
+      "web3": "6.19.0",
+      "eth-account": "0.11.2",
+      "eth-utils": "4.1.1",
+      "eth-keys": "0.5.1",
+      "eth-tester": "0.11.0b2",
+      "py-evm": "0.10.1b1"
+    },
+    "web3_file": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/web3/__init__.py",
+    "eth_account_file": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/eth_account/__init__.py",
+    "typed_transactions_file": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/eth_account/_utils/typed_transactions/__init__.py",
+    "target_site": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311",
+    "pythonpath": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311:/home/skk/smart-contract-fuzz-v2/deepseek:/home/skk/smart-contract-fuzz-v2/func/功能",
+    "parent": {
+      "executable": "/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11-linux-x86_64-gnu/bin/python",
+      "web3_file": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/web3/__init__.py",
+      "eth_account_file": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/eth_account/__init__.py",
+      "typed_transactions_file": "/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/eth_account/_utils/typed_transactions/__init__.py"
+    },
+    "child_returncode": 0,
+    "child_stdout": "{\"executable\": \"/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11-linux-x86_64-gnu/bin/python\", \"prefix\": \"/home/skk/smart-contract-fuzz-v2/.tools/uv/python/cpython-3.11.18-linux-x86_64-gnu\", \"versions\": {\"web3\": \"6.19.0\", \"eth-account\": \"0.11.2\", \"eth-utils\": \"4.1.1\", \"eth-keys\": \"0.5.1\", \"eth-tester\": \"0.11.0b2\", \"py-evm\": \"0.10.1b1\"}, \"web3_file\": \"/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/web3/__init__.py\", \"eth_account_file\": \"/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/eth_account/__init__.py\", \"typed_transactions_file\": \"/home/skk/smart-contract-fuzz-v2/.tools/phase43-runtime-py311/eth_account/_utils/typed_transactions/__init__.py\"}\n"
+  },
+  "code_sha256": {
+    "func/功能/状态反馈序列扩展.py": "488ae1c2064077e00551edd3892fcedcbadf0025a81d3f251b1169afcd260491",
+    "func/功能/种子验证.py": "4e9ba0142bba7051f423455cce39c59d590670e20b8dd65e55e8ed483260514d",
+    "func/功能/跨交易状态约束.py": "da5aeca087ae2ebb83907c6657c685c18b11f7e309a592d9bc351ee2ae463df4",
+    "func/测试过程/跨交易属性状态依赖审计/Phase36自适应扩展.py": "5d0690646fd99ee2ac596157a894cc8a606ae1279b5b116e6a54fd4fd825a18a",
+    "func/测试过程/跨交易属性状态依赖审计/Phase37前置约束绑定验证.py": "304f88efed1d2f5d5e9a1a1e2faf4934e3c9980b2c601c19f63bbde930155b46",
+    "func/测试过程/跨交易属性状态依赖审计/Phase43批量实验.py": "c2361d3f49cd4e398b8d241468ce5f0f2c077f36f6c74b9520a963447d2da7ac",
+    "func/测试过程/跨交易属性状态依赖审计/Phase46目标状态反馈配对实验.py": "b9e64f07d9dae7722bfd74b94462662688d2c48d88461127d4f7369920a7de53"
+  },
+  "driver_sha256": "d7520665cfcbd247c268cfd4a03ec1f2dd5df31a862b294ebe9c9e22383a42de"
+}
