@@ -104,7 +104,7 @@ def _abi_value(kind: str, value: Any) -> dict[str, Any]:
                 escaped += f"\\{byte}\\&"
         return {"tag": "AbiString", "contents": escaped + '"'}
     if kind == "address":
-        return {"tag": "AbiAddress", "contents": str(int(normalized, 16))}
+        return {"tag": "AbiAddress", "contents": normalized}
     if kind == "bool":
         return {"tag": "AbiBool", "contents": normalized}
     if re.fullmatch(r"bytes([1-9]|[12][0-9]|3[0-2])", kind):
@@ -201,6 +201,7 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
                           feedback: str | None = None, attempt: int = 1,
                           fixed_prefix_transactions: list[dict[str, Any]] | None = None,
                           environment: dict[str, Any] | None = None,
+                          goal_mode: str = "default",
                           call_options: dict[str, Any] | None = None):
     property_context = next(p for p in context["properties"]
                             if p["property_id"] == candidate["property_id"])
@@ -282,17 +283,26 @@ def instantiate_candidate(context: dict[str, Any], candidate: dict[str, Any], *,
         "attempt": attempt,
     }
 
+    if goal_mode == "falsify":
+        prompt["rules"].extend([
+            "务必优先从 deployment_state.view_values 和 environment.harness_address 读取真实部署地址（如 token1()、token2()、player()、owner() 等），禁止随意杜撰地址。",
+            "根据源码中的余额、授权、价格或算术公式精确推算每笔交易的 arguments、sender 与 value_wei，确保每笔交易都能通过 require 守卫，同时尽可能逼近或直接触发目标安全属性的违反条件。",
+            "在跨账户协作场景中，明确在不同交易间切换 sender_pool 中的不同 sender（如先由主账户转账/存款，再切换第二账户 approve 或存款，再切回触发目标操作）。",
+        ])
+
     def validate(data: dict[str, Any]) -> None:
         _validator(context, candidate, feedback, fixed_prefix_transactions)(data)
 
     encoding_started = time.perf_counter()
     user_message = json.dumps(prompt, ensure_ascii=False, separators=(",", ":"))
     prompt_encoding_seconds = time.perf_counter() - encoding_started
+    call_kwargs = dict(call_options or {})
+    max_tokens = int(call_kwargs.pop("max_tokens", 4096))
     data, event = call_json(
-        system="你是智能合约交易参数具体化器。只根据输入 ABI 与源码作答，必须输出合法 JSON。",
+        system="你是智能合约交易参数具体化器。只根据输入 ABI、链上初始/执行状态与源码精确推算参数，思考请保持简洁高效，尽快输出合法 JSON。",
         user=user_message,
         tag=f"AgentB_{context['project']}_{candidate['candidate_id']}_try{attempt}",
-        max_tokens=4096, validator=validate, **(call_options or {}))
+        max_tokens=max_tokens, validator=validate, **call_kwargs)
     event["prompt_json_encoding_seconds"] = round(prompt_encoding_seconds, 9)
     event["prompt_utf8_bytes"] = len(user_message.encode("utf-8"))
     return data, event

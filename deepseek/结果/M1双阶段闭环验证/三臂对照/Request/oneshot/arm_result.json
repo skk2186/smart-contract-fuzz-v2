@@ -1,0 +1,88 @@
+{
+  "project": "Request",
+  "property_id": "bc39edeb78eed12c3bea",
+  "property_name": "echidna_captured_never_exceeds_authorized",
+  "arm": "oneshot",
+  "valid_seed_count": 1,
+  "injected_seed_count": 1,
+  "anvil_counterexample": false,
+  "layer1_repairs_applied": 0,
+  "stage1_replans_used": 0,
+  "stage2_escalations_used": 0,
+  "echidna_seed_only_loaded": 1,
+  "echidna_seed_only_replayed": 1,
+  "echidna_seed_only_falsified": false,
+  "echidna_seed_only_instructions": 11213,
+  "echidna_fuzz_loaded": 1,
+  "echidna_fuzz_falsified": false,
+  "echidna_elapsed": 14.474,
+  "echidna_unique_instructions": 22914,
+  "echidna_fuzzing_txs": 20000,
+  "seed_gen_seconds": 9.471,
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 0,
+    "prompt_tokens": 26912,
+    "completion_tokens": 1009,
+    "total_tokens": 27921,
+    "estimated_cost_usd_offpeak": "0.004491672",
+    "estimated_cost_usd_peak": "0.008983344"
+  },
+  "eval_trace": [
+    {
+      "phase": "initial",
+      "candidate_id": "oneshot-init-01",
+      "steps": [
+        "driver_authorizePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 0,
+      "target_property_violation": false,
+      "error": null
+    }
+  ],
+  "winning_seed_transactions": [
+    {
+      "index": 1,
+      "function": "driver_authorizePayment(uint256,uint256,uint16)",
+      "abi_signature": "driver_authorizePayment(uint256,uint256,uint16)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        1000,
+        1000,
+        0
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": []
+    },
+    {
+      "index": 2,
+      "function": "driver_capturePayment(uint256,uint256,uint16)",
+      "abi_signature": "driver_capturePayment(uint256,uint256,uint16)",
+      "sender": "0x0000000000000000000000000000000000010000",
+      "arguments": [
+        0,
+        1000,
+        0
+      ],
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "from_transaction": 1,
+          "event": "PaymentAuthorized",
+          "field": "paymentReference",
+          "note": "paymentIndex=0 映射到 paymentRefCounter=1 后的 paymentRef=1；若事件字段不可用，执行器按源码 bytes8(uint64(1 + (0 % 1))) 推导"
+        }
+      ]
+    }
+  ],
+  "total_elapsed": 25.398
+}

@@ -1,0 +1,295 @@
+{
+  "project": "BeeStorage",
+  "property_id": "2c68514fc72b1303d6e8",
+  "property_name": "echidna_stamp_internal_pot_not_above_contract_balance",
+  "arm": "hybrid",
+  "valid_seed_count": 2,
+  "injected_seed_count": 2,
+  "anvil_counterexample": false,
+  "layer1_repairs_applied": 0,
+  "stage1_replans_used": 1,
+  "stage2_escalations_used": 2,
+  "echidna_seed_only_loaded": 2,
+  "echidna_seed_only_replayed": 2,
+  "echidna_seed_only_falsified": false,
+  "echidna_seed_only_instructions": 18875,
+  "echidna_fuzz_loaded": 2,
+  "echidna_fuzz_falsified": false,
+  "echidna_elapsed": 30.032,
+  "echidna_unique_instructions": 29809,
+  "echidna_fuzzing_txs": 6502,
+  "seed_gen_seconds": 730.838,
+  "api_usage": {
+    "request_attempts": 14,
+    "failed_request_attempts": 1,
+    "prompt_tokens": 188077,
+    "completion_tokens": 108039,
+    "total_tokens": 296116,
+    "estimated_cost_usd_offpeak": "0.087559494",
+    "estimated_cost_usd_peak": "0.175118988"
+  },
+  "eval_trace": [
+    {
+      "phase": "initial",
+      "candidate_id": "hybrid-init-01",
+      "steps": [
+        "act_admin_setOraclePrice(uint32)",
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_updater_adjustOraclePrice(uint16)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_actor_increaseDepth(uint8,bytes32,uint8)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_admin_setOraclePrice(uint32)",
+        "act_actor_expireAll(uint8)",
+        "act_actor_withdrawSurplus(uint8)",
+        "act_actor_expireAll(uint8)"
+      ],
+      "status": "replay_failed",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "initial",
+      "candidate_id": "hybrid-init-02",
+      "steps": [
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_updater_adjustOraclePrice(uint16)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_actor_increaseDepth(uint8,bytes32,uint8)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_actor_increaseDepth(uint8,bytes32,uint8)",
+        "act_actor_expireAll(uint8)",
+        "act_actor_expireAll(uint8)"
+      ],
+      "status": "replay_failed",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "stage1_replan_1",
+      "candidate_id": "hybrid-s1r1-01",
+      "steps": [
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_topUp(uint8,bytes32,uint256)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 0,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "stage1_replan_1",
+      "candidate_id": "hybrid-s1r1-02",
+      "steps": [
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_tick()",
+        "act_tick()",
+        "act_actor_expireAll(uint8)",
+        "act_actor_expireAll(uint8)",
+        "act_actor_expireAll(uint8)"
+      ],
+      "status": "replay_failed",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "stage2_escalation_1",
+      "candidate_id": "hybrid-s2e1-01",
+      "steps": [
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_redist_happyReveal(uint8)",
+        "act_tick()",
+        "act_tick()",
+        "act_redist_happyReveal(uint8)",
+        "act_admin_setOraclePrice(uint32)",
+        "act_actor_expireAll(uint8)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 0,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "stage2_escalation_1",
+      "candidate_id": "hybrid-s2e1-02",
+      "steps": [
+        "act_admin_setOraclePrice(uint32)",
+        "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+        "act_actor_manageStake(uint8,bytes32,uint256,uint8)",
+        "act_updater_adjustOraclePrice(uint16)",
+        "act_actor_topUp(uint8,bytes32,uint256)",
+        "act_redist_happyCommit(uint8,bytes32,bytes32)",
+        "act_tick()",
+        "act_redist_happyReveal(uint8)",
+        "act_actor_withdrawSurplus(uint8)",
+        "act_actor_topUp(uint8,bytes32,uint256)"
+      ],
+      "status": "replay_failed",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "s2_esc2_error",
+      "error": "token_budget_exceeded: 本次请求最坏上界 155726 将超过剩余 Token 预算 103884"
+    }
+  ],
+  "winning_seed_transactions": [
+    {
+      "function": "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+      "arguments": [
+        0,
+        1000,
+        0,
+        1,
+        "0x0000000000000000000000000000000000000000000000000000000000000001",
+        false
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_actor_topUp(uint8,bytes32,uint256)",
+      "arguments": [
+        0,
+        "0x23d7dd4e8a1398f3e84013b1e88d0315292f60bb5cdf67582d18be3189a15af9",
+        1000
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "parameter": "batchId",
+          "from_transaction": 1,
+          "event": "BatchCreated",
+          "field": "batchId"
+        }
+      ],
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_actor_createBatch(uint8,uint256,uint8,uint8,bytes32,bool)",
+      "arguments": [
+        1,
+        1000,
+        0,
+        1,
+        "0x0000000000000000000000000000000000000000000000000000000000000002",
+        true
+      ],
+      "sender": "0x0000000000000000000000000000000000020000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_actor_topUp(uint8,bytes32,uint256)",
+      "arguments": [
+        1,
+        "0x4237686dce388ea72f74551e353495c648b65a6d4dbe8d58210f05289911966d",
+        1000
+      ],
+      "sender": "0x0000000000000000000000000000000000020000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "parameter": "batchId",
+          "from_transaction": 3,
+          "event": "BatchCreated",
+          "field": "batchId"
+        }
+      ],
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_redist_happyReveal(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "no_state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_tick()",
+      "arguments": [],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "no_state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_tick()",
+      "arguments": [],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "no_state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_redist_happyReveal(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "no_state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_admin_setOraclePrice(uint32)",
+      "arguments": [
+        1000000000
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "act_actor_expireAll(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "no_state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    }
+  ],
+  "total_elapsed": 763.653
+}

@@ -1,0 +1,202 @@
+{
+  "project": "Request",
+  "property_id": "bc39edeb78eed12c3bea",
+  "property_name": "echidna_captured_never_exceeds_authorized",
+  "arm": "hybrid",
+  "valid_seed_count": 4,
+  "injected_seed_count": 4,
+  "anvil_counterexample": false,
+  "layer1_repairs_applied": 0,
+  "stage1_replans_used": 0,
+  "stage2_escalations_used": 2,
+  "echidna_seed_only_loaded": 4,
+  "echidna_seed_only_replayed": 4,
+  "echidna_seed_only_falsified": false,
+  "echidna_seed_only_instructions": 13795,
+  "echidna_fuzz_loaded": 4,
+  "echidna_fuzz_falsified": false,
+  "echidna_elapsed": 16.716,
+  "echidna_unique_instructions": 22914,
+  "echidna_fuzzing_txs": 20007,
+  "seed_gen_seconds": 663.159,
+  "api_usage": {
+    "request_attempts": 16,
+    "failed_request_attempts": 2,
+    "prompt_tokens": 216158,
+    "completion_tokens": 117116,
+    "total_tokens": 333274,
+    "estimated_cost_usd_offpeak": "0.089635290",
+    "estimated_cost_usd_peak": "0.179270580"
+  },
+  "eval_trace": [
+    {
+      "phase": "initial",
+      "candidate_id": "hybrid-init-01",
+      "steps": [
+        "driver_authorizePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "initial",
+      "candidate_id": "hybrid-init-02",
+      "steps": [
+        "driver_chargePayment(uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "stage2_escalation_1",
+      "candidate_id": "hybrid-s2e1-01",
+      "steps": [
+        "driver_chargePayment(uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)"
+      ],
+      "status": "replay_failed",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "stage2_escalation_1",
+      "candidate_id": "hybrid-s2e1-02",
+      "steps": [
+        "driver_authorizePayment(uint256,uint256,uint16)",
+        "driver_authorizePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)"
+      ],
+      "status": "replay_failed",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 0,
+      "target_property_violation": false,
+      "error": "DeepSeekCallError: ValueError: sender 必须来自当前属性可用账户池：'0x0000000000000000000000000000000000001000'"
+    },
+    {
+      "phase": "stage2_escalation_2",
+      "candidate_id": "hybrid-s2e2-01",
+      "steps": [
+        "driver_authorizePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    },
+    {
+      "phase": "stage2_escalation_2",
+      "candidate_id": "hybrid-s2e2-02",
+      "steps": [
+        "driver_chargePayment(uint256,uint16)",
+        "driver_authorizePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)",
+        "driver_capturePayment(uint256,uint256,uint16)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 1,
+      "target_property_violation": false,
+      "error": null
+    }
+  ],
+  "winning_seed_transactions": [
+    {
+      "function": "driver_chargePayment(uint256,uint16)",
+      "arguments": [
+        1000000,
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "driver_authorizePayment(uint256,uint256,uint16)",
+      "arguments": [
+        4000000,
+        4000000,
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "driver_capturePayment(uint256,uint256,uint16)",
+      "arguments": [
+        1,
+        1000000,
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "driver_capturePayment(uint256,uint256,uint16)",
+      "arguments": [
+        1,
+        1000000,
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "driver_capturePayment(uint256,uint256,uint16)",
+      "arguments": [
+        1,
+        1000000,
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    },
+    {
+      "function": "driver_capturePayment(uint256,uint256,uint16)",
+      "arguments": [
+        1,
+        1000000,
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "expected_outcome": "state_change",
+      "delay_seconds": 0,
+      "delay_blocks": 0
+    }
+  ],
+  "total_elapsed": 681.583
+}

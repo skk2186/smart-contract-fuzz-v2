@@ -1,0 +1,88 @@
+{
+  "project": "TokenWhale",
+  "property_id": "85ecbb71ea3e7168edab",
+  "property_name": "echidna_no_token_inflation",
+  "arm": "hybrid",
+  "valid_seed_count": 1,
+  "injected_seed_count": 1,
+  "anvil_counterexample": true,
+  "layer1_repairs_applied": 0,
+  "stage1_replans_used": 0,
+  "stage2_escalations_used": 0,
+  "echidna_seed_only_loaded": 1,
+  "echidna_seed_only_replayed": 1,
+  "echidna_seed_only_falsified": true,
+  "echidna_seed_only_instructions": 880,
+  "echidna_fuzz_loaded": 1,
+  "echidna_fuzz_falsified": true,
+  "echidna_elapsed": 0.226,
+  "echidna_unique_instructions": 880,
+  "echidna_fuzzing_txs": 4,
+  "seed_gen_seconds": 70.179,
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 0,
+    "prompt_tokens": 13109,
+    "completion_tokens": 9436,
+    "total_tokens": 22545,
+    "estimated_cost_usd_offpeak": "0.007420974",
+    "estimated_cost_usd_peak": "0.014841948"
+  },
+  "eval_trace": [
+    {
+      "phase": "initial",
+      "candidate_id": "hybrid-init-01",
+      "steps": [
+        "approve(address,uint256)",
+        "transferFrom(address,address,uint256)",
+        "transfer(address,uint256)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 0,
+      "target_property_violation": true,
+      "error": null
+    }
+  ],
+  "winning_seed_transactions": [
+    {
+      "function": "approve(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000020000",
+        1000
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "transferFrom(address,address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        "0x0000000000000000000000000000000000010000",
+        1000
+      ],
+      "sender": "0x0000000000000000000000000000000000020000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "transfer(address,uint256)",
+      "arguments": [
+        "0x0000000000000000000000000000000000010000",
+        1000000
+      ],
+      "sender": "0x0000000000000000000000000000000000020000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    }
+  ],
+  "total_elapsed": 73.072,
+  "abi_address_fix_verified": true
+}

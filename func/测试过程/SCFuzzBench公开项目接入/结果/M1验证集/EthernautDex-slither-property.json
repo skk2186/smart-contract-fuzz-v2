@@ -1,0 +1,357 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol",
+    "contract": "EthernautDexHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "IERC20Like",
+      "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#14-17"
+    },
+    {
+      "name": "SwappableToken",
+      "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#19-70"
+    },
+    {
+      "name": "EthernautDexHarness",
+      "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#72-133"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "EthernautDexHarness",
+      "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#72-133"
+    }
+  ],
+  "properties": [
+    {
+      "property": "EthernautDexHarness.echidna_dex_reserves_non_empty()",
+      "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#129-132",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "36dfdfaa21bb1b408da9",
+      "analysis_contract": "EthernautDexHarness",
+      "analysis_contract_source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#72-133",
+      "read_states": [
+        "EthernautDexHarness.token1",
+        "EthernautDexHarness.token2"
+      ],
+      "property_write_states": [],
+      "environment_reads": [
+        "this"
+      ],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "EthernautDexHarness.echidna_dex_reserves_non_empty()",
+          "states": [
+            "EthernautDexHarness.token1",
+            "EthernautDexHarness.token2"
+          ],
+          "expression": "IERC20Like(token1).balanceOf(address(this)) > 0 && IERC20Like(token2).balanceOf(address(this)) > 0",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131"
+        }
+      ],
+      "candidate_actions": [],
+      "cross_contract": {
+        "observations": [
+          {
+            "observation_id": "call_0",
+            "receiver": "TMP_71",
+            "receiver_scope": "EthernautDexHarness",
+            "receiver_path": null,
+            "external_route": [
+              {
+                "caller_contract": "EthernautDexHarness",
+                "expression": "TMP_71",
+                "kind": "unresolved",
+                "state_slot": null,
+                "state_slot_source": null,
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+                "caller": "EthernautDexHarness.echidna_dex_reserves_non_empty()"
+              }
+            ],
+            "target": "IERC20Like.balanceOf(address)",
+            "read_states": [],
+            "call": "TMP_73(uint256) = HIGH_LEVEL_CALL, dest:TMP_71(IERC20Like), function:balanceOf, arguments:['TMP_72']  ",
+            "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+            "resolution": "unresolved_target"
+          },
+          {
+            "observation_id": "call_1",
+            "receiver": "TMP_75",
+            "receiver_scope": "EthernautDexHarness",
+            "receiver_path": null,
+            "external_route": [
+              {
+                "caller_contract": "EthernautDexHarness",
+                "expression": "TMP_75",
+                "kind": "unresolved",
+                "state_slot": null,
+                "state_slot_source": null,
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+                "caller": "EthernautDexHarness.echidna_dex_reserves_non_empty()"
+              }
+            ],
+            "target": "IERC20Like.balanceOf(address)",
+            "read_states": [],
+            "call": "TMP_77(uint256) = HIGH_LEVEL_CALL, dest:TMP_75(IERC20Like), function:balanceOf, arguments:['TMP_76']  ",
+            "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+            "resolution": "unresolved_target"
+          }
+        ],
+        "opaque_property_calls": [
+          {
+            "caller": "EthernautDexHarness.echidna_dex_reserves_non_empty()",
+            "call": "TMP_73(uint256) = HIGH_LEVEL_CALL, dest:TMP_71(IERC20Like), function:balanceOf, arguments:['TMP_72']  ",
+            "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+            "external_route": [
+              {
+                "caller_contract": "EthernautDexHarness",
+                "expression": "TMP_71",
+                "kind": "unresolved",
+                "state_slot": null,
+                "state_slot_source": null,
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+                "caller": "EthernautDexHarness.echidna_dex_reserves_non_empty()"
+              }
+            ],
+            "reason": "高层调用缺少可解析的目标函数体"
+          },
+          {
+            "caller": "EthernautDexHarness.echidna_dex_reserves_non_empty()",
+            "call": "TMP_77(uint256) = HIGH_LEVEL_CALL, dest:TMP_75(IERC20Like), function:balanceOf, arguments:['TMP_76']  ",
+            "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+            "external_route": [
+              {
+                "caller_contract": "EthernautDexHarness",
+                "expression": "TMP_75",
+                "kind": "unresolved",
+                "state_slot": null,
+                "state_slot_source": null,
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+                "caller": "EthernautDexHarness.echidna_dex_reserves_non_empty()"
+              }
+            ],
+            "reason": "高层调用缺少可解析的目标函数体"
+          }
+        ],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [
+          {
+            "observation_id": "call_0",
+            "receiver": "TMP_71",
+            "receiver_scope": "EthernautDexHarness",
+            "receiver_path": null,
+            "external_route": [
+              {
+                "caller_contract": "EthernautDexHarness",
+                "expression": "TMP_71",
+                "kind": "unresolved",
+                "state_slot": null,
+                "state_slot_source": null,
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+                "caller": "EthernautDexHarness.echidna_dex_reserves_non_empty()"
+              }
+            ],
+            "target": "IERC20Like.balanceOf(address)",
+            "read_states": [],
+            "call": "TMP_73(uint256) = HIGH_LEVEL_CALL, dest:TMP_71(IERC20Like), function:balanceOf, arguments:['TMP_72']  ",
+            "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+            "resolution": "unresolved_target"
+          },
+          {
+            "observation_id": "call_1",
+            "receiver": "TMP_75",
+            "receiver_scope": "EthernautDexHarness",
+            "receiver_path": null,
+            "external_route": [
+              {
+                "caller_contract": "EthernautDexHarness",
+                "expression": "TMP_75",
+                "kind": "unresolved",
+                "state_slot": null,
+                "state_slot_source": null,
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+                "caller": "EthernautDexHarness.echidna_dex_reserves_non_empty()"
+              }
+            ],
+            "target": "IERC20Like.balanceOf(address)",
+            "read_states": [],
+            "call": "TMP_77(uint256) = HIGH_LEVEL_CALL, dest:TMP_75(IERC20Like), function:balanceOf, arguments:['TMP_76']  ",
+            "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#130-131",
+            "resolution": "unresolved_target"
+          }
+        ],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [
+          {
+            "function": "EthernautDexHarness.swap(address,address,uint256)",
+            "calls": [
+              {
+                "caller": "EthernautDexHarness.swap(address,address,uint256)",
+                "call": "TMP_33(uint256) = HIGH_LEVEL_CALL, dest:TMP_32(IERC20Like), function:balanceOf, arguments:['msg.sender']  ",
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#91",
+                "external_route": [
+                  {
+                    "caller_contract": "EthernautDexHarness",
+                    "expression": "TMP_32",
+                    "kind": "unresolved",
+                    "state_slot": null,
+                    "state_slot_source": null,
+                    "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#91",
+                    "caller": "EthernautDexHarness.swap(address,address,uint256)"
+                  }
+                ],
+                "reason": "高层调用缺少可解析的目标函数体"
+              },
+              {
+                "caller": "EthernautDexHarness.swap(address,address,uint256)",
+                "call": "TMP_39(bool) = HIGH_LEVEL_CALL, dest:TMP_37(IERC20Like), function:transferFrom, arguments:['msg.sender', 'TMP_38', 'amount']  ",
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#93",
+                "external_route": [
+                  {
+                    "caller_contract": "EthernautDexHarness",
+                    "expression": "TMP_37",
+                    "kind": "unresolved",
+                    "state_slot": null,
+                    "state_slot_source": null,
+                    "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#93",
+                    "caller": "EthernautDexHarness.swap(address,address,uint256)"
+                  }
+                ],
+                "reason": "高层调用缺少可解析的目标函数体"
+              },
+              {
+                "caller": "EthernautDexHarness.swap(address,address,uint256)",
+                "call": "TMP_45(bool) = HIGH_LEVEL_CALL, dest:TMP_43(IERC20Like), function:transferFrom, arguments:['TMP_44', 'msg.sender', 'swapAmount']  ",
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#95",
+                "external_route": [
+                  {
+                    "caller_contract": "EthernautDexHarness",
+                    "expression": "TMP_43",
+                    "kind": "unresolved",
+                    "state_slot": null,
+                    "state_slot_source": null,
+                    "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#95",
+                    "caller": "EthernautDexHarness.swap(address,address,uint256)"
+                  }
+                ],
+                "reason": "高层调用缺少可解析的目标函数体"
+              },
+              {
+                "caller": "EthernautDexHarness.getSwapPrice(address,address,uint256)",
+                "call": "TMP_49(uint256) = HIGH_LEVEL_CALL, dest:TMP_47(IERC20Like), function:balanceOf, arguments:['TMP_48']  ",
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#100",
+                "external_route": [
+                  {
+                    "caller_contract": "EthernautDexHarness",
+                    "expression": "TMP_47",
+                    "kind": "unresolved",
+                    "state_slot": null,
+                    "state_slot_source": null,
+                    "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#100",
+                    "caller": "EthernautDexHarness.getSwapPrice(address,address,uint256)"
+                  }
+                ],
+                "reason": "高层调用缺少可解析的目标函数体"
+              },
+              {
+                "caller": "EthernautDexHarness.getSwapPrice(address,address,uint256)",
+                "call": "TMP_53(uint256) = HIGH_LEVEL_CALL, dest:TMP_51(IERC20Like), function:balanceOf, arguments:['TMP_52']  ",
+                "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#100",
+                "external_route": [
+                  {
+                    "caller_contract": "EthernautDexHarness",
+                    "expression": "TMP_51",
+                    "kind": "unresolved",
+                    "state_slot": null,
+                    "state_slot_source": null,
+                    "source": "sol/单合约测试/EthernautDex/EthernautDexHarness.sol#100",
+                    "caller": "EthernautDexHarness.getSwapPrice(address,address,uint256)"
+                  }
+                ],
+                "reason": "高层调用缺少可解析的目标函数体"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          }
+        ],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [],
+      "evidence_summary": {
+        "candidate_links": 0,
+        "links_with_write_site": 0,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 1
+      },
+      "analysis_class": "stateful_dependency_unresolved",
+      "analysis_status": "analyzed",
+      "context_status": "observations_only",
+      "dependency_status": "incomplete",
+      "unresolved_effect_actions": [
+        {
+          "function": "EthernautDexHarness.approve(address,uint256)",
+          "external_calls": [
+            "HIGH_LEVEL_CALL, dest:TMP_55(SwappableToken), function:approve, arguments:['msg.sender', 'spender', 'amount']  ",
+            "HIGH_LEVEL_CALL, dest:TMP_57(SwappableToken), function:approve, arguments:['msg.sender', 'spender', 'amount']  "
+          ],
+          "inline_assembly": false,
+          "reason": "无已解析的直接写入；外部调用、回调或汇编可能产生未建模影响。"
+        },
+        {
+          "function": "EthernautDexHarness.swap(address,address,uint256)",
+          "external_calls": [
+            "TMP_33(uint256) = HIGH_LEVEL_CALL, dest:TMP_32(IERC20Like), function:balanceOf, arguments:['msg.sender']  ",
+            "TMP_39(bool) = HIGH_LEVEL_CALL, dest:TMP_37(IERC20Like), function:transferFrom, arguments:['msg.sender', 'TMP_38', 'amount']  ",
+            "TMP_42(bool) = HIGH_LEVEL_CALL, dest:TMP_40(SwappableToken), function:approve, arguments:['TMP_41', 'swapAmount']  ",
+            "TMP_45(bool) = HIGH_LEVEL_CALL, dest:TMP_43(IERC20Like), function:transferFrom, arguments:['TMP_44', 'msg.sender', 'swapAmount']  ",
+            "TMP_49(uint256) = HIGH_LEVEL_CALL, dest:TMP_47(IERC20Like), function:balanceOf, arguments:['TMP_48']  ",
+            "TMP_53(uint256) = HIGH_LEVEL_CALL, dest:TMP_51(IERC20Like), function:balanceOf, arguments:['TMP_52']  "
+          ],
+          "inline_assembly": false,
+          "reason": "无已解析的直接写入；外部调用、回调或汇编可能产生未建模影响。"
+        }
+      ],
+      "prerequisite_state_closure": [],
+      "unknowns": [
+        "EthernautDexHarness.echidna_dex_reserves_non_empty(): 未找到可改变所读状态的已解析外部入口",
+        "EthernautDexHarness.echidna_dex_reserves_non_empty(): 部分外部属性读取无法解析到目标状态",
+        "属性自身含外部调用；其读取结果取决于实际部署与调用环境",
+        "属性自身含无法静态解析的调用；状态依赖可能不完整",
+        "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {},
+  "global_unknowns": [
+    "EthernautDexHarness.echidna_dex_reserves_non_empty(): 未找到可改变所读状态的已解析外部入口",
+    "EthernautDexHarness.echidna_dex_reserves_non_empty(): 部分外部属性读取无法解析到目标状态"
+  ],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

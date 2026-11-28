@@ -1246,7 +1246,17 @@ def replay_seed(project: str, candidate: dict[str, Any], transactions: list[dict
             session.rpc("evm_setNextBlockTimestamp",
                         [latest_timestamp + max(1, delay_seconds)])
             signature = tx["function"]
-            fn = contract.get_function_by_signature(signature)(*args)
+            abi_inputs = action.get("abi_inputs", [])
+            encoded_args = []
+            for idx_arg, arg_val in enumerate(args):
+                arg_type = abi_inputs[idx_arg].get("type", "") if idx_arg < len(abi_inputs) else ""
+                if arg_type == "address" and isinstance(arg_val, str) and Web3.is_address(arg_val):
+                    encoded_args.append(_checksum(arg_val))
+                elif arg_type == "address[]" and isinstance(arg_val, list):
+                    encoded_args.append([_checksum(v) if isinstance(v, str) and Web3.is_address(v) else v for v in arg_val])
+                else:
+                    encoded_args.append(arg_val)
+            fn = contract.get_function_by_signature(signature)(*encoded_args)
             call_data = fn._encode_transaction_data()
             rpc_tx = {"from": sender, "to": contract.address, "data": call_data,
                       "value": hex(int(tx["value_wei"])),

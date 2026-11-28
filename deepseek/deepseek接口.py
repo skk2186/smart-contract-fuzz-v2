@@ -129,8 +129,9 @@ def call_json(*, system: str, user: str, tag: str, model: str = "deepseek-flash"
                "response_format": {"type": "json_object"},
                "thinking": {"type": thinking},
                "max_tokens": max_tokens,
-               "temperature": 0,
                "stream": False}
+    if thinking != "enabled":
+        payload["temperature"] = 0
     request_hash = hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
     request_upper_bound = len(system.encode("utf-8")) + len(user.encode("utf-8")) + max_tokens
     for attempt in range(max_retries + 1):
@@ -180,6 +181,10 @@ def call_json(*, system: str, user: str, tag: str, model: str = "deepseek-flash"
             choice = body["choices"][0]
             event["finish_reason"] = choice.get("finish_reason")
             if event["finish_reason"] != "stop":
+                if event["finish_reason"] == "length" and payload.get("thinking", {}).get("type") == "enabled":
+                    # Auto-fallback on thinking length truncation: switch retry to concise non-thinking mode
+                    payload["thinking"] = {"type": "disabled"}
+                    payload["temperature"] = 0
                 raise DeepSeekCallError("incomplete_response", str(event["finish_reason"]))
             content = choice["message"].get("content")
             if not content or not content.strip():

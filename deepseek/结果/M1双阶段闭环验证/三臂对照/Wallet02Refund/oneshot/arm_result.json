@@ -1,0 +1,79 @@
+{
+  "project": "Wallet02Refund",
+  "property_id": "8e75f62866f6d582a033",
+  "property_name": "echidna_wallet_accounting_respected",
+  "arm": "oneshot",
+  "valid_seed_count": 1,
+  "injected_seed_count": 1,
+  "anvil_counterexample": false,
+  "layer1_repairs_applied": 0,
+  "stage1_replans_used": 0,
+  "stage2_escalations_used": 0,
+  "echidna_seed_only_loaded": 1,
+  "echidna_seed_only_replayed": 1,
+  "echidna_seed_only_falsified": false,
+  "echidna_seed_only_instructions": 1018,
+  "echidna_fuzz_loaded": 1,
+  "echidna_fuzz_falsified": false,
+  "echidna_elapsed": 4.94,
+  "echidna_unique_instructions": 1690,
+  "echidna_fuzzing_txs": 20003,
+  "seed_gen_seconds": 6.845,
+  "api_usage": {
+    "request_attempts": 2,
+    "failed_request_attempts": 0,
+    "prompt_tokens": 8080,
+    "completion_tokens": 767,
+    "total_tokens": 8847,
+    "estimated_cost_usd_offpeak": "0.0016722",
+    "estimated_cost_usd_peak": "0.0033444"
+  },
+  "eval_trace": [
+    {
+      "phase": "initial",
+      "candidate_id": "oneshot-init-01",
+      "steps": [
+        "deposit(uint8)",
+        "refund(uint8)"
+      ],
+      "status": "executable",
+      "layer1_repairs": 0,
+      "layer2_b_repairs": 0,
+      "target_property_violation": false,
+      "error": null
+    }
+  ],
+  "winning_seed_transactions": [
+    {
+      "function": "deposit(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "1000000000000000000",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change"
+    },
+    {
+      "function": "refund(uint8)",
+      "arguments": [
+        0
+      ],
+      "sender": "0x0000000000000000000000000000000000010000",
+      "value_wei": "0",
+      "delay_seconds": 0,
+      "delay_blocks": 0,
+      "expected_outcome": "state_change",
+      "data_dependencies": [
+        {
+          "depends_on_transaction": 1,
+          "relation": "reuse_same_account_index",
+          "field": "account",
+          "value": "0"
+        }
+      ]
+    }
+  ],
+  "total_elapsed": 12.356
+}

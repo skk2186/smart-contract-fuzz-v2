@@ -471,6 +471,84 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
             "effect_evidence": evidence,
         })
 
+    # Guard prerequisite writer closure: include mutating ABI functions from
+    # effect_catalog that write state variables read by guards of existing
+    # candidate actions (e.g., approve() writing allowance read by transferFrom()).
+    existing_abi_sigs = {a.get("abi_signature") for a in actions if a.get("abi_signature")}
+    property_tail_name = prop.get("property", "").rsplit(".", 1)[-1]
+    for _closure_hop in range(2):
+        guard_read_states: set[str] = set()
+        for act in actions:
+            for eff in act.get("effect_evidence", []):
+                for g in eff.get("guards", []):
+                    for st in g.get("state_reads", []):
+                        if isinstance(st, str) and st:
+                            guard_read_states.add(st)
+        for st in prop.get("prerequisite_state_closure", []):
+            if isinstance(st, str) and st:
+                guard_read_states.add(st)
+        if not guard_read_states:
+            break
+        writer_effects: dict[str, list[dict[str, Any]]] = {}
+        for eff in effect_catalog.values():
+            st = eff.get("state")
+            writer = eff.get("writer")
+            if isinstance(st, str) and st in guard_read_states and isinstance(writer, str):
+                writer_effects.setdefault(writer, []).append(eff)
+        added_this_hop = 0
+        for writer_full, eff_list in sorted(writer_effects.items()):
+            short_sig = writer_full.rsplit(".", 1)[-1]
+            abi_entry = abi_functions.get(short_sig)
+            if abi_entry is None:
+                same_name = by_name.get(short_sig.split("(", 1)[0], [])
+                if len(same_name) == 1:
+                    abi_entry = same_name[0]
+            if abi_entry is None:
+                continue
+            abi_sig = _abi_signature(abi_entry)
+            if abi_sig in existing_abi_sigs or abi_sig == property_tail_name:
+                continue
+            if abi_entry.get("stateMutability") in {"view", "pure"}:
+                continue
+            supported, unsupported_reason = _seed_abi_supported(abi_entry)
+            if not supported:
+                continue
+            ev_rows = []
+            written_states = []
+            for eff in eff_list:
+                if eff.get("state") and eff["state"] not in written_states:
+                    written_states.append(eff["state"])
+                g_rows = [{key: g.get(key) for key in
+                           ("kind", "expression", "branch", "variables_read",
+                            "state_reads", "data_dependencies", "predicate_calls",
+                            "predicate_logic", "source")}
+                          for g in eff.get("guards", [])[:8]]
+                ev_rows.append({"state": eff.get("state"), "writer": eff.get("writer"),
+                                "expression": eff.get("expression"),
+                                "source": eff.get("source"), "guards": g_rows})
+            actions.append({
+                "function": writer_full,
+                "abi_signature": abi_sig,
+                "abi_inputs": [{"name": x.get("name", ""), "type": x["type"]}
+                               for x in abi_entry.get("inputs", [])],
+                "argument_ranges": _abi_argument_ranges(abi_entry),
+                "state_mutability": abi_entry.get("stateMutability"),
+                "payable": abi_entry.get("stateMutability") == "payable",
+                "matched_states": written_states,
+                "environment_reads": [],
+                "static_status": "prerequisite_guard_writer",
+                "action_source": "prerequisite_guard_writer",
+                "seed_compatible": True,
+                "seed_limitation": None,
+                "source_excerpt": _function_excerpt(project, writer_full, abi_signature=abi_sig),
+                "source_call_chain": _source_call_chain(project, writer_full, abi_sig),
+                "effect_evidence": ev_rows,
+            })
+            existing_abi_sigs.add(abi_sig)
+            added_this_hop += 1
+        if added_this_hop == 0:
+            break
+
     # Attach helper effects only when the public action source visibly calls the
     # corresponding helper. This is a candidate relation, not a proof of runtime
     # reachability or object aliasing.
@@ -697,7 +775,8 @@ def _focused_actions(prop: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[s
     trigger = (prop.get("assertion_trigger") or {}).get("abi_signature")
     kept = [action for action in actions
             if action_states.get(str(action.get("abi_signature") or action.get("function")), set())
-            & focused_states or action.get("abi_signature") == trigger]
+            & focused_states or action.get("abi_signature") == trigger
+            or action.get("action_source") == "prerequisite_guard_writer"]
     if not kept:
         kept = actions
         method = "evidence_not_selective_keep_all"

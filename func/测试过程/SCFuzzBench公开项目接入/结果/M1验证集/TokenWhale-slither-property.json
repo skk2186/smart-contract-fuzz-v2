@@ -1,0 +1,1420 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/TokenWhale/TokenWhaleHarness.sol",
+    "contract": "TokenWhaleHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/TokenWhale/TokenWhaleHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "TokenWhaleHarness",
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#9-64"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "TokenWhaleHarness",
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#9-64"
+    }
+  ],
+  "properties": [
+    {
+      "property": "TokenWhaleHarness.echidna_no_token_inflation()",
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#61-63",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "85ecbb71ea3e7168edab",
+      "analysis_contract": "TokenWhaleHarness",
+      "analysis_contract_source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#9-64",
+      "read_states": [
+        "TokenWhaleHarness.balanceOf",
+        "TokenWhaleHarness.player"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "TokenWhaleHarness.echidna_no_token_inflation()",
+          "states": [
+            "TokenWhaleHarness.balanceOf",
+            "TokenWhaleHarness.player"
+          ],
+          "expression": "balanceOf[player] < 1000000",
+          "index_accesses": [
+            {
+              "base": "balanceOf",
+              "key": "player",
+              "reference": "REF_16"
+            }
+          ],
+          "source_index_accesses": [
+            "balanceOf[player]"
+          ],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#62"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "effect_ids": [
+            "e4a8ee752f1becc3",
+            "b6308fbea688a8d4"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "effect_ids": [
+            "7e7a0643870288f6",
+            "5bd586f5de2b63cb"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "524a9b952dbf841d",
+        "5bd586f5de2b63cb",
+        "7e7a0643870288f6",
+        "b496634f566af0e9",
+        "b6308fbea688a8d4",
+        "e4a8ee752f1becc3"
+      ],
+      "evidence_summary": {
+        "candidate_links": 2,
+        "links_with_write_site": 2,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "TokenWhaleHarness.balanceOf",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "TokenWhaleHarness.constructor()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "TokenWhaleHarness.transfer(address,uint256)",
+              "effect_ids": [
+                "e4a8ee752f1becc3",
+                "b6308fbea688a8d4"
+              ]
+            },
+            {
+              "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+              "effect_ids": [
+                "7e7a0643870288f6",
+                "5bd586f5de2b63cb"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "TokenWhaleHarness.allowance",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "TokenWhaleHarness.approve(address,uint256)",
+              "effect_ids": [
+                "524a9b952dbf841d"
+              ]
+            },
+            {
+              "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+              "effect_ids": [
+                "b496634f566af0e9"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "524a9b952dbf841d": {
+      "state": "TokenWhaleHarness.allowance",
+      "writer": "TokenWhaleHarness.approve(address,uint256)",
+      "expression": "allowance[msg.sender][spender] = value",
+      "index_accesses": [
+        {
+          "base": "allowance",
+          "key": "msg.sender",
+          "reference": "REF_7"
+        },
+        {
+          "base": "REF_7",
+          "key": "spender",
+          "reference": "REF_8"
+        }
+      ],
+      "source_index_accesses": [
+        "allowance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#48",
+      "call_path": [
+        {
+          "function": "TokenWhaleHarness.approve(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "TokenWhaleHarness.approve(address,uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "524a9b952dbf841d"
+    },
+    "5bd586f5de2b63cb": {
+      "state": "TokenWhaleHarness.balanceOf",
+      "writer": "TokenWhaleHarness._transfer(address,uint256)",
+      "expression": "balanceOf[to] += value",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "to",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[to]"
+      ],
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#35",
+      "call_path": [
+        {
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        },
+        {
+          "function": "TokenWhaleHarness._transfer(address,uint256)",
+          "bindings": {
+            "to": "to",
+            "value": "value"
+          },
+          "call_source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#58"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(balanceOf[from] >= value)",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "from",
+            "value"
+          ],
+          "data_dependencies": {
+            "from": [
+              "from"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#53"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "to",
+            "value"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#54"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(allowance[from][msg.sender] >= value)",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.allowance",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "from",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "allowance": [
+              "allowance"
+            ],
+            "from": [
+              "from"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#55"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(balanceOf[from] >= value)",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "from",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "from": [
+                    "from"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#53"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "to",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#54"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(allowance[from][msg.sender] >= value)",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.allowance",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "from",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "from": [
+                    "from"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#55"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "TokenWhaleHarness._transfer(address,uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "5bd586f5de2b63cb"
+    },
+    "7e7a0643870288f6": {
+      "state": "TokenWhaleHarness.balanceOf",
+      "writer": "TokenWhaleHarness._transfer(address,uint256)",
+      "expression": "balanceOf[msg.sender] -= value",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "msg.sender",
+          "reference": "REF_2"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[msg.sender]"
+      ],
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#34",
+      "call_path": [
+        {
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        },
+        {
+          "function": "TokenWhaleHarness._transfer(address,uint256)",
+          "bindings": {
+            "to": "to",
+            "value": "value"
+          },
+          "call_source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#58"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(balanceOf[from] >= value)",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "from",
+            "value"
+          ],
+          "data_dependencies": {
+            "from": [
+              "from"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#53"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "to",
+            "value"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#54"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(allowance[from][msg.sender] >= value)",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.allowance",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "from",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "allowance": [
+              "allowance"
+            ],
+            "from": [
+              "from"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#55"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(balanceOf[from] >= value)",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "from",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "from": [
+                    "from"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#53"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "to",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#54"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(allowance[from][msg.sender] >= value)",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.allowance",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "from",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "from": [
+                    "from"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#55"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "TokenWhaleHarness._transfer(address,uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "7e7a0643870288f6"
+    },
+    "b496634f566af0e9": {
+      "state": "TokenWhaleHarness.allowance",
+      "writer": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+      "expression": "allowance[from][msg.sender] -= value",
+      "index_accesses": [
+        {
+          "base": "allowance",
+          "key": "from",
+          "reference": "REF_14"
+        },
+        {
+          "base": "REF_14",
+          "key": "msg.sender",
+          "reference": "REF_15"
+        }
+      ],
+      "source_index_accesses": [
+        "allowance[from]"
+      ],
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#57",
+      "call_path": [
+        {
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(balanceOf[from] >= value)",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "from",
+            "value"
+          ],
+          "data_dependencies": {
+            "from": [
+              "from"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#53"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "to",
+            "value"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#54"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool)(allowance[from][msg.sender] >= value)",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.allowance",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "from",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "allowance": [
+              "allowance"
+            ],
+            "from": [
+              "from"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#55"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(balanceOf[from] >= value)",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "from",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "from": [
+                    "from"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#53"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "to",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#54"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool)(allowance[from][msg.sender] >= value)",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.allowance",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "from",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "from": [
+                    "from"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#55"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "b496634f566af0e9"
+    },
+    "b6308fbea688a8d4": {
+      "state": "TokenWhaleHarness.balanceOf",
+      "writer": "TokenWhaleHarness._transfer(address,uint256)",
+      "expression": "balanceOf[to] += value",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "to",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[to]"
+      ],
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#35",
+      "call_path": [
+        {
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        },
+        {
+          "function": "TokenWhaleHarness._transfer(address,uint256)",
+          "bindings": {
+            "to": "to",
+            "value": "value"
+          },
+          "call_source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#44"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "expression": "require(bool)(balanceOf[msg.sender] >= value)",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "value": [
+              "value"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#41"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "to",
+            "value"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#42"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transfer(address,uint256)",
+                "expression": "require(bool)(balanceOf[msg.sender] >= value)",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "value": [
+                    "value"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#41"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transfer(address,uint256)",
+                "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "to",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#42"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "TokenWhaleHarness._transfer(address,uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "b6308fbea688a8d4"
+    },
+    "e4a8ee752f1becc3": {
+      "state": "TokenWhaleHarness.balanceOf",
+      "writer": "TokenWhaleHarness._transfer(address,uint256)",
+      "expression": "balanceOf[msg.sender] -= value",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "msg.sender",
+          "reference": "REF_2"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[msg.sender]"
+      ],
+      "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#34",
+      "call_path": [
+        {
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        },
+        {
+          "function": "TokenWhaleHarness._transfer(address,uint256)",
+          "bindings": {
+            "to": "to",
+            "value": "value"
+          },
+          "call_source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#44"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "expression": "require(bool)(balanceOf[msg.sender] >= value)",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "value": [
+              "value"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#41"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+          "branch": null,
+          "state_reads": [
+            "TokenWhaleHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "TokenWhaleHarness.balanceOf",
+              "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "to",
+            "value"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "balanceOf": [
+              "balanceOf"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#42"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "TokenWhaleHarness.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transfer(address,uint256)",
+                "expression": "require(bool)(balanceOf[msg.sender] >= value)",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "value": [
+                    "value"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#41"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "TokenWhaleHarness.transfer(address,uint256)",
+                "expression": "require(bool)(balanceOf[to] + value >= balanceOf[to])",
+                "branch": null,
+                "state_reads": [
+                  "TokenWhaleHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "TokenWhaleHarness.balanceOf",
+                    "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "to",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ],
+                  "balanceOf": [
+                    "balanceOf"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/TokenWhale/TokenWhaleHarness.sol#42"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "TokenWhaleHarness._transfer(address,uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "e4a8ee752f1becc3"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

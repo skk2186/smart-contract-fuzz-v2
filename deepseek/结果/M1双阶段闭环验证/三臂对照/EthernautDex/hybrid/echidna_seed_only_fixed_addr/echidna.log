@@ -1,0 +1,60 @@
+[2026-11-28 20:40:03.30] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (0.18361725s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:EthernautDexHarness
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/M1双阶段闭环验证/三臂对照/EthernautDex/hybrid/echidna_seed_only_fixed_addr/reproducers
+Loaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/M1双阶段闭环验证/三臂对照/EthernautDex/hybrid/echidna_seed_only_fixed_addr/coverage
+[2026-11-28 20:40:03.57] [Worker 0] Test echidna_dex_reserves_non_empty falsified!
+  Call sequence:
+EthernautDexHarness.approve(0xa647ff3c36cfab592509e13860ab8c4f28781a66,1000000)
+EthernautDexHarness.swap(0x54919a19522ce7c842e25735a9cfecef1c0a06da,0x1375317aa980daabf22f990a378eccad9b40dc0,10)
+EthernautDexHarness.swap(0x1375317aa980daabf22f990a378eccad9b40dc0,0x54919a19522ce7c842e25735a9cfecef1c0a06da,20)
+EthernautDexHarness.swap(0x54919a19522ce7c842e25735a9cfecef1c0a06da,0x1375317aa980daabf22f990a378eccad9b40dc0,24)
+EthernautDexHarness.swap(0x1375317aa980daabf22f990a378eccad9b40dc0,0x54919a19522ce7c842e25735a9cfecef1c0a06da,30)
+EthernautDexHarness.swap(0x54919a19522ce7c842e25735a9cfecef1c0a06da,0x1375317aa980daabf22f990a378eccad9b40dc0,41)
+EthernautDexHarness.swap(0x1375317aa980daabf22f990a378eccad9b40dc0,0x54919a19522ce7c842e25735a9cfecef1c0a06da,45)
+
+[2026-11-28 20:40:03.57] [Worker 0] New coverage: 3924 instr, 2 contracts, 1 seqs in corpus
+[2026-11-28 20:40:03.57] [Worker 0] Sequence replayed from corpus file seed-263e5a6d89d943bab7252ca13865f64a.txt (1/1)
+[2026-11-28 20:40:03.57]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/M1双阶段闭环验证/三臂对照/EthernautDex/hybrid/echidna_seed_only_fixed_addr/reproducers-unshrunk/814449723048349334.txt
+[2026-11-28 20:40:03.57]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/deepseek/结果/M1双阶段闭环验证/三臂对照/EthernautDex/hybrid/echidna_seed_only_fixed_addr/coverage/814449723048349334.txt
+[2026-11-28 20:40:03.59] [Worker 0] Test limit reached. Stopping.
+[2026-11-28 20:40:03.59] [status] tests: 1/1, fuzzing: 8/0, values: [], cov: 3924, corpus: 1, gas/s: 0
+echidna_dex_reserves_non_empty: failed!💥  
+  Call sequence:
+    EthernautDexHarness.approve(0xa647ff3c36cfab592509e13860ab8c4f28781a66,1000000)
+    EthernautDexHarness.swap(0x54919a19522ce7c842e25735a9cfecef1c0a06da,0x1375317aa980daabf22f990a378eccad9b40dc0,10)
+    EthernautDexHarness.swap(0x1375317aa980daabf22f990a378eccad9b40dc0,0x54919a19522ce7c842e25735a9cfecef1c0a06da,20)
+    EthernautDexHarness.swap(0x54919a19522ce7c842e25735a9cfecef1c0a06da,0x1375317aa980daabf22f990a378eccad9b40dc0,24)
+    EthernautDexHarness.swap(0x1375317aa980daabf22f990a378eccad9b40dc0,0x54919a19522ce7c842e25735a9cfecef1c0a06da,30)
+    EthernautDexHarness.swap(0x54919a19522ce7c842e25735a9cfecef1c0a06da,0x1375317aa980daabf22f990a378eccad9b40dc0,41)
+    EthernautDexHarness.swap(0x1375317aa980daabf22f990a378eccad9b40dc0,0x54919a19522ce7c842e25735a9cfecef1c0a06da,45)
+
+Traces: 
+call [1mSwappableToken[0m::balanceOf(address)([1mIERC20Like[0m) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:91)[0m
+ └╴← (65)
+call [1mSwappableToken[0m::balanceOf(address)([1mEthernautDexHarness[0m) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:100)[0m
+ └╴← (45)
+call [1mSwappableToken[0m::balanceOf(address)([1mEthernautDexHarness[0m) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:100)[0m
+ └╴← (110)
+call [1mSwappableToken[0m::transferFrom(address,address,uint256)([1mIERC20Like[0m, [1mEthernautDexHarness[0m, 45) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:93)[0m
+ ├╴emit [36mTransfer[0m(from=[1mIERC20Like[0m, to=[1mEthernautDexHarness[0m, value=45) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:67)[0m
+ └╴← (true)
+call [1mSwappableToken[0m::approve(address,uint256)([1mEthernautDexHarness[0m, 110) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:94)[0m
+ ├╴emit [36mApproval[0m(owner=[1mEthernautDexHarness[0m, spender=[1mEthernautDexHarness[0m, value=110) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:43)[0m
+ └╴← 0x0000000000000000000000000000000000000000000000000000000000000001
+call [1mSwappableToken[0m::transferFrom(address,address,uint256)([1mEthernautDexHarness[0m, [1mIERC20Like[0m, 110) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:95)[0m
+ ├╴emit [36mTransfer[0m(from=[1mEthernautDexHarness[0m, to=[1mIERC20Like[0m, value=110) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:67)[0m
+ └╴← (true)
+emit [36mSwapped[0m(trader=[1mIERC20Like[0m, from=[1mSwappableToken[0m, to=[1mSwappableToken[0m, amountIn=45, amountOut=110) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautDex/EthernautDexHarness.sol:96)[0m
+
+
+Unique instructions: 3924
+Unique codehashes: 2
+Corpus size: 1
+Seed: 20261128
+Total calls: 8
+
+[2026-11-28 20:40:03.60] Saving test reproducers... Done! (0.00187123s)
+[2026-11-28 20:40:03.61] Saving corpus... Done! (0.000119618s)
+[2026-11-28 20:40:03.61] Saving foundry reproducers... Done! (0.001415712s)
+[2026-11-28 20:40:03.61] Saving coverage... Done! (0.066459811s)

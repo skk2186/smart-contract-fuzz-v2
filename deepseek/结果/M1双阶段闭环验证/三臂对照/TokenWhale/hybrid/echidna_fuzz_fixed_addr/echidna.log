@@ -1,0 +1,35 @@
+[2026-11-28 20:40:04.54] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/TokenWhale/TokenWhaleHarness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (0.146378219s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/TokenWhale/TokenWhaleHarness.sol:TokenWhaleHarness
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/M1双阶段闭环验证/三臂对照/TokenWhale/hybrid/echidna_fuzz_fixed_addr/reproducers
+Loaded 1 transaction sequences from /home/skk/smart-contract-fuzz-v2/deepseek/结果/M1双阶段闭环验证/三臂对照/TokenWhale/hybrid/echidna_fuzz_fixed_addr/coverage
+[2026-11-28 20:40:04.70] [Worker 0] Test echidna_no_token_inflation falsified!
+  Call sequence:
+TokenWhaleHarness.approve(0x20000,1000) from: 0x0000000000000000000000000000000000010000
+TokenWhaleHarness.transferFrom(0x10000,0x10000,1000) from: 0x0000000000000000000000000000000000020000
+TokenWhaleHarness.transfer(0x10000,1000000) from: 0x0000000000000000000000000000000000020000
+
+[2026-11-28 20:40:04.70] [Worker 0] New coverage: 880 instr, 1 contracts, 1 seqs in corpus
+[2026-11-28 20:40:04.70] [Worker 0] Sequence replayed from corpus file seed-41cb943413d64027bcf8c1028650b523.txt (1/1)
+[2026-11-28 20:40:04.70] [Worker 0] Test limit reached. Stopping.
+[2026-11-28 20:40:04.70] [status] tests: 1/1, fuzzing: 4/20000, values: [], cov: 880, corpus: 1, gas/s: 0
+echidna_no_token_inflation: failed!💥  
+  Call sequence:
+    TokenWhaleHarness.approve(0x20000,1000) from: 0x0000000000000000000000000000000000010000
+    TokenWhaleHarness.transferFrom(0x10000,0x10000,1000) from: 0x0000000000000000000000000000000000020000
+    TokenWhaleHarness.transfer(0x10000,1000000) from: 0x0000000000000000000000000000000000020000
+
+Traces: 
+emit [36mTransfer[0m(from=0x0000000000000000000000000000000000020000, to=0x0000000000000000000000000000000000010000, value=1000000) [1m(/home/skk/smart-contract-fuzz-v2/sol/单合约测试/TokenWhale/TokenWhaleHarness.sol:37)[0m
+
+
+Unique instructions: 880
+Unique codehashes: 1
+Corpus size: 1
+Seed: 20261128
+Total calls: 4
+
+[2026-11-28 20:40:04.70] Saving test reproducers... Done! (0.000382623s)
+[2026-11-28 20:40:04.70] Saving corpus... Done! (0.000065882s)
+[2026-11-28 20:40:04.70] Saving foundry reproducers... Done! (0.000528991s)
+[2026-11-28 20:40:04.70] Saving coverage... Done! (0.021239066s)

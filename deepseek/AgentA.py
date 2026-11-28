@@ -253,13 +253,19 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
                         task_constraints: list[str] | None = None,
                         repair_feedback: str | None = None,
                         deployment_state: dict[str, Any] | None = None,
+                        goal_mode: str = "default",
                         call_options: dict[str, Any] | None = None):
     """返回 (结构化候选, API 调用记录)。不补造静态分析未提供的入口。"""
     compact_started = time.perf_counter()
     agent_context = compact_for_agent(context)
     compact_seconds = time.perf_counter() - compact_started
+    task_text = (
+        "针对目标安全属性，深入分析合约源码、数学计算与跨交易状态依赖，规划以逼近安全边界或违反（falsify）目标安全属性为导向的多交易攻击/测试序列。"
+        if goal_mode == "falsify"
+        else "为每条目标安全属性规划可执行的多交易准备序列。"
+    )
     prompt = {
-        "task": "为每条目标安全属性规划可执行的多交易准备序列。",
+        "task": task_text,
         "rules": [
             "每条输出必须绑定自己的 property_id，不能把组内属性合并成一个谓词。",
             "只使用 candidate_actions 中 seed_compatible=true 的 abi_signature。",
@@ -289,6 +295,13 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
         "deployment_state": deployment_state or context.get("deployment_state"),
         "context": agent_context,
     }
+    if goal_mode == "falsify":
+        prompt["rules"].extend([
+            "目标不是停留在 1-2 步简单安全调用，而是分析如何通过多步状态演化打破目标安全属性或触达深层边界状态。",
+            "重点检查四类常见跨交易路径：(1) 先授权/初始化/创建对象再消费；(2) 多账户/多角色（不同 msg.sender 或不同账户索引）协同交互与共享资金池耗尽；(3) 利用舍入、价格/比例偏移或状态未清零进行多轮交替或重复操作（在 max_steps 内展开完整步数）；(4) 旧版 Solidity 算术上下溢或错位记账。",
+            "当 max_candidates > 1 时，应给出彼此策略明显不同的候选序列（例如不同前置链、不同角色协作路径或不同深度），不要只做无意义的重复。",
+            "若 previous_attempt_feedback 包含已有成功序列及其实际链上 getter 状态快照（property_escalation），应基于该实测状态继续深化、延长或修正步骤以进一步逼近属性违反边界。",
+        ])
     if any(prop.get("assertion_trigger") for prop in context.get("properties", [])):
         prompt["rules"].append(
             "对 assertion_test 目标，只规划触发检查前的状态准备交易；目标断言函数会由参数实例化器在序列末尾调用，不要把它重复放进 steps。")
@@ -297,10 +310,11 @@ def generate_candidates(context: dict[str, Any], *, max_candidates: int = 2,
     user_message = json.dumps(prompt, ensure_ascii=False, separators=(",", ":"))
     prompt_encoding_seconds = time.perf_counter() - encoding_started
     call_kwargs = dict(call_options or {})
+    max_tokens = int(call_kwargs.pop("max_tokens", 4096))
     data, event = call_json(
-        system="你是智能合约测试序列规划器。只根据给定 Slither 证据和源码作答，必须输出合法 JSON。",
+        system="你是智能合约安全测试与多交易攻击序列规划器。只根据给定 Slither 证据、执行反馈和源码作答，思考请保持简洁高效，尽快输出合法 JSON。",
         user=user_message,
-        tag=tag or f"AgentA_{context['project']}", max_tokens=4096,
+        tag=tag or f"AgentA_{context['project']}", max_tokens=max_tokens,
         **call_kwargs)
     data = normalize_agent_a_response(context, data, max_candidates=max_candidates,
                                       max_steps=max_steps, min_steps=min_steps,
