@@ -1,0 +1,407 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_FibonacciBalance/Harness.sol",
+    "contract": "SBFibonacciHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_FibonacciBalance/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "FibonacciBalance",
+      "source": "sol/单合约测试/SB_FibonacciBalance/FibonacciBalance.sol#10-40"
+    },
+    {
+      "name": "FibonacciLib",
+      "source": "sol/单合约测试/SB_FibonacciBalance/FibonacciBalance.sol#43-62"
+    },
+    {
+      "name": "SBFibonacciHarness",
+      "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#4-29"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBFibonacciHarness",
+      "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#4-29"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBFibonacciHarness.echidna_lib_start_not_hijacked()",
+      "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#26-28",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "6d8a451a4ed5a098ab83",
+      "analysis_contract": "SBFibonacciHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#4-29",
+      "read_states": [
+        "SBFibonacciHarness.drained"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBFibonacciHarness.echidna_lib_start_not_hijacked()",
+          "states": [
+            "SBFibonacciHarness.drained"
+          ],
+          "expression": "! drained",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#27"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBFibonacciHarness.callWithdraw()",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "SBFibonacciHarness.drained"
+          ],
+          "effect_ids": [
+            "19c9d6cd5345d416"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [
+          {
+            "function": "SBFibonacciHarness.callWithdraw()",
+            "calls": [
+              {
+                "caller": "FibonacciBalance.withdraw()",
+                "call": "TMP_0(bool) = LOW_LEVEL_CALL, dest:fibonacciLibrary, function:delegatecall, arguments:['fibSig', 'withdrawalCounter']  ",
+                "source": "sol/单合约测试/SB_FibonacciBalance/FibonacciBalance.sol#31",
+                "external_route": [
+                  {
+                    "caller_contract": "SBFibonacciHarness",
+                    "expression": "target",
+                    "kind": "state_slot",
+                    "state_slot": "SBFibonacciHarness.target",
+                    "state_slot_source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#6",
+                    "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#18",
+                    "caller": "SBFibonacciHarness.callWithdraw()"
+                  }
+                ],
+                "reason": "低层调用的目标状态写入无法由 Slither 静态解析"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          }
+        ],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "19c9d6cd5345d416",
+        "2f0d4e6d4b9ca581"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 1
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "SBFibonacciHarness.target",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SBFibonacciHarness.init()",
+              "effect_ids": [
+                "2f0d4e6d4b9ca581"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "候选调用链含外部调用；静态输出未证明其返回值或副作用"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "19c9d6cd5345d416": {
+      "state": "SBFibonacciHarness.drained",
+      "writer": "SBFibonacciHarness.callWithdraw()",
+      "expression": "drained = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#20",
+      "call_path": [
+        {
+          "function": "SBFibonacciHarness.callWithdraw()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBFibonacciHarness.callWithdraw()",
+          "expression": "require(bool)(address(target) != address(0))",
+          "branch": null,
+          "state_reads": [
+            "SBFibonacciHarness.target"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBFibonacciHarness.target",
+              "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "target"
+          ],
+          "data_dependencies": {
+            "target": [
+              "target"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#16"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SBFibonacciHarness.callWithdraw()",
+          "expression": "address(target).balance < b",
+          "branch": "true",
+          "state_reads": [
+            "SBFibonacciHarness.target"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBFibonacciHarness.target",
+              "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "b",
+            "target"
+          ],
+          "data_dependencies": {
+            "target": [
+              "target"
+            ],
+            "b": [
+              "target"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#19"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBFibonacciHarness.callWithdraw()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBFibonacciHarness.callWithdraw()",
+                "expression": "require(bool)(address(target) != address(0))",
+                "branch": null,
+                "state_reads": [
+                  "SBFibonacciHarness.target"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBFibonacciHarness.target",
+                    "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "target"
+                ],
+                "data_dependencies": {
+                  "target": [
+                    "target"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#16"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SBFibonacciHarness.callWithdraw()",
+                "expression": "address(target).balance < b",
+                "branch": "true",
+                "state_reads": [
+                  "SBFibonacciHarness.target"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBFibonacciHarness.target",
+                    "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "b",
+                  "target"
+                ],
+                "data_dependencies": {
+                  "target": [
+                    "target"
+                  ],
+                  "b": [
+                    "target"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#19"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "SBFibonacciHarness.callWithdraw()",
+          "call": "HIGH_LEVEL_CALL, dest:target(FibonacciBalance), function:withdraw, arguments:[]  ",
+          "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#18"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "19c9d6cd5345d416"
+    },
+    "2f0d4e6d4b9ca581": {
+      "state": "SBFibonacciHarness.target",
+      "writer": "SBFibonacciHarness.init()",
+      "expression": "target = (new FibonacciBalance).value(msg.value)(address(lib))",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#12",
+      "call_path": [
+        {
+          "function": "SBFibonacciHarness.init()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBFibonacciHarness.init()",
+          "expression": "require(bool)(address(target) == address(0) && msg.value >= 2000000000000000000)",
+          "branch": null,
+          "state_reads": [
+            "SBFibonacciHarness.target"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBFibonacciHarness.target",
+              "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "msg.value",
+            "target"
+          ],
+          "data_dependencies": {
+            "target": [
+              "target"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#10"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBFibonacciHarness.init()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBFibonacciHarness.init()",
+                "expression": "require(bool)(address(target) == address(0) && msg.value >= 2000000000000000000)",
+                "branch": null,
+                "state_reads": [
+                  "SBFibonacciHarness.target"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBFibonacciHarness.target",
+                    "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "msg.value",
+                  "target"
+                ],
+                "data_dependencies": {
+                  "target": [
+                    "target"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_FibonacciBalance/Harness.sol#10"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "2f0d4e6d4b9ca581"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

@@ -1,0 +1,390 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IntegerOverflowMul/Harness.sol",
+    "contract": "SBIntOverflowMulHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IntegerOverflowMul/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBIntOverflowMulHarness",
+      "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#4-19"
+    },
+    {
+      "name": "IntegerOverflowMul",
+      "source": "sol/单合约测试/SB_IntegerOverflowMul/integer_overflow_mul.sol#12-19"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBIntOverflowMulHarness",
+      "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#4-19"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBIntOverflowMulHarness.echidna_count_never_wraps_to_zero()",
+      "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#16-18",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "0583c992ecbdf8224c4c",
+      "analysis_contract": "SBIntOverflowMulHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#4-19",
+      "read_states": [
+        "SBIntOverflowMulHarness.overflowedToZero"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBIntOverflowMulHarness.echidna_count_never_wraps_to_zero()",
+          "states": [
+            "SBIntOverflowMulHarness.overflowedToZero"
+          ],
+          "expression": "! overflowedToZero",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#17"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "SBIntOverflowMulHarness.overflowedToZero"
+          ],
+          "effect_ids": [
+            "284154086768b6c6"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "284154086768b6c6",
+        "48b002ae1c35287a",
+        "e0edbd8a9804fed4"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "IntegerOverflowMul.count",
+          "depth": 0,
+          "declaration_initializer": "2",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "IntegerOverflowMul.run(uint256)",
+              "effect_ids": [
+                "e0edbd8a9804fed4"
+              ]
+            },
+            {
+              "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+              "effect_ids": [
+                "48b002ae1c35287a"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "284154086768b6c6": {
+      "state": "SBIntOverflowMulHarness.overflowedToZero",
+      "writer": "SBIntOverflowMulHarness.runNonZero(uint256)",
+      "expression": "overflowedToZero = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#12",
+      "call_path": [
+        {
+          "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+          "expression": "require(bool)(input > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "input"
+          ],
+          "data_dependencies": {
+            "input": [
+              "input"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#8"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+          "expression": "beforeVal > 0 && count == 0",
+          "branch": "true",
+          "state_reads": [
+            "IntegerOverflowMul.count"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "IntegerOverflowMul.count",
+              "source": "sol/单合约测试/SB_IntegerOverflowMul/integer_overflow_mul.sol#13"
+            }
+          ],
+          "variables_read": [
+            "beforeVal",
+            "count"
+          ],
+          "data_dependencies": {
+            "count": [
+              "count"
+            ],
+            "beforeVal": [
+              "count"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#11"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+                "expression": "require(bool)(input > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "input"
+                ],
+                "data_dependencies": {
+                  "input": [
+                    "input"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#8"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+                "expression": "beforeVal > 0 && count == 0",
+                "branch": "true",
+                "state_reads": [
+                  "IntegerOverflowMul.count"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "IntegerOverflowMul.count",
+                    "source": "sol/单合约测试/SB_IntegerOverflowMul/integer_overflow_mul.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "beforeVal",
+                  "count"
+                ],
+                "data_dependencies": {
+                  "count": [
+                    "count"
+                  ],
+                  "beforeVal": [
+                    "count"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#11"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "284154086768b6c6"
+    },
+    "48b002ae1c35287a": {
+      "state": "IntegerOverflowMul.count",
+      "writer": "IntegerOverflowMul.run(uint256)",
+      "expression": "count *= input",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_IntegerOverflowMul/integer_overflow_mul.sol#17",
+      "call_path": [
+        {
+          "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+          "bindings": {},
+          "call_source": null
+        },
+        {
+          "function": "IntegerOverflowMul.run(uint256)",
+          "bindings": {
+            "input": "input"
+          },
+          "call_source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#10"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+          "expression": "require(bool)(input > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "input"
+          ],
+          "data_dependencies": {
+            "input": [
+              "input"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#8"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBIntOverflowMulHarness.runNonZero(uint256)",
+                "expression": "require(bool)(input > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "input"
+                ],
+                "data_dependencies": {
+                  "input": [
+                    "input"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_IntegerOverflowMul/Harness.sol#8"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "IntegerOverflowMul.run(uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "48b002ae1c35287a"
+    },
+    "e0edbd8a9804fed4": {
+      "state": "IntegerOverflowMul.count",
+      "writer": "IntegerOverflowMul.run(uint256)",
+      "expression": "count *= input",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_IntegerOverflowMul/integer_overflow_mul.sol#17",
+      "call_path": [
+        {
+          "function": "IntegerOverflowMul.run(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "IntegerOverflowMul.run(uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "e0edbd8a9804fed4"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

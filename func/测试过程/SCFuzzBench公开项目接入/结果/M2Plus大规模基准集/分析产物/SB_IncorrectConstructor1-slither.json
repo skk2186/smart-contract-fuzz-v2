@@ -1,0 +1,209 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IncorrectConstructor1/Harness.sol",
+    "contract": "SBIncorrectCtor1Harness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IncorrectConstructor1/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBIncorrectCtor1Harness",
+      "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#4-27"
+    },
+    {
+      "name": "Missing",
+      "source": "sol/单合约测试/SB_IncorrectConstructor1/incorrect_constructor_name1.sol#9-34"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBIncorrectCtor1Harness",
+      "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#4-27"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBIncorrectCtor1Harness.echidna_funds_not_stolen()",
+      "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#24-26",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "074fbcdebe20eb6f1019",
+      "analysis_contract": "SBIncorrectCtor1Harness",
+      "analysis_contract_source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#4-27",
+      "read_states": [
+        "SBIncorrectCtor1Harness.stolen"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBIncorrectCtor1Harness.echidna_funds_not_stolen()",
+          "states": [
+            "SBIncorrectCtor1Harness.stolen"
+          ],
+          "expression": "! stolen",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#25"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBIncorrectCtor1Harness.withdrawFunds()",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender",
+            "this"
+          ],
+          "matched_states": [
+            "SBIncorrectCtor1Harness.stolen"
+          ],
+          "effect_ids": [
+            "c01f40f3f257c6ad"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "c01f40f3f257c6ad"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "c01f40f3f257c6ad": {
+      "state": "SBIncorrectCtor1Harness.stolen",
+      "writer": "SBIncorrectCtor1Harness.withdrawFunds()",
+      "expression": "stolen = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#20",
+      "call_path": [
+        {
+          "function": "SBIncorrectCtor1Harness.withdrawFunds()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "SBIncorrectCtor1Harness.withdrawFunds()",
+          "expression": "beforeBal > 0 && msg.sender != deployerAddr",
+          "branch": "true",
+          "state_reads": [
+            "SBIncorrectCtor1Harness.deployerAddr"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBIncorrectCtor1Harness.deployerAddr",
+              "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#5"
+            }
+          ],
+          "variables_read": [
+            "beforeBal",
+            "deployerAddr",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "deployerAddr": [
+              "deployerAddr"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#19"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBIncorrectCtor1Harness.withdrawFunds()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "SBIncorrectCtor1Harness.withdrawFunds()",
+                "expression": "beforeBal > 0 && msg.sender != deployerAddr",
+                "branch": "true",
+                "state_reads": [
+                  "SBIncorrectCtor1Harness.deployerAddr"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBIncorrectCtor1Harness.deployerAddr",
+                    "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#5"
+                  }
+                ],
+                "variables_read": [
+                  "beforeBal",
+                  "deployerAddr",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "deployerAddr": [
+                    "deployerAddr"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_IncorrectConstructor1/Harness.sol#19"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "c01f40f3f257c6ad"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

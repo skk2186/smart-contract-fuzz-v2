@@ -1,0 +1,633 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_ERC20FrontRun/Harness.sol",
+    "contract": "SBERC20FrontRunHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_ERC20FrontRun/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SafeMath",
+      "source": "sol/单合约测试/SB_ERC20FrontRun/ERC20.sol#13-71"
+    },
+    {
+      "name": "ERC20",
+      "source": "sol/单合约测试/SB_ERC20FrontRun/ERC20.sol#74-130"
+    },
+    {
+      "name": "SBERC20FrontRunHarness",
+      "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#4-35"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBERC20FrontRunHarness",
+      "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#4-35"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBERC20FrontRunHarness.echidna_spender_respects_reduced_cap()",
+      "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#32-34",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "f4c16bf873afc8419a27",
+      "analysis_contract": "SBERC20FrontRunHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#4-35",
+      "read_states": [
+        "SBERC20FrontRunHarness.capExceededAfterReset"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBERC20FrontRunHarness.echidna_spender_respects_reduced_cap()",
+          "states": [
+            "SBERC20FrontRunHarness.capExceededAfterReset"
+          ],
+          "expression": "! capExceededAfterReset",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#33"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "SBERC20FrontRunHarness.capExceededAfterReset"
+          ],
+          "effect_ids": [
+            "5389f117312301fc"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "5389f117312301fc",
+        "e947a0b23661f622",
+        "f9c0c762b13ec514"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [
+        {
+          "function": "ERC20.transfer(address,uint256)",
+          "external_calls": [
+            "TMP_45(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sub(uint256,uint256), arguments:['REF_33', 'value'] ",
+            "TMP_46(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.add(uint256,uint256), arguments:['REF_36', 'value'] "
+          ],
+          "inline_assembly": false,
+          "reason": "无已解析的直接写入；外部调用、回调或汇编可能产生未建模影响。"
+        },
+        {
+          "function": "ERC20.transferFrom(address,address,uint256)",
+          "external_calls": [
+            "TMP_59(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sub(uint256,uint256), arguments:['REF_44', 'value'] ",
+            "TMP_60(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.add(uint256,uint256), arguments:['REF_47', 'value'] ",
+            "TMP_61(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sub(uint256,uint256), arguments:['REF_52', 'value'] "
+          ],
+          "inline_assembly": false,
+          "reason": "无已解析的直接写入；外部调用、回调或汇编可能产生未建模影响。"
+        }
+      ],
+      "prerequisite_state_closure": [
+        {
+          "state": "SBERC20FrontRunHarness.totalSpentBySpender",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+              "effect_ids": [
+                "f9c0c762b13ec514"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "SBERC20FrontRunHarness.highestSingleApproval",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SBERC20FrontRunHarness.ownerApprove(address,uint256)",
+              "effect_ids": [
+                "e947a0b23661f622"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "5389f117312301fc": {
+      "state": "SBERC20FrontRunHarness.capExceededAfterReset",
+      "writer": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+      "expression": "capExceededAfterReset = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#28",
+      "call_path": [
+        {
+          "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+          "expression": "require(bool)(msg.sender == SPENDER && value > 0)",
+          "branch": null,
+          "state_reads": [
+            "SBERC20FrontRunHarness.SPENDER"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBERC20FrontRunHarness.SPENDER",
+              "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "SPENDER",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "SPENDER": [
+              "SPENDER"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#24"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+          "expression": "highestSingleApproval > 0 && totalSpentBySpender > highestSingleApproval",
+          "branch": "true",
+          "state_reads": [
+            "SBERC20FrontRunHarness.highestSingleApproval",
+            "SBERC20FrontRunHarness.totalSpentBySpender"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBERC20FrontRunHarness.highestSingleApproval",
+              "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#7"
+            },
+            {
+              "state": "SBERC20FrontRunHarness.totalSpentBySpender",
+              "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#8"
+            }
+          ],
+          "variables_read": [
+            "highestSingleApproval",
+            "totalSpentBySpender"
+          ],
+          "data_dependencies": {
+            "totalSpentBySpender": [
+              "totalSpentBySpender",
+              "value"
+            ],
+            "highestSingleApproval": [
+              "highestSingleApproval"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#27"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+                "expression": "require(bool)(msg.sender == SPENDER && value > 0)",
+                "branch": null,
+                "state_reads": [
+                  "SBERC20FrontRunHarness.SPENDER"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBERC20FrontRunHarness.SPENDER",
+                    "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "SPENDER",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "SPENDER": [
+                    "SPENDER"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#24"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+                "expression": "highestSingleApproval > 0 && totalSpentBySpender > highestSingleApproval",
+                "branch": "true",
+                "state_reads": [
+                  "SBERC20FrontRunHarness.highestSingleApproval",
+                  "SBERC20FrontRunHarness.totalSpentBySpender"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBERC20FrontRunHarness.highestSingleApproval",
+                    "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#7"
+                  },
+                  {
+                    "state": "SBERC20FrontRunHarness.totalSpentBySpender",
+                    "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#8"
+                  }
+                ],
+                "variables_read": [
+                  "highestSingleApproval",
+                  "totalSpentBySpender"
+                ],
+                "data_dependencies": {
+                  "totalSpentBySpender": [
+                    "totalSpentBySpender",
+                    "value"
+                  ],
+                  "highestSingleApproval": [
+                    "highestSingleApproval"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#27"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "5389f117312301fc"
+    },
+    "e947a0b23661f622": {
+      "state": "SBERC20FrontRunHarness.highestSingleApproval",
+      "writer": "SBERC20FrontRunHarness.ownerApprove(address,uint256)",
+      "expression": "highestSingleApproval = value",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#18",
+      "call_path": [
+        {
+          "function": "SBERC20FrontRunHarness.ownerApprove(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBERC20FrontRunHarness.ownerApprove(address,uint256)",
+          "expression": "require(bool)(msg.sender == OWNER && spender == SPENDER && value > 0 && value <= 100)",
+          "branch": null,
+          "state_reads": [
+            "SBERC20FrontRunHarness.OWNER",
+            "SBERC20FrontRunHarness.SPENDER"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBERC20FrontRunHarness.OWNER",
+              "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#5"
+            },
+            {
+              "state": "SBERC20FrontRunHarness.SPENDER",
+              "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "OWNER",
+            "SPENDER",
+            "msg.sender",
+            "spender",
+            "value"
+          ],
+          "data_dependencies": {
+            "SPENDER": [
+              "SPENDER"
+            ],
+            "spender": [
+              "spender"
+            ],
+            "value": [
+              "value"
+            ],
+            "OWNER": [
+              "OWNER"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#16"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SBERC20FrontRunHarness.ownerApprove(address,uint256)",
+          "expression": "value > highestSingleApproval",
+          "branch": "true",
+          "state_reads": [
+            "SBERC20FrontRunHarness.highestSingleApproval"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBERC20FrontRunHarness.highestSingleApproval",
+              "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#7"
+            }
+          ],
+          "variables_read": [
+            "highestSingleApproval",
+            "value"
+          ],
+          "data_dependencies": {
+            "highestSingleApproval": [
+              "highestSingleApproval",
+              "value"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#17"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBERC20FrontRunHarness.ownerApprove(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBERC20FrontRunHarness.ownerApprove(address,uint256)",
+                "expression": "require(bool)(msg.sender == OWNER && spender == SPENDER && value > 0 && value <= 100)",
+                "branch": null,
+                "state_reads": [
+                  "SBERC20FrontRunHarness.OWNER",
+                  "SBERC20FrontRunHarness.SPENDER"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBERC20FrontRunHarness.OWNER",
+                    "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#5"
+                  },
+                  {
+                    "state": "SBERC20FrontRunHarness.SPENDER",
+                    "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "OWNER",
+                  "SPENDER",
+                  "msg.sender",
+                  "spender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "SPENDER": [
+                    "SPENDER"
+                  ],
+                  "spender": [
+                    "spender"
+                  ],
+                  "value": [
+                    "value"
+                  ],
+                  "OWNER": [
+                    "OWNER"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#16"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SBERC20FrontRunHarness.ownerApprove(address,uint256)",
+                "expression": "value > highestSingleApproval",
+                "branch": "true",
+                "state_reads": [
+                  "SBERC20FrontRunHarness.highestSingleApproval"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBERC20FrontRunHarness.highestSingleApproval",
+                    "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "highestSingleApproval",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "highestSingleApproval": [
+                    "highestSingleApproval",
+                    "value"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#17"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "e947a0b23661f622"
+    },
+    "f9c0c762b13ec514": {
+      "state": "SBERC20FrontRunHarness.totalSpentBySpender",
+      "writer": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+      "expression": "totalSpentBySpender += value",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#26",
+      "call_path": [
+        {
+          "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+          "expression": "require(bool)(msg.sender == SPENDER && value > 0)",
+          "branch": null,
+          "state_reads": [
+            "SBERC20FrontRunHarness.SPENDER"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBERC20FrontRunHarness.SPENDER",
+              "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "SPENDER",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "SPENDER": [
+              "SPENDER"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#24"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBERC20FrontRunHarness.spenderPull(address,uint256)",
+                "expression": "require(bool)(msg.sender == SPENDER && value > 0)",
+                "branch": null,
+                "state_reads": [
+                  "SBERC20FrontRunHarness.SPENDER"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBERC20FrontRunHarness.SPENDER",
+                    "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "SPENDER",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "SPENDER": [
+                    "SPENDER"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_ERC20FrontRun/Harness.sol#24"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "f9c0c762b13ec514"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

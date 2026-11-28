@@ -1,0 +1,374 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_TokenUnderflow/Harness.sol",
+    "contract": "SBTokenUnderflowHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_TokenUnderflow/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBTokenUnderflowHarness",
+      "source": "sol/单合约测试/SB_TokenUnderflow/Harness.sol#4-15"
+    },
+    {
+      "name": "Token",
+      "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#9-30"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBTokenUnderflowHarness",
+      "source": "sol/单合约测试/SB_TokenUnderflow/Harness.sol#4-15"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBTokenUnderflowHarness.echidna_balances_bounded_by_supply()",
+      "source": "sol/单合约测试/SB_TokenUnderflow/Harness.sol#12-14",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "46f6d46eb90658084c57",
+      "analysis_contract": "SBTokenUnderflowHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_TokenUnderflow/Harness.sol#4-15",
+      "read_states": [
+        "SBTokenUnderflowHarness.USER1",
+        "SBTokenUnderflowHarness.USER2",
+        "Token.balances",
+        "Token.totalSupply"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBTokenUnderflowHarness.echidna_balances_bounded_by_supply()",
+          "states": [
+            "SBTokenUnderflowHarness.USER1",
+            "SBTokenUnderflowHarness.USER2",
+            "Token.balances",
+            "Token.totalSupply"
+          ],
+          "expression": "balances[USER1] <= totalSupply && balances[USER2] <= totalSupply",
+          "index_accesses": [
+            {
+              "base": "balances",
+              "key": "USER1",
+              "reference": "REF_6"
+            },
+            {
+              "base": "balances",
+              "key": "USER2",
+              "reference": "REF_7"
+            }
+          ],
+          "source_index_accesses": [
+            "balances[USER1]",
+            "balances[USER2]"
+          ],
+          "source": "sol/单合约测试/SB_TokenUnderflow/Harness.sol#13"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "Token.transfer(address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "Token.balances"
+          ],
+          "effect_ids": [
+            "48bedf35d0c8b616",
+            "9d7dab77f673955e"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "48bedf35d0c8b616",
+        "9d7dab77f673955e"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "Token.balances",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "SBTokenUnderflowHarness.constructor()",
+            "Token.Token(uint256)"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "Token.transfer(address,uint256)",
+              "effect_ids": [
+                "48bedf35d0c8b616",
+                "9d7dab77f673955e"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "48bedf35d0c8b616": {
+      "state": "Token.balances",
+      "writer": "Token.transfer(address,uint256)",
+      "expression": "balances[msg.sender] -= _value",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "msg.sender",
+          "reference": "REF_2"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#22",
+      "call_path": [
+        {
+          "function": "Token.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Token.transfer(address,uint256)",
+          "expression": "require(bool)(balances[msg.sender] - _value >= 0)",
+          "branch": null,
+          "state_reads": [
+            "Token.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Token.balances",
+              "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#11"
+            }
+          ],
+          "variables_read": [
+            "_value",
+            "balances",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "_value": [
+              "_value"
+            ],
+            "balances": [
+              "_value",
+              "balances"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#20"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Token.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Token.transfer(address,uint256)",
+                "expression": "require(bool)(balances[msg.sender] - _value >= 0)",
+                "branch": null,
+                "state_reads": [
+                  "Token.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Token.balances",
+                    "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "_value",
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "_value": [
+                    "_value"
+                  ],
+                  "balances": [
+                    "_value",
+                    "balances"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#20"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "48bedf35d0c8b616"
+    },
+    "9d7dab77f673955e": {
+      "state": "Token.balances",
+      "writer": "Token.transfer(address,uint256)",
+      "expression": "balances[_to] += _value",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "_to",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[_to]"
+      ],
+      "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#23",
+      "call_path": [
+        {
+          "function": "Token.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Token.transfer(address,uint256)",
+          "expression": "require(bool)(balances[msg.sender] - _value >= 0)",
+          "branch": null,
+          "state_reads": [
+            "Token.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Token.balances",
+              "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#11"
+            }
+          ],
+          "variables_read": [
+            "_value",
+            "balances",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "_value": [
+              "_value"
+            ],
+            "balances": [
+              "_value",
+              "balances"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#20"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Token.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Token.transfer(address,uint256)",
+                "expression": "require(bool)(balances[msg.sender] - _value >= 0)",
+                "branch": null,
+                "state_reads": [
+                  "Token.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Token.balances",
+                    "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "_value",
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "_value": [
+                    "_value"
+                  ],
+                  "balances": [
+                    "_value",
+                    "balances"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_TokenUnderflow/token.sol#20"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "9d7dab77f673955e"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

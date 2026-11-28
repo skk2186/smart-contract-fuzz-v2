@@ -1,0 +1,210 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_FindThisHash/Harness.sol",
+    "contract": "SBFindThisHashHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_FindThisHash/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "FindThisHash",
+      "source": "sol/单合约测试/SB_FindThisHash/FindThisHash.sol#9-20"
+    },
+    {
+      "name": "SBFindThisHashHarness",
+      "source": "sol/单合约测试/SB_FindThisHash/Harness.sol#4-15"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBFindThisHashHarness",
+      "source": "sol/单合约测试/SB_FindThisHash/Harness.sol#4-15"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBFindThisHashHarness.echidna_hash_puzzle_unsolved()",
+      "source": "sol/单合约测试/SB_FindThisHash/Harness.sol#12-14",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "d9c959302e70dfa2af52",
+      "analysis_contract": "SBFindThisHashHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_FindThisHash/Harness.sol#4-15",
+      "read_states": [
+        "SBFindThisHashHarness.solved"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBFindThisHashHarness.echidna_hash_puzzle_unsolved()",
+          "states": [
+            "SBFindThisHashHarness.solved"
+          ],
+          "expression": "! solved",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_FindThisHash/Harness.sol#13"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBFindThisHashHarness.solvePuzzle(string)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "SBFindThisHashHarness.solved"
+          ],
+          "effect_ids": [
+            "b2fe09b90de919d5"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "b2fe09b90de919d5"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "b2fe09b90de919d5": {
+      "state": "SBFindThisHashHarness.solved",
+      "writer": "SBFindThisHashHarness.solvePuzzle(string)",
+      "expression": "solved = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_FindThisHash/Harness.sol#9",
+      "call_path": [
+        {
+          "function": "SBFindThisHashHarness.solvePuzzle(string)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBFindThisHashHarness.solvePuzzle(string)",
+          "expression": "require(bool)(hash == keccak256()(abi.encodePacked(solution)))",
+          "branch": null,
+          "state_reads": [
+            "FindThisHash.hash"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "FindThisHash.hash",
+              "source": "sol/单合约测试/SB_FindThisHash/FindThisHash.sol#10"
+            }
+          ],
+          "variables_read": [
+            "hash",
+            "solution"
+          ],
+          "data_dependencies": {
+            "solution": [
+              "solution"
+            ],
+            "hash": [
+              "hash"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_FindThisHash/Harness.sol#8"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBFindThisHashHarness.solvePuzzle(string)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBFindThisHashHarness.solvePuzzle(string)",
+                "expression": "require(bool)(hash == keccak256()(abi.encodePacked(solution)))",
+                "branch": null,
+                "state_reads": [
+                  "FindThisHash.hash"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "FindThisHash.hash",
+                    "source": "sol/单合约测试/SB_FindThisHash/FindThisHash.sol#10"
+                  }
+                ],
+                "variables_read": [
+                  "hash",
+                  "solution"
+                ],
+                "data_dependencies": {
+                  "solution": [
+                    "solution"
+                  ],
+                  "hash": [
+                    "hash"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_FindThisHash/Harness.sol#8"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "b2fe09b90de919d5"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

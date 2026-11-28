@@ -1,0 +1,52 @@
+[2026-11-28 21:41:27.48] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/ToB_Exercise1/solution.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (0.127185666s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/ToB_Exercise1/solution.sol:TestToken
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/ToB_Exercise1/native_seed_20261128/reproducers
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/ToB_Exercise1/native_seed_20261128/coverage
+[2026-11-28 21:41:27.62] [Worker 0] New coverage: 643 instr, 1 contracts, 1 seqs in corpus
+[2026-11-28 21:41:27.62]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/ToB_Exercise1/native_seed_20261128/coverage/6293877057699895972.txt
+[2026-11-28 21:41:27.62] [Worker 0] New coverage: 844 instr, 1 contracts, 2 seqs in corpus
+[2026-11-28 21:41:27.62]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/ToB_Exercise1/native_seed_20261128/coverage/7908231761682974330.txt
+[2026-11-28 21:41:27.62] [Worker 0] New coverage: 920 instr, 1 contracts, 3 seqs in corpus
+[2026-11-28 21:41:27.62]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/ToB_Exercise1/native_seed_20261128/coverage/6989515324470676538.txt
+[2026-11-28 21:41:27.62] [Worker 0] Test echidna_test_balance falsified!
+  Call sequence:
+TestToken.pause() from: 0x0000000000000000000000000000000000020000 Time delay: 72850 seconds Block delay: 49951
+TestToken.paused() from: 0x0000000000000000000000000000000000010000 Time delay: 83328 seconds Block delay: 16608
+TestToken.owner() from: 0x0000000000000000000000000000000000030000 Time delay: 55203 seconds Block delay: 72850
+TestToken.balances(0x40000) from: 0x0000000000000000000000000000000000010000 Time delay: 33878 seconds Block delay: 75047
+TestToken.paused() from: 0x0000000000000000000000000000000000020000 Time delay: 1625 seconds Block delay: 73193
+TestToken.resume() from: 0x0000000000000000000000000000000000010000 Time delay: 43683 seconds Block delay: 59300
+TestToken.owner() from: 0x0000000000000000000000000000000000010000 Time delay: 71837 seconds Block delay: 9770
+TestToken.transfer(0xffffffff,30000153328041025956546678230233928515979030578850317269553073024719488104375) from: 0x0000000000000000000000000000000000020000 Time delay: 32767 seconds Block delay: 63694
+TestToken.transfer(0x1fffffffe,1524785992) from: 0x0000000000000000000000000000000000050000 Time delay: 32767 seconds Block delay: 80976
+TestToken.transfer(0x10000,115792089237316195423570985008687907853269984665640564039457584007913129639935) from: 0x0000000000000000000000000000000000030000 Time delay: 32767 seconds Block delay: 16667
+
+[2026-11-28 21:41:27.63]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/ToB_Exercise1/native_seed_20261128/reproducers-unshrunk/6572246117674451485.txt
+[2026-11-28 21:41:27.63] [Worker 0] Test limit reached. Stopping.
+[2026-11-28 21:41:27.63] [status] tests: 1/1, fuzzing: 44/20000, values: [], cov: 920, corpus: 3, gas/s: 0
+echidna_test_balance: failed!💥  
+  Call sequence:
+    TestToken.paused() from: 0x0000000000000000000000000000000000010000 Time delay: 83328 seconds Block delay: 16608
+    TestToken.owner() from: 0x0000000000000000000000000000000000030000 Time delay: 55203 seconds Block delay: 72850
+    TestToken.balances(0x40000) from: 0x0000000000000000000000000000000000010000 Time delay: 33878 seconds Block delay: 75047
+    TestToken.paused() from: 0x0000000000000000000000000000000000020000 Time delay: 1625 seconds Block delay: 73193
+    *wait* Time delay: 43683 seconds Block delay: 59300
+    TestToken.owner() from: 0x0000000000000000000000000000000000010000 Time delay: 71837 seconds Block delay: 9770
+    TestToken.transfer(0xffffffff,30000153328041025956546678230233928515979030578850317269553073024719488104375) from: 0x0000000000000000000000000000000000020000 Time delay: 32767 seconds Block delay: 63694
+    TestToken.transfer(0x1fffffffe,1524785992) from: 0x0000000000000000000000000000000000050000 Time delay: 32767 seconds Block delay: 80976
+    TestToken.transfer(0x10000,115792089237316195423570985008687907853269984665640564039457584007913129639935) from: 0x0000000000000000000000000000000000030000 Time delay: 32767 seconds Block delay: 16667
+
+Traces: 
+
+
+Unique instructions: 920
+Unique codehashes: 1
+Corpus size: 3
+Seed: 20261128
+Total calls: 44
+
+[2026-11-28 21:41:27.63] Saving test reproducers... Done! (0.000555282s)
+[2026-11-28 21:41:27.63] Saving corpus... Done! (0.000148419s)
+[2026-11-28 21:41:27.63] Saving foundry reproducers... Done! (0.000507336s)
+[2026-11-28 21:41:27.63] Saving coverage... Done! (0.01306544s)

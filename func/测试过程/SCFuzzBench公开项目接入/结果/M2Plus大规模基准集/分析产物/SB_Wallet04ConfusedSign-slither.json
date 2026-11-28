@@ -1,0 +1,453 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol",
+    "contract": "SBWallet04Harness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBWallet04Harness",
+      "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#4-27"
+    },
+    {
+      "name": "Wallet",
+      "source": "sol/单合约测试/SB_Wallet04ConfusedSign/wallet_04_confused_sign.sol#14-42"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBWallet04Harness",
+      "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#4-27"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBWallet04Harness.echidna_withdraw_bounded_by_deposit()",
+      "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#24-26",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "d182d11c4031359e5897",
+      "analysis_contract": "SBWallet04Harness",
+      "analysis_contract_source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#4-27",
+      "read_states": [
+        "SBWallet04Harness.overWithdrawn"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBWallet04Harness.echidna_withdraw_bounded_by_deposit()",
+          "states": [
+            "SBWallet04Harness.overWithdrawn"
+          ],
+          "expression": "! overWithdrawn",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#25"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBWallet04Harness.withdrawTracked(uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "SBWallet04Harness.overWithdrawn"
+          ],
+          "effect_ids": [
+            "1c536795f5085f18"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "1c536795f5085f18",
+        "8eea2139543b2975",
+        "d4eb03eaaec11348"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "SBWallet04Harness.trackedDeposit",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SBWallet04Harness.depositTracked()",
+              "effect_ids": [
+                "8eea2139543b2975"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "SBWallet04Harness.trackedWithdraw",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SBWallet04Harness.withdrawTracked(uint256)",
+              "effect_ids": [
+                "d4eb03eaaec11348"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "1c536795f5085f18": {
+      "state": "SBWallet04Harness.overWithdrawn",
+      "writer": "SBWallet04Harness.withdrawTracked(uint256)",
+      "expression": "overWithdrawn = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#20",
+      "call_path": [
+        {
+          "function": "SBWallet04Harness.withdrawTracked(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBWallet04Harness.withdrawTracked(uint256)",
+          "expression": "require(bool)(amount > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#16"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SBWallet04Harness.withdrawTracked(uint256)",
+          "expression": "trackedWithdraw[msg.sender] > trackedDeposit[msg.sender]",
+          "branch": "true",
+          "state_reads": [
+            "SBWallet04Harness.trackedDeposit",
+            "SBWallet04Harness.trackedWithdraw"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBWallet04Harness.trackedDeposit",
+              "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#5"
+            },
+            {
+              "state": "SBWallet04Harness.trackedWithdraw",
+              "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#6"
+            }
+          ],
+          "variables_read": [
+            "msg.sender",
+            "trackedDeposit",
+            "trackedWithdraw"
+          ],
+          "data_dependencies": {
+            "trackedDeposit": [
+              "trackedDeposit"
+            ],
+            "trackedWithdraw": [
+              "amount",
+              "trackedWithdraw"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#19"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBWallet04Harness.withdrawTracked(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBWallet04Harness.withdrawTracked(uint256)",
+                "expression": "require(bool)(amount > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#16"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SBWallet04Harness.withdrawTracked(uint256)",
+                "expression": "trackedWithdraw[msg.sender] > trackedDeposit[msg.sender]",
+                "branch": "true",
+                "state_reads": [
+                  "SBWallet04Harness.trackedDeposit",
+                  "SBWallet04Harness.trackedWithdraw"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBWallet04Harness.trackedDeposit",
+                    "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#5"
+                  },
+                  {
+                    "state": "SBWallet04Harness.trackedWithdraw",
+                    "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#6"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "trackedDeposit",
+                  "trackedWithdraw"
+                ],
+                "data_dependencies": {
+                  "trackedDeposit": [
+                    "trackedDeposit"
+                  ],
+                  "trackedWithdraw": [
+                    "amount",
+                    "trackedWithdraw"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#19"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "1c536795f5085f18"
+    },
+    "8eea2139543b2975": {
+      "state": "SBWallet04Harness.trackedDeposit",
+      "writer": "SBWallet04Harness.depositTracked()",
+      "expression": "trackedDeposit[msg.sender] += msg.value",
+      "index_accesses": [
+        {
+          "base": "trackedDeposit",
+          "key": "msg.sender",
+          "reference": "REF_8"
+        }
+      ],
+      "source_index_accesses": [
+        "trackedDeposit[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#11",
+      "call_path": [
+        {
+          "function": "SBWallet04Harness.depositTracked()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBWallet04Harness.depositTracked()",
+          "expression": "require(bool)(msg.value > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#10"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBWallet04Harness.depositTracked()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBWallet04Harness.depositTracked()",
+                "expression": "require(bool)(msg.value > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#10"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "8eea2139543b2975"
+    },
+    "d4eb03eaaec11348": {
+      "state": "SBWallet04Harness.trackedWithdraw",
+      "writer": "SBWallet04Harness.withdrawTracked(uint256)",
+      "expression": "trackedWithdraw[msg.sender] += amount",
+      "index_accesses": [
+        {
+          "base": "trackedWithdraw",
+          "key": "msg.sender",
+          "reference": "REF_9"
+        }
+      ],
+      "source_index_accesses": [
+        "trackedWithdraw[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#18",
+      "call_path": [
+        {
+          "function": "SBWallet04Harness.withdrawTracked(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBWallet04Harness.withdrawTracked(uint256)",
+          "expression": "require(bool)(amount > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#16"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBWallet04Harness.withdrawTracked(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBWallet04Harness.withdrawTracked(uint256)",
+                "expression": "require(bool)(amount > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_Wallet04ConfusedSign/Harness.sol#16"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "d4eb03eaaec11348"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

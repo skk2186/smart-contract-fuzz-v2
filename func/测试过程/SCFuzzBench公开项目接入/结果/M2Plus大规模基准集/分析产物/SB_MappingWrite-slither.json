@@ -1,0 +1,106 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_MappingWrite/Harness.sol",
+    "contract": "SBMappingWriteHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_MappingWrite/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBMappingWriteHarness",
+      "source": "sol/单合约测试/SB_MappingWrite/Harness.sol#4-15"
+    },
+    {
+      "name": "Map",
+      "source": "sol/单合约测试/SB_MappingWrite/mapping_write.sol#11-30"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBMappingWriteHarness",
+      "source": "sol/单合约测试/SB_MappingWrite/Harness.sol#4-15"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBMappingWriteHarness.echidna_owner_unchanged()",
+      "source": "sol/单合约测试/SB_MappingWrite/Harness.sol#12-14",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "e2474059a4d0c4e417e0",
+      "analysis_contract": "SBMappingWriteHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_MappingWrite/Harness.sol#4-15",
+      "read_states": [
+        "Map.owner",
+        "SBMappingWriteHarness.initialOwner"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBMappingWriteHarness.echidna_owner_unchanged()",
+          "states": [
+            "Map.owner",
+            "SBMappingWriteHarness.initialOwner"
+          ],
+          "expression": "owner == initialOwner",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_MappingWrite/Harness.sol#13"
+        }
+      ],
+      "candidate_actions": [],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [],
+      "evidence_summary": {
+        "candidate_links": 0,
+        "links_with_write_site": 0,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_dependency_unresolved",
+      "analysis_status": "analyzed",
+      "context_status": "observations_only",
+      "dependency_status": "incomplete",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [],
+      "unknowns": [
+        "SBMappingWriteHarness.echidna_owner_unchanged(): 未找到可改变所读状态的已解析外部入口"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {},
+  "global_unknowns": [
+    "SBMappingWriteHarness.echidna_owner_unchanged(): 未找到可改变所读状态的已解析外部入口"
+  ],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

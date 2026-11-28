@@ -1,0 +1,202 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_TokenBankMainnet/Harness.sol",
+    "contract": "SBTokenBankHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_TokenBankMainnet/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "Ownable",
+      "source": "sol/单合约测试/SB_TokenBankMainnet/0x39cfd754c85023648bf003bea2dd498c5612abfa.sol#9-34"
+    },
+    {
+      "name": "Token",
+      "source": "sol/单合约测试/SB_TokenBankMainnet/0x39cfd754c85023648bf003bea2dd498c5612abfa.sol#36-46"
+    },
+    {
+      "name": "TokenBank",
+      "source": "sol/单合约测试/SB_TokenBankMainnet/0x39cfd754c85023648bf003bea2dd498c5612abfa.sol#48-105"
+    },
+    {
+      "name": "SBTokenBankHarness",
+      "source": "sol/单合约测试/SB_TokenBankMainnet/Harness.sol#4-19"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBTokenBankHarness",
+      "source": "sol/单合约测试/SB_TokenBankMainnet/Harness.sol#4-19"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBTokenBankHarness.echidna_owner_preserved()",
+      "source": "sol/单合约测试/SB_TokenBankMainnet/Harness.sol#16-18",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "3fc173d4bd0a5dbdf23b",
+      "analysis_contract": "SBTokenBankHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_TokenBankMainnet/Harness.sol#4-19",
+      "read_states": [
+        "SBTokenBankHarness.initialOwner",
+        "Token.owner"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBTokenBankHarness.echidna_owner_preserved()",
+          "states": [
+            "SBTokenBankHarness.initialOwner",
+            "Token.owner"
+          ],
+          "expression": "owner == initialOwner",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_TokenBankMainnet/Harness.sol#17"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "TokenBank.initTokenBank()",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "Token.owner"
+          ],
+          "effect_ids": [
+            "8d1fcd36fcb06244"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [
+          {
+            "function": "Token.WithdrawToken(address,uint256,address)",
+            "calls": [
+              {
+                "caller": "Token.WithdrawToken(address,uint256,address)",
+                "call": "TMP_37(bool) = LOW_LEVEL_CALL, dest:token, function:call, arguments:['TMP_36', 'to', 'amount']  ",
+                "source": "sol/单合约测试/SB_TokenBankMainnet/0x39cfd754c85023648bf003bea2dd498c5612abfa.sol#44",
+                "external_route": [],
+                "reason": "低层调用的目标状态写入无法由 Slither 静态解析"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          },
+          {
+            "function": "TokenBank.WitdrawTokenToHolder(address,address,uint256)",
+            "calls": [
+              {
+                "caller": "Token.WithdrawToken(address,uint256,address)",
+                "call": "TMP_37(bool) = LOW_LEVEL_CALL, dest:token, function:call, arguments:['TMP_36', 'to', 'amount']  ",
+                "source": "sol/单合约测试/SB_TokenBankMainnet/0x39cfd754c85023648bf003bea2dd498c5612abfa.sol#44",
+                "external_route": [],
+                "reason": "低层调用的目标状态写入无法由 Slither 静态解析"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          }
+        ],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "8d1fcd36fcb06244"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 2
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [
+        {
+          "function": "Token.WithdrawToken(address,uint256,address)",
+          "external_calls": [
+            "TMP_37(bool) = LOW_LEVEL_CALL, dest:token, function:call, arguments:['TMP_36', 'to', 'amount']  "
+          ],
+          "inline_assembly": false,
+          "reason": "无已解析的直接写入；外部调用、回调或汇编可能产生未建模影响。"
+        },
+        {
+          "function": "TokenBank.WitdrawTokenToHolder(address,address,uint256)",
+          "external_calls": [
+            "TMP_37(bool) = LOW_LEVEL_CALL, dest:token, function:call, arguments:['TMP_36', 'to', 'amount']  "
+          ],
+          "inline_assembly": false,
+          "reason": "无已解析的直接写入；外部调用、回调或汇编可能产生未建模影响。"
+        }
+      ],
+      "prerequisite_state_closure": [],
+      "unknowns": [
+        "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "8d1fcd36fcb06244": {
+      "state": "Token.owner",
+      "writer": "TokenBank.initTokenBank()",
+      "expression": "owner = msg.sender",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_TokenBankMainnet/0x39cfd754c85023648bf003bea2dd498c5612abfa.sol#57",
+      "call_path": [
+        {
+          "function": "TokenBank.initTokenBank()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "TokenBank.initTokenBank()",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "8d1fcd36fcb06244"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

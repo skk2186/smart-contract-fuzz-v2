@@ -1,0 +1,319 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_UnprotectedOwner/Harness.sol",
+    "contract": "SBUnprotectedHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_UnprotectedOwner/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBUnprotectedHarness",
+      "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#4-21"
+    },
+    {
+      "name": "Unprotected",
+      "source": "sol/单合约测试/SB_UnprotectedOwner/unprotected0.sol#9-39"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBUnprotectedHarness",
+      "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#4-21"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBUnprotectedHarness.echidna_only_initial_owner_privileged()",
+      "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#18-20",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "409573f215d30c2cf192",
+      "analysis_contract": "SBUnprotectedHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#4-21",
+      "read_states": [
+        "SBUnprotectedHarness.nonInitialTriggered"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBUnprotectedHarness.echidna_only_initial_owner_privileged()",
+          "states": [
+            "SBUnprotectedHarness.nonInitialTriggered"
+          ],
+          "expression": "! nonInitialTriggered",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#19"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBUnprotectedHarness.privilegedAction()",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "SBUnprotectedHarness.nonInitialTriggered"
+          ],
+          "effect_ids": [
+            "08a0dfc888092525"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "08a0dfc888092525",
+        "6acb4e135297a5ff"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "Unprotected.owner",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "Unprotected.Unprotected()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "Unprotected.changeOwner(address)",
+              "effect_ids": [
+                "6acb4e135297a5ff"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "08a0dfc888092525": {
+      "state": "SBUnprotectedHarness.nonInitialTriggered",
+      "writer": "SBUnprotectedHarness.privilegedAction()",
+      "expression": "nonInitialTriggered = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#14",
+      "call_path": [
+        {
+          "function": "SBUnprotectedHarness.privilegedAction()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Unprotected.onlyowner()",
+          "expression": "require(bool)(msg.sender == owner)",
+          "branch": null,
+          "state_reads": [
+            "Unprotected.owner"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Unprotected.owner",
+              "source": "sol/单合约测试/SB_UnprotectedOwner/unprotected0.sol#10"
+            }
+          ],
+          "variables_read": [
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_UnprotectedOwner/unprotected0.sol#13"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SBUnprotectedHarness.privilegedAction()",
+          "expression": "msg.sender != initialOwner",
+          "branch": "true",
+          "state_reads": [
+            "SBUnprotectedHarness.initialOwner"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBUnprotectedHarness.initialOwner",
+              "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#5"
+            }
+          ],
+          "variables_read": [
+            "initialOwner",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "initialOwner": [
+              "initialOwner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#13"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Unprotected.onlyowner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Unprotected.onlyowner()",
+                "expression": "require(bool)(msg.sender == owner)",
+                "branch": null,
+                "state_reads": [
+                  "Unprotected.owner"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Unprotected.owner",
+                    "source": "sol/单合约测试/SB_UnprotectedOwner/unprotected0.sol#10"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_UnprotectedOwner/unprotected0.sol#13"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "SBUnprotectedHarness.privilegedAction()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "SBUnprotectedHarness.privilegedAction()",
+                "expression": "msg.sender != initialOwner",
+                "branch": "true",
+                "state_reads": [
+                  "SBUnprotectedHarness.initialOwner"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBUnprotectedHarness.initialOwner",
+                    "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#5"
+                  }
+                ],
+                "variables_read": [
+                  "initialOwner",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "initialOwner": [
+                    "initialOwner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_UnprotectedOwner/Harness.sol#13"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "08a0dfc888092525"
+    },
+    "6acb4e135297a5ff": {
+      "state": "Unprotected.owner",
+      "writer": "Unprotected.changeOwner(address)",
+      "expression": "owner = _newOwner",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_UnprotectedOwner/unprotected0.sol#28",
+      "call_path": [
+        {
+          "function": "Unprotected.changeOwner(address)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Unprotected.changeOwner(address)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "6acb4e135297a5ff"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

@@ -1,0 +1,735 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_OddsAndEvens/Harness.sol",
+    "contract": "SBOddsAndEvensHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_OddsAndEvens/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBOddsAndEvensHarness",
+      "source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#4-18"
+    },
+    {
+      "name": "OddsAndEvens",
+      "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#9-53"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBOddsAndEvensHarness",
+      "source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#4-18"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBOddsAndEvensHarness.echidna_second_player_cannot_always_win()",
+      "source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#15-17",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "cfac0b5fde929637ac0c",
+      "analysis_contract": "SBOddsAndEvensHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#4-18",
+      "read_states": [
+        "SBOddsAndEvensHarness.roundCompleted"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBOddsAndEvensHarness.echidna_second_player_cannot_always_win()",
+          "states": [
+            "SBOddsAndEvensHarness.roundCompleted"
+          ],
+          "expression": "! roundCompleted",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#16"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBOddsAndEvensHarness.playRound(uint256)",
+          "payable": true,
+          "environment_reads": [
+            "msg.sender",
+            "msg.value"
+          ],
+          "matched_states": [
+            "SBOddsAndEvensHarness.roundCompleted"
+          ],
+          "effect_ids": [
+            "56e0991dee39ee30"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "4703f430ada9c825",
+        "56e0991dee39ee30",
+        "957ac462394da5ad",
+        "de6229c3940341e5",
+        "ff796aa1c8dcbc7b"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "OddsAndEvens.tot",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "OddsAndEvens.play(uint256)",
+              "effect_ids": [
+                "de6229c3940341e5",
+                "957ac462394da5ad"
+              ]
+            },
+            {
+              "function": "SBOddsAndEvensHarness.playRound(uint256)",
+              "effect_ids": [
+                "4703f430ada9c825",
+                "ff796aa1c8dcbc7b"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "4703f430ada9c825": {
+      "state": "OddsAndEvens.tot",
+      "writer": "OddsAndEvens.play(uint256)",
+      "expression": "tot ++",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#29",
+      "call_path": [
+        {
+          "function": "SBOddsAndEvensHarness.playRound(uint256)",
+          "bindings": {},
+          "call_source": null
+        },
+        {
+          "function": "OddsAndEvens.play(uint256)",
+          "bindings": {
+            "number": "number"
+          },
+          "call_source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#9"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "OddsAndEvens.play(uint256)",
+          "expression": "msg.value != 1000000000000000000",
+          "branch": "false",
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#26"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBOddsAndEvensHarness.playRound(uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        },
+        {
+          "function": "OddsAndEvens.play(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.play(uint256)",
+                "expression": "msg.value != 1000000000000000000",
+                "branch": "false",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#26"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "4703f430ada9c825"
+    },
+    "56e0991dee39ee30": {
+      "state": "SBOddsAndEvensHarness.roundCompleted",
+      "writer": "SBOddsAndEvensHarness.playRound(uint256)",
+      "expression": "roundCompleted = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#11",
+      "call_path": [
+        {
+          "function": "SBOddsAndEvensHarness.playRound(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "SBOddsAndEvensHarness.playRound(uint256)",
+          "expression": "beforeTot == 1 && tot == 0",
+          "branch": "true",
+          "state_reads": [
+            "OddsAndEvens.tot"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "OddsAndEvens.tot",
+              "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#18"
+            }
+          ],
+          "variables_read": [
+            "beforeTot",
+            "tot"
+          ],
+          "data_dependencies": {
+            "beforeTot": [
+              "tot"
+            ],
+            "tot": [
+              "tot"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#10"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBOddsAndEvensHarness.playRound(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "SBOddsAndEvensHarness.playRound(uint256)",
+                "expression": "beforeTot == 1 && tot == 0",
+                "branch": "true",
+                "state_reads": [
+                  "OddsAndEvens.tot"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "OddsAndEvens.tot",
+                    "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "beforeTot",
+                  "tot"
+                ],
+                "data_dependencies": {
+                  "beforeTot": [
+                    "tot"
+                  ],
+                  "tot": [
+                    "tot"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#10"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "56e0991dee39ee30"
+    },
+    "957ac462394da5ad": {
+      "state": "OddsAndEvens.tot",
+      "writer": "OddsAndEvens.andTheWinnerIs()",
+      "expression": "tot = 0",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#45",
+      "call_path": [
+        {
+          "function": "OddsAndEvens.play(uint256)",
+          "bindings": {},
+          "call_source": null
+        },
+        {
+          "function": "OddsAndEvens.andTheWinnerIs()",
+          "bindings": {},
+          "call_source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#31"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "OddsAndEvens.play(uint256)",
+          "expression": "msg.value != 1000000000000000000",
+          "branch": "false",
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#26"
+        },
+        {
+          "kind": "control_branch",
+          "function": "OddsAndEvens.play(uint256)",
+          "expression": "tot == 2",
+          "branch": "true",
+          "state_reads": [
+            "OddsAndEvens.tot"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "OddsAndEvens.tot",
+              "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#18"
+            }
+          ],
+          "variables_read": [
+            "tot"
+          ],
+          "data_dependencies": {
+            "tot": [
+              "tot"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "OddsAndEvens.play(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.play(uint256)",
+                "expression": "msg.value != 1000000000000000000",
+                "branch": "false",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#26"
+              },
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.play(uint256)",
+                "expression": "tot == 2",
+                "branch": "true",
+                "state_reads": [
+                  "OddsAndEvens.tot"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "OddsAndEvens.tot",
+                    "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "tot"
+                ],
+                "data_dependencies": {
+                  "tot": [
+                    "tot"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "OddsAndEvens.andTheWinnerIs()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.andTheWinnerIs()",
+                "expression": "n % 2 == 0",
+                "branch": "true",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "n"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#37"
+              }
+            ],
+            [
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.andTheWinnerIs()",
+                "expression": "n % 2 == 0",
+                "branch": "false",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "n"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#37"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "957ac462394da5ad"
+    },
+    "de6229c3940341e5": {
+      "state": "OddsAndEvens.tot",
+      "writer": "OddsAndEvens.play(uint256)",
+      "expression": "tot ++",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#29",
+      "call_path": [
+        {
+          "function": "OddsAndEvens.play(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "OddsAndEvens.play(uint256)",
+          "expression": "msg.value != 1000000000000000000",
+          "branch": "false",
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#26"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "OddsAndEvens.play(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.play(uint256)",
+                "expression": "msg.value != 1000000000000000000",
+                "branch": "false",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#26"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "de6229c3940341e5"
+    },
+    "ff796aa1c8dcbc7b": {
+      "state": "OddsAndEvens.tot",
+      "writer": "OddsAndEvens.andTheWinnerIs()",
+      "expression": "tot = 0",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#45",
+      "call_path": [
+        {
+          "function": "SBOddsAndEvensHarness.playRound(uint256)",
+          "bindings": {},
+          "call_source": null
+        },
+        {
+          "function": "OddsAndEvens.play(uint256)",
+          "bindings": {
+            "number": "number"
+          },
+          "call_source": "sol/单合约测试/SB_OddsAndEvens/Harness.sol#9"
+        },
+        {
+          "function": "OddsAndEvens.andTheWinnerIs()",
+          "bindings": {},
+          "call_source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#31"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "OddsAndEvens.play(uint256)",
+          "expression": "msg.value != 1000000000000000000",
+          "branch": "false",
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#26"
+        },
+        {
+          "kind": "control_branch",
+          "function": "OddsAndEvens.play(uint256)",
+          "expression": "tot == 2",
+          "branch": "true",
+          "state_reads": [
+            "OddsAndEvens.tot"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "OddsAndEvens.tot",
+              "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#18"
+            }
+          ],
+          "variables_read": [
+            "tot"
+          ],
+          "data_dependencies": {
+            "tot": [
+              "tot"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBOddsAndEvensHarness.playRound(uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        },
+        {
+          "function": "OddsAndEvens.play(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.play(uint256)",
+                "expression": "msg.value != 1000000000000000000",
+                "branch": "false",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#26"
+              },
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.play(uint256)",
+                "expression": "tot == 2",
+                "branch": "true",
+                "state_reads": [
+                  "OddsAndEvens.tot"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "OddsAndEvens.tot",
+                    "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "tot"
+                ],
+                "data_dependencies": {
+                  "tot": [
+                    "tot"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "OddsAndEvens.andTheWinnerIs()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.andTheWinnerIs()",
+                "expression": "n % 2 == 0",
+                "branch": "true",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "n"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#37"
+              }
+            ],
+            [
+              {
+                "kind": "control_branch",
+                "function": "OddsAndEvens.andTheWinnerIs()",
+                "expression": "n % 2 == 0",
+                "branch": "false",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "n"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_OddsAndEvens/odds_and_evens.sol#37"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "ff796aa1c8dcbc7b"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

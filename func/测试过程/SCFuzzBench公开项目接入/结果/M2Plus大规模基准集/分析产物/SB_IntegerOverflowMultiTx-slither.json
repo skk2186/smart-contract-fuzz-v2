@@ -1,0 +1,247 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IntegerOverflowMultiTx/Harness.sol",
+    "contract": "SBMultiTxOverflowHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IntegerOverflowMultiTx/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBMultiTxOverflowHarness",
+      "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/Harness.sol#4-8"
+    },
+    {
+      "name": "IntegerOverflowMultiTxMultiFuncFeasible",
+      "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/integer_overflow_multitx_multifunc_feasible.sol#12-27"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBMultiTxOverflowHarness",
+      "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/Harness.sol#4-8"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBMultiTxOverflowHarness.echidna_count_no_underflow()",
+      "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/Harness.sol#5-7",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "b67d04e2a9cfea33cd66",
+      "analysis_contract": "SBMultiTxOverflowHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_IntegerOverflowMultiTx/Harness.sol#4-8",
+      "read_states": [
+        "IntegerOverflowMultiTxMultiFuncFeasible.count"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBMultiTxOverflowHarness.echidna_count_no_underflow()",
+          "states": [
+            "IntegerOverflowMultiTxMultiFuncFeasible.count"
+          ],
+          "expression": "count <= 1",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/Harness.sol#6"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "IntegerOverflowMultiTxMultiFuncFeasible.run(uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "IntegerOverflowMultiTxMultiFuncFeasible.count"
+          ],
+          "effect_ids": [
+            "539239a50508ea73"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "539239a50508ea73",
+        "96d12e74746e66d0"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "IntegerOverflowMultiTxMultiFuncFeasible.initialized",
+          "depth": 0,
+          "declaration_initializer": "0",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "IntegerOverflowMultiTxMultiFuncFeasible.init()",
+              "effect_ids": [
+                "96d12e74746e66d0"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "539239a50508ea73": {
+      "state": "IntegerOverflowMultiTxMultiFuncFeasible.count",
+      "writer": "IntegerOverflowMultiTxMultiFuncFeasible.run(uint256)",
+      "expression": "count -= input",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/integer_overflow_multitx_multifunc_feasible.sol#25",
+      "call_path": [
+        {
+          "function": "IntegerOverflowMultiTxMultiFuncFeasible.run(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "IntegerOverflowMultiTxMultiFuncFeasible.run(uint256)",
+          "expression": "initialized == 0",
+          "branch": "false",
+          "state_reads": [
+            "IntegerOverflowMultiTxMultiFuncFeasible.initialized"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "IntegerOverflowMultiTxMultiFuncFeasible.initialized",
+              "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/integer_overflow_multitx_multifunc_feasible.sol#13"
+            }
+          ],
+          "variables_read": [
+            "initialized"
+          ],
+          "data_dependencies": {
+            "initialized": [
+              "initialized"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/integer_overflow_multitx_multifunc_feasible.sol#21"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "IntegerOverflowMultiTxMultiFuncFeasible.run(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "IntegerOverflowMultiTxMultiFuncFeasible.run(uint256)",
+                "expression": "initialized == 0",
+                "branch": "false",
+                "state_reads": [
+                  "IntegerOverflowMultiTxMultiFuncFeasible.initialized"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "IntegerOverflowMultiTxMultiFuncFeasible.initialized",
+                    "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/integer_overflow_multitx_multifunc_feasible.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "initialized"
+                ],
+                "data_dependencies": {
+                  "initialized": [
+                    "initialized"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/integer_overflow_multitx_multifunc_feasible.sol#21"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "539239a50508ea73"
+    },
+    "96d12e74746e66d0": {
+      "state": "IntegerOverflowMultiTxMultiFuncFeasible.initialized",
+      "writer": "IntegerOverflowMultiTxMultiFuncFeasible.init()",
+      "expression": "initialized = 1",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_IntegerOverflowMultiTx/integer_overflow_multitx_multifunc_feasible.sol#17",
+      "call_path": [
+        {
+          "function": "IntegerOverflowMultiTxMultiFuncFeasible.init()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "IntegerOverflowMultiTxMultiFuncFeasible.init()",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "96d12e74746e66d0"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

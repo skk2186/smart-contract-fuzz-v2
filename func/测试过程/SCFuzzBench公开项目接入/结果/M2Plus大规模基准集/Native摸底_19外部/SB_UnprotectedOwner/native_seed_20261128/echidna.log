@@ -1,0 +1,39 @@
+[2026-11-28 21:54:37.89] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_UnprotectedOwner/Harness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (0.131974668s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_UnprotectedOwner/Harness.sol:SBUnprotectedHarness
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_19外部/SB_UnprotectedOwner/native_seed_20261128/reproducers
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_19外部/SB_UnprotectedOwner/native_seed_20261128/coverage
+[2026-11-28 21:54:38.03] [Worker 0] New coverage: 290 instr, 1 contracts, 1 seqs in corpus
+[2026-11-28 21:54:38.03]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_19外部/SB_UnprotectedOwner/native_seed_20261128/coverage/6716441980346816926.txt
+[2026-11-28 21:54:38.04] [Worker 0] Test echidna_only_initial_owner_privileged falsified!
+  Call sequence:
+SBUnprotectedHarness.changeOwner(0x2fffffffd) from: 0x0000000000000000000000000000000000020000 Time delay: 16423 seconds Block delay: 46396
+SBUnprotectedHarness.nonInitialTriggered() from: 0x0000000000000000000000000000000000040000 Time delay: 49951 seconds Block delay: 16677
+SBUnprotectedHarness.changeOwner(0x10000) from: 0x0000000000000000000000000000000000040000 Time delay: 81033 seconds Block delay: 25135
+SBUnprotectedHarness.initialOwner() from: 0x0000000000000000000000000000000000040000 Time delay: 52101 seconds Block delay: 70386
+SBUnprotectedHarness.privilegedAction() from: 0x0000000000000000000000000000000000010000 Time delay: 63694 seconds Block delay: 59300
+
+[2026-11-28 21:54:38.04] [Worker 0] New coverage: 337 instr, 1 contracts, 2 seqs in corpus
+[2026-11-28 21:54:38.04]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_19外部/SB_UnprotectedOwner/native_seed_20261128/reproducers-unshrunk/8153166942198695176.txt
+[2026-11-28 21:54:38.04] [Worker 0] Test limit reached. Stopping.
+[2026-11-28 21:54:38.04] [status] tests: 1/1, fuzzing: 88/20000, values: [], cov: 337, corpus: 2, gas/s: 0
+echidna_only_initial_owner_privileged: failed!💥  
+  Call sequence:
+    SBUnprotectedHarness.nonInitialTriggered() from: 0x0000000000000000000000000000000000040000 Time delay: 49951 seconds Block delay: 16677
+    SBUnprotectedHarness.changeOwner(0x10000) from: 0x0000000000000000000000000000000000040000 Time delay: 81033 seconds Block delay: 25135
+    SBUnprotectedHarness.initialOwner() from: 0x0000000000000000000000000000000000040000 Time delay: 52101 seconds Block delay: 70386
+    SBUnprotectedHarness.privilegedAction() from: 0x0000000000000000000000000000000000010000 Time delay: 63694 seconds Block delay: 59300
+
+Traces: 
+
+
+Unique instructions: 337
+Unique codehashes: 1
+Corpus size: 2
+Seed: 20261128
+Total calls: 88
+
+[2026-11-28 21:54:38.04] Saving test reproducers... Done! (0.000469187s)
+[2026-11-28 21:54:38.04] Saving corpus... Done! (0.000135001s)
+[2026-11-28 21:54:38.04] Saving foundry reproducers... Done! (0.000536968s)
+[2026-11-28 21:54:38.05] Saving coverage... Done! (0.010953703s)

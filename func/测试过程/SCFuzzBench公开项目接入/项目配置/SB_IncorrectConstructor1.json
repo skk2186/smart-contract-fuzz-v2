@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "project_name": "SB_IncorrectConstructor1",
+  "v2_enabled": true,
+  "source": {
+    "repository": "https://github.com/smartbugs/smartbugs-curated",
+    "commit": "230e649123477eff332742a59a1c7cc6dc286cab",
+    "root": "sol/单合约测试/SB_IncorrectConstructor1"
+  },
+  "paths": {
+    "analysis_report": "func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/分析产物/SB_IncorrectConstructor1-slither.json",
+    "compiled_artifact": "func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/分析产物/SB_IncorrectConstructor1-compile.json"
+  },
+  "compiler": {
+    "build_system": "solc",
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IncorrectConstructor1/Harness.sol",
+    "version": "0.4.24",
+    "solc": "/home/skk/.solc-select/artifacts/solc-0.4.24/solc-0.4.24",
+    "remappings": [],
+    "extra_args": [],
+    "compile_options": {
+      "compile_force_framework": "solc",
+      "cwd": "/tmp"
+    }
+  },
+  "harness": {
+    "source": "Harness.sol",
+    "contract": "SBIncorrectCtor1Harness"
+  },
+  "analysis": {
+    "property_functions": []
+  },
+  "deployment": {
+    "mode": "constructor",
+    "constructor_args": [],
+    "deployer": "0x0000000000000000000000000000000000030000",
+    "contract_address": "0xA647ff3c36cFab592509E13860ab8c4F28781a66",
+    "address_derivation": "CREATE(deployer, nonce=0)",
+    "required_dependencies": []
+  },
+  "execution": {
+    "chain_id": 1,
+    "deployment_timestamp": 1524785992,
+    "deployment_block_number": 4370000,
+    "base_fee_per_gas": 0,
+    "gas_price": 0,
+    "block_gas_limit": 100000000,
+    "max_transaction_gas": 12500000,
+    "initial_balance": 100000000000000000000,
+    "hardfork": "shanghai"
+  },
+  "property": {
+    "mode": "property",
+    "engine_prefix": "echidna_",
+    "sender": "0x0000000000000000000000000000000000010000",
+    "target_property_id": "074fbcdebe20eb6f1019",
+    "target_property": "SBIncorrectCtor1Harness.echidna_funds_not_stolen()"
+  },
+  "actions": {
+    "senders": [
+      "0x0000000000000000000000000000000000010000",
+      "0x0000000000000000000000000000000000020000",
+      "0x0000000000000000000000000000000000030000",
+      "0x0000000000000000000000000000000000040000",
+      "0x0000000000000000000000000000000000050000"
+    ]
+  },
+  "echidna": {
+    "prefix": "echidna_",
+    "test_mode": "property",
+    "workers": 1,
+    "call_sequence_length": 10,
+    "stop_on_fail": false,
+    "disable_slither": true
+  },
+  "medusa": {
+    "test_prefixes": [
+      "echidna_"
+    ],
+    "test_mode": "property",
+    "status": "ready"
+  }
+}

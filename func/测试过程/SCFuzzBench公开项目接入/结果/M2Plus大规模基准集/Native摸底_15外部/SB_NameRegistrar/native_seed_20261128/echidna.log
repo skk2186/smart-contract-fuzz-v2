@@ -1,0 +1,37 @@
+[2026-11-28 21:41:27.10] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_NameRegistrar/Harness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (0.112530345s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_NameRegistrar/Harness.sol:SBNameRegistrarHarness
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/SB_NameRegistrar/native_seed_20261128/reproducers
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/SB_NameRegistrar/native_seed_20261128/coverage
+[2026-11-28 21:41:27.23] [Worker 0] Test echidna_registrar_stays_locked falsified!
+  Call sequence:
+SBNameRegistrarHarness.registeredNameRecord(0x2fffffffd) from: 0x0000000000000000000000000000000000020000 Time delay: 16423 seconds Block delay: 46396
+SBNameRegistrarHarness.resolve("\135\255.\155\153Q\CAN\250<aA\180\FS|\197\214\171\172E\252\161\250\147\236\158\EM\163XQ'\134x") from: 0x0000000000000000000000000000000000040000 Time delay: 66671 seconds Block delay: 78
+SBNameRegistrarHarness.resolve("p\188\210Q\202 u\173U~\221\225\199\250\177\&3|%E\128\246\140t\208S\146\&4\248\207\247)\177") from: 0x0000000000000000000000000000000000050000 Time delay: 11320 seconds Block delay: 46396
+SBNameRegistrarHarness.unlocked() from: 0x0000000000000000000000000000000000010000 Time delay: 67545 seconds Block delay: 7393
+SBNameRegistrarHarness.register("\141L@<\245p\SO]\153\162)\183y6\205\230\218\144\164\144\DC2\171\147\GS&\195\STX\166`!\146\SUB",0x30000) from: 0x0000000000000000000000000000000000010000 Time delay: 10210 seconds Block delay: 16667
+
+[2026-11-28 21:41:27.23] [Worker 0] New coverage: 519 instr, 1 contracts, 1 seqs in corpus
+[2026-11-28 21:41:27.23]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/SB_NameRegistrar/native_seed_20261128/reproducers-unshrunk/3698933090275190262.txt
+[2026-11-28 21:41:27.23] [Worker 0] Test limit reached. Stopping.
+[2026-11-28 21:41:27.23] [status] tests: 1/1, fuzzing: 11/20000, values: [], cov: 519, corpus: 1, gas/s: 0
+echidna_registrar_stays_locked: failed!💥  
+  Call sequence:
+    SBNameRegistrarHarness.registeredNameRecord(0x2fffffffd) from: 0x0000000000000000000000000000000000020000 Time delay: 16423 seconds Block delay: 46396
+    SBNameRegistrarHarness.resolve("\135\255.\155\153Q\CAN\250<aA\180\FS|\197\214\171\172E\252\161\250\147\236\158\EM\163XQ'\134x") from: 0x0000000000000000000000000000000000040000 Time delay: 66671 seconds Block delay: 78
+    SBNameRegistrarHarness.resolve("p\188\210Q\202 u\173U~\221\225\199\250\177\&3|%E\128\246\140t\208S\146\&4\248\207\247)\177") from: 0x0000000000000000000000000000000000050000 Time delay: 11320 seconds Block delay: 46396
+    SBNameRegistrarHarness.register("\141L@<\245p\SO]\153\162)\183y6\205\230\218\144\164\144\DC2\171\147\GS&\195\STX\166`!\146\SUB",0x30000) from: 0x0000000000000000000000000000000000010000 Time delay: 10210 seconds Block delay: 16667
+
+Traces: 
+
+
+Unique instructions: 519
+Unique codehashes: 1
+Corpus size: 1
+Seed: 20261128
+Total calls: 11
+
+[2026-11-28 21:41:27.23] Saving test reproducers... Done! (0.000428562s)
+[2026-11-28 21:41:27.23] Saving corpus... Done! (0.000076828s)
+[2026-11-28 21:41:27.23] Saving foundry reproducers... Done! (0.000457991s)
+[2026-11-28 21:41:27.23] Saving coverage... Done! (0.010957515s)

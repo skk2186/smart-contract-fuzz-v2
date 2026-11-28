@@ -1,0 +1,34 @@
+[2026-11-28 21:41:26.32] Compiling `/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IntegerOverflowMultiTxOneFunc/Harness.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (0.108705277s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IntegerOverflowMultiTxOneFunc/Harness.sol:SBOneFuncOverflowHarness
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/SB_IntegerOverflowMultiTxOneFunc/native_seed_20261128/reproducers
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2Plus大规模基准集/Native摸底_15外部/SB_IntegerOverflowMultiTxOneFunc/native_seed_20261128/coverage
+[2026-11-28 21:41:26.45] [Worker 0] Test echidna_count_no_underflow falsified!
+  Call sequence:
+SBOneFuncOverflowHarness.run(73396491541839400124076986501470420416254759017467166457530666972244080506876) from: 0x0000000000000000000000000000000000020000 Time delay: 46396 seconds Block delay: 15421
+SBOneFuncOverflowHarness.count() from: 0x0000000000000000000000000000000000040000 Time delay: 16677 seconds Block delay: 7668
+SBOneFuncOverflowHarness.count() from: 0x0000000000000000000000000000000000020000 Time delay: 71785 seconds Block delay: 29724
+SBOneFuncOverflowHarness.run(17756862248728235297195493034996582016883276796155930146836266534093302218656) from: 0x0000000000000000000000000000000000050000 Time delay: 7668 seconds Block delay: 81872
+
+[2026-11-28 21:41:26.45] [Worker 0] New coverage: 155 instr, 1 contracts, 1 seqs in corpus
+[2026-11-28 21:41:26.45] [Worker 0] Test limit reached. Stopping.
+[2026-11-28 21:41:26.45] [status] tests: 1/1, fuzzing: 11/20000, values: [], cov: 155, corpus: 1, gas/s: 0
+echidna_count_no_underflow: failed!💥  
+  Call sequence:
+    SBOneFuncOverflowHarness.run(73396491541839400124076986501470420416254759017467166457530666972244080506876) from: 0x0000000000000000000000000000000000020000 Time delay: 46396 seconds Block delay: 15421
+    SBOneFuncOverflowHarness.count() from: 0x0000000000000000000000000000000000040000 Time delay: 16677 seconds Block delay: 7668
+    SBOneFuncOverflowHarness.run(17756862248728235297195493034996582016883276796155930146836266534093302218656) from: 0x0000000000000000000000000000000000050000 Time delay: 7668 seconds Block delay: 81872
+
+Traces: 
+
+
+Unique instructions: 155
+Unique codehashes: 1
+Corpus size: 1
+Seed: 20261128
+Total calls: 11
+
+[2026-11-28 21:41:26.45] Saving test reproducers... Done! (0.000275246s)
+[2026-11-28 21:41:26.45] Saving corpus... Done! (0.000083675s)
+[2026-11-28 21:41:26.45] Saving foundry reproducers... Done! (0.000427324s)
+[2026-11-28 21:41:26.45] Saving coverage... Done! (0.005259709s)

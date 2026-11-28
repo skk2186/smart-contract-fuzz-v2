@@ -1,0 +1,384 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_DosAddress/Harness.sol",
+    "contract": "SBDosAddressHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_DosAddress/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBDosAddressHarness",
+      "source": "sol/单合约测试/SB_DosAddress/Harness.sol#4-8"
+    },
+    {
+      "name": "DosGas",
+      "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#9-36"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBDosAddressHarness",
+      "source": "sol/单合约测试/SB_DosAddress/Harness.sol#4-8"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBDosAddressHarness.echidna_not_won_via_unbounded_loop()",
+      "source": "sol/单合约测试/SB_DosAddress/Harness.sol#5-7",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "957e4032885c967193a1",
+      "analysis_contract": "SBDosAddressHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_DosAddress/Harness.sol#4-8",
+      "read_states": [
+        "DosGas.win"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "DosGas.iWin()",
+          "states": [
+            "DosGas.win"
+          ],
+          "expression": "win",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#30"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "DosGas.emptyCreditors()",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "DosGas.win"
+          ],
+          "effect_ids": [
+            "723bac020821fca9"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "05893efb7db1b59c",
+        "723bac020821fca9",
+        "d87ceea7f07bea71"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "DosGas.creditorAddresses",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DosGas.addCreditors()",
+              "effect_ids": [
+                "d87ceea7f07bea71"
+              ]
+            },
+            {
+              "function": "DosGas.emptyCreditors()",
+              "effect_ids": [
+                "05893efb7db1b59c"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "05893efb7db1b59c": {
+      "state": "DosGas.creditorAddresses",
+      "writer": "DosGas.emptyCreditors()",
+      "expression": "creditorAddresses = new address[](0)",
+      "index_accesses": [],
+      "source_index_accesses": [
+        "address[]"
+      ],
+      "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#17",
+      "call_path": [
+        {
+          "function": "DosGas.emptyCreditors()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "DosGas.emptyCreditors()",
+          "expression": "creditorAddresses.length > 1500",
+          "branch": "true",
+          "state_reads": [
+            "DosGas.creditorAddresses"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DosGas.creditorAddresses",
+              "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#11"
+            }
+          ],
+          "variables_read": [
+            "creditorAddresses"
+          ],
+          "data_dependencies": {
+            "creditorAddresses": [
+              "creditorAddresses"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#16"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DosGas.emptyCreditors()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "DosGas.emptyCreditors()",
+                "expression": "creditorAddresses.length > 1500",
+                "branch": "true",
+                "state_reads": [
+                  "DosGas.creditorAddresses"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DosGas.creditorAddresses",
+                    "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "creditorAddresses"
+                ],
+                "data_dependencies": {
+                  "creditorAddresses": [
+                    "creditorAddresses"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#16"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "05893efb7db1b59c"
+    },
+    "723bac020821fca9": {
+      "state": "DosGas.win",
+      "writer": "DosGas.emptyCreditors()",
+      "expression": "win = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#18",
+      "call_path": [
+        {
+          "function": "DosGas.emptyCreditors()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "DosGas.emptyCreditors()",
+          "expression": "creditorAddresses.length > 1500",
+          "branch": "true",
+          "state_reads": [
+            "DosGas.creditorAddresses"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DosGas.creditorAddresses",
+              "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#11"
+            }
+          ],
+          "variables_read": [
+            "creditorAddresses"
+          ],
+          "data_dependencies": {
+            "creditorAddresses": [
+              "creditorAddresses"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#16"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DosGas.emptyCreditors()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "DosGas.emptyCreditors()",
+                "expression": "creditorAddresses.length > 1500",
+                "branch": "true",
+                "state_reads": [
+                  "DosGas.creditorAddresses"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DosGas.creditorAddresses",
+                    "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#11"
+                  }
+                ],
+                "variables_read": [
+                  "creditorAddresses"
+                ],
+                "data_dependencies": {
+                  "creditorAddresses": [
+                    "creditorAddresses"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#16"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "723bac020821fca9"
+    },
+    "d87ceea7f07bea71": {
+      "state": "DosGas.creditorAddresses",
+      "writer": "DosGas.addCreditors()",
+      "expression": "creditorAddresses.push(msg.sender)",
+      "index_accesses": [
+        {
+          "base": "creditorAddresses",
+          "key": "TMP_5",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#24",
+      "call_path": [
+        {
+          "function": "DosGas.addCreditors()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "DosGas.addCreditors()",
+          "expression": "i < 350",
+          "branch": "true",
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "i"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#23"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DosGas.addCreditors()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "DosGas.addCreditors()",
+                "expression": "i < 350",
+                "branch": "true",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "i"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_DosAddress/dos_address.sol#23"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "d87ceea7f07bea71"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

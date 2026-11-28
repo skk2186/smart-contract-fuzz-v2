@@ -1,0 +1,234 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_Rubixi/Harness.sol",
+    "contract": "SBRubixiHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_Rubixi/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBRubixiHarness",
+      "source": "sol/单合约测试/SB_Rubixi/Harness.sol#4-30"
+    },
+    {
+      "name": "Rubixi",
+      "source": "sol/单合约测试/SB_Rubixi/rubixi.sol#10-162"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBRubixiHarness",
+      "source": "sol/单合约测试/SB_Rubixi/Harness.sol#4-30"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBRubixiHarness.echidna_fees_not_taken_by_non_deployer()",
+      "source": "sol/单合约测试/SB_Rubixi/Harness.sol#27-29",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "5067a527444eae7fc5b1",
+      "analysis_contract": "SBRubixiHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_Rubixi/Harness.sol#4-30",
+      "read_states": [
+        "SBRubixiHarness.unauthorizedFeeCollect"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBRubixiHarness.echidna_fees_not_taken_by_non_deployer()",
+          "states": [
+            "SBRubixiHarness.unauthorizedFeeCollect"
+          ],
+          "expression": "! unauthorizedFeeCollect",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_Rubixi/Harness.sol#28"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBRubixiHarness.guardedCollectAllFees()",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender",
+            "this"
+          ],
+          "matched_states": [
+            "SBRubixiHarness.unauthorizedFeeCollect"
+          ],
+          "effect_ids": [
+            "85c353aa0fe40e87"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [
+          {
+            "function": "SBRubixiHarness.contributeFee()",
+            "calls": [
+              {
+                "caller": "SBRubixiHarness.contributeFee()",
+                "call": "TMP_54(bool) = LOW_LEVEL_CALL, dest:TMP_52, function:call, arguments:[] value:msg.value ",
+                "source": "sol/单合约测试/SB_Rubixi/Harness.sol#16",
+                "external_route": [],
+                "reason": "低层调用的目标状态写入无法由 Slither 静态解析"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          }
+        ],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "85c353aa0fe40e87"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 1
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [
+        {
+          "function": "SBRubixiHarness.contributeFee()",
+          "external_calls": [
+            "TMP_54(bool) = LOW_LEVEL_CALL, dest:TMP_52, function:call, arguments:[] value:msg.value "
+          ],
+          "inline_assembly": false,
+          "reason": "无已解析的直接写入；外部调用、回调或汇编可能产生未建模影响。"
+        }
+      ],
+      "prerequisite_state_closure": [],
+      "unknowns": [
+        "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "85c353aa0fe40e87": {
+      "state": "SBRubixiHarness.unauthorizedFeeCollect",
+      "writer": "SBRubixiHarness.guardedCollectAllFees()",
+      "expression": "unauthorizedFeeCollect = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_Rubixi/Harness.sol#23",
+      "call_path": [
+        {
+          "function": "SBRubixiHarness.guardedCollectAllFees()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "control_branch",
+          "function": "SBRubixiHarness.guardedCollectAllFees()",
+          "expression": "beforeBal > 0 && msg.sender != initialDeployer",
+          "branch": "true",
+          "state_reads": [
+            "SBRubixiHarness.initialDeployer"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBRubixiHarness.initialDeployer",
+              "source": "sol/单合约测试/SB_Rubixi/Harness.sol#5"
+            }
+          ],
+          "variables_read": [
+            "beforeBal",
+            "initialDeployer",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "initialDeployer": [
+              "initialDeployer"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_Rubixi/Harness.sol#22"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBRubixiHarness.guardedCollectAllFees()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "SBRubixiHarness.guardedCollectAllFees()",
+                "expression": "beforeBal > 0 && msg.sender != initialDeployer",
+                "branch": "true",
+                "state_reads": [
+                  "SBRubixiHarness.initialDeployer"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBRubixiHarness.initialDeployer",
+                    "source": "sol/单合约测试/SB_Rubixi/Harness.sol#5"
+                  }
+                ],
+                "variables_read": [
+                  "beforeBal",
+                  "initialDeployer",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "initialDeployer": [
+                    "initialDeployer"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_Rubixi/Harness.sol#22"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "85c353aa0fe40e87"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

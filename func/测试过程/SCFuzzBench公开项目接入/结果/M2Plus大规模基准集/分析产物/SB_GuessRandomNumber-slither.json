@@ -1,0 +1,269 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_GuessRandomNumber/Harness.sol",
+    "contract": "SBGuessRandomHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_GuessRandomNumber/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBGuessRandomHarness",
+      "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#4-25"
+    },
+    {
+      "name": "GuessTheRandomNumberChallenge",
+      "source": "sol/单合约测试/SB_GuessRandomNumber/guess_the_random_number.sol#9-29"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBGuessRandomHarness",
+      "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#4-25"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBGuessRandomHarness.echidna_challenge_not_completed()",
+      "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#19-24",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "dfcd28356de172d04130",
+      "analysis_contract": "SBGuessRandomHarness",
+      "analysis_contract_source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#4-25",
+      "read_states": [
+        "SBGuessRandomHarness.challenge"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBGuessRandomHarness.echidna_challenge_not_completed()",
+          "states": [
+            "SBGuessRandomHarness.challenge"
+          ],
+          "expression": "address(challenge) == address(0)",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#20"
+        },
+        {
+          "function": "SBGuessRandomHarness.echidna_challenge_not_completed()",
+          "states": [
+            "SBGuessRandomHarness.challenge"
+          ],
+          "expression": "! challenge.isComplete()",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#23"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBGuessRandomHarness.initChallenge()",
+          "payable": true,
+          "environment_reads": [
+            "msg.value"
+          ],
+          "matched_states": [
+            "SBGuessRandomHarness.challenge"
+          ],
+          "effect_ids": [
+            "3012ee873dea5f9b"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [
+          {
+            "observation_id": "call_0",
+            "receiver": "challenge",
+            "receiver_scope": "SBGuessRandomHarness",
+            "receiver_path": [
+              "SBGuessRandomHarness:SBGuessRandomHarness.challenge@sol/单合约测试/SB_GuessRandomNumber/Harness.sol#5"
+            ],
+            "external_route": [
+              {
+                "caller_contract": "SBGuessRandomHarness",
+                "expression": "challenge",
+                "kind": "state_slot",
+                "state_slot": "SBGuessRandomHarness.challenge",
+                "state_slot_source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#5",
+                "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#23",
+                "caller": "SBGuessRandomHarness.echidna_challenge_not_completed()"
+              }
+            ],
+            "target": "GuessTheRandomNumberChallenge.isComplete()",
+            "read_states": [],
+            "call": "TMP_20(bool) = HIGH_LEVEL_CALL, dest:challenge(GuessTheRandomNumberChallenge), function:isComplete, arguments:[]  ",
+            "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#23",
+            "resolution": "stateless_target"
+          }
+        ],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "3012ee873dea5f9b"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [
+        {
+          "function": "SBGuessRandomHarness.guessNumber(uint8)",
+          "external_calls": [
+            "HIGH_LEVEL_CALL, dest:challenge(GuessTheRandomNumberChallenge), function:guess, arguments:['n'] value:1000000000000000000 "
+          ],
+          "inline_assembly": false,
+          "reason": "无已解析的直接写入；外部调用、回调或汇编可能产生未建模影响。"
+        }
+      ],
+      "prerequisite_state_closure": [
+        {
+          "state": "SBGuessRandomHarness.challenge",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SBGuessRandomHarness.initChallenge()",
+              "effect_ids": [
+                "3012ee873dea5f9b"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "属性自身含外部调用；其读取结果取决于实际部署与调用环境",
+        "部分入口的外部调用或汇编效果未闭合；直接读写候选集合可能漏掉间接影响"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "3012ee873dea5f9b": {
+      "state": "SBGuessRandomHarness.challenge",
+      "writer": "SBGuessRandomHarness.initChallenge()",
+      "expression": "challenge = (new GuessTheRandomNumberChallenge).value(1000000000000000000)()",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#9",
+      "call_path": [
+        {
+          "function": "SBGuessRandomHarness.initChallenge()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBGuessRandomHarness.initChallenge()",
+          "expression": "require(bool)(address(challenge) == address(0) && msg.value == 1000000000000000000)",
+          "branch": null,
+          "state_reads": [
+            "SBGuessRandomHarness.challenge"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SBGuessRandomHarness.challenge",
+              "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#5"
+            }
+          ],
+          "variables_read": [
+            "challenge",
+            "msg.value"
+          ],
+          "data_dependencies": {
+            "challenge": [
+              "challenge"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#8"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBGuessRandomHarness.initChallenge()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBGuessRandomHarness.initChallenge()",
+                "expression": "require(bool)(address(challenge) == address(0) && msg.value == 1000000000000000000)",
+                "branch": null,
+                "state_reads": [
+                  "SBGuessRandomHarness.challenge"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SBGuessRandomHarness.challenge",
+                    "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#5"
+                  }
+                ],
+                "variables_read": [
+                  "challenge",
+                  "msg.value"
+                ],
+                "data_dependencies": {
+                  "challenge": [
+                    "challenge"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_GuessRandomNumber/Harness.sol#8"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "3012ee873dea5f9b"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

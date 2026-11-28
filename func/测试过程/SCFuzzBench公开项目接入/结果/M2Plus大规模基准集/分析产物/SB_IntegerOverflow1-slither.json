@@ -1,0 +1,236 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IntegerOverflow1/Harness.sol",
+    "contract": "SBIntOverflow1Harness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SB_IntegerOverflow1/Harness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SBIntOverflow1Harness",
+      "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#4-23"
+    },
+    {
+      "name": "Overflow",
+      "source": "sol/单合约测试/SB_IntegerOverflow1/integer_overflow_1.sol#9-24"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SBIntOverflow1Harness",
+      "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#4-23"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SBIntOverflow1Harness.echidna_seller_balance_monotonic()",
+      "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#20-22",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "25f17ebd2d4c67812128",
+      "analysis_contract": "SBIntOverflow1Harness",
+      "analysis_contract_source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#4-23",
+      "read_states": [
+        "SBIntOverflow1Harness.wrapped"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SBIntOverflow1Harness.echidna_seller_balance_monotonic()",
+          "states": [
+            "SBIntOverflow1Harness.wrapped"
+          ],
+          "expression": "! wrapped",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#21"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SBIntOverflow1Harness.addTracked(uint256)",
+          "payable": false,
+          "environment_reads": [],
+          "matched_states": [
+            "SBIntOverflow1Harness.wrapped"
+          ],
+          "effect_ids": [
+            "d27baf617f18040f"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "d27baf617f18040f"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [],
+      "unknowns": [
+        "候选调用链含内联汇编；相关数据流可能不完整"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "d27baf617f18040f": {
+      "state": "SBIntOverflow1Harness.wrapped",
+      "writer": "SBIntOverflow1Harness.addTracked(uint256)",
+      "expression": "wrapped = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#15",
+      "call_path": [
+        {
+          "function": "SBIntOverflow1Harness.addTracked(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SBIntOverflow1Harness.addTracked(uint256)",
+          "expression": "require(bool)(value > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "value"
+          ],
+          "data_dependencies": {
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#9"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SBIntOverflow1Harness.addTracked(uint256)",
+          "expression": "cur < prev || cur < value",
+          "branch": "true",
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "cur",
+            "prev",
+            "value"
+          ],
+          "data_dependencies": {
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#14"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SBIntOverflow1Harness.addTracked(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SBIntOverflow1Harness.addTracked(uint256)",
+                "expression": "require(bool)(value > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "value"
+                ],
+                "data_dependencies": {
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#9"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SBIntOverflow1Harness.addTracked(uint256)",
+                "expression": "cur < prev || cur < value",
+                "branch": "true",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "cur",
+                  "prev",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SB_IntegerOverflow1/Harness.sol#14"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "d27baf617f18040f"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

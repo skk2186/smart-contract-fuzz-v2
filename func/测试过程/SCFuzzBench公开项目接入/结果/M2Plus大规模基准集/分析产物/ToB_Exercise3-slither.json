@@ -1,0 +1,959 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/ToB_Exercise3/solution.sol",
+    "contract": "TestToken",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/ToB_Exercise3/solution.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "MintableToken",
+      "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#6-20"
+    },
+    {
+      "name": "TestToken",
+      "source": "sol/单合约测试/ToB_Exercise3/solution.sol#11-21"
+    },
+    {
+      "name": "Ownable",
+      "source": "sol/单合约测试/ToB_Exercise3/token.sol#6-13"
+    },
+    {
+      "name": "Pausable",
+      "source": "sol/单合约测试/ToB_Exercise3/token.sol#15-34"
+    },
+    {
+      "name": "Token",
+      "source": "sol/单合约测试/ToB_Exercise3/token.sol#36-43"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "TestToken",
+      "source": "sol/单合约测试/ToB_Exercise3/solution.sol#11-21"
+    }
+  ],
+  "properties": [
+    {
+      "property": "TestToken.echidna_test_balance()",
+      "source": "sol/单合约测试/ToB_Exercise3/solution.sol#18-20",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "c21d3013ef42b9e00b50",
+      "analysis_contract": "TestToken",
+      "analysis_contract_source": "sol/单合约测试/ToB_Exercise3/solution.sol#11-21",
+      "read_states": [
+        "Token.balances"
+      ],
+      "property_write_states": [],
+      "environment_reads": [
+        "msg.sender"
+      ],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "TestToken.echidna_test_balance()",
+          "states": [
+            "Token.balances"
+          ],
+          "expression": "balances[msg.sender] <= 10_000",
+          "index_accesses": [
+            {
+              "base": "balances",
+              "key": "msg.sender",
+              "reference": "REF_6"
+            }
+          ],
+          "source_index_accesses": [
+            "balances[msg.sender]"
+          ],
+          "source": "sol/单合约测试/ToB_Exercise3/solution.sol#19"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "MintableToken.mint(uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "Token.balances"
+          ],
+          "effect_ids": [
+            "8323ca1892bf3a3d"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "Token.transfer(address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "Token.balances"
+          ],
+          "effect_ids": [
+            "423134c9d663c25c",
+            "c8a8f4d7bc6afe73"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "423134c9d663c25c",
+        "8323ca1892bf3a3d",
+        "91885268c9ddc43c",
+        "a327d50e859280b0",
+        "c8a8f4d7bc6afe73",
+        "db6d448d29385351"
+      ],
+      "evidence_summary": {
+        "candidate_links": 2,
+        "links_with_write_site": 2,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "Pausable._paused",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "Pausable.pause()",
+              "effect_ids": [
+                "91885268c9ddc43c"
+              ]
+            },
+            {
+              "function": "Pausable.resume()",
+              "effect_ids": [
+                "db6d448d29385351"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "MintableToken.totalMinted",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "MintableToken.mint(uint256)",
+              "effect_ids": [
+                "a327d50e859280b0"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "423134c9d663c25c": {
+      "state": "Token.balances",
+      "writer": "Token.transfer(address,uint256)",
+      "expression": "balances[msg.sender] -= value",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "msg.sender",
+          "reference": "REF_4"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[msg.sender]"
+      ],
+      "source": "sol/单合约测试/ToB_Exercise3/token.sol#40",
+      "call_path": [
+        {
+          "function": "Token.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Pausable.whenNotPaused()",
+          "expression": "require(bool,string)(! _paused,Pausable: Contract is paused.)",
+          "branch": null,
+          "state_reads": [
+            "Pausable._paused"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Pausable._paused",
+              "source": "sol/单合约测试/ToB_Exercise3/token.sol#16"
+            }
+          ],
+          "variables_read": [
+            "_paused"
+          ],
+          "data_dependencies": {
+            "_paused": [
+              "_paused"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/ToB_Exercise3/token.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Pausable.whenNotPaused()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Pausable.whenNotPaused()",
+                "expression": "require(bool,string)(! _paused,Pausable: Contract is paused.)",
+                "branch": null,
+                "state_reads": [
+                  "Pausable._paused"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Pausable._paused",
+                    "source": "sol/单合约测试/ToB_Exercise3/token.sol#16"
+                  }
+                ],
+                "variables_read": [
+                  "_paused"
+                ],
+                "data_dependencies": {
+                  "_paused": [
+                    "_paused"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/ToB_Exercise3/token.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "Token.transfer(address,uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "423134c9d663c25c"
+    },
+    "8323ca1892bf3a3d": {
+      "state": "Token.balances",
+      "writer": "MintableToken.mint(uint256)",
+      "expression": "balances[msg.sender] += value",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "msg.sender",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[msg.sender]"
+      ],
+      "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#18",
+      "call_path": [
+        {
+          "function": "MintableToken.mint(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Ownable.onlyOwner()",
+          "expression": "require(bool,string)(msg.sender == owner,Ownable: Caller is not the owner.)",
+          "branch": null,
+          "state_reads": [
+            "Ownable.owner"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Ownable.owner",
+              "source": "sol/单合约测试/ToB_Exercise3/token.sol#7"
+            }
+          ],
+          "variables_read": [
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/ToB_Exercise3/token.sol#10"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "MintableToken.mint(uint256)",
+          "expression": "require(bool)(int256(value) + totalMinted < totalMintable)",
+          "branch": null,
+          "state_reads": [
+            "MintableToken.totalMintable",
+            "MintableToken.totalMinted"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "MintableToken.totalMintable",
+              "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#8"
+            },
+            {
+              "state": "MintableToken.totalMinted",
+              "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#7"
+            }
+          ],
+          "variables_read": [
+            "totalMintable",
+            "totalMinted",
+            "value"
+          ],
+          "data_dependencies": {
+            "value": [
+              "value"
+            ],
+            "totalMinted": [
+              "totalMinted",
+              "value"
+            ],
+            "totalMintable": [
+              "totalMintable"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#15"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Ownable.onlyOwner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Ownable.onlyOwner()",
+                "expression": "require(bool,string)(msg.sender == owner,Ownable: Caller is not the owner.)",
+                "branch": null,
+                "state_reads": [
+                  "Ownable.owner"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Ownable.owner",
+                    "source": "sol/单合约测试/ToB_Exercise3/token.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/ToB_Exercise3/token.sol#10"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "MintableToken.mint(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "MintableToken.mint(uint256)",
+                "expression": "require(bool)(int256(value) + totalMinted < totalMintable)",
+                "branch": null,
+                "state_reads": [
+                  "MintableToken.totalMintable",
+                  "MintableToken.totalMinted"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "MintableToken.totalMintable",
+                    "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#8"
+                  },
+                  {
+                    "state": "MintableToken.totalMinted",
+                    "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "totalMintable",
+                  "totalMinted",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "value": [
+                    "value"
+                  ],
+                  "totalMinted": [
+                    "totalMinted",
+                    "value"
+                  ],
+                  "totalMintable": [
+                    "totalMintable"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#15"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "8323ca1892bf3a3d"
+    },
+    "91885268c9ddc43c": {
+      "state": "Pausable._paused",
+      "writer": "Pausable.pause()",
+      "expression": "_paused = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/ToB_Exercise3/token.sol#23",
+      "call_path": [
+        {
+          "function": "Pausable.pause()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Ownable.onlyOwner()",
+          "expression": "require(bool,string)(msg.sender == owner,Ownable: Caller is not the owner.)",
+          "branch": null,
+          "state_reads": [
+            "Ownable.owner"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Ownable.owner",
+              "source": "sol/单合约测试/ToB_Exercise3/token.sol#7"
+            }
+          ],
+          "variables_read": [
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/ToB_Exercise3/token.sol#10"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Ownable.onlyOwner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Ownable.onlyOwner()",
+                "expression": "require(bool,string)(msg.sender == owner,Ownable: Caller is not the owner.)",
+                "branch": null,
+                "state_reads": [
+                  "Ownable.owner"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Ownable.owner",
+                    "source": "sol/单合约测试/ToB_Exercise3/token.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/ToB_Exercise3/token.sol#10"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "Pausable.pause()",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "91885268c9ddc43c"
+    },
+    "a327d50e859280b0": {
+      "state": "MintableToken.totalMinted",
+      "writer": "MintableToken.mint(uint256)",
+      "expression": "totalMinted += int256(value)",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#16",
+      "call_path": [
+        {
+          "function": "MintableToken.mint(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Ownable.onlyOwner()",
+          "expression": "require(bool,string)(msg.sender == owner,Ownable: Caller is not the owner.)",
+          "branch": null,
+          "state_reads": [
+            "Ownable.owner"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Ownable.owner",
+              "source": "sol/单合约测试/ToB_Exercise3/token.sol#7"
+            }
+          ],
+          "variables_read": [
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/ToB_Exercise3/token.sol#10"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "MintableToken.mint(uint256)",
+          "expression": "require(bool)(int256(value) + totalMinted < totalMintable)",
+          "branch": null,
+          "state_reads": [
+            "MintableToken.totalMintable",
+            "MintableToken.totalMinted"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "MintableToken.totalMintable",
+              "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#8"
+            },
+            {
+              "state": "MintableToken.totalMinted",
+              "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#7"
+            }
+          ],
+          "variables_read": [
+            "totalMintable",
+            "totalMinted",
+            "value"
+          ],
+          "data_dependencies": {
+            "value": [
+              "value"
+            ],
+            "totalMinted": [
+              "totalMinted",
+              "value"
+            ],
+            "totalMintable": [
+              "totalMintable"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#15"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Ownable.onlyOwner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Ownable.onlyOwner()",
+                "expression": "require(bool,string)(msg.sender == owner,Ownable: Caller is not the owner.)",
+                "branch": null,
+                "state_reads": [
+                  "Ownable.owner"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Ownable.owner",
+                    "source": "sol/单合约测试/ToB_Exercise3/token.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/ToB_Exercise3/token.sol#10"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "MintableToken.mint(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "MintableToken.mint(uint256)",
+                "expression": "require(bool)(int256(value) + totalMinted < totalMintable)",
+                "branch": null,
+                "state_reads": [
+                  "MintableToken.totalMintable",
+                  "MintableToken.totalMinted"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "MintableToken.totalMintable",
+                    "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#8"
+                  },
+                  {
+                    "state": "MintableToken.totalMinted",
+                    "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "totalMintable",
+                  "totalMinted",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "value": [
+                    "value"
+                  ],
+                  "totalMinted": [
+                    "totalMinted",
+                    "value"
+                  ],
+                  "totalMintable": [
+                    "totalMintable"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/ToB_Exercise3/mintable.sol#15"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "a327d50e859280b0"
+    },
+    "c8a8f4d7bc6afe73": {
+      "state": "Token.balances",
+      "writer": "Token.transfer(address,uint256)",
+      "expression": "balances[to] += value",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "to",
+          "reference": "REF_5"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[to]"
+      ],
+      "source": "sol/单合约测试/ToB_Exercise3/token.sol#41",
+      "call_path": [
+        {
+          "function": "Token.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Pausable.whenNotPaused()",
+          "expression": "require(bool,string)(! _paused,Pausable: Contract is paused.)",
+          "branch": null,
+          "state_reads": [
+            "Pausable._paused"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Pausable._paused",
+              "source": "sol/单合约测试/ToB_Exercise3/token.sol#16"
+            }
+          ],
+          "variables_read": [
+            "_paused"
+          ],
+          "data_dependencies": {
+            "_paused": [
+              "_paused"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/ToB_Exercise3/token.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Pausable.whenNotPaused()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Pausable.whenNotPaused()",
+                "expression": "require(bool,string)(! _paused,Pausable: Contract is paused.)",
+                "branch": null,
+                "state_reads": [
+                  "Pausable._paused"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Pausable._paused",
+                    "source": "sol/单合约测试/ToB_Exercise3/token.sol#16"
+                  }
+                ],
+                "variables_read": [
+                  "_paused"
+                ],
+                "data_dependencies": {
+                  "_paused": [
+                    "_paused"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/ToB_Exercise3/token.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "Token.transfer(address,uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "c8a8f4d7bc6afe73"
+    },
+    "db6d448d29385351": {
+      "state": "Pausable._paused",
+      "writer": "Pausable.resume()",
+      "expression": "_paused = false",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/ToB_Exercise3/token.sol#27",
+      "call_path": [
+        {
+          "function": "Pausable.resume()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "Ownable.onlyOwner()",
+          "expression": "require(bool,string)(msg.sender == owner,Ownable: Caller is not the owner.)",
+          "branch": null,
+          "state_reads": [
+            "Ownable.owner"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "Ownable.owner",
+              "source": "sol/单合约测试/ToB_Exercise3/token.sol#7"
+            }
+          ],
+          "variables_read": [
+            "msg.sender",
+            "owner"
+          ],
+          "data_dependencies": {
+            "owner": [
+              "owner"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/ToB_Exercise3/token.sol#10"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "Ownable.onlyOwner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "Ownable.onlyOwner()",
+                "expression": "require(bool,string)(msg.sender == owner,Ownable: Caller is not the owner.)",
+                "branch": null,
+                "state_reads": [
+                  "Ownable.owner"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "Ownable.owner",
+                    "source": "sol/单合约测试/ToB_Exercise3/token.sol#7"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "owner"
+                ],
+                "data_dependencies": {
+                  "owner": [
+                    "owner"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/ToB_Exercise3/token.sol#10"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "Pausable.resume()",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "db6d448d29385351"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}
