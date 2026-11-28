@@ -1,0 +1,2603 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol",
+    "contract": "DeFiOracleLendingHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "DeFiOracleLendingHarness",
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#13-93"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "DeFiOracleLendingHarness",
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#13-93"
+    }
+  ],
+  "properties": [
+    {
+      "property": "DeFiOracleLendingHarness.echidna_lending_pool_no_bad_debt()",
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#90-92",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "1504ce4005e338b342e9",
+      "analysis_contract": "DeFiOracleLendingHarness",
+      "analysis_contract_source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#13-93",
+      "read_states": [
+        "DeFiOracleLendingHarness.undercollateralizedBorrowObserved"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "DeFiOracleLendingHarness.echidna_lending_pool_no_bad_debt()",
+          "states": [
+            "DeFiOracleLendingHarness.undercollateralizedBorrowObserved"
+          ],
+          "expression": "! undercollateralizedBorrowObserved",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#91"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "DeFiOracleLendingHarness.undercollateralizedBorrowObserved"
+          ],
+          "effect_ids": [
+            "048b7ade297ee76e"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "048b7ade297ee76e",
+        "1d6c1ec0fee62580",
+        "2cc6421be865360a",
+        "3343c4effc671e1b",
+        "61fcac8cae2a8c88",
+        "68160a1ed3902c04",
+        "97e655335b9b9e34",
+        "9ca9df771737d7ef",
+        "9fd78a625388226e",
+        "a7e33b9167b36795",
+        "bf7b422f97cb98d1",
+        "d0dcc4fc56722d65",
+        "e5889fad5a444671",
+        "fcca5963228c9c61"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "DeFiOracleLendingHarness.borrowedDebt",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiOracleLendingHarness.borrow(uint256)",
+              "effect_ids": [
+                "68160a1ed3902c04"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiOracleLendingHarness.poolDebtReserve",
+          "depth": 0,
+          "declaration_initializer": "1000",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiOracleLendingHarness.borrow(uint256)",
+              "effect_ids": [
+                "bf7b422f97cb98d1"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiOracleLendingHarness.depositedCollateral",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+              "effect_ids": [
+                "e5889fad5a444671"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiOracleLendingHarness.userColBalance",
+          "depth": 1,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "DeFiOracleLendingHarness.constructor()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+              "effect_ids": [
+                "3343c4effc671e1b"
+              ]
+            },
+            {
+              "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+              "effect_ids": [
+                "9ca9df771737d7ef"
+              ]
+            },
+            {
+              "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+              "effect_ids": [
+                "fcca5963228c9c61"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiOracleLendingHarness.ammDebtReserve",
+          "depth": 2,
+          "declaration_initializer": "1000",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+              "effect_ids": [
+                "9fd78a625388226e"
+              ]
+            },
+            {
+              "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+              "effect_ids": [
+                "2cc6421be865360a"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiOracleLendingHarness.userDebtBalance",
+          "depth": 2,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "DeFiOracleLendingHarness.constructor()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiOracleLendingHarness.borrow(uint256)",
+              "effect_ids": [
+                "d0dcc4fc56722d65"
+              ]
+            },
+            {
+              "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+              "effect_ids": [
+                "1d6c1ec0fee62580"
+              ]
+            },
+            {
+              "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+              "effect_ids": [
+                "a7e33b9167b36795"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiOracleLendingHarness.ammColReserve",
+          "depth": 2,
+          "declaration_initializer": "1000",
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+              "effect_ids": [
+                "97e655335b9b9e34"
+              ]
+            },
+            {
+              "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+              "effect_ids": [
+                "61fcac8cae2a8c88"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "048b7ade297ee76e": {
+      "state": "DeFiOracleLendingHarness.undercollateralizedBorrowObserved",
+      "writer": "DeFiOracleLendingHarness.borrow(uint256)",
+      "expression": "undercollateralizedBorrowObserved = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#84",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "require(bool,string)(debtAmount > 0 && debtAmount <= poolDebtReserve,POOL_LIQUIDITY_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.poolDebtReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.poolDebtReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#21"
+            }
+          ],
+          "variables_read": [
+            "debtAmount",
+            "poolDebtReserve"
+          ],
+          "data_dependencies": {
+            "poolDebtReserve": [
+              "debtAmount",
+              "poolDebtReserve"
+            ],
+            "debtAmount": [
+              "debtAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#73"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "require(bool,string)(borrowedDebt[msg.sender] + debtAmount <= maxBorrow,INSUFFICIENT_COLLATERAL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.borrowedDebt"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.borrowedDebt",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "borrowedDebt",
+            "debtAmount",
+            "maxBorrow",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "debtAmount": [
+              "debtAmount"
+            ],
+            "borrowedDebt": [
+              "borrowedDebt",
+              "debtAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#76"
+        },
+        {
+          "kind": "control_branch",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "borrowedDebt[msg.sender] > depositedCollateral[msg.sender] * 2",
+          "branch": "true",
+          "state_reads": [
+            "DeFiOracleLendingHarness.borrowedDebt",
+            "DeFiOracleLendingHarness.depositedCollateral"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.borrowedDebt",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+            },
+            {
+              "state": "DeFiOracleLendingHarness.depositedCollateral",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "borrowedDebt",
+            "depositedCollateral",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "borrowedDebt": [
+              "borrowedDebt",
+              "debtAmount"
+            ],
+            "depositedCollateral": [
+              "depositedCollateral"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#83"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "require(bool,string)(debtAmount > 0 && debtAmount <= poolDebtReserve,POOL_LIQUIDITY_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.poolDebtReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.poolDebtReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#21"
+                  }
+                ],
+                "variables_read": [
+                  "debtAmount",
+                  "poolDebtReserve"
+                ],
+                "data_dependencies": {
+                  "poolDebtReserve": [
+                    "debtAmount",
+                    "poolDebtReserve"
+                  ],
+                  "debtAmount": [
+                    "debtAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#73"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "require(bool,string)(borrowedDebt[msg.sender] + debtAmount <= maxBorrow,INSUFFICIENT_COLLATERAL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.borrowedDebt"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.borrowedDebt",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "borrowedDebt",
+                  "debtAmount",
+                  "maxBorrow",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "debtAmount": [
+                    "debtAmount"
+                  ],
+                  "borrowedDebt": [
+                    "borrowedDebt",
+                    "debtAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#76"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "borrowedDebt[msg.sender] > depositedCollateral[msg.sender] * 2",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiOracleLendingHarness.borrowedDebt",
+                  "DeFiOracleLendingHarness.depositedCollateral"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.borrowedDebt",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+                  },
+                  {
+                    "state": "DeFiOracleLendingHarness.depositedCollateral",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "borrowedDebt",
+                  "depositedCollateral",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "borrowedDebt": [
+                    "borrowedDebt",
+                    "debtAmount"
+                  ],
+                  "depositedCollateral": [
+                    "depositedCollateral"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#83"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "048b7ade297ee76e"
+    },
+    "1d6c1ec0fee62580": {
+      "state": "DeFiOracleLendingHarness.userDebtBalance",
+      "writer": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+      "expression": "userDebtBalance[msg.sender] += debtOut",
+      "index_accesses": [
+        {
+          "base": "userDebtBalance",
+          "key": "msg.sender",
+          "reference": "REF_7"
+        }
+      ],
+      "source_index_accesses": [
+        "userDebtBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#61",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "expression": "require(bool,string)(colIn > 0 && userColBalance[msg.sender] >= colIn,INSUFFICIENT_COL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userColBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userColBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+            }
+          ],
+          "variables_read": [
+            "colIn",
+            "msg.sender",
+            "userColBalance"
+          ],
+          "data_dependencies": {
+            "colIn": [
+              "colIn"
+            ],
+            "userColBalance": [
+              "colIn",
+              "userColBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#55"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "expression": "require(bool,string)(debtOut > 0 && debtOut < ammDebtReserve,BAD_SWAP)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.ammDebtReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.ammDebtReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#18"
+            }
+          ],
+          "variables_read": [
+            "ammDebtReserve",
+            "debtOut"
+          ],
+          "data_dependencies": {
+            "ammDebtReserve": [
+              "ammDebtReserve",
+              "colIn"
+            ],
+            "debtOut": [
+              "ammDebtReserve",
+              "colIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#57"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+                "expression": "require(bool,string)(colIn > 0 && userColBalance[msg.sender] >= colIn,INSUFFICIENT_COL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userColBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userColBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+                  }
+                ],
+                "variables_read": [
+                  "colIn",
+                  "msg.sender",
+                  "userColBalance"
+                ],
+                "data_dependencies": {
+                  "colIn": [
+                    "colIn"
+                  ],
+                  "userColBalance": [
+                    "colIn",
+                    "userColBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#55"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+                "expression": "require(bool,string)(debtOut > 0 && debtOut < ammDebtReserve,BAD_SWAP)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.ammDebtReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.ammDebtReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "ammDebtReserve",
+                  "debtOut"
+                ],
+                "data_dependencies": {
+                  "ammDebtReserve": [
+                    "ammDebtReserve",
+                    "colIn"
+                  ],
+                  "debtOut": [
+                    "ammDebtReserve",
+                    "colIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#57"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "1d6c1ec0fee62580"
+    },
+    "2cc6421be865360a": {
+      "state": "DeFiOracleLendingHarness.ammDebtReserve",
+      "writer": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+      "expression": "ammDebtReserve += debtIn",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#48",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "expression": "require(bool,string)(debtIn > 0 && userDebtBalance[msg.sender] >= debtIn,INSUFFICIENT_DEBT)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userDebtBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userDebtBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "debtIn",
+            "msg.sender",
+            "userDebtBalance"
+          ],
+          "data_dependencies": {
+            "userDebtBalance": [
+              "debtIn",
+              "userDebtBalance"
+            ],
+            "debtIn": [
+              "debtIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#43"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "expression": "require(bool,string)(colOut > 0 && colOut < ammColReserve,BAD_SWAP)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.ammColReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.ammColReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "ammColReserve",
+            "colOut"
+          ],
+          "data_dependencies": {
+            "ammColReserve": [
+              "ammColReserve",
+              "debtIn"
+            ],
+            "colOut": [
+              "ammColReserve",
+              "debtIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#46"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+                "expression": "require(bool,string)(debtIn > 0 && userDebtBalance[msg.sender] >= debtIn,INSUFFICIENT_DEBT)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userDebtBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userDebtBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "debtIn",
+                  "msg.sender",
+                  "userDebtBalance"
+                ],
+                "data_dependencies": {
+                  "userDebtBalance": [
+                    "debtIn",
+                    "userDebtBalance"
+                  ],
+                  "debtIn": [
+                    "debtIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#43"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+                "expression": "require(bool,string)(colOut > 0 && colOut < ammColReserve,BAD_SWAP)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.ammColReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.ammColReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "ammColReserve",
+                  "colOut"
+                ],
+                "data_dependencies": {
+                  "ammColReserve": [
+                    "ammColReserve",
+                    "debtIn"
+                  ],
+                  "colOut": [
+                    "ammColReserve",
+                    "debtIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#46"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "2cc6421be865360a"
+    },
+    "3343c4effc671e1b": {
+      "state": "DeFiOracleLendingHarness.userColBalance",
+      "writer": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+      "expression": "userColBalance[msg.sender] -= colAmount",
+      "index_accesses": [
+        {
+          "base": "userColBalance",
+          "key": "msg.sender",
+          "reference": "REF_9"
+        }
+      ],
+      "source_index_accesses": [
+        "userColBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#67",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+          "expression": "require(bool,string)(colAmount > 0 && userColBalance[msg.sender] >= colAmount,INSUFFICIENT_COL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userColBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userColBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+            }
+          ],
+          "variables_read": [
+            "colAmount",
+            "msg.sender",
+            "userColBalance"
+          ],
+          "data_dependencies": {
+            "colAmount": [
+              "colAmount"
+            ],
+            "userColBalance": [
+              "colAmount",
+              "userColBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#66"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+                "expression": "require(bool,string)(colAmount > 0 && userColBalance[msg.sender] >= colAmount,INSUFFICIENT_COL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userColBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userColBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+                  }
+                ],
+                "variables_read": [
+                  "colAmount",
+                  "msg.sender",
+                  "userColBalance"
+                ],
+                "data_dependencies": {
+                  "colAmount": [
+                    "colAmount"
+                  ],
+                  "userColBalance": [
+                    "colAmount",
+                    "userColBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#66"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "3343c4effc671e1b"
+    },
+    "61fcac8cae2a8c88": {
+      "state": "DeFiOracleLendingHarness.ammColReserve",
+      "writer": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+      "expression": "ammColReserve -= colOut",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#49",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "expression": "require(bool,string)(debtIn > 0 && userDebtBalance[msg.sender] >= debtIn,INSUFFICIENT_DEBT)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userDebtBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userDebtBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "debtIn",
+            "msg.sender",
+            "userDebtBalance"
+          ],
+          "data_dependencies": {
+            "userDebtBalance": [
+              "debtIn",
+              "userDebtBalance"
+            ],
+            "debtIn": [
+              "debtIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#43"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "expression": "require(bool,string)(colOut > 0 && colOut < ammColReserve,BAD_SWAP)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.ammColReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.ammColReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "ammColReserve",
+            "colOut"
+          ],
+          "data_dependencies": {
+            "ammColReserve": [
+              "ammColReserve",
+              "debtIn"
+            ],
+            "colOut": [
+              "ammColReserve",
+              "debtIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#46"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+                "expression": "require(bool,string)(debtIn > 0 && userDebtBalance[msg.sender] >= debtIn,INSUFFICIENT_DEBT)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userDebtBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userDebtBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "debtIn",
+                  "msg.sender",
+                  "userDebtBalance"
+                ],
+                "data_dependencies": {
+                  "userDebtBalance": [
+                    "debtIn",
+                    "userDebtBalance"
+                  ],
+                  "debtIn": [
+                    "debtIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#43"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+                "expression": "require(bool,string)(colOut > 0 && colOut < ammColReserve,BAD_SWAP)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.ammColReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.ammColReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "ammColReserve",
+                  "colOut"
+                ],
+                "data_dependencies": {
+                  "ammColReserve": [
+                    "ammColReserve",
+                    "debtIn"
+                  ],
+                  "colOut": [
+                    "ammColReserve",
+                    "debtIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#46"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "61fcac8cae2a8c88"
+    },
+    "68160a1ed3902c04": {
+      "state": "DeFiOracleLendingHarness.borrowedDebt",
+      "writer": "DeFiOracleLendingHarness.borrow(uint256)",
+      "expression": "borrowedDebt[msg.sender] += debtAmount",
+      "index_accesses": [
+        {
+          "base": "borrowedDebt",
+          "key": "msg.sender",
+          "reference": "REF_13"
+        }
+      ],
+      "source_index_accesses": [
+        "borrowedDebt[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#78",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "require(bool,string)(debtAmount > 0 && debtAmount <= poolDebtReserve,POOL_LIQUIDITY_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.poolDebtReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.poolDebtReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#21"
+            }
+          ],
+          "variables_read": [
+            "debtAmount",
+            "poolDebtReserve"
+          ],
+          "data_dependencies": {
+            "poolDebtReserve": [
+              "debtAmount",
+              "poolDebtReserve"
+            ],
+            "debtAmount": [
+              "debtAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#73"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "require(bool,string)(borrowedDebt[msg.sender] + debtAmount <= maxBorrow,INSUFFICIENT_COLLATERAL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.borrowedDebt"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.borrowedDebt",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "borrowedDebt",
+            "debtAmount",
+            "maxBorrow",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "debtAmount": [
+              "debtAmount"
+            ],
+            "borrowedDebt": [
+              "borrowedDebt",
+              "debtAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#76"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "require(bool,string)(debtAmount > 0 && debtAmount <= poolDebtReserve,POOL_LIQUIDITY_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.poolDebtReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.poolDebtReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#21"
+                  }
+                ],
+                "variables_read": [
+                  "debtAmount",
+                  "poolDebtReserve"
+                ],
+                "data_dependencies": {
+                  "poolDebtReserve": [
+                    "debtAmount",
+                    "poolDebtReserve"
+                  ],
+                  "debtAmount": [
+                    "debtAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#73"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "require(bool,string)(borrowedDebt[msg.sender] + debtAmount <= maxBorrow,INSUFFICIENT_COLLATERAL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.borrowedDebt"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.borrowedDebt",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "borrowedDebt",
+                  "debtAmount",
+                  "maxBorrow",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "debtAmount": [
+                    "debtAmount"
+                  ],
+                  "borrowedDebt": [
+                    "borrowedDebt",
+                    "debtAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#76"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "68160a1ed3902c04"
+    },
+    "97e655335b9b9e34": {
+      "state": "DeFiOracleLendingHarness.ammColReserve",
+      "writer": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+      "expression": "ammColReserve += colIn",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#59",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "expression": "require(bool,string)(colIn > 0 && userColBalance[msg.sender] >= colIn,INSUFFICIENT_COL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userColBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userColBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+            }
+          ],
+          "variables_read": [
+            "colIn",
+            "msg.sender",
+            "userColBalance"
+          ],
+          "data_dependencies": {
+            "colIn": [
+              "colIn"
+            ],
+            "userColBalance": [
+              "colIn",
+              "userColBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#55"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "expression": "require(bool,string)(debtOut > 0 && debtOut < ammDebtReserve,BAD_SWAP)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.ammDebtReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.ammDebtReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#18"
+            }
+          ],
+          "variables_read": [
+            "ammDebtReserve",
+            "debtOut"
+          ],
+          "data_dependencies": {
+            "ammDebtReserve": [
+              "ammDebtReserve",
+              "colIn"
+            ],
+            "debtOut": [
+              "ammDebtReserve",
+              "colIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#57"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+                "expression": "require(bool,string)(colIn > 0 && userColBalance[msg.sender] >= colIn,INSUFFICIENT_COL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userColBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userColBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+                  }
+                ],
+                "variables_read": [
+                  "colIn",
+                  "msg.sender",
+                  "userColBalance"
+                ],
+                "data_dependencies": {
+                  "colIn": [
+                    "colIn"
+                  ],
+                  "userColBalance": [
+                    "colIn",
+                    "userColBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#55"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+                "expression": "require(bool,string)(debtOut > 0 && debtOut < ammDebtReserve,BAD_SWAP)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.ammDebtReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.ammDebtReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "ammDebtReserve",
+                  "debtOut"
+                ],
+                "data_dependencies": {
+                  "ammDebtReserve": [
+                    "ammDebtReserve",
+                    "colIn"
+                  ],
+                  "debtOut": [
+                    "ammDebtReserve",
+                    "colIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#57"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "97e655335b9b9e34"
+    },
+    "9ca9df771737d7ef": {
+      "state": "DeFiOracleLendingHarness.userColBalance",
+      "writer": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+      "expression": "userColBalance[msg.sender] -= colIn",
+      "index_accesses": [
+        {
+          "base": "userColBalance",
+          "key": "msg.sender",
+          "reference": "REF_6"
+        }
+      ],
+      "source_index_accesses": [
+        "userColBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#58",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "expression": "require(bool,string)(colIn > 0 && userColBalance[msg.sender] >= colIn,INSUFFICIENT_COL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userColBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userColBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+            }
+          ],
+          "variables_read": [
+            "colIn",
+            "msg.sender",
+            "userColBalance"
+          ],
+          "data_dependencies": {
+            "colIn": [
+              "colIn"
+            ],
+            "userColBalance": [
+              "colIn",
+              "userColBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#55"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "expression": "require(bool,string)(debtOut > 0 && debtOut < ammDebtReserve,BAD_SWAP)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.ammDebtReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.ammDebtReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#18"
+            }
+          ],
+          "variables_read": [
+            "ammDebtReserve",
+            "debtOut"
+          ],
+          "data_dependencies": {
+            "ammDebtReserve": [
+              "ammDebtReserve",
+              "colIn"
+            ],
+            "debtOut": [
+              "ammDebtReserve",
+              "colIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#57"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+                "expression": "require(bool,string)(colIn > 0 && userColBalance[msg.sender] >= colIn,INSUFFICIENT_COL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userColBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userColBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+                  }
+                ],
+                "variables_read": [
+                  "colIn",
+                  "msg.sender",
+                  "userColBalance"
+                ],
+                "data_dependencies": {
+                  "colIn": [
+                    "colIn"
+                  ],
+                  "userColBalance": [
+                    "colIn",
+                    "userColBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#55"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+                "expression": "require(bool,string)(debtOut > 0 && debtOut < ammDebtReserve,BAD_SWAP)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.ammDebtReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.ammDebtReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "ammDebtReserve",
+                  "debtOut"
+                ],
+                "data_dependencies": {
+                  "ammDebtReserve": [
+                    "ammDebtReserve",
+                    "colIn"
+                  ],
+                  "debtOut": [
+                    "ammDebtReserve",
+                    "colIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#57"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "9ca9df771737d7ef"
+    },
+    "9fd78a625388226e": {
+      "state": "DeFiOracleLendingHarness.ammDebtReserve",
+      "writer": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+      "expression": "ammDebtReserve -= debtOut",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#60",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "expression": "require(bool,string)(colIn > 0 && userColBalance[msg.sender] >= colIn,INSUFFICIENT_COL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userColBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userColBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+            }
+          ],
+          "variables_read": [
+            "colIn",
+            "msg.sender",
+            "userColBalance"
+          ],
+          "data_dependencies": {
+            "colIn": [
+              "colIn"
+            ],
+            "userColBalance": [
+              "colIn",
+              "userColBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#55"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "expression": "require(bool,string)(debtOut > 0 && debtOut < ammDebtReserve,BAD_SWAP)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.ammDebtReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.ammDebtReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#18"
+            }
+          ],
+          "variables_read": [
+            "ammDebtReserve",
+            "debtOut"
+          ],
+          "data_dependencies": {
+            "ammDebtReserve": [
+              "ammDebtReserve",
+              "colIn"
+            ],
+            "debtOut": [
+              "ammDebtReserve",
+              "colIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#57"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+                "expression": "require(bool,string)(colIn > 0 && userColBalance[msg.sender] >= colIn,INSUFFICIENT_COL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userColBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userColBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+                  }
+                ],
+                "variables_read": [
+                  "colIn",
+                  "msg.sender",
+                  "userColBalance"
+                ],
+                "data_dependencies": {
+                  "colIn": [
+                    "colIn"
+                  ],
+                  "userColBalance": [
+                    "colIn",
+                    "userColBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#55"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapColForDebt(uint256)",
+                "expression": "require(bool,string)(debtOut > 0 && debtOut < ammDebtReserve,BAD_SWAP)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.ammDebtReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.ammDebtReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "ammDebtReserve",
+                  "debtOut"
+                ],
+                "data_dependencies": {
+                  "ammDebtReserve": [
+                    "ammDebtReserve",
+                    "colIn"
+                  ],
+                  "debtOut": [
+                    "ammDebtReserve",
+                    "colIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#57"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "9fd78a625388226e"
+    },
+    "a7e33b9167b36795": {
+      "state": "DeFiOracleLendingHarness.userDebtBalance",
+      "writer": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+      "expression": "userDebtBalance[msg.sender] -= debtIn",
+      "index_accesses": [
+        {
+          "base": "userDebtBalance",
+          "key": "msg.sender",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [
+        "userDebtBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#47",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "expression": "require(bool,string)(debtIn > 0 && userDebtBalance[msg.sender] >= debtIn,INSUFFICIENT_DEBT)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userDebtBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userDebtBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "debtIn",
+            "msg.sender",
+            "userDebtBalance"
+          ],
+          "data_dependencies": {
+            "userDebtBalance": [
+              "debtIn",
+              "userDebtBalance"
+            ],
+            "debtIn": [
+              "debtIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#43"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "expression": "require(bool,string)(colOut > 0 && colOut < ammColReserve,BAD_SWAP)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.ammColReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.ammColReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "ammColReserve",
+            "colOut"
+          ],
+          "data_dependencies": {
+            "ammColReserve": [
+              "ammColReserve",
+              "debtIn"
+            ],
+            "colOut": [
+              "ammColReserve",
+              "debtIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#46"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+                "expression": "require(bool,string)(debtIn > 0 && userDebtBalance[msg.sender] >= debtIn,INSUFFICIENT_DEBT)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userDebtBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userDebtBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "debtIn",
+                  "msg.sender",
+                  "userDebtBalance"
+                ],
+                "data_dependencies": {
+                  "userDebtBalance": [
+                    "debtIn",
+                    "userDebtBalance"
+                  ],
+                  "debtIn": [
+                    "debtIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#43"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+                "expression": "require(bool,string)(colOut > 0 && colOut < ammColReserve,BAD_SWAP)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.ammColReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.ammColReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "ammColReserve",
+                  "colOut"
+                ],
+                "data_dependencies": {
+                  "ammColReserve": [
+                    "ammColReserve",
+                    "debtIn"
+                  ],
+                  "colOut": [
+                    "ammColReserve",
+                    "debtIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#46"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "a7e33b9167b36795"
+    },
+    "bf7b422f97cb98d1": {
+      "state": "DeFiOracleLendingHarness.poolDebtReserve",
+      "writer": "DeFiOracleLendingHarness.borrow(uint256)",
+      "expression": "poolDebtReserve -= debtAmount",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#79",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "require(bool,string)(debtAmount > 0 && debtAmount <= poolDebtReserve,POOL_LIQUIDITY_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.poolDebtReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.poolDebtReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#21"
+            }
+          ],
+          "variables_read": [
+            "debtAmount",
+            "poolDebtReserve"
+          ],
+          "data_dependencies": {
+            "poolDebtReserve": [
+              "debtAmount",
+              "poolDebtReserve"
+            ],
+            "debtAmount": [
+              "debtAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#73"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "require(bool,string)(borrowedDebt[msg.sender] + debtAmount <= maxBorrow,INSUFFICIENT_COLLATERAL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.borrowedDebt"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.borrowedDebt",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "borrowedDebt",
+            "debtAmount",
+            "maxBorrow",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "debtAmount": [
+              "debtAmount"
+            ],
+            "borrowedDebt": [
+              "borrowedDebt",
+              "debtAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#76"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "require(bool,string)(debtAmount > 0 && debtAmount <= poolDebtReserve,POOL_LIQUIDITY_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.poolDebtReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.poolDebtReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#21"
+                  }
+                ],
+                "variables_read": [
+                  "debtAmount",
+                  "poolDebtReserve"
+                ],
+                "data_dependencies": {
+                  "poolDebtReserve": [
+                    "debtAmount",
+                    "poolDebtReserve"
+                  ],
+                  "debtAmount": [
+                    "debtAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#73"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "require(bool,string)(borrowedDebt[msg.sender] + debtAmount <= maxBorrow,INSUFFICIENT_COLLATERAL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.borrowedDebt"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.borrowedDebt",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "borrowedDebt",
+                  "debtAmount",
+                  "maxBorrow",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "debtAmount": [
+                    "debtAmount"
+                  ],
+                  "borrowedDebt": [
+                    "borrowedDebt",
+                    "debtAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#76"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "bf7b422f97cb98d1"
+    },
+    "d0dcc4fc56722d65": {
+      "state": "DeFiOracleLendingHarness.userDebtBalance",
+      "writer": "DeFiOracleLendingHarness.borrow(uint256)",
+      "expression": "userDebtBalance[msg.sender] += debtAmount",
+      "index_accesses": [
+        {
+          "base": "userDebtBalance",
+          "key": "msg.sender",
+          "reference": "REF_14"
+        }
+      ],
+      "source_index_accesses": [
+        "userDebtBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#80",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "require(bool,string)(debtAmount > 0 && debtAmount <= poolDebtReserve,POOL_LIQUIDITY_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.poolDebtReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.poolDebtReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#21"
+            }
+          ],
+          "variables_read": [
+            "debtAmount",
+            "poolDebtReserve"
+          ],
+          "data_dependencies": {
+            "poolDebtReserve": [
+              "debtAmount",
+              "poolDebtReserve"
+            ],
+            "debtAmount": [
+              "debtAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#73"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "expression": "require(bool,string)(borrowedDebt[msg.sender] + debtAmount <= maxBorrow,INSUFFICIENT_COLLATERAL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.borrowedDebt"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.borrowedDebt",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "borrowedDebt",
+            "debtAmount",
+            "maxBorrow",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "debtAmount": [
+              "debtAmount"
+            ],
+            "borrowedDebt": [
+              "borrowedDebt",
+              "debtAmount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#76"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.borrow(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "require(bool,string)(debtAmount > 0 && debtAmount <= poolDebtReserve,POOL_LIQUIDITY_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.poolDebtReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.poolDebtReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#21"
+                  }
+                ],
+                "variables_read": [
+                  "debtAmount",
+                  "poolDebtReserve"
+                ],
+                "data_dependencies": {
+                  "poolDebtReserve": [
+                    "debtAmount",
+                    "poolDebtReserve"
+                  ],
+                  "debtAmount": [
+                    "debtAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#73"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.borrow(uint256)",
+                "expression": "require(bool,string)(borrowedDebt[msg.sender] + debtAmount <= maxBorrow,INSUFFICIENT_COLLATERAL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.borrowedDebt"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.borrowedDebt",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "borrowedDebt",
+                  "debtAmount",
+                  "maxBorrow",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "debtAmount": [
+                    "debtAmount"
+                  ],
+                  "borrowedDebt": [
+                    "borrowedDebt",
+                    "debtAmount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#76"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "d0dcc4fc56722d65"
+    },
+    "e5889fad5a444671": {
+      "state": "DeFiOracleLendingHarness.depositedCollateral",
+      "writer": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+      "expression": "depositedCollateral[msg.sender] += colAmount",
+      "index_accesses": [
+        {
+          "base": "depositedCollateral",
+          "key": "msg.sender",
+          "reference": "REF_10"
+        }
+      ],
+      "source_index_accesses": [
+        "depositedCollateral[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#68",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+          "expression": "require(bool,string)(colAmount > 0 && userColBalance[msg.sender] >= colAmount,INSUFFICIENT_COL)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userColBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userColBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+            }
+          ],
+          "variables_read": [
+            "colAmount",
+            "msg.sender",
+            "userColBalance"
+          ],
+          "data_dependencies": {
+            "colAmount": [
+              "colAmount"
+            ],
+            "userColBalance": [
+              "colAmount",
+              "userColBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#66"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.depositCollateral(uint256)",
+                "expression": "require(bool,string)(colAmount > 0 && userColBalance[msg.sender] >= colAmount,INSUFFICIENT_COL)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userColBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userColBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#22"
+                  }
+                ],
+                "variables_read": [
+                  "colAmount",
+                  "msg.sender",
+                  "userColBalance"
+                ],
+                "data_dependencies": {
+                  "colAmount": [
+                    "colAmount"
+                  ],
+                  "userColBalance": [
+                    "colAmount",
+                    "userColBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#66"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "e5889fad5a444671"
+    },
+    "fcca5963228c9c61": {
+      "state": "DeFiOracleLendingHarness.userColBalance",
+      "writer": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+      "expression": "userColBalance[msg.sender] += colOut",
+      "index_accesses": [
+        {
+          "base": "userColBalance",
+          "key": "msg.sender",
+          "reference": "REF_4"
+        }
+      ],
+      "source_index_accesses": [
+        "userColBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#50",
+      "call_path": [
+        {
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "expression": "require(bool,string)(debtIn > 0 && userDebtBalance[msg.sender] >= debtIn,INSUFFICIENT_DEBT)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.userDebtBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.userDebtBalance",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "debtIn",
+            "msg.sender",
+            "userDebtBalance"
+          ],
+          "data_dependencies": {
+            "userDebtBalance": [
+              "debtIn",
+              "userDebtBalance"
+            ],
+            "debtIn": [
+              "debtIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#43"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "expression": "require(bool,string)(colOut > 0 && colOut < ammColReserve,BAD_SWAP)",
+          "branch": null,
+          "state_reads": [
+            "DeFiOracleLendingHarness.ammColReserve"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiOracleLendingHarness.ammColReserve",
+              "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "ammColReserve",
+            "colOut"
+          ],
+          "data_dependencies": {
+            "ammColReserve": [
+              "ammColReserve",
+              "debtIn"
+            ],
+            "colOut": [
+              "ammColReserve",
+              "debtIn"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#46"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+                "expression": "require(bool,string)(debtIn > 0 && userDebtBalance[msg.sender] >= debtIn,INSUFFICIENT_DEBT)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.userDebtBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.userDebtBalance",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "debtIn",
+                  "msg.sender",
+                  "userDebtBalance"
+                ],
+                "data_dependencies": {
+                  "userDebtBalance": [
+                    "debtIn",
+                    "userDebtBalance"
+                  ],
+                  "debtIn": [
+                    "debtIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#43"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiOracleLendingHarness.swapDebtForCol(uint256)",
+                "expression": "require(bool,string)(colOut > 0 && colOut < ammColReserve,BAD_SWAP)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiOracleLendingHarness.ammColReserve"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiOracleLendingHarness.ammColReserve",
+                    "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "ammColReserve",
+                  "colOut"
+                ],
+                "data_dependencies": {
+                  "ammColReserve": [
+                    "ammColReserve",
+                    "debtIn"
+                  ],
+                  "colOut": [
+                    "ammColReserve",
+                    "debtIn"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiOracleLending/DeFiOracleLendingHarness.sol#46"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "fcca5963228c9c61"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

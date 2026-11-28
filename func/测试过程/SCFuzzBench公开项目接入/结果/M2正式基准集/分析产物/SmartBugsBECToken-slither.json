@@ -1,0 +1,1048 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol",
+    "contract": "SmartBugsBECTokenHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SmartBugsBECTokenHarness",
+      "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#12-58"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SmartBugsBECTokenHarness",
+      "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#12-58"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SmartBugsBECTokenHarness.echidna_supply_conserved()",
+      "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#53-57",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "582328abd2cbf5f3bd3c",
+      "analysis_contract": "SmartBugsBECTokenHarness",
+      "analysis_contract_source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#12-58",
+      "read_states": [
+        "SmartBugsBECTokenHarness.PLAYER1",
+        "SmartBugsBECTokenHarness.PLAYER2",
+        "SmartBugsBECTokenHarness.PLAYER3",
+        "SmartBugsBECTokenHarness.balances",
+        "SmartBugsBECTokenHarness.totalSupply"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SmartBugsBECTokenHarness.echidna_supply_conserved()",
+          "states": [
+            "SmartBugsBECTokenHarness.PLAYER1",
+            "SmartBugsBECTokenHarness.PLAYER2",
+            "SmartBugsBECTokenHarness.PLAYER3",
+            "SmartBugsBECTokenHarness.balances",
+            "SmartBugsBECTokenHarness.totalSupply"
+          ],
+          "expression": "balances[PLAYER1] <= totalSupply && balances[PLAYER2] <= totalSupply && balances[PLAYER3] <= totalSupply",
+          "index_accesses": [
+            {
+              "base": "balances",
+              "key": "PLAYER1",
+              "reference": "REF_13"
+            },
+            {
+              "base": "balances",
+              "key": "PLAYER2",
+              "reference": "REF_14"
+            },
+            {
+              "base": "balances",
+              "key": "PLAYER3",
+              "reference": "REF_15"
+            }
+          ],
+          "source_index_accesses": [
+            "balances[PLAYER1]",
+            "balances[PLAYER2]",
+            "balances[PLAYER3]"
+          ],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#54-56"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "SmartBugsBECTokenHarness.balances"
+          ],
+          "effect_ids": [
+            "f63c7ba7e5fdc541",
+            "2615c90efd46e949"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "SmartBugsBECTokenHarness.balances"
+          ],
+          "effect_ids": [
+            "8acc32ba61b9ab15",
+            "9741b3602ae79c2f"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "2615c90efd46e949",
+        "8acc32ba61b9ab15",
+        "9741b3602ae79c2f",
+        "f63c7ba7e5fdc541"
+      ],
+      "evidence_summary": {
+        "candidate_links": 2,
+        "links_with_write_site": 2,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "SmartBugsBECTokenHarness.balances",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "SmartBugsBECTokenHarness.constructor()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+              "effect_ids": [
+                "f63c7ba7e5fdc541",
+                "2615c90efd46e949"
+              ]
+            },
+            {
+              "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+              "effect_ids": [
+                "8acc32ba61b9ab15",
+                "9741b3602ae79c2f"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选",
+        "候选调用链含循环；CFG 仅枚举无重复节点的路径"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "2615c90efd46e949": {
+      "state": "SmartBugsBECTokenHarness.balances",
+      "writer": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+      "expression": "balances[_receivers[i]] += _value",
+      "index_accesses": [
+        {
+          "base": "_receivers",
+          "key": "i",
+          "reference": "REF_10"
+        },
+        {
+          "base": "balances",
+          "key": "REF_10",
+          "reference": "REF_11"
+        }
+      ],
+      "source_index_accesses": [
+        "_receivers[i]",
+        "balances[_receivers[i]]"
+      ],
+      "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#46",
+      "call_path": [
+        {
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "expression": "require(bool)(cnt > 0 && cnt <= 20)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "cnt"
+          ],
+          "data_dependencies": {
+            "cnt": [
+              "_receivers"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#40"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "expression": "require(bool)(_value > 0 && balances[msg.sender] >= amount)",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsBECTokenHarness.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsBECTokenHarness.balances",
+              "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "_value",
+            "amount",
+            "balances",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "_receivers",
+              "_value"
+            ],
+            "balances": [
+              "_receivers",
+              "_value",
+              "balances"
+            ],
+            "_value": [
+              "_value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#41"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "expression": "i < cnt",
+          "branch": "true",
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "cnt",
+            "i"
+          ],
+          "data_dependencies": {
+            "cnt": [
+              "_receivers"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#44"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "expression": "require(bool)(_receivers[i] != address(0))",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "_receivers",
+            "i"
+          ],
+          "data_dependencies": {
+            "_receivers": [
+              "_receivers"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#45"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+                "expression": "require(bool)(cnt > 0 && cnt <= 20)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "cnt"
+                ],
+                "data_dependencies": {
+                  "cnt": [
+                    "_receivers"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#40"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+                "expression": "require(bool)(_value > 0 && balances[msg.sender] >= amount)",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsBECTokenHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsBECTokenHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "_value",
+                  "amount",
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "_receivers",
+                    "_value"
+                  ],
+                  "balances": [
+                    "_receivers",
+                    "_value",
+                    "balances"
+                  ],
+                  "_value": [
+                    "_value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#41"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+                "expression": "i < cnt",
+                "branch": "true",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "cnt",
+                  "i"
+                ],
+                "data_dependencies": {
+                  "cnt": [
+                    "_receivers"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#44"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+                "expression": "require(bool)(_receivers[i] != address(0))",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "_receivers",
+                  "i"
+                ],
+                "data_dependencies": {
+                  "_receivers": [
+                    "_receivers"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#45"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "2615c90efd46e949"
+    },
+    "8acc32ba61b9ab15": {
+      "state": "SmartBugsBECTokenHarness.balances",
+      "writer": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+      "expression": "balances[msg.sender] -= _value",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "msg.sender",
+          "reference": "REF_4"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#31",
+      "call_path": [
+        {
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "expression": "require(bool)(_to != address(0))",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "_to"
+          ],
+          "data_dependencies": {
+            "_to": [
+              "_to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#28"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "expression": "require(bool)(_value > 0 && _value <= balances[msg.sender])",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsBECTokenHarness.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsBECTokenHarness.balances",
+              "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "_value",
+            "balances",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "_value": [
+              "_value"
+            ],
+            "balances": [
+              "_value",
+              "balances"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#29"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "expression": "require(bool)(balances[_to] + _value >= balances[_to])",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsBECTokenHarness.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsBECTokenHarness.balances",
+              "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "_to",
+            "_value",
+            "balances"
+          ],
+          "data_dependencies": {
+            "_value": [
+              "_value"
+            ],
+            "balances": [
+              "_value",
+              "balances"
+            ],
+            "_to": [
+              "_to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#30"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+                "expression": "require(bool)(_to != address(0))",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "_to"
+                ],
+                "data_dependencies": {
+                  "_to": [
+                    "_to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#28"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+                "expression": "require(bool)(_value > 0 && _value <= balances[msg.sender])",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsBECTokenHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsBECTokenHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "_value",
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "_value": [
+                    "_value"
+                  ],
+                  "balances": [
+                    "_value",
+                    "balances"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#29"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+                "expression": "require(bool)(balances[_to] + _value >= balances[_to])",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsBECTokenHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsBECTokenHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "_to",
+                  "_value",
+                  "balances"
+                ],
+                "data_dependencies": {
+                  "_value": [
+                    "_value"
+                  ],
+                  "balances": [
+                    "_value",
+                    "balances"
+                  ],
+                  "_to": [
+                    "_to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#30"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "8acc32ba61b9ab15"
+    },
+    "9741b3602ae79c2f": {
+      "state": "SmartBugsBECTokenHarness.balances",
+      "writer": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+      "expression": "balances[_to] += _value",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "_to",
+          "reference": "REF_5"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[_to]"
+      ],
+      "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#32",
+      "call_path": [
+        {
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "expression": "require(bool)(_to != address(0))",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "_to"
+          ],
+          "data_dependencies": {
+            "_to": [
+              "_to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#28"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "expression": "require(bool)(_value > 0 && _value <= balances[msg.sender])",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsBECTokenHarness.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsBECTokenHarness.balances",
+              "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "_value",
+            "balances",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "_value": [
+              "_value"
+            ],
+            "balances": [
+              "_value",
+              "balances"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#29"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "expression": "require(bool)(balances[_to] + _value >= balances[_to])",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsBECTokenHarness.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsBECTokenHarness.balances",
+              "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "_to",
+            "_value",
+            "balances"
+          ],
+          "data_dependencies": {
+            "_value": [
+              "_value"
+            ],
+            "balances": [
+              "_value",
+              "balances"
+            ],
+            "_to": [
+              "_to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#30"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+                "expression": "require(bool)(_to != address(0))",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "_to"
+                ],
+                "data_dependencies": {
+                  "_to": [
+                    "_to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#28"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+                "expression": "require(bool)(_value > 0 && _value <= balances[msg.sender])",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsBECTokenHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsBECTokenHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "_value",
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "_value": [
+                    "_value"
+                  ],
+                  "balances": [
+                    "_value",
+                    "balances"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#29"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.transfer(address,uint256)",
+                "expression": "require(bool)(balances[_to] + _value >= balances[_to])",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsBECTokenHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsBECTokenHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "_to",
+                  "_value",
+                  "balances"
+                ],
+                "data_dependencies": {
+                  "_value": [
+                    "_value"
+                  ],
+                  "balances": [
+                    "_value",
+                    "balances"
+                  ],
+                  "_to": [
+                    "_to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#30"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "9741b3602ae79c2f"
+    },
+    "f63c7ba7e5fdc541": {
+      "state": "SmartBugsBECTokenHarness.balances",
+      "writer": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+      "expression": "balances[msg.sender] -= amount",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "msg.sender",
+          "reference": "REF_8"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#43",
+      "call_path": [
+        {
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "expression": "require(bool)(cnt > 0 && cnt <= 20)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "cnt"
+          ],
+          "data_dependencies": {
+            "cnt": [
+              "_receivers"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#40"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "expression": "require(bool)(_value > 0 && balances[msg.sender] >= amount)",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsBECTokenHarness.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsBECTokenHarness.balances",
+              "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "_value",
+            "amount",
+            "balances",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "_receivers",
+              "_value"
+            ],
+            "balances": [
+              "_receivers",
+              "_value",
+              "balances"
+            ],
+            "_value": [
+              "_value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#41"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+                "expression": "require(bool)(cnt > 0 && cnt <= 20)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "cnt"
+                ],
+                "data_dependencies": {
+                  "cnt": [
+                    "_receivers"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#40"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsBECTokenHarness.batchTransfer(address[],uint256)",
+                "expression": "require(bool)(_value > 0 && balances[msg.sender] >= amount)",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsBECTokenHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsBECTokenHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "_value",
+                  "amount",
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "_receivers",
+                    "_value"
+                  ],
+                  "balances": [
+                    "_receivers",
+                    "_value",
+                    "balances"
+                  ],
+                  "_value": [
+                    "_value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsBECToken/SmartBugsBECTokenHarness.sol#41"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "f63c7ba7e5fdc541"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

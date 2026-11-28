@@ -1,0 +1,1609 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol",
+    "contract": "DeFiEscrowHashIdHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "DeFiEscrowHashIdHarness",
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#9-87"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "DeFiEscrowHashIdHarness",
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#9-87"
+    }
+  ],
+  "properties": [
+    {
+      "property": "DeFiEscrowHashIdHarness.echidna_escrow_solvency()",
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#84-86",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "734da344e11d93aaabc3",
+      "analysis_contract": "DeFiEscrowHashIdHarness",
+      "analysis_contract_source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#9-87",
+      "read_states": [
+        "DeFiEscrowHashIdHarness.totalDeposited",
+        "DeFiEscrowHashIdHarness.totalPaidOut"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "DeFiEscrowHashIdHarness.echidna_escrow_solvency()",
+          "states": [
+            "DeFiEscrowHashIdHarness.totalDeposited",
+            "DeFiEscrowHashIdHarness.totalPaidOut"
+          ],
+          "expression": "totalPaidOut <= totalDeposited",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#85"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "DeFiEscrowHashIdHarness.totalPaidOut"
+          ],
+          "effect_ids": [
+            "99e91515b368a05a"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "DeFiEscrowHashIdHarness.totalPaidOut"
+          ],
+          "effect_ids": [
+            "ac5db061c2766d11"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "payable": true,
+          "environment_reads": [
+            "block.timestamp",
+            "msg.sender",
+            "msg.value"
+          ],
+          "matched_states": [
+            "DeFiEscrowHashIdHarness.totalDeposited"
+          ],
+          "effect_ids": [
+            "c9556b8d6c821dc7"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [
+          {
+            "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+            "calls": [
+              {
+                "caller": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+                "call": "TUPLE_1(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_36, function:call, arguments:[''] value:REF_28 ",
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#78",
+                "external_route": [],
+                "reason": "低层调用的目标状态写入无法由 Slither 静态解析"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          },
+          {
+            "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+            "calls": [
+              {
+                "caller": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "call": "TUPLE_0(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_27, function:call, arguments:[''] value:REF_17 ",
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#64",
+                "external_route": [],
+                "reason": "低层调用的目标状态写入无法由 Slither 静态解析"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          }
+        ],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "08668ef8431b9583",
+        "311b7a6bd02948fb",
+        "7ea47cb221344507",
+        "99e91515b368a05a",
+        "a217b8aae7f8d040",
+        "ac5db061c2766d11",
+        "c9556b8d6c821dc7"
+      ],
+      "evidence_summary": {
+        "candidate_links": 3,
+        "links_with_write_site": 3,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 2
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "DeFiEscrowHashIdHarness.escrows",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+              "effect_ids": [
+                "311b7a6bd02948fb"
+              ]
+            },
+            {
+              "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+              "effect_ids": [
+                "7ea47cb221344507"
+              ]
+            },
+            {
+              "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+              "effect_ids": [
+                "a217b8aae7f8d040"
+              ]
+            },
+            {
+              "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+              "effect_ids": [
+                "08668ef8431b9583"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "候选调用链含外部调用；静态输出未证明其返回值或副作用"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "08668ef8431b9583": {
+      "state": "DeFiEscrowHashIdHarness.escrows",
+      "writer": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+      "expression": "escrows[escrowId] = Escrow({depositor:msg.sender,beneficiary:beneficiary,amount:msg.value,approved:false,claimed:false,cancelled:false})",
+      "index_accesses": [
+        {
+          "base": "escrows",
+          "key": "escrowId",
+          "reference": "REF_1"
+        }
+      ],
+      "source_index_accesses": [
+        "escrows[escrowId]"
+      ],
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#34-41",
+      "call_path": [
+        {
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "expression": "require(bool,string)(beneficiary != address(0) && beneficiary != msg.sender,INVALID_BENEFICIARY)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "beneficiary",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "beneficiary": [
+              "beneficiary"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#30"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "expression": "require(bool,string)(msg.value >= 1000000000000000000,MIN_ESCROW_1_ETH)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+                "expression": "require(bool,string)(beneficiary != address(0) && beneficiary != msg.sender,INVALID_BENEFICIARY)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "beneficiary",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "beneficiary": [
+                    "beneficiary"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#30"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+                "expression": "require(bool,string)(msg.value >= 1000000000000000000,MIN_ESCROW_1_ETH)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "08668ef8431b9583"
+    },
+    "311b7a6bd02948fb": {
+      "state": "DeFiEscrowHashIdHarness.escrows",
+      "writer": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+      "expression": "e.approved = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#51",
+      "call_path": [
+        {
+          "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+          "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#48"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+          "expression": "require(bool,string)(msg.sender == e.depositor,NOT_DEPOSITOR)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#49"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+          "expression": "require(bool,string)(! e.cancelled && ! e.claimed,ESCROW_CLOSED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#50"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+                "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#48"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+                "expression": "require(bool,string)(msg.sender == e.depositor,NOT_DEPOSITOR)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#49"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.approveRelease(bytes32)",
+                "expression": "require(bool,string)(! e.cancelled && ! e.claimed,ESCROW_CLOSED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#50"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "311b7a6bd02948fb"
+    },
+    "7ea47cb221344507": {
+      "state": "DeFiEscrowHashIdHarness.escrows",
+      "writer": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+      "expression": "e.cancelled = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#76",
+      "call_path": [
+        {
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#72"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "expression": "require(bool,string)(msg.sender == e.depositor,NOT_DEPOSITOR)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#73"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "expression": "require(bool,string)(! e.cancelled,ALREADY_CANCELLED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#74"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+                "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#72"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+                "expression": "require(bool,string)(msg.sender == e.depositor,NOT_DEPOSITOR)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#73"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+                "expression": "require(bool,string)(! e.cancelled,ALREADY_CANCELLED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#74"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "call": "TUPLE_1(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_36, function:call, arguments:[''] value:REF_28 ",
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#78"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "7ea47cb221344507"
+    },
+    "99e91515b368a05a": {
+      "state": "DeFiEscrowHashIdHarness.totalPaidOut",
+      "writer": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+      "expression": "totalPaidOut += e.amount",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#77",
+      "call_path": [
+        {
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#72"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "expression": "require(bool,string)(msg.sender == e.depositor,NOT_DEPOSITOR)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#73"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "expression": "require(bool,string)(! e.cancelled,ALREADY_CANCELLED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#74"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+                "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#72"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+                "expression": "require(bool,string)(msg.sender == e.depositor,NOT_DEPOSITOR)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#73"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+                "expression": "require(bool,string)(! e.cancelled,ALREADY_CANCELLED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#74"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "DeFiEscrowHashIdHarness.cancelEscrow(bytes32)",
+          "call": "TUPLE_1(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_36, function:call, arguments:[''] value:REF_28 ",
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#78"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "99e91515b368a05a"
+    },
+    "a217b8aae7f8d040": {
+      "state": "DeFiEscrowHashIdHarness.escrows",
+      "writer": "DeFiEscrowHashIdHarness.claim(bytes32)",
+      "expression": "e.claimed = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#62",
+      "call_path": [
+        {
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#57"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "expression": "require(bool,string)(msg.sender == e.beneficiary,NOT_BENEFICIARY)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#58"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "expression": "require(bool,string)(e.approved,NOT_APPROVED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#59"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "expression": "require(bool,string)(! e.claimed,ALREADY_CLAIMED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#60"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#57"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "expression": "require(bool,string)(msg.sender == e.beneficiary,NOT_BENEFICIARY)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#58"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "expression": "require(bool,string)(e.approved,NOT_APPROVED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#59"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "expression": "require(bool,string)(! e.claimed,ALREADY_CLAIMED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#60"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "call": "TUPLE_0(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_27, function:call, arguments:[''] value:REF_17 ",
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#64"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "a217b8aae7f8d040"
+    },
+    "ac5db061c2766d11": {
+      "state": "DeFiEscrowHashIdHarness.totalPaidOut",
+      "writer": "DeFiEscrowHashIdHarness.claim(bytes32)",
+      "expression": "totalPaidOut += e.amount",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#63",
+      "call_path": [
+        {
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#57"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "expression": "require(bool,string)(msg.sender == e.beneficiary,NOT_BENEFICIARY)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#58"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "expression": "require(bool,string)(e.approved,NOT_APPROVED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#59"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "expression": "require(bool,string)(! e.claimed,ALREADY_CLAIMED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiEscrowHashIdHarness.escrows"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiEscrowHashIdHarness.escrows",
+              "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+            }
+          ],
+          "variables_read": [
+            "e",
+            "escrows"
+          ],
+          "data_dependencies": {
+            "escrows": [
+              "escrows"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#60"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "expression": "require(bool,string)(e.amount > 0,ESCROW_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#57"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "expression": "require(bool,string)(msg.sender == e.beneficiary,NOT_BENEFICIARY)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#58"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "expression": "require(bool,string)(e.approved,NOT_APPROVED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#59"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+                "expression": "require(bool,string)(! e.claimed,ALREADY_CLAIMED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiEscrowHashIdHarness.escrows"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiEscrowHashIdHarness.escrows",
+                    "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "e",
+                  "escrows"
+                ],
+                "data_dependencies": {
+                  "escrows": [
+                    "escrows"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#60"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "DeFiEscrowHashIdHarness.claim(bytes32)",
+          "call": "TUPLE_0(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_27, function:call, arguments:[''] value:REF_17 ",
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#64"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "ac5db061c2766d11"
+    },
+    "c9556b8d6c821dc7": {
+      "state": "DeFiEscrowHashIdHarness.totalDeposited",
+      "writer": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+      "expression": "totalDeposited += msg.value",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#42",
+      "call_path": [
+        {
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "expression": "require(bool,string)(beneficiary != address(0) && beneficiary != msg.sender,INVALID_BENEFICIARY)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "beneficiary",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "beneficiary": [
+              "beneficiary"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#30"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "expression": "require(bool,string)(msg.value >= 1000000000000000000,MIN_ESCROW_1_ETH)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#31"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+                "expression": "require(bool,string)(beneficiary != address(0) && beneficiary != msg.sender,INVALID_BENEFICIARY)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "beneficiary",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "beneficiary": [
+                    "beneficiary"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#30"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiEscrowHashIdHarness.createEscrow(address,bytes32)",
+                "expression": "require(bool,string)(msg.value >= 1000000000000000000,MIN_ESCROW_1_ETH)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiEscrowHashId/DeFiEscrowHashIdHarness.sol#31"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "c9556b8d6c821dc7"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

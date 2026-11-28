@@ -1,0 +1,230 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol",
+    "contract": "CTETokenSaleHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "CTETokenSaleHarness",
+      "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#11-57"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "CTETokenSaleHarness",
+      "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#11-57"
+    }
+  ],
+  "properties": [
+    {
+      "property": "CTETokenSaleHarness.echidna_pool_not_drained_below_seed()",
+      "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#51-56",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "d215df4f56fb9c6da977",
+      "analysis_contract": "CTETokenSaleHarness",
+      "analysis_contract_source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#11-57",
+      "read_states": [
+        "CTETokenSaleHarness.initialPoolBalance"
+      ],
+      "property_write_states": [],
+      "environment_reads": [
+        "this"
+      ],
+      "balance_observations": [
+        {
+          "function": "CTETokenSaleHarness.echidna_pool_not_drained_below_seed()",
+          "operation": "TMP_19(uint256) = SOLIDITY_CALL balance(address)(TMP_18)",
+          "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#55"
+        }
+      ],
+      "read_sites": [
+        {
+          "function": "CTETokenSaleHarness.echidna_pool_not_drained_below_seed()",
+          "states": [
+            "CTETokenSaleHarness.initialPoolBalance"
+          ],
+          "expression": "initialPoolBalance < 1000000000000000000",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#52"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "CTETokenSaleHarness.seedPool()",
+          "payable": true,
+          "environment_reads": [
+            "msg.value"
+          ],
+          "matched_states": [
+            "CTETokenSaleHarness.initialPoolBalance"
+          ],
+          "effect_ids": [
+            "7a62ce1032c62ba5"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "7a62ce1032c62ba5"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "CTETokenSaleHarness.initialPoolBalance",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "CTETokenSaleHarness.constructor()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "CTETokenSaleHarness.seedPool()",
+              "effect_ids": [
+                "7a62ce1032c62ba5"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "属性观察合约原生币余额；外部转入、强制转入及部署余额需要执行环境确认"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "7a62ce1032c62ba5": {
+      "state": "CTETokenSaleHarness.initialPoolBalance",
+      "writer": "CTETokenSaleHarness.seedPool()",
+      "expression": "initialPoolBalance = msg.value",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#26",
+      "call_path": [
+        {
+          "function": "CTETokenSaleHarness.seedPool()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "CTETokenSaleHarness.seedPool()",
+          "expression": "require(bool)(initialPoolBalance == 0 && msg.value >= 1000000000000000000)",
+          "branch": null,
+          "state_reads": [
+            "CTETokenSaleHarness.initialPoolBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "CTETokenSaleHarness.initialPoolBalance",
+              "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "initialPoolBalance",
+            "msg.value"
+          ],
+          "data_dependencies": {
+            "initialPoolBalance": [
+              "initialPoolBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#25"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "CTETokenSaleHarness.seedPool()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "CTETokenSaleHarness.seedPool()",
+                "expression": "require(bool)(initialPoolBalance == 0 && msg.value >= 1000000000000000000)",
+                "branch": null,
+                "state_reads": [
+                  "CTETokenSaleHarness.initialPoolBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "CTETokenSaleHarness.initialPoolBalance",
+                    "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "initialPoolBalance",
+                  "msg.value"
+                ],
+                "data_dependencies": {
+                  "initialPoolBalance": [
+                    "initialPoolBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/CTETokenSale/CTETokenSaleHarness.sol#25"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "7a62ce1032c62ba5"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

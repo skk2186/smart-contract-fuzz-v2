@@ -1,0 +1,1850 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol",
+    "contract": "DeFiGovDoubleVoteHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "DeFiGovDoubleVoteHarness",
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#11-89"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "DeFiGovDoubleVoteHarness",
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#11-89"
+    }
+  ],
+  "properties": [
+    {
+      "property": "DeFiGovDoubleVoteHarness.echidna_quorum_cannot_be_exceeded()",
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#86-88",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "a48cd4a8b72cd960ab62",
+      "analysis_contract": "DeFiGovDoubleVoteHarness",
+      "analysis_contract_source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#11-89",
+      "read_states": [
+        "DeFiGovDoubleVoteHarness.quorumBypassed"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.echidna_quorum_cannot_be_exceeded()",
+          "states": [
+            "DeFiGovDoubleVoteHarness.quorumBypassed"
+          ],
+          "expression": "! quorumBypassed",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#87"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "payable": false,
+          "environment_reads": [
+            "block.timestamp"
+          ],
+          "matched_states": [
+            "DeFiGovDoubleVoteHarness.quorumBypassed"
+          ],
+          "effect_ids": [
+            "45625e3251fdb518"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "1ebde0492fc7e2d6",
+        "447b4fbcd4cba663",
+        "45625e3251fdb518",
+        "5a6c231b958047ba",
+        "5b45588504f8b65e",
+        "a778c91550c43e99",
+        "d35d009da35d5e6d"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "DeFiGovDoubleVoteHarness.proposals",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiGovDoubleVoteHarness.createProposal(bytes32)",
+              "effect_ids": [
+                "1ebde0492fc7e2d6"
+              ]
+            },
+            {
+              "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+              "effect_ids": [
+                "d35d009da35d5e6d"
+              ]
+            },
+            {
+              "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+              "effect_ids": [
+                "5b45588504f8b65e"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiGovDoubleVoteHarness.balanceOf",
+          "depth": 1,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "DeFiGovDoubleVoteHarness.constructor()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+              "effect_ids": [
+                "a778c91550c43e99",
+                "5a6c231b958047ba"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiGovDoubleVoteHarness.hasVoted",
+          "depth": 1,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+              "effect_ids": [
+                "447b4fbcd4cba663"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "1ebde0492fc7e2d6": {
+      "state": "DeFiGovDoubleVoteHarness.proposals",
+      "writer": "DeFiGovDoubleVoteHarness.createProposal(bytes32)",
+      "expression": "proposals[proposalId] = Proposal({proposer:msg.sender,createdAt:block.timestamp,votesFor:0,executed:false})",
+      "index_accesses": [
+        {
+          "base": "proposals",
+          "key": "proposalId",
+          "reference": "REF_6"
+        }
+      ],
+      "source_index_accesses": [
+        "proposals[proposalId]"
+      ],
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#50-55",
+      "call_path": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.createProposal(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.createProposal(bytes32)",
+          "expression": "require(bool,string)(balanceOf[msg.sender] > 0,NO_VOTING_POWER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.balanceOf",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "balanceOf": [
+              "balanceOf"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#47"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.createProposal(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.createProposal(bytes32)",
+                "expression": "require(bool,string)(balanceOf[msg.sender] > 0,NO_VOTING_POWER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.balanceOf",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "balanceOf": [
+                    "balanceOf"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#47"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "1ebde0492fc7e2d6"
+    },
+    "447b4fbcd4cba663": {
+      "state": "DeFiGovDoubleVoteHarness.hasVoted",
+      "writer": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+      "expression": "hasVoted[proposalId][msg.sender] = true",
+      "index_accesses": [
+        {
+          "base": "hasVoted",
+          "key": "proposalId",
+          "reference": "REF_14"
+        },
+        {
+          "base": "REF_14",
+          "key": "msg.sender",
+          "reference": "REF_15"
+        }
+      ],
+      "source_index_accesses": [
+        "hasVoted[proposalId]"
+      ],
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#68",
+      "call_path": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(p.createdAt > 0,PROPOSAL_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#61"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(! p.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#62"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(block.timestamp < p.createdAt + VOTING_PERIOD,VOTING_ENDED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#15"
+            },
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "VOTING_PERIOD",
+            "block.timestamp",
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "VOTING_PERIOD": [
+              "VOTING_PERIOD"
+            ],
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#63"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(! hasVoted[proposalId][msg.sender],ALREADY_VOTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.hasVoted"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.hasVoted",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#28"
+            }
+          ],
+          "variables_read": [
+            "hasVoted",
+            "msg.sender",
+            "proposalId"
+          ],
+          "data_dependencies": {
+            "proposalId": [
+              "proposalId"
+            ],
+            "hasVoted": [
+              "hasVoted"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#64"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(weight > 0,ZERO_WEIGHT)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "weight"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#66"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(p.createdAt > 0,PROPOSAL_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#61"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(! p.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#62"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(block.timestamp < p.createdAt + VOTING_PERIOD,VOTING_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#15"
+                  },
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "VOTING_PERIOD",
+                  "block.timestamp",
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "VOTING_PERIOD": [
+                    "VOTING_PERIOD"
+                  ],
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#63"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(! hasVoted[proposalId][msg.sender],ALREADY_VOTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.hasVoted"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.hasVoted",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#28"
+                  }
+                ],
+                "variables_read": [
+                  "hasVoted",
+                  "msg.sender",
+                  "proposalId"
+                ],
+                "data_dependencies": {
+                  "proposalId": [
+                    "proposalId"
+                  ],
+                  "hasVoted": [
+                    "hasVoted"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#64"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(weight > 0,ZERO_WEIGHT)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "weight"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#66"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "447b4fbcd4cba663"
+    },
+    "45625e3251fdb518": {
+      "state": "DeFiGovDoubleVoteHarness.quorumBypassed",
+      "writer": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+      "expression": "quorumBypassed = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#81",
+      "call_path": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "expression": "require(bool,string)(p.createdAt > 0,PROPOSAL_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#75"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "expression": "require(bool,string)(! p.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#76"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "expression": "require(bool,string)(block.timestamp >= p.createdAt + VOTING_PERIOD,VOTING_STILL_ACTIVE)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#15"
+            },
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "VOTING_PERIOD",
+            "block.timestamp",
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "VOTING_PERIOD": [
+              "VOTING_PERIOD"
+            ],
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#77"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "expression": "require(bool,string)(p.votesFor >= QUORUM,QUORUM_NOT_MET)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.QUORUM",
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.QUORUM",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#14"
+            },
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "QUORUM",
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "QUORUM": [
+              "QUORUM"
+            ],
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#78"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+                "expression": "require(bool,string)(p.createdAt > 0,PROPOSAL_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#75"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+                "expression": "require(bool,string)(! p.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#76"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+                "expression": "require(bool,string)(block.timestamp >= p.createdAt + VOTING_PERIOD,VOTING_STILL_ACTIVE)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#15"
+                  },
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "VOTING_PERIOD",
+                  "block.timestamp",
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "VOTING_PERIOD": [
+                    "VOTING_PERIOD"
+                  ],
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#77"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+                "expression": "require(bool,string)(p.votesFor >= QUORUM,QUORUM_NOT_MET)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.QUORUM",
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.QUORUM",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#14"
+                  },
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "QUORUM",
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "QUORUM": [
+                    "QUORUM"
+                  ],
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#78"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "45625e3251fdb518"
+    },
+    "5a6c231b958047ba": {
+      "state": "DeFiGovDoubleVoteHarness.balanceOf",
+      "writer": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+      "expression": "balanceOf[to] += amount",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "to",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[to]"
+      ],
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#43",
+      "call_path": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+          "expression": "require(bool,string)(to != address(0) && amount > 0,INVALID_TRANSFER)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount",
+            "to"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#40"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+          "expression": "require(bool,string)(balanceOf[msg.sender] >= amount,INSUFFICIENT_BALANCE)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.balanceOf",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "balanceOf",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "balanceOf": [
+              "amount",
+              "balanceOf"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#41"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+                "expression": "require(bool,string)(to != address(0) && amount > 0,INVALID_TRANSFER)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount",
+                  "to"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#40"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+                "expression": "require(bool,string)(balanceOf[msg.sender] >= amount,INSUFFICIENT_BALANCE)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.balanceOf",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "balanceOf",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "balanceOf": [
+                    "amount",
+                    "balanceOf"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#41"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "5a6c231b958047ba"
+    },
+    "5b45588504f8b65e": {
+      "state": "DeFiGovDoubleVoteHarness.proposals",
+      "writer": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+      "expression": "p.votesFor += weight",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#69",
+      "call_path": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(p.createdAt > 0,PROPOSAL_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#61"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(! p.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#62"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(block.timestamp < p.createdAt + VOTING_PERIOD,VOTING_ENDED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#15"
+            },
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "VOTING_PERIOD",
+            "block.timestamp",
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "VOTING_PERIOD": [
+              "VOTING_PERIOD"
+            ],
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#63"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(! hasVoted[proposalId][msg.sender],ALREADY_VOTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.hasVoted"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.hasVoted",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#28"
+            }
+          ],
+          "variables_read": [
+            "hasVoted",
+            "msg.sender",
+            "proposalId"
+          ],
+          "data_dependencies": {
+            "proposalId": [
+              "proposalId"
+            ],
+            "hasVoted": [
+              "hasVoted"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#64"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "expression": "require(bool,string)(weight > 0,ZERO_WEIGHT)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "weight"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#66"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(p.createdAt > 0,PROPOSAL_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#61"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(! p.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#62"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(block.timestamp < p.createdAt + VOTING_PERIOD,VOTING_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#15"
+                  },
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "VOTING_PERIOD",
+                  "block.timestamp",
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "VOTING_PERIOD": [
+                    "VOTING_PERIOD"
+                  ],
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#63"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(! hasVoted[proposalId][msg.sender],ALREADY_VOTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.hasVoted"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.hasVoted",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#28"
+                  }
+                ],
+                "variables_read": [
+                  "hasVoted",
+                  "msg.sender",
+                  "proposalId"
+                ],
+                "data_dependencies": {
+                  "proposalId": [
+                    "proposalId"
+                  ],
+                  "hasVoted": [
+                    "hasVoted"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#64"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.vote(bytes32)",
+                "expression": "require(bool,string)(weight > 0,ZERO_WEIGHT)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "weight"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#66"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "5b45588504f8b65e"
+    },
+    "a778c91550c43e99": {
+      "state": "DeFiGovDoubleVoteHarness.balanceOf",
+      "writer": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+      "expression": "balanceOf[msg.sender] -= amount",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "msg.sender",
+          "reference": "REF_2"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#42",
+      "call_path": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+          "expression": "require(bool,string)(to != address(0) && amount > 0,INVALID_TRANSFER)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount",
+            "to"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#40"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+          "expression": "require(bool,string)(balanceOf[msg.sender] >= amount,INSUFFICIENT_BALANCE)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.balanceOf",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "amount",
+            "balanceOf",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "balanceOf": [
+              "amount",
+              "balanceOf"
+            ],
+            "amount": [
+              "amount"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#41"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+                "expression": "require(bool,string)(to != address(0) && amount > 0,INVALID_TRANSFER)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount",
+                  "to"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#40"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.transfer(address,uint256)",
+                "expression": "require(bool,string)(balanceOf[msg.sender] >= amount,INSUFFICIENT_BALANCE)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.balanceOf",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "amount",
+                  "balanceOf",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "balanceOf": [
+                    "amount",
+                    "balanceOf"
+                  ],
+                  "amount": [
+                    "amount"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#41"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "a778c91550c43e99"
+    },
+    "d35d009da35d5e6d": {
+      "state": "DeFiGovDoubleVoteHarness.proposals",
+      "writer": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+      "expression": "p.executed = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#80",
+      "call_path": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "expression": "require(bool,string)(p.createdAt > 0,PROPOSAL_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#75"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "expression": "require(bool,string)(! p.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#76"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "expression": "require(bool,string)(block.timestamp >= p.createdAt + VOTING_PERIOD,VOTING_STILL_ACTIVE)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#15"
+            },
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "VOTING_PERIOD",
+            "block.timestamp",
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "VOTING_PERIOD": [
+              "VOTING_PERIOD"
+            ],
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#77"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "expression": "require(bool,string)(p.votesFor >= QUORUM,QUORUM_NOT_MET)",
+          "branch": null,
+          "state_reads": [
+            "DeFiGovDoubleVoteHarness.QUORUM",
+            "DeFiGovDoubleVoteHarness.proposals"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiGovDoubleVoteHarness.QUORUM",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#14"
+            },
+            {
+              "state": "DeFiGovDoubleVoteHarness.proposals",
+              "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "QUORUM",
+            "p",
+            "proposals"
+          ],
+          "data_dependencies": {
+            "QUORUM": [
+              "QUORUM"
+            ],
+            "proposals": [
+              "proposals"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#78"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+                "expression": "require(bool,string)(p.createdAt > 0,PROPOSAL_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#75"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+                "expression": "require(bool,string)(! p.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#76"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+                "expression": "require(bool,string)(block.timestamp >= p.createdAt + VOTING_PERIOD,VOTING_STILL_ACTIVE)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.VOTING_PERIOD",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#15"
+                  },
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "VOTING_PERIOD",
+                  "block.timestamp",
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "VOTING_PERIOD": [
+                    "VOTING_PERIOD"
+                  ],
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#77"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiGovDoubleVoteHarness.executeProposal(bytes32)",
+                "expression": "require(bool,string)(p.votesFor >= QUORUM,QUORUM_NOT_MET)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiGovDoubleVoteHarness.QUORUM",
+                  "DeFiGovDoubleVoteHarness.proposals"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.QUORUM",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#14"
+                  },
+                  {
+                    "state": "DeFiGovDoubleVoteHarness.proposals",
+                    "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "QUORUM",
+                  "p",
+                  "proposals"
+                ],
+                "data_dependencies": {
+                  "QUORUM": [
+                    "QUORUM"
+                  ],
+                  "proposals": [
+                    "proposals"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiGovDoubleVote/DeFiGovDoubleVoteHarness.sol#78"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "d35d009da35d5e6d"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

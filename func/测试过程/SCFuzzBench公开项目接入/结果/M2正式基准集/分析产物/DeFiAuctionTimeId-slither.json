@@ -1,0 +1,1971 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol",
+    "contract": "DeFiAuctionTimeIdHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "DeFiAuctionTimeIdHarness",
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#13-92"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "DeFiAuctionTimeIdHarness",
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#13-92"
+    }
+  ],
+  "properties": [
+    {
+      "property": "DeFiAuctionTimeIdHarness.echidna_auction_accounting_conserved()",
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#89-91",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "b3e885afcffb5bee06b1",
+      "analysis_contract": "DeFiAuctionTimeIdHarness",
+      "analysis_contract_source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#13-92",
+      "read_states": [
+        "DeFiAuctionTimeIdHarness.totalDeposited",
+        "DeFiAuctionTimeIdHarness.totalPaidOut"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.echidna_auction_accounting_conserved()",
+          "states": [
+            "DeFiAuctionTimeIdHarness.totalDeposited",
+            "DeFiAuctionTimeIdHarness.totalPaidOut"
+          ],
+          "expression": "totalPaidOut <= totalDeposited",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#90"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "payable": true,
+          "environment_reads": [
+            "block.timestamp",
+            "msg.sender",
+            "msg.value"
+          ],
+          "matched_states": [
+            "DeFiAuctionTimeIdHarness.totalDeposited"
+          ],
+          "effect_ids": [
+            "d22d65e9633bf628"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "payable": false,
+          "environment_reads": [
+            "block.timestamp"
+          ],
+          "matched_states": [
+            "DeFiAuctionTimeIdHarness.totalPaidOut"
+          ],
+          "effect_ids": [
+            "38433e7a194c5f02"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "DeFiAuctionTimeIdHarness.totalPaidOut"
+          ],
+          "effect_ids": [
+            "f06667991e9552ab"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [
+          {
+            "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+            "calls": [
+              {
+                "caller": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "call": "TUPLE_0(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_31, function:call, arguments:[''] value:REF_26 ",
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#73",
+                "external_route": [],
+                "reason": "低层调用的目标状态写入无法由 Slither 静态解析"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          },
+          {
+            "function": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+            "calls": [
+              {
+                "caller": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+                "call": "TUPLE_1(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_36, function:call, arguments:[''] value:amount ",
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#83",
+                "external_route": [],
+                "reason": "低层调用的目标状态写入无法由 Slither 静态解析"
+              }
+            ],
+            "status": "opaque_effect_possible_no_property_link"
+          }
+        ],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "38433e7a194c5f02",
+        "59a8693ee2da56a9",
+        "5b93e1be42c82bc8",
+        "9e8973666ba9c0e9",
+        "d22d65e9633bf628",
+        "f06667991e9552ab",
+        "ff0bba1e9fbb7386"
+      ],
+      "evidence_summary": {
+        "candidate_links": 3,
+        "links_with_write_site": 3,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 2
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "DeFiAuctionTimeIdHarness.auctions",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+              "effect_ids": [
+                "5b93e1be42c82bc8",
+                "ff0bba1e9fbb7386"
+              ]
+            },
+            {
+              "function": "DeFiAuctionTimeIdHarness.createAuction(uint256,bytes32)",
+              "effect_ids": [
+                "59a8693ee2da56a9"
+              ]
+            },
+            {
+              "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+              "effect_ids": [
+                "9e8973666ba9c0e9"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "候选调用链含外部调用；静态输出未证明其返回值或副作用"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "38433e7a194c5f02": {
+      "state": "DeFiAuctionTimeIdHarness.totalPaidOut",
+      "writer": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+      "expression": "totalPaidOut += a.highestBid",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#72",
+      "call_path": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#64"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "expression": "require(bool,string)(block.timestamp >= a.endTime,AUCTION_NOT_ENDED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions",
+            "block.timestamp"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#65"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "expression": "require(bool,string)(! a.settled,ALREADY_SETTLED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#66"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "expression": "require(bool,string)(a.highestBidder != address(0),NO_BIDS)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#67"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#64"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "expression": "require(bool,string)(block.timestamp >= a.endTime,AUCTION_NOT_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "block.timestamp"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#65"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "expression": "require(bool,string)(! a.settled,ALREADY_SETTLED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#66"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "expression": "require(bool,string)(a.highestBidder != address(0),NO_BIDS)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#67"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "call": "TUPLE_0(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_31, function:call, arguments:[''] value:REF_26 ",
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#73"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "38433e7a194c5f02"
+    },
+    "59a8693ee2da56a9": {
+      "state": "DeFiAuctionTimeIdHarness.auctions",
+      "writer": "DeFiAuctionTimeIdHarness.createAuction(uint256,bytes32)",
+      "expression": "auctions[auctionId] = Auction({seller:msg.sender,endTime:block.timestamp + duration,highestBidder:address(0),highestBid:0,settled:false})",
+      "index_accesses": [
+        {
+          "base": "auctions",
+          "key": "auctionId",
+          "reference": "REF_1"
+        }
+      ],
+      "source_index_accesses": [
+        "auctions[auctionId]"
+      ],
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#37-43",
+      "call_path": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.createAuction(uint256,bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.createAuction(uint256,bytes32)",
+          "expression": "require(bool,string)(duration >= 600 && duration <= 7200,INVALID_DURATION)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "duration"
+          ],
+          "data_dependencies": {
+            "duration": [
+              "duration"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#34"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.createAuction(uint256,bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.createAuction(uint256,bytes32)",
+                "expression": "require(bool,string)(duration >= 600 && duration <= 7200,INVALID_DURATION)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "duration"
+                ],
+                "data_dependencies": {
+                  "duration": [
+                    "duration"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#34"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "59a8693ee2da56a9"
+    },
+    "5b93e1be42c82bc8": {
+      "state": "DeFiAuctionTimeIdHarness.auctions",
+      "writer": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+      "expression": "a.highestBidder = msg.sender",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#56",
+      "call_path": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions",
+            "block.timestamp"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions",
+            "msg.value"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "block.timestamp"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "msg.value"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "a.highestBidder != address(0)",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#53"
+              }
+            ],
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "block.timestamp"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "msg.value"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "a.highestBidder != address(0)",
+                "branch": "false",
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#53"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "5b93e1be42c82bc8"
+    },
+    "9e8973666ba9c0e9": {
+      "state": "DeFiAuctionTimeIdHarness.auctions",
+      "writer": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+      "expression": "a.settled = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#69",
+      "call_path": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#64"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "expression": "require(bool,string)(block.timestamp >= a.endTime,AUCTION_NOT_ENDED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions",
+            "block.timestamp"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#65"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "expression": "require(bool,string)(! a.settled,ALREADY_SETTLED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#66"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "expression": "require(bool,string)(a.highestBidder != address(0),NO_BIDS)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#67"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#64"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "expression": "require(bool,string)(block.timestamp >= a.endTime,AUCTION_NOT_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "block.timestamp"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#65"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "expression": "require(bool,string)(! a.settled,ALREADY_SETTLED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#66"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+                "expression": "require(bool,string)(a.highestBidder != address(0),NO_BIDS)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#67"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.settle(bytes32)",
+          "call": "TUPLE_0(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_31, function:call, arguments:[''] value:REF_26 ",
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#73"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "9e8973666ba9c0e9"
+    },
+    "d22d65e9633bf628": {
+      "state": "DeFiAuctionTimeIdHarness.totalDeposited",
+      "writer": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+      "expression": "totalDeposited += msg.value",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#58",
+      "call_path": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions",
+            "block.timestamp"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions",
+            "msg.value"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "block.timestamp"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "msg.value"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "a.highestBidder != address(0)",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#53"
+              }
+            ],
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "block.timestamp"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "msg.value"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "a.highestBidder != address(0)",
+                "branch": "false",
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#53"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "d22d65e9633bf628"
+    },
+    "f06667991e9552ab": {
+      "state": "DeFiAuctionTimeIdHarness.totalPaidOut",
+      "writer": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+      "expression": "totalPaidOut += amount",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#82",
+      "call_path": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+          "expression": "require(bool,string)(amount > 0,NOTHING_TO_WITHDRAW)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#80"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+                "expression": "require(bool,string)(amount > 0,NOTHING_TO_WITHDRAW)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#80"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.withdrawOutbid(bytes32)",
+          "call": "TUPLE_1(bool,bytes) = LOW_LEVEL_CALL, dest:TMP_36, function:call, arguments:[''] value:amount ",
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#83"
+        }
+      ],
+      "expression_call_constraints": [],
+      "id": "f06667991e9552ab"
+    },
+    "ff0bba1e9fbb7386": {
+      "state": "DeFiAuctionTimeIdHarness.auctions",
+      "writer": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+      "expression": "a.highestBid = msg.value",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#57",
+      "call_path": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions",
+            "block.timestamp"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiAuctionTimeIdHarness.auctions"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiAuctionTimeIdHarness.auctions",
+              "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "a",
+            "auctions",
+            "msg.value"
+          ],
+          "data_dependencies": {
+            "auctions": [
+              "auctions"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "block.timestamp"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "msg.value"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "a.highestBidder != address(0)",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#53"
+              }
+            ],
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(a.endTime > 0,AUCTION_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#49"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(block.timestamp < a.endTime,AUCTION_ENDED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "block.timestamp"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#50"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "require(bool,string)(msg.value >= 1000000000000000000 && msg.value > a.highestBid,BID_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions",
+                  "msg.value"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#51"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiAuctionTimeIdHarness.bid(bytes32)",
+                "expression": "a.highestBidder != address(0)",
+                "branch": "false",
+                "state_reads": [
+                  "DeFiAuctionTimeIdHarness.auctions"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiAuctionTimeIdHarness.auctions",
+                    "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "a",
+                  "auctions"
+                ],
+                "data_dependencies": {
+                  "auctions": [
+                    "auctions"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiAuctionTimeId/DeFiAuctionTimeIdHarness.sol#53"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "ff0bba1e9fbb7386"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

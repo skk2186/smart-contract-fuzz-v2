@@ -1,0 +1,58 @@
+[2026-11-28 21:14:31.26] Compiling `sol/真实项目/Kink/echidna/KinkPoolEchidna.sol`... WARNING: Slither was explicitly disabled. Echidna uses Slither (https://github.com/crytic/slither) to perform source analysis, which makes fuzzing more effective. You should enable it.
+Done! (12.792434333s)
+Analyzing contract: /home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/echidna/KinkPoolEchidna.sol:KinkPoolEchidna
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2正式基准集/Native摸底/Kink/native_seed_20261128_v2/reproducers
+Loaded 0 transaction sequences from /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2正式基准集/Native摸底/Kink/native_seed_20261128_v2/coverage
+[2026-11-28 21:14:44.33] [Worker 0] Test echidna_invariant_matches_supply falsified!
+  Call sequence:
+KinkPoolEchidna.echidna_token1_conserved() from: 0x0000000000000000000000000000000000020000 Time delay: 49951 seconds Block delay: 16423
+KinkPoolEchidna.token1() from: 0x0000000000000000000000000000000000020000 Time delay: 62441 seconds Block delay: 49951
+KinkPoolEchidna.echidna_token0_accounting() from: 0x0000000000000000000000000000000000040000 Time delay: 6511 seconds Block delay: 71785
+KinkPoolEchidna.echidna_reserves_match_balances() from: 0x0000000000000000000000000000000000050000 Time delay: 73640 seconds Block delay: 41378
+KinkPoolEchidna.initialToken1() from: 0x0000000000000000000000000000000000030000 Time delay: 52101 seconds Block delay: 45606
+KinkPoolEchidna.echidna_token0_accounting() from: 0x0000000000000000000000000000000000050000 Time delay: 78 seconds Block delay: 49949
+KinkPoolEchidna.adversarialSwap(46740817476241221568510132734496013920490309800460362009416190038848018943632,81461821676699795974924617013089337698675277701139376064201533667672478083713) from: 0x0000000000000000000000000000000000050000 Time delay: 35918 seconds Block delay: 40710
+
+[2026-11-28 21:14:44.33]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2正式基准集/Native摸底/Kink/native_seed_20261128_v2/reproducers-unshrunk/4940761920931668297.txt
+[2026-11-28 21:14:44.34] [Worker 0] New coverage: 9390 instr, 8 contracts, 1 seqs in corpus
+[2026-11-28 21:14:44.34]  Saved reproducer to /home/skk/smart-contract-fuzz-v2/func/测试过程/SCFuzzBench公开项目接入/结果/M2正式基准集/Native摸底/Kink/native_seed_20261128_v2/coverage/3116997134298044282.txt
+[2026-11-28 21:14:44.37] [Worker 0] Test limit reached. Stopping.
+[2026-11-28 21:14:44.37] [status] tests: 1/1, fuzzing: 11/20000, values: [], cov: 9390, corpus: 1, gas/s: 0
+echidna_invariant_matches_supply: failed!💥  
+  Call sequence:
+    KinkPoolEchidna.echidna_token1_conserved() from: 0x0000000000000000000000000000000000020000 Time delay: 49951 seconds Block delay: 16423
+    KinkPoolEchidna.token1() from: 0x0000000000000000000000000000000000020000 Time delay: 62441 seconds Block delay: 49951
+    KinkPoolEchidna.echidna_token0_accounting() from: 0x0000000000000000000000000000000000040000 Time delay: 6511 seconds Block delay: 71785
+    KinkPoolEchidna.echidna_reserves_match_balances() from: 0x0000000000000000000000000000000000050000 Time delay: 73640 seconds Block delay: 41378
+    KinkPoolEchidna.echidna_token0_accounting() from: 0x0000000000000000000000000000000000050000 Time delay: 78 seconds Block delay: 49949
+    KinkPoolEchidna.adversarialSwap(46740817476241221568510132734496013920490309800460362009416190038848018943632,81461821676699795974924617013089337698675277701139376064201533667672478083713) from: 0x0000000000000000000000000000000000050000 Time delay: 35918 seconds Block delay: 40710
+
+Traces: 
+call 0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f::[1mtotalSupply[0m() [1m<no source map>[0m
+ ├╴delegatecall [1mKinkPool[0m::totalSupply()() [1m<no source map>[0m
+ │  └╴← (19899998749937417763373)
+ └╴← (19899998749937417763373)
+call 0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f::[1mcurrentInvariant[0m() [1m<no source map>[0m
+ ├╴delegatecall [1mKinkPool[0m::currentInvariant()() [1m<no source map>[0m
+ │  ├╴call [1mMockERC20[0m::balanceOf(address)(0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f) [1m(/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/KinkPool.sol:167)[0m
+ │  │  └╴← (11030843952237893741)
+ │  ├╴call 0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA::[1mbalanceOf[0m(0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f) [1m(/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/KinkPool.sol:168)[0m
+ │  │  └╴← (105832096219674971063919)
+ │  ├╴call [1mMockERC20[0m::balanceOf(address)(0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f) [1m(/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/KinkPool.sol:167)[0m
+ │  │  └╴← (11030843952237893741)
+ │  ├╴call 0x54919A19522Ce7c842E25735a9cFEcef1c0a06dA::[1mbalanceOf[0m(0xCa7D73225b58ff6bF96734Ef8E63713f4516A06f) [1m(/home/skk/smart-contract-fuzz-v2/sol/真实项目/Kink/KinkPool.sol:168)[0m
+ │  │  └╴← (105832096219674971063919)
+ │  └╴← (39591564140807446552938)
+ └╴← (39591564140807446552938)
+
+
+Unique instructions: 9390
+Unique codehashes: 8
+Corpus size: 1
+Seed: 20261128
+Total calls: 11
+
+[2026-11-28 21:14:44.39] Saving test reproducers... Done! (0.000771334s)
+[2026-11-28 21:14:44.39] Saving corpus... Done! (0.000102681s)
+[2026-11-28 21:14:44.39] Saving foundry reproducers... Done! (0.001146469s)
+[2026-11-28 21:14:44.39] Saving coverage... Done! (0.498989029s)

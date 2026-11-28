@@ -1,0 +1,2127 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol",
+    "contract": "DeFiERC4626InflationHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "DeFiERC4626InflationHarness",
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#13-82"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "DeFiERC4626InflationHarness",
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#13-82"
+    }
+  ],
+  "properties": [
+    {
+      "property": "DeFiERC4626InflationHarness.echidna_no_zero_share_deposit_loss()",
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#79-81",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "616871908331a8f2f4c2",
+      "analysis_contract": "DeFiERC4626InflationHarness",
+      "analysis_contract_source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#13-82",
+      "read_states": [
+        "DeFiERC4626InflationHarness.zeroShareLossOccurred"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "DeFiERC4626InflationHarness.echidna_no_zero_share_deposit_loss()",
+          "states": [
+            "DeFiERC4626InflationHarness.zeroShareLossOccurred"
+          ],
+          "expression": "! zeroShareLossOccurred",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#80"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender",
+            "this"
+          ],
+          "matched_states": [
+            "DeFiERC4626InflationHarness.zeroShareLossOccurred"
+          ],
+          "effect_ids": [
+            "b3dd8e919b32e405"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "04d55b2f20fb210e",
+        "409fbdc10171b324",
+        "62399689d2c92d94",
+        "67b965a52c820506",
+        "a1b9dd12c988cf11",
+        "aace3f9b030df960",
+        "b3dd8e919b32e405",
+        "e86bd8fa7b5f2654"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "DeFiERC4626InflationHarness.tokenAllowance",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiERC4626InflationHarness.approveVault(uint256)",
+              "effect_ids": [
+                "e86bd8fa7b5f2654"
+              ]
+            },
+            {
+              "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+              "effect_ids": [
+                "aace3f9b030df960"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiERC4626InflationHarness.tokenBalance",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "DeFiERC4626InflationHarness.constructor()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+              "effect_ids": [
+                "409fbdc10171b324"
+              ]
+            },
+            {
+              "function": "DeFiERC4626InflationHarness.donateToVault(uint256)",
+              "effect_ids": [
+                "04d55b2f20fb210e"
+              ]
+            },
+            {
+              "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+              "effect_ids": [
+                "67b965a52c820506"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiERC4626InflationHarness.shareBalance",
+          "depth": 1,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+              "effect_ids": [
+                "a1b9dd12c988cf11"
+              ]
+            },
+            {
+              "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+              "effect_ids": [
+                "62399689d2c92d94"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "04d55b2f20fb210e": {
+      "state": "DeFiERC4626InflationHarness.tokenBalance",
+      "writer": "DeFiERC4626InflationHarness.donateToVault(uint256)",
+      "expression": "tokenBalance[msg.sender] -= assets",
+      "index_accesses": [
+        {
+          "base": "tokenBalance",
+          "key": "msg.sender",
+          "reference": "REF_12"
+        }
+      ],
+      "source_index_accesses": [
+        "tokenBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#63",
+      "call_path": [
+        {
+          "function": "DeFiERC4626InflationHarness.donateToVault(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.donateToVault(uint256)",
+          "expression": "require(bool,string)(assets > 0,ZERO_DONATION)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "assets"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#61"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.donateToVault(uint256)",
+          "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenBalance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "tokenBalance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenBalance": [
+              "assets",
+              "tokenBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#62"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiERC4626InflationHarness.donateToVault(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.donateToVault(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_DONATION)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#61"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.donateToVault(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#62"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "04d55b2f20fb210e"
+    },
+    "409fbdc10171b324": {
+      "state": "DeFiERC4626InflationHarness.tokenBalance",
+      "writer": "DeFiERC4626InflationHarness.deposit(uint256)",
+      "expression": "tokenBalance[msg.sender] -= assets",
+      "index_accesses": [
+        {
+          "base": "tokenBalance",
+          "key": "msg.sender",
+          "reference": "REF_9"
+        }
+      ],
+      "source_index_accesses": [
+        "tokenBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#49",
+      "call_path": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "assets"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenAllowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenAllowance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "this",
+            "tokenAllowance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenAllowance": [
+              "tokenAllowance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenBalance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "tokenBalance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenBalance": [
+              "assets",
+              "tokenBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenAllowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenAllowance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "this",
+                  "tokenAllowance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenAllowance": [
+                    "tokenAllowance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "totalShares == 0",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.totalShares"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.totalShares",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "totalShares"
+                ],
+                "data_dependencies": {
+                  "totalShares": [
+                    "assets",
+                    "totalShares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#42"
+              }
+            ],
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenAllowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenAllowance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "this",
+                  "tokenAllowance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenAllowance": [
+                    "tokenAllowance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "totalShares == 0",
+                "branch": "false",
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.totalShares"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.totalShares",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "totalShares"
+                ],
+                "data_dependencies": {
+                  "totalShares": [
+                    "assets",
+                    "totalShares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#42"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "409fbdc10171b324"
+    },
+    "62399689d2c92d94": {
+      "state": "DeFiERC4626InflationHarness.shareBalance",
+      "writer": "DeFiERC4626InflationHarness.redeem(uint256)",
+      "expression": "shareBalance[msg.sender] -= shares",
+      "index_accesses": [
+        {
+          "base": "shareBalance",
+          "key": "msg.sender",
+          "reference": "REF_14"
+        }
+      ],
+      "source_index_accesses": [
+        "shareBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#71",
+      "call_path": [
+        {
+          "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+          "expression": "require(bool,string)(shares > 0 && shareBalance[msg.sender] >= shares,INSUFFICIENT_SHARES)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.shareBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.shareBalance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#19"
+            }
+          ],
+          "variables_read": [
+            "msg.sender",
+            "shareBalance",
+            "shares"
+          ],
+          "data_dependencies": {
+            "shares": [
+              "shares"
+            ],
+            "shareBalance": [
+              "shareBalance",
+              "shares"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#69"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+                "expression": "require(bool,string)(shares > 0 && shareBalance[msg.sender] >= shares,INSUFFICIENT_SHARES)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.shareBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.shareBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#19"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "shareBalance",
+                  "shares"
+                ],
+                "data_dependencies": {
+                  "shares": [
+                    "shares"
+                  ],
+                  "shareBalance": [
+                    "shareBalance",
+                    "shares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#69"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "62399689d2c92d94"
+    },
+    "67b965a52c820506": {
+      "state": "DeFiERC4626InflationHarness.tokenBalance",
+      "writer": "DeFiERC4626InflationHarness.redeem(uint256)",
+      "expression": "tokenBalance[msg.sender] += assets",
+      "index_accesses": [
+        {
+          "base": "tokenBalance",
+          "key": "msg.sender",
+          "reference": "REF_15"
+        }
+      ],
+      "source_index_accesses": [
+        "tokenBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#74",
+      "call_path": [
+        {
+          "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+          "expression": "require(bool,string)(shares > 0 && shareBalance[msg.sender] >= shares,INSUFFICIENT_SHARES)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.shareBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.shareBalance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#19"
+            }
+          ],
+          "variables_read": [
+            "msg.sender",
+            "shareBalance",
+            "shares"
+          ],
+          "data_dependencies": {
+            "shares": [
+              "shares"
+            ],
+            "shareBalance": [
+              "shareBalance",
+              "shares"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#69"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.redeem(uint256)",
+                "expression": "require(bool,string)(shares > 0 && shareBalance[msg.sender] >= shares,INSUFFICIENT_SHARES)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.shareBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.shareBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#19"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "shareBalance",
+                  "shares"
+                ],
+                "data_dependencies": {
+                  "shares": [
+                    "shares"
+                  ],
+                  "shareBalance": [
+                    "shareBalance",
+                    "shares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#69"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "67b965a52c820506"
+    },
+    "a1b9dd12c988cf11": {
+      "state": "DeFiERC4626InflationHarness.shareBalance",
+      "writer": "DeFiERC4626InflationHarness.deposit(uint256)",
+      "expression": "shareBalance[msg.sender] += shares",
+      "index_accesses": [
+        {
+          "base": "shareBalance",
+          "key": "msg.sender",
+          "reference": "REF_10"
+        }
+      ],
+      "source_index_accesses": [
+        "shareBalance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#51",
+      "call_path": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "assets"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenAllowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenAllowance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "this",
+            "tokenAllowance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenAllowance": [
+              "tokenAllowance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenBalance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "tokenBalance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenBalance": [
+              "assets",
+              "tokenBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenAllowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenAllowance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "this",
+                  "tokenAllowance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenAllowance": [
+                    "tokenAllowance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "totalShares == 0",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.totalShares"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.totalShares",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "totalShares"
+                ],
+                "data_dependencies": {
+                  "totalShares": [
+                    "assets",
+                    "totalShares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#42"
+              }
+            ],
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenAllowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenAllowance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "this",
+                  "tokenAllowance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenAllowance": [
+                    "tokenAllowance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "totalShares == 0",
+                "branch": "false",
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.totalShares"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.totalShares",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "totalShares"
+                ],
+                "data_dependencies": {
+                  "totalShares": [
+                    "assets",
+                    "totalShares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#42"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "a1b9dd12c988cf11"
+    },
+    "aace3f9b030df960": {
+      "state": "DeFiERC4626InflationHarness.tokenAllowance",
+      "writer": "DeFiERC4626InflationHarness.deposit(uint256)",
+      "expression": "tokenAllowance[msg.sender][address(this)] -= assets",
+      "index_accesses": [
+        {
+          "base": "tokenAllowance",
+          "key": "msg.sender",
+          "reference": "REF_7"
+        },
+        {
+          "base": "REF_7",
+          "key": "TMP_11",
+          "reference": "REF_8"
+        }
+      ],
+      "source_index_accesses": [
+        "tokenAllowance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#48",
+      "call_path": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "assets"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenAllowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenAllowance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "this",
+            "tokenAllowance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenAllowance": [
+              "tokenAllowance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenBalance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "tokenBalance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenBalance": [
+              "assets",
+              "tokenBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenAllowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenAllowance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "this",
+                  "tokenAllowance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenAllowance": [
+                    "tokenAllowance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "totalShares == 0",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.totalShares"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.totalShares",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "totalShares"
+                ],
+                "data_dependencies": {
+                  "totalShares": [
+                    "assets",
+                    "totalShares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#42"
+              }
+            ],
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenAllowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenAllowance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "this",
+                  "tokenAllowance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenAllowance": [
+                    "tokenAllowance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "totalShares == 0",
+                "branch": "false",
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.totalShares"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.totalShares",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "totalShares"
+                ],
+                "data_dependencies": {
+                  "totalShares": [
+                    "assets",
+                    "totalShares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#42"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "aace3f9b030df960"
+    },
+    "b3dd8e919b32e405": {
+      "state": "DeFiERC4626InflationHarness.zeroShareLossOccurred",
+      "writer": "DeFiERC4626InflationHarness.deposit(uint256)",
+      "expression": "zeroShareLossOccurred = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#55",
+      "call_path": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "assets"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenAllowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenAllowance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "this",
+            "tokenAllowance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenAllowance": [
+              "tokenAllowance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+          "branch": null,
+          "state_reads": [
+            "DeFiERC4626InflationHarness.tokenBalance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiERC4626InflationHarness.tokenBalance",
+              "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+            }
+          ],
+          "variables_read": [
+            "assets",
+            "msg.sender",
+            "tokenBalance"
+          ],
+          "data_dependencies": {
+            "assets": [
+              "assets"
+            ],
+            "tokenBalance": [
+              "assets",
+              "tokenBalance"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+        },
+        {
+          "kind": "control_branch",
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "expression": "assets >= 1000000000000000000 && shares == 0",
+          "branch": "true",
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "assets",
+            "shares"
+          ],
+          "data_dependencies": {
+            "shares": [
+              "assets"
+            ],
+            "assets": [
+              "assets"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#54"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenAllowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenAllowance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "this",
+                  "tokenAllowance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenAllowance": [
+                    "tokenAllowance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "totalShares == 0",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.totalShares"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.totalShares",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "totalShares"
+                ],
+                "data_dependencies": {
+                  "totalShares": [
+                    "assets",
+                    "totalShares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#42"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "assets >= 1000000000000000000 && shares == 0",
+                "branch": "true",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets",
+                  "shares"
+                ],
+                "data_dependencies": {
+                  "shares": [
+                    "assets"
+                  ],
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#54"
+              }
+            ],
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(assets > 0,ZERO_ASSETS)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#38"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenAllowance[msg.sender][address(this)] >= assets,ALLOWANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenAllowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenAllowance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "this",
+                  "tokenAllowance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenAllowance": [
+                    "tokenAllowance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "require(bool,string)(tokenBalance[msg.sender] >= assets,BALANCE_TOO_LOW)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.tokenBalance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.tokenBalance",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#17"
+                  }
+                ],
+                "variables_read": [
+                  "assets",
+                  "msg.sender",
+                  "tokenBalance"
+                ],
+                "data_dependencies": {
+                  "assets": [
+                    "assets"
+                  ],
+                  "tokenBalance": [
+                    "assets",
+                    "tokenBalance"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#40"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "totalShares == 0",
+                "branch": "false",
+                "state_reads": [
+                  "DeFiERC4626InflationHarness.totalShares"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiERC4626InflationHarness.totalShares",
+                    "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "totalShares"
+                ],
+                "data_dependencies": {
+                  "totalShares": [
+                    "assets",
+                    "totalShares"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#42"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiERC4626InflationHarness.deposit(uint256)",
+                "expression": "assets >= 1000000000000000000 && shares == 0",
+                "branch": "true",
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "assets",
+                  "shares"
+                ],
+                "data_dependencies": {
+                  "shares": [
+                    "assets"
+                  ],
+                  "assets": [
+                    "assets"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#54"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "b3dd8e919b32e405"
+    },
+    "e86bd8fa7b5f2654": {
+      "state": "DeFiERC4626InflationHarness.tokenAllowance",
+      "writer": "DeFiERC4626InflationHarness.approveVault(uint256)",
+      "expression": "tokenAllowance[msg.sender][address(this)] = amount",
+      "index_accesses": [
+        {
+          "base": "tokenAllowance",
+          "key": "msg.sender",
+          "reference": "REF_2"
+        },
+        {
+          "base": "REF_2",
+          "key": "TMP_0",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [
+        "tokenAllowance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/DeFiERC4626Inflation/DeFiERC4626InflationHarness.sol#34",
+      "call_path": [
+        {
+          "function": "DeFiERC4626InflationHarness.approveVault(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiERC4626InflationHarness.approveVault(uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "e86bd8fa7b5f2654"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

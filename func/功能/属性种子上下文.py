@@ -372,7 +372,8 @@ def _seed_abi_supported(entry: dict[str, Any]) -> tuple[bool, str | None]:
     def supported_type(kind: str) -> bool:
         array_match = re.fullmatch(r"(.+)\[\]", kind)
         if array_match:
-            return bool(SEED_TYPES.fullmatch(array_match.group(1)))
+            elem = array_match.group(1)
+            return elem == "address" or bool(SEED_TYPES.fullmatch(elem))
         return (kind == "string" or kind == "address" or kind == "bool" or
                 bool(SEED_TYPES.fullmatch(kind)) or
                 bool(FIXED_BYTES_TYPES.fullmatch(kind)))
@@ -548,6 +549,47 @@ def _property_context(project: str, prop: dict[str, Any], report: dict[str, Any]
             added_this_hop += 1
         if added_this_hop == 0:
             break
+
+    # Implicit ETH balance writer closure: when the property predicate reads
+    # contract ETH balance (e.g., address(this).balance), include payable ABI
+    # actions and functions whose source sends ETH (.transfer / .send / .call{value).
+    prop_pred_src = source_excerpt(project, prop.get("source", "")) or ""
+    if ".balance" in prop_pred_src:
+        for abi_sig, abi_entry in sorted(abi_functions.items()):
+            if abi_sig in existing_abi_sigs or abi_sig == property_tail_name:
+                continue
+            if abi_entry.get("stateMutability") in {"view", "pure"}:
+                continue
+            supported, _ = _seed_abi_supported(abi_entry)
+            if not supported:
+                continue
+            full_sig = f"{PROJECTS[project]['contract']}.{abi_sig}"
+            fn_src = _function_excerpt(project, full_sig, abi_signature=abi_sig) or ""
+            touches_eth = (
+                abi_entry.get("stateMutability") == "payable"
+                or bool(re.search(r"\.(?:transfer|send)\s*\(|\.call\s*\{[^}]*value|\.call\.value\s*\(", fn_src))
+            )
+            if not touches_eth:
+                continue
+            actions.append({
+                "function": full_sig,
+                "abi_signature": abi_sig,
+                "abi_inputs": [{"name": x.get("name", ""), "type": x["type"]}
+                               for x in abi_entry.get("inputs", [])],
+                "argument_ranges": _abi_argument_ranges(abi_entry),
+                "state_mutability": abi_entry.get("stateMutability"),
+                "payable": abi_entry.get("stateMutability") == "payable",
+                "matched_states": ["<contract_eth_balance>"],
+                "environment_reads": [],
+                "static_status": "eth_balance_effect_writer",
+                "action_source": "eth_balance_effect_writer",
+                "seed_compatible": True,
+                "seed_limitation": None,
+                "source_excerpt": fn_src,
+                "source_call_chain": _source_call_chain(project, full_sig, abi_sig),
+                "effect_evidence": [],
+            })
+            existing_abi_sigs.add(abi_sig)
 
     # Attach helper effects only when the public action source visibly calls the
     # corresponding helper. This is a candidate relation, not a proof of runtime
@@ -776,7 +818,7 @@ def _focused_actions(prop: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[s
     kept = [action for action in actions
             if action_states.get(str(action.get("abi_signature") or action.get("function")), set())
             & focused_states or action.get("abi_signature") == trigger
-            or action.get("action_source") == "prerequisite_guard_writer"]
+            or action.get("action_source") in {"prerequisite_guard_writer", "eth_balance_effect_writer"}]
     if not kept:
         kept = actions
         method = "evidence_not_selective_keep_all"

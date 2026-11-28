@@ -77,6 +77,10 @@ def _abi_value(kind: str, value: Any) -> dict[str, Any]:
     array_match = re.fullmatch(r"(.+)\[\]", kind)
     if array_match:
         element_kind = array_match.group(1)
+        if element_kind == "address":
+            return {"tag": "AbiArrayDynamic",
+                    "contents": [{"tag": "AbiAddressType"},
+                                 [_abi_value(element_kind, item) for item in normalized]]}
         integer_match = re.fullmatch(r"(u?int)([0-9]*)", element_kind)
         if not integer_match:
             raise ValueError(f"Echidna 动态数组原生语料暂不支持元素类型：{element_kind}")

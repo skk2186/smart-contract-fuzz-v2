@@ -1,0 +1,2869 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol",
+    "contract": "DeFiMultiSigBypassHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "DeFiMultiSigBypassHarness",
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#10-96"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "DeFiMultiSigBypassHarness",
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#10-96"
+    }
+  ],
+  "properties": [
+    {
+      "property": "DeFiMultiSigBypassHarness.echidna_threshold_requires_distinct_signers()",
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#93-95",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "0b8e8cd7a6bd83f5745e",
+      "analysis_contract": "DeFiMultiSigBypassHarness",
+      "analysis_contract_source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#10-96",
+      "read_states": [
+        "DeFiMultiSigBypassHarness.singleSignerExecuted"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "DeFiMultiSigBypassHarness.echidna_threshold_requires_distinct_signers()",
+          "states": [
+            "DeFiMultiSigBypassHarness.singleSignerExecuted"
+          ],
+          "expression": "! singleSignerExecuted",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#94"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "DeFiMultiSigBypassHarness.singleSignerExecuted"
+          ],
+          "effect_ids": [
+            "f4d09e5e67de4917"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "0241ce42a4965bdb",
+        "056cca7a9beaa2f5",
+        "0df0e9c26150aece",
+        "296f2be8a97bd211",
+        "3feca1898cf06059",
+        "ab80420153392d08",
+        "d61b0330b2ab9aa9",
+        "f4d09e5e67de4917"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "DeFiMultiSigBypassHarness.distinctSignerCount",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+              "effect_ids": [
+                "0df0e9c26150aece"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiMultiSigBypassHarness.txs",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+              "effect_ids": [
+                "d61b0330b2ab9aa9"
+              ]
+            },
+            {
+              "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+              "effect_ids": [
+                "3feca1898cf06059"
+              ]
+            },
+            {
+              "function": "DeFiMultiSigBypassHarness.submitTx(address,uint256,bytes32)",
+              "effect_ids": [
+                "0241ce42a4965bdb"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiMultiSigBypassHarness.isConfirmed",
+          "depth": 1,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+              "effect_ids": [
+                "296f2be8a97bd211"
+              ]
+            },
+            {
+              "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+              "effect_ids": [
+                "ab80420153392d08"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "DeFiMultiSigBypassHarness.everConfirmed",
+          "depth": 1,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+              "effect_ids": [
+                "056cca7a9beaa2f5"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "0241ce42a4965bdb": {
+      "state": "DeFiMultiSigBypassHarness.txs",
+      "writer": "DeFiMultiSigBypassHarness.submitTx(address,uint256,bytes32)",
+      "expression": "txs[txId] = TxProposal({to:to,amount:amount,confirmationCount:0,executed:false})",
+      "index_accesses": [
+        {
+          "base": "txs",
+          "key": "txId",
+          "reference": "REF_1"
+        }
+      ],
+      "source_index_accesses": [
+        "txs[txId]"
+      ],
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#44-49",
+      "call_path": [
+        {
+          "function": "DeFiMultiSigBypassHarness.submitTx(address,uint256,bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.SIGNER_1",
+            "DeFiMultiSigBypassHarness.SIGNER_2",
+            "DeFiMultiSigBypassHarness.SIGNER_3"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "SIGNER_1",
+            "SIGNER_2",
+            "SIGNER_3",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "SIGNER_1": [
+              "SIGNER_1"
+            ],
+            "SIGNER_3": [
+              "SIGNER_3"
+            ],
+            "SIGNER_2": [
+              "SIGNER_2"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.submitTx(address,uint256,bytes32)",
+          "expression": "require(bool,string)(to != address(0) && amount > 0,INVALID_TX)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "amount",
+            "to"
+          ],
+          "data_dependencies": {
+            "amount": [
+              "amount"
+            ],
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#41"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.onlySigner()",
+                "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.SIGNER_1",
+                  "DeFiMultiSigBypassHarness.SIGNER_2",
+                  "DeFiMultiSigBypassHarness.SIGNER_3"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "SIGNER_1",
+                  "SIGNER_2",
+                  "SIGNER_3",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "SIGNER_1": [
+                    "SIGNER_1"
+                  ],
+                  "SIGNER_3": [
+                    "SIGNER_3"
+                  ],
+                  "SIGNER_2": [
+                    "SIGNER_2"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "DeFiMultiSigBypassHarness.submitTx(address,uint256,bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.submitTx(address,uint256,bytes32)",
+                "expression": "require(bool,string)(to != address(0) && amount > 0,INVALID_TX)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "amount",
+                  "to"
+                ],
+                "data_dependencies": {
+                  "amount": [
+                    "amount"
+                  ],
+                  "to": [
+                    "to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#41"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "0241ce42a4965bdb"
+    },
+    "056cca7a9beaa2f5": {
+      "state": "DeFiMultiSigBypassHarness.everConfirmed",
+      "writer": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+      "expression": "everConfirmed[txId][msg.sender] = true",
+      "index_accesses": [
+        {
+          "base": "everConfirmed",
+          "key": "txId",
+          "reference": "REF_12"
+        },
+        {
+          "base": "REF_12",
+          "key": "msg.sender",
+          "reference": "REF_13"
+        }
+      ],
+      "source_index_accesses": [
+        "everConfirmed[txId]"
+      ],
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#62",
+      "call_path": [
+        {
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.SIGNER_1",
+            "DeFiMultiSigBypassHarness.SIGNER_2",
+            "DeFiMultiSigBypassHarness.SIGNER_3"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "SIGNER_1",
+            "SIGNER_2",
+            "SIGNER_3",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "SIGNER_1": [
+              "SIGNER_1"
+            ],
+            "SIGNER_3": [
+              "SIGNER_3"
+            ],
+            "SIGNER_2": [
+              "SIGNER_2"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#55"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#56"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(! isConfirmed[txId][msg.sender],ALREADY_CONFIRMED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.isConfirmed"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.isConfirmed",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "isConfirmed",
+            "msg.sender",
+            "txId"
+          ],
+          "data_dependencies": {
+            "isConfirmed": [
+              "isConfirmed"
+            ],
+            "txId": [
+              "txId"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#57"
+        },
+        {
+          "kind": "control_branch",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "! everConfirmed[txId][msg.sender]",
+          "branch": "true",
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.everConfirmed"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.everConfirmed",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "everConfirmed",
+            "msg.sender",
+            "txId"
+          ],
+          "data_dependencies": {
+            "txId": [
+              "txId"
+            ],
+            "everConfirmed": [
+              "everConfirmed"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#61"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.onlySigner()",
+                "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.SIGNER_1",
+                  "DeFiMultiSigBypassHarness.SIGNER_2",
+                  "DeFiMultiSigBypassHarness.SIGNER_3"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "SIGNER_1",
+                  "SIGNER_2",
+                  "SIGNER_3",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "SIGNER_1": [
+                    "SIGNER_1"
+                  ],
+                  "SIGNER_3": [
+                    "SIGNER_3"
+                  ],
+                  "SIGNER_2": [
+                    "SIGNER_2"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#55"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#56"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(! isConfirmed[txId][msg.sender],ALREADY_CONFIRMED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.isConfirmed"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.isConfirmed",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "isConfirmed",
+                  "msg.sender",
+                  "txId"
+                ],
+                "data_dependencies": {
+                  "isConfirmed": [
+                    "isConfirmed"
+                  ],
+                  "txId": [
+                    "txId"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#57"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "! everConfirmed[txId][msg.sender]",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.everConfirmed"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.everConfirmed",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "everConfirmed",
+                  "msg.sender",
+                  "txId"
+                ],
+                "data_dependencies": {
+                  "txId": [
+                    "txId"
+                  ],
+                  "everConfirmed": [
+                    "everConfirmed"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#61"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "056cca7a9beaa2f5"
+    },
+    "0df0e9c26150aece": {
+      "state": "DeFiMultiSigBypassHarness.distinctSignerCount",
+      "writer": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+      "expression": "distinctSignerCount[txId] += 1",
+      "index_accesses": [
+        {
+          "base": "distinctSignerCount",
+          "key": "txId",
+          "reference": "REF_14"
+        }
+      ],
+      "source_index_accesses": [
+        "distinctSignerCount[txId]"
+      ],
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#63",
+      "call_path": [
+        {
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.SIGNER_1",
+            "DeFiMultiSigBypassHarness.SIGNER_2",
+            "DeFiMultiSigBypassHarness.SIGNER_3"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "SIGNER_1",
+            "SIGNER_2",
+            "SIGNER_3",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "SIGNER_1": [
+              "SIGNER_1"
+            ],
+            "SIGNER_3": [
+              "SIGNER_3"
+            ],
+            "SIGNER_2": [
+              "SIGNER_2"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#55"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#56"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(! isConfirmed[txId][msg.sender],ALREADY_CONFIRMED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.isConfirmed"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.isConfirmed",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "isConfirmed",
+            "msg.sender",
+            "txId"
+          ],
+          "data_dependencies": {
+            "isConfirmed": [
+              "isConfirmed"
+            ],
+            "txId": [
+              "txId"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#57"
+        },
+        {
+          "kind": "control_branch",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "! everConfirmed[txId][msg.sender]",
+          "branch": "true",
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.everConfirmed"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.everConfirmed",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#27"
+            }
+          ],
+          "variables_read": [
+            "everConfirmed",
+            "msg.sender",
+            "txId"
+          ],
+          "data_dependencies": {
+            "txId": [
+              "txId"
+            ],
+            "everConfirmed": [
+              "everConfirmed"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#61"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.onlySigner()",
+                "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.SIGNER_1",
+                  "DeFiMultiSigBypassHarness.SIGNER_2",
+                  "DeFiMultiSigBypassHarness.SIGNER_3"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "SIGNER_1",
+                  "SIGNER_2",
+                  "SIGNER_3",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "SIGNER_1": [
+                    "SIGNER_1"
+                  ],
+                  "SIGNER_3": [
+                    "SIGNER_3"
+                  ],
+                  "SIGNER_2": [
+                    "SIGNER_2"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#55"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#56"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(! isConfirmed[txId][msg.sender],ALREADY_CONFIRMED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.isConfirmed"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.isConfirmed",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "isConfirmed",
+                  "msg.sender",
+                  "txId"
+                ],
+                "data_dependencies": {
+                  "isConfirmed": [
+                    "isConfirmed"
+                  ],
+                  "txId": [
+                    "txId"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#57"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "! everConfirmed[txId][msg.sender]",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.everConfirmed"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.everConfirmed",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#27"
+                  }
+                ],
+                "variables_read": [
+                  "everConfirmed",
+                  "msg.sender",
+                  "txId"
+                ],
+                "data_dependencies": {
+                  "txId": [
+                    "txId"
+                  ],
+                  "everConfirmed": [
+                    "everConfirmed"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#61"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "0df0e9c26150aece"
+    },
+    "296f2be8a97bd211": {
+      "state": "DeFiMultiSigBypassHarness.isConfirmed",
+      "writer": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+      "expression": "isConfirmed[txId][msg.sender] = true",
+      "index_accesses": [
+        {
+          "base": "isConfirmed",
+          "key": "txId",
+          "reference": "REF_7"
+        },
+        {
+          "base": "REF_7",
+          "key": "msg.sender",
+          "reference": "REF_8"
+        }
+      ],
+      "source_index_accesses": [
+        "isConfirmed[txId]"
+      ],
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#59",
+      "call_path": [
+        {
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.SIGNER_1",
+            "DeFiMultiSigBypassHarness.SIGNER_2",
+            "DeFiMultiSigBypassHarness.SIGNER_3"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "SIGNER_1",
+            "SIGNER_2",
+            "SIGNER_3",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "SIGNER_1": [
+              "SIGNER_1"
+            ],
+            "SIGNER_3": [
+              "SIGNER_3"
+            ],
+            "SIGNER_2": [
+              "SIGNER_2"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#55"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#56"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(! isConfirmed[txId][msg.sender],ALREADY_CONFIRMED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.isConfirmed"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.isConfirmed",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "isConfirmed",
+            "msg.sender",
+            "txId"
+          ],
+          "data_dependencies": {
+            "isConfirmed": [
+              "isConfirmed"
+            ],
+            "txId": [
+              "txId"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#57"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.onlySigner()",
+                "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.SIGNER_1",
+                  "DeFiMultiSigBypassHarness.SIGNER_2",
+                  "DeFiMultiSigBypassHarness.SIGNER_3"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "SIGNER_1",
+                  "SIGNER_2",
+                  "SIGNER_3",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "SIGNER_1": [
+                    "SIGNER_1"
+                  ],
+                  "SIGNER_3": [
+                    "SIGNER_3"
+                  ],
+                  "SIGNER_2": [
+                    "SIGNER_2"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#55"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#56"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(! isConfirmed[txId][msg.sender],ALREADY_CONFIRMED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.isConfirmed"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.isConfirmed",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "isConfirmed",
+                  "msg.sender",
+                  "txId"
+                ],
+                "data_dependencies": {
+                  "isConfirmed": [
+                    "isConfirmed"
+                  ],
+                  "txId": [
+                    "txId"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#57"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "296f2be8a97bd211"
+    },
+    "3feca1898cf06059": {
+      "state": "DeFiMultiSigBypassHarness.txs",
+      "writer": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+      "expression": "t.executed = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#85",
+      "call_path": [
+        {
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.SIGNER_1",
+            "DeFiMultiSigBypassHarness.SIGNER_2",
+            "DeFiMultiSigBypassHarness.SIGNER_3"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "SIGNER_1",
+            "SIGNER_2",
+            "SIGNER_3",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "SIGNER_1": [
+              "SIGNER_1"
+            ],
+            "SIGNER_3": [
+              "SIGNER_3"
+            ],
+            "SIGNER_2": [
+              "SIGNER_2"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#81"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#82"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "expression": "require(bool,string)(t.confirmationCount >= THRESHOLD,INSUFFICIENT_CONFIRMATIONS)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.THRESHOLD",
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.THRESHOLD",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#14"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "THRESHOLD",
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "THRESHOLD": [
+              "THRESHOLD"
+            ],
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#83"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.onlySigner()",
+                "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.SIGNER_1",
+                  "DeFiMultiSigBypassHarness.SIGNER_2",
+                  "DeFiMultiSigBypassHarness.SIGNER_3"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "SIGNER_1",
+                  "SIGNER_2",
+                  "SIGNER_3",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "SIGNER_1": [
+                    "SIGNER_1"
+                  ],
+                  "SIGNER_3": [
+                    "SIGNER_3"
+                  ],
+                  "SIGNER_2": [
+                    "SIGNER_2"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+                "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#81"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+                "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#82"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+                "expression": "require(bool,string)(t.confirmationCount >= THRESHOLD,INSUFFICIENT_CONFIRMATIONS)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.THRESHOLD",
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.THRESHOLD",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#14"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "THRESHOLD",
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "THRESHOLD": [
+                    "THRESHOLD"
+                  ],
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#83"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "3feca1898cf06059"
+    },
+    "ab80420153392d08": {
+      "state": "DeFiMultiSigBypassHarness.isConfirmed",
+      "writer": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+      "expression": "isConfirmed[txId][msg.sender] = false",
+      "index_accesses": [
+        {
+          "base": "isConfirmed",
+          "key": "txId",
+          "reference": "REF_21"
+        },
+        {
+          "base": "REF_21",
+          "key": "msg.sender",
+          "reference": "REF_22"
+        }
+      ],
+      "source_index_accesses": [
+        "isConfirmed[txId]"
+      ],
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#75",
+      "call_path": [
+        {
+          "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.SIGNER_1",
+            "DeFiMultiSigBypassHarness.SIGNER_2",
+            "DeFiMultiSigBypassHarness.SIGNER_3"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "SIGNER_1",
+            "SIGNER_2",
+            "SIGNER_3",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "SIGNER_1": [
+              "SIGNER_1"
+            ],
+            "SIGNER_3": [
+              "SIGNER_3"
+            ],
+            "SIGNER_2": [
+              "SIGNER_2"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+          "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#71"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+          "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#72"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+          "expression": "require(bool,string)(isConfirmed[txId][msg.sender],NOT_CONFIRMED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.isConfirmed"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.isConfirmed",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "isConfirmed",
+            "msg.sender",
+            "txId"
+          ],
+          "data_dependencies": {
+            "txId": [
+              "txId"
+            ],
+            "isConfirmed": [
+              "isConfirmed"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#73"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.onlySigner()",
+                "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.SIGNER_1",
+                  "DeFiMultiSigBypassHarness.SIGNER_2",
+                  "DeFiMultiSigBypassHarness.SIGNER_3"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "SIGNER_1",
+                  "SIGNER_2",
+                  "SIGNER_3",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "SIGNER_1": [
+                    "SIGNER_1"
+                  ],
+                  "SIGNER_3": [
+                    "SIGNER_3"
+                  ],
+                  "SIGNER_2": [
+                    "SIGNER_2"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+                "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#71"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+                "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#72"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.revokeConfirmation(bytes32)",
+                "expression": "require(bool,string)(isConfirmed[txId][msg.sender],NOT_CONFIRMED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.isConfirmed"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.isConfirmed",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "isConfirmed",
+                  "msg.sender",
+                  "txId"
+                ],
+                "data_dependencies": {
+                  "txId": [
+                    "txId"
+                  ],
+                  "isConfirmed": [
+                    "isConfirmed"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#73"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "ab80420153392d08"
+    },
+    "d61b0330b2ab9aa9": {
+      "state": "DeFiMultiSigBypassHarness.txs",
+      "writer": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+      "expression": "t.confirmationCount += 1",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#60",
+      "call_path": [
+        {
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.SIGNER_1",
+            "DeFiMultiSigBypassHarness.SIGNER_2",
+            "DeFiMultiSigBypassHarness.SIGNER_3"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "SIGNER_1",
+            "SIGNER_2",
+            "SIGNER_3",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "SIGNER_1": [
+              "SIGNER_1"
+            ],
+            "SIGNER_3": [
+              "SIGNER_3"
+            ],
+            "SIGNER_2": [
+              "SIGNER_2"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#55"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#56"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "expression": "require(bool,string)(! isConfirmed[txId][msg.sender],ALREADY_CONFIRMED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.isConfirmed"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.isConfirmed",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+            }
+          ],
+          "variables_read": [
+            "isConfirmed",
+            "msg.sender",
+            "txId"
+          ],
+          "data_dependencies": {
+            "isConfirmed": [
+              "isConfirmed"
+            ],
+            "txId": [
+              "txId"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#57"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.onlySigner()",
+                "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.SIGNER_1",
+                  "DeFiMultiSigBypassHarness.SIGNER_2",
+                  "DeFiMultiSigBypassHarness.SIGNER_3"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "SIGNER_1",
+                  "SIGNER_2",
+                  "SIGNER_3",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "SIGNER_1": [
+                    "SIGNER_1"
+                  ],
+                  "SIGNER_3": [
+                    "SIGNER_3"
+                  ],
+                  "SIGNER_2": [
+                    "SIGNER_2"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#55"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#56"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.confirmTx(bytes32)",
+                "expression": "require(bool,string)(! isConfirmed[txId][msg.sender],ALREADY_CONFIRMED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.isConfirmed"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.isConfirmed",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#25"
+                  }
+                ],
+                "variables_read": [
+                  "isConfirmed",
+                  "msg.sender",
+                  "txId"
+                ],
+                "data_dependencies": {
+                  "isConfirmed": [
+                    "isConfirmed"
+                  ],
+                  "txId": [
+                    "txId"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#57"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "d61b0330b2ab9aa9"
+    },
+    "f4d09e5e67de4917": {
+      "state": "DeFiMultiSigBypassHarness.singleSignerExecuted",
+      "writer": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+      "expression": "singleSignerExecuted = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#87",
+      "call_path": [
+        {
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.SIGNER_1",
+            "DeFiMultiSigBypassHarness.SIGNER_2",
+            "DeFiMultiSigBypassHarness.SIGNER_3"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "SIGNER_1",
+            "SIGNER_2",
+            "SIGNER_3",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "SIGNER_1": [
+              "SIGNER_1"
+            ],
+            "SIGNER_3": [
+              "SIGNER_3"
+            ],
+            "SIGNER_2": [
+              "SIGNER_2"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#81"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#82"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "expression": "require(bool,string)(t.confirmationCount >= THRESHOLD,INSUFFICIENT_CONFIRMATIONS)",
+          "branch": null,
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.THRESHOLD",
+            "DeFiMultiSigBypassHarness.txs"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.THRESHOLD",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#14"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.txs",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "THRESHOLD",
+            "t",
+            "txs"
+          ],
+          "data_dependencies": {
+            "THRESHOLD": [
+              "THRESHOLD"
+            ],
+            "txs": [
+              "txs"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#83"
+        },
+        {
+          "kind": "control_branch",
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "expression": "distinctSignerCount[txId] < THRESHOLD",
+          "branch": "true",
+          "state_reads": [
+            "DeFiMultiSigBypassHarness.THRESHOLD",
+            "DeFiMultiSigBypassHarness.distinctSignerCount"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "DeFiMultiSigBypassHarness.THRESHOLD",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#14"
+            },
+            {
+              "state": "DeFiMultiSigBypassHarness.distinctSignerCount",
+              "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#26"
+            }
+          ],
+          "variables_read": [
+            "THRESHOLD",
+            "distinctSignerCount",
+            "txId"
+          ],
+          "data_dependencies": {
+            "distinctSignerCount": [
+              "distinctSignerCount"
+            ],
+            "txId": [
+              "txId"
+            ],
+            "THRESHOLD": [
+              "THRESHOLD"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#86"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "DeFiMultiSigBypassHarness.onlySigner()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.onlySigner()",
+                "expression": "require(bool,string)(msg.sender == SIGNER_1 || msg.sender == SIGNER_2 || msg.sender == SIGNER_3,NOT_SIGNER)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.SIGNER_1",
+                  "DeFiMultiSigBypassHarness.SIGNER_2",
+                  "DeFiMultiSigBypassHarness.SIGNER_3"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_1",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#11"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_2",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#12"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.SIGNER_3",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "SIGNER_1",
+                  "SIGNER_2",
+                  "SIGNER_3",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "SIGNER_1": [
+                    "SIGNER_1"
+                  ],
+                  "SIGNER_3": [
+                    "SIGNER_3"
+                  ],
+                  "SIGNER_2": [
+                    "SIGNER_2"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#36"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+                "expression": "require(bool,string)(t.amount > 0,TX_NOT_FOUND)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#81"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+                "expression": "require(bool,string)(! t.executed,ALREADY_EXECUTED)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#82"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+                "expression": "require(bool,string)(t.confirmationCount >= THRESHOLD,INSUFFICIENT_CONFIRMATIONS)",
+                "branch": null,
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.THRESHOLD",
+                  "DeFiMultiSigBypassHarness.txs"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.THRESHOLD",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#14"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.txs",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "THRESHOLD",
+                  "t",
+                  "txs"
+                ],
+                "data_dependencies": {
+                  "THRESHOLD": [
+                    "THRESHOLD"
+                  ],
+                  "txs": [
+                    "txs"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#83"
+              },
+              {
+                "kind": "control_branch",
+                "function": "DeFiMultiSigBypassHarness.executeTx(bytes32)",
+                "expression": "distinctSignerCount[txId] < THRESHOLD",
+                "branch": "true",
+                "state_reads": [
+                  "DeFiMultiSigBypassHarness.THRESHOLD",
+                  "DeFiMultiSigBypassHarness.distinctSignerCount"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "DeFiMultiSigBypassHarness.THRESHOLD",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#14"
+                  },
+                  {
+                    "state": "DeFiMultiSigBypassHarness.distinctSignerCount",
+                    "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#26"
+                  }
+                ],
+                "variables_read": [
+                  "THRESHOLD",
+                  "distinctSignerCount",
+                  "txId"
+                ],
+                "data_dependencies": {
+                  "distinctSignerCount": [
+                    "distinctSignerCount"
+                  ],
+                  "txId": [
+                    "txId"
+                  ],
+                  "THRESHOLD": [
+                    "THRESHOLD"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/DeFiMultiSigBypass/DeFiMultiSigBypassHarness.sol#86"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "f4d09e5e67de4917"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

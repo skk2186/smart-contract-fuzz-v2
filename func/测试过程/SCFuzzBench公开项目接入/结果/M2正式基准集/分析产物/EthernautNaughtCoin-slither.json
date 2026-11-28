@@ -1,0 +1,1472 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol",
+    "contract": "EthernautNaughtCoinHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "EthernautNaughtCoinHarness",
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#13-79"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "EthernautNaughtCoinHarness",
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#13-79"
+    }
+  ],
+  "properties": [
+    {
+      "property": "EthernautNaughtCoinHarness.echidna_locked_balance_not_drained()",
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#73-78",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "8e711464162d0c681ea4",
+      "analysis_contract": "EthernautNaughtCoinHarness",
+      "analysis_contract_source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#13-79",
+      "read_states": [
+        "EthernautNaughtCoinHarness.balanceOf",
+        "EthernautNaughtCoinHarness.player",
+        "EthernautNaughtCoinHarness.timeLock"
+      ],
+      "property_write_states": [],
+      "environment_reads": [
+        "block.timestamp"
+      ],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "EthernautNaughtCoinHarness.echidna_locked_balance_not_drained()",
+          "states": [
+            "EthernautNaughtCoinHarness.timeLock"
+          ],
+          "expression": "block.timestamp <= timeLock",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#74"
+        },
+        {
+          "function": "EthernautNaughtCoinHarness.echidna_locked_balance_not_drained()",
+          "states": [
+            "EthernautNaughtCoinHarness.balanceOf",
+            "EthernautNaughtCoinHarness.player"
+          ],
+          "expression": "balanceOf[player] > 0",
+          "index_accesses": [
+            {
+              "base": "balanceOf",
+              "key": "player",
+              "reference": "REF_13"
+            }
+          ],
+          "source_index_accesses": [
+            "balanceOf[player]"
+          ],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#75"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "block.timestamp",
+            "msg.sender"
+          ],
+          "matched_states": [
+            "EthernautNaughtCoinHarness.balanceOf"
+          ],
+          "effect_ids": [
+            "c41313559fc22bd4",
+            "6f2aaa5c62844bdd"
+          ],
+          "analysis_status": "candidate_only"
+        },
+        {
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender"
+          ],
+          "matched_states": [
+            "EthernautNaughtCoinHarness.balanceOf"
+          ],
+          "effect_ids": [
+            "1b470b85980d3fe2",
+            "a6919c6d45fcf559"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "1b470b85980d3fe2",
+        "6f2aaa5c62844bdd",
+        "88296b22c4c541f4",
+        "a6919c6d45fcf559",
+        "c41313559fc22bd4",
+        "ed25e3df12b7c109"
+      ],
+      "evidence_summary": {
+        "candidate_links": 2,
+        "links_with_write_site": 2,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_supported_with_limits",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "EthernautNaughtCoinHarness.balanceOf",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [
+            "EthernautNaughtCoinHarness.constructor()"
+          ],
+          "possible_setup_actions": [
+            {
+              "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+              "effect_ids": [
+                "c41313559fc22bd4",
+                "6f2aaa5c62844bdd"
+              ]
+            },
+            {
+              "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+              "effect_ids": [
+                "1b470b85980d3fe2",
+                "a6919c6d45fcf559"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "EthernautNaughtCoinHarness.allowance",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "EthernautNaughtCoinHarness.approve(address,uint256)",
+              "effect_ids": [
+                "ed25e3df12b7c109"
+              ]
+            },
+            {
+              "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+              "effect_ids": [
+                "88296b22c4c541f4"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [
+        "mapping/数组索引别名未求解；共享基础状态变量仅代表保守候选"
+      ],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "1b470b85980d3fe2": {
+      "state": "EthernautNaughtCoinHarness.balanceOf",
+      "writer": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+      "expression": "balanceOf[from] -= value",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "from",
+          "reference": "REF_11"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[from]"
+      ],
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#66",
+      "call_path": [
+        {
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(to != address(0),Zero recipient)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "to"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#62"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(balanceOf[from] >= value,Insufficient balance)",
+          "branch": null,
+          "state_reads": [
+            "EthernautNaughtCoinHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "EthernautNaughtCoinHarness.balanceOf",
+              "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "from",
+            "value"
+          ],
+          "data_dependencies": {
+            "balanceOf": [
+              "balanceOf",
+              "value"
+            ],
+            "from": [
+              "from"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#63"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(allowance[from][msg.sender] >= value,Insufficient allowance)",
+          "branch": null,
+          "state_reads": [
+            "EthernautNaughtCoinHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "EthernautNaughtCoinHarness.allowance",
+              "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "from",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "allowance": [
+              "allowance"
+            ],
+            "value": [
+              "value"
+            ],
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#64"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(to != address(0),Zero recipient)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "to"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#62"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(balanceOf[from] >= value,Insufficient balance)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.balanceOf",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "from",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "balanceOf": [
+                    "balanceOf",
+                    "value"
+                  ],
+                  "from": [
+                    "from"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#63"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(allowance[from][msg.sender] >= value,Insufficient allowance)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.allowance",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "from",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "value": [
+                    "value"
+                  ],
+                  "from": [
+                    "from"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#64"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "1b470b85980d3fe2"
+    },
+    "6f2aaa5c62844bdd": {
+      "state": "EthernautNaughtCoinHarness.balanceOf",
+      "writer": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+      "expression": "balanceOf[to] += value",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "to",
+          "reference": "REF_3"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[to]"
+      ],
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#49",
+      "call_path": [
+        {
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "expression": "require(bool,string)(to != address(0),Zero recipient)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "to"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#46"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "expression": "require(bool,string)(balanceOf[msg.sender] >= value,Insufficient balance)",
+          "branch": null,
+          "state_reads": [
+            "EthernautNaughtCoinHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "EthernautNaughtCoinHarness.balanceOf",
+              "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "balanceOf": [
+              "balanceOf",
+              "value"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#47"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "EthernautNaughtCoinHarness.lockTokens()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "EthernautNaughtCoinHarness.lockTokens()",
+                "expression": "msg.sender == player",
+                "branch": "true",
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.player"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.player",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "player"
+                ],
+                "data_dependencies": {
+                  "player": [
+                    "player"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.lockTokens()",
+                "expression": "require(bool,string)(block.timestamp > timeLock,Tokens are time-locked)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.timeLock"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.timeLock",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "block.timestamp",
+                  "timeLock"
+                ],
+                "data_dependencies": {
+                  "timeLock": [
+                    "timeLock"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#40"
+              }
+            ],
+            [
+              {
+                "kind": "control_branch",
+                "function": "EthernautNaughtCoinHarness.lockTokens()",
+                "expression": "msg.sender == player",
+                "branch": "false",
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.player"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.player",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "player"
+                ],
+                "data_dependencies": {
+                  "player": [
+                    "player"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#39"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+                "expression": "require(bool,string)(to != address(0),Zero recipient)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "to"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#46"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+                "expression": "require(bool,string)(balanceOf[msg.sender] >= value,Insufficient balance)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.balanceOf",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "balanceOf": [
+                    "balanceOf",
+                    "value"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#47"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "6f2aaa5c62844bdd"
+    },
+    "88296b22c4c541f4": {
+      "state": "EthernautNaughtCoinHarness.allowance",
+      "writer": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+      "expression": "allowance[from][msg.sender] -= value",
+      "index_accesses": [
+        {
+          "base": "allowance",
+          "key": "from",
+          "reference": "REF_9"
+        },
+        {
+          "base": "REF_9",
+          "key": "msg.sender",
+          "reference": "REF_10"
+        }
+      ],
+      "source_index_accesses": [
+        "allowance[from]"
+      ],
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#65",
+      "call_path": [
+        {
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(to != address(0),Zero recipient)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "to"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#62"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(balanceOf[from] >= value,Insufficient balance)",
+          "branch": null,
+          "state_reads": [
+            "EthernautNaughtCoinHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "EthernautNaughtCoinHarness.balanceOf",
+              "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "from",
+            "value"
+          ],
+          "data_dependencies": {
+            "balanceOf": [
+              "balanceOf",
+              "value"
+            ],
+            "from": [
+              "from"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#63"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(allowance[from][msg.sender] >= value,Insufficient allowance)",
+          "branch": null,
+          "state_reads": [
+            "EthernautNaughtCoinHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "EthernautNaughtCoinHarness.allowance",
+              "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "from",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "allowance": [
+              "allowance"
+            ],
+            "value": [
+              "value"
+            ],
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#64"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(to != address(0),Zero recipient)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "to"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#62"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(balanceOf[from] >= value,Insufficient balance)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.balanceOf",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "from",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "balanceOf": [
+                    "balanceOf",
+                    "value"
+                  ],
+                  "from": [
+                    "from"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#63"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(allowance[from][msg.sender] >= value,Insufficient allowance)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.allowance",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "from",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "value": [
+                    "value"
+                  ],
+                  "from": [
+                    "from"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#64"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "88296b22c4c541f4"
+    },
+    "a6919c6d45fcf559": {
+      "state": "EthernautNaughtCoinHarness.balanceOf",
+      "writer": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+      "expression": "balanceOf[to] += value",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "to",
+          "reference": "REF_12"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[to]"
+      ],
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#67",
+      "call_path": [
+        {
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(to != address(0),Zero recipient)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "to"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#62"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(balanceOf[from] >= value,Insufficient balance)",
+          "branch": null,
+          "state_reads": [
+            "EthernautNaughtCoinHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "EthernautNaughtCoinHarness.balanceOf",
+              "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "from",
+            "value"
+          ],
+          "data_dependencies": {
+            "balanceOf": [
+              "balanceOf",
+              "value"
+            ],
+            "from": [
+              "from"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#63"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "expression": "require(bool,string)(allowance[from][msg.sender] >= value,Insufficient allowance)",
+          "branch": null,
+          "state_reads": [
+            "EthernautNaughtCoinHarness.allowance"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "EthernautNaughtCoinHarness.allowance",
+              "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#24"
+            }
+          ],
+          "variables_read": [
+            "allowance",
+            "from",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "allowance": [
+              "allowance"
+            ],
+            "value": [
+              "value"
+            ],
+            "from": [
+              "from"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#64"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(to != address(0),Zero recipient)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "to"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#62"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(balanceOf[from] >= value,Insufficient balance)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.balanceOf",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "from",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "balanceOf": [
+                    "balanceOf",
+                    "value"
+                  ],
+                  "from": [
+                    "from"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#63"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transferFrom(address,address,uint256)",
+                "expression": "require(bool,string)(allowance[from][msg.sender] >= value,Insufficient allowance)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.allowance"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.allowance",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#24"
+                  }
+                ],
+                "variables_read": [
+                  "allowance",
+                  "from",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "allowance": [
+                    "allowance"
+                  ],
+                  "value": [
+                    "value"
+                  ],
+                  "from": [
+                    "from"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#64"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "a6919c6d45fcf559"
+    },
+    "c41313559fc22bd4": {
+      "state": "EthernautNaughtCoinHarness.balanceOf",
+      "writer": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+      "expression": "balanceOf[msg.sender] -= value",
+      "index_accesses": [
+        {
+          "base": "balanceOf",
+          "key": "msg.sender",
+          "reference": "REF_2"
+        }
+      ],
+      "source_index_accesses": [
+        "balanceOf[msg.sender]"
+      ],
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#48",
+      "call_path": [
+        {
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "expression": "require(bool,string)(to != address(0),Zero recipient)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "to"
+          ],
+          "data_dependencies": {
+            "to": [
+              "to"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#46"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "expression": "require(bool,string)(balanceOf[msg.sender] >= value,Insufficient balance)",
+          "branch": null,
+          "state_reads": [
+            "EthernautNaughtCoinHarness.balanceOf"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "EthernautNaughtCoinHarness.balanceOf",
+              "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+            }
+          ],
+          "variables_read": [
+            "balanceOf",
+            "msg.sender",
+            "value"
+          ],
+          "data_dependencies": {
+            "balanceOf": [
+              "balanceOf",
+              "value"
+            ],
+            "value": [
+              "value"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#47"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "EthernautNaughtCoinHarness.lockTokens()",
+          "paths": [
+            [
+              {
+                "kind": "control_branch",
+                "function": "EthernautNaughtCoinHarness.lockTokens()",
+                "expression": "msg.sender == player",
+                "branch": "true",
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.player"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.player",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "player"
+                ],
+                "data_dependencies": {
+                  "player": [
+                    "player"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#39"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.lockTokens()",
+                "expression": "require(bool,string)(block.timestamp > timeLock,Tokens are time-locked)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.timeLock"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.timeLock",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#18"
+                  }
+                ],
+                "variables_read": [
+                  "block.timestamp",
+                  "timeLock"
+                ],
+                "data_dependencies": {
+                  "timeLock": [
+                    "timeLock"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#40"
+              }
+            ],
+            [
+              {
+                "kind": "control_branch",
+                "function": "EthernautNaughtCoinHarness.lockTokens()",
+                "expression": "msg.sender == player",
+                "branch": "false",
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.player"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.player",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#20"
+                  }
+                ],
+                "variables_read": [
+                  "msg.sender",
+                  "player"
+                ],
+                "data_dependencies": {
+                  "player": [
+                    "player"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#39"
+              }
+            ]
+          ],
+          "truncated": false
+        },
+        {
+          "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+                "expression": "require(bool,string)(to != address(0),Zero recipient)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "to"
+                ],
+                "data_dependencies": {
+                  "to": [
+                    "to"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#46"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.transfer(address,uint256)",
+                "expression": "require(bool,string)(balanceOf[msg.sender] >= value,Insufficient balance)",
+                "branch": null,
+                "state_reads": [
+                  "EthernautNaughtCoinHarness.balanceOf"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "EthernautNaughtCoinHarness.balanceOf",
+                    "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#23"
+                  }
+                ],
+                "variables_read": [
+                  "balanceOf",
+                  "msg.sender",
+                  "value"
+                ],
+                "data_dependencies": {
+                  "balanceOf": [
+                    "balanceOf",
+                    "value"
+                  ],
+                  "value": [
+                    "value"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#47"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "c41313559fc22bd4"
+    },
+    "ed25e3df12b7c109": {
+      "state": "EthernautNaughtCoinHarness.allowance",
+      "writer": "EthernautNaughtCoinHarness.approve(address,uint256)",
+      "expression": "allowance[msg.sender][spender] = value",
+      "index_accesses": [
+        {
+          "base": "allowance",
+          "key": "msg.sender",
+          "reference": "REF_4"
+        },
+        {
+          "base": "REF_4",
+          "key": "spender",
+          "reference": "REF_5"
+        }
+      ],
+      "source_index_accesses": [
+        "allowance[msg.sender]"
+      ],
+      "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#56",
+      "call_path": [
+        {
+          "function": "EthernautNaughtCoinHarness.approve(address,uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "EthernautNaughtCoinHarness.approve(address,uint256)",
+          "expression": "require(bool,string)(spender != address(0),Zero spender)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "spender"
+          ],
+          "data_dependencies": {
+            "spender": [
+              "spender"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#55"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "EthernautNaughtCoinHarness.approve(address,uint256)",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "EthernautNaughtCoinHarness.approve(address,uint256)",
+                "expression": "require(bool,string)(spender != address(0),Zero spender)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "spender"
+                ],
+                "data_dependencies": {
+                  "spender": [
+                    "spender"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/EthernautNaughtCoin/EthernautNaughtCoinHarness.sol#55"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "ed25e3df12b7c109"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}

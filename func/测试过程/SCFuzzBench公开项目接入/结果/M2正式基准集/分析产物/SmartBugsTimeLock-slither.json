@@ -1,0 +1,975 @@
+{
+  "schema_version": "3.1",
+  "status": "complete",
+  "input": {
+    "target": "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol",
+    "contract": "SmartBugsTimeLockHarness",
+    "project_root": null,
+    "detected_framework": null,
+    "compile_options": [],
+    "slither_version": "0.11.6",
+    "crytic_compile_version": "0.4.2",
+    "analysis_targets": [
+      "/home/skk/smart-contract-fuzz-v2/sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol"
+    ],
+    "foundry_target_mode": "project_or_file",
+    "foundry_compile_all": null,
+    "compilation_platform": "solc"
+  },
+  "contracts_discovered": [
+    {
+      "name": "SmartBugsTimeLockHarness",
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#11-60"
+    }
+  ],
+  "contracts_analyzed": [
+    {
+      "name": "SmartBugsTimeLockHarness",
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#11-60"
+    }
+  ],
+  "properties": [
+    {
+      "property": "SmartBugsTimeLockHarness.echidna_no_early_withdrawal()",
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#57-59",
+      "property_kind": "boolean_property",
+      "property_parameters": [],
+      "assertion_sites": [],
+      "property_id": "1dddbb032e0b7d58829b",
+      "analysis_contract": "SmartBugsTimeLockHarness",
+      "analysis_contract_source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#11-60",
+      "read_states": [
+        "SmartBugsTimeLockHarness.earlyWithdrawalObserved"
+      ],
+      "property_write_states": [],
+      "environment_reads": [],
+      "balance_observations": [],
+      "read_sites": [
+        {
+          "function": "SmartBugsTimeLockHarness.echidna_no_early_withdrawal()",
+          "states": [
+            "SmartBugsTimeLockHarness.earlyWithdrawalObserved"
+          ],
+          "expression": "! earlyWithdrawalObserved",
+          "index_accesses": [],
+          "source_index_accesses": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#58"
+        }
+      ],
+      "candidate_actions": [
+        {
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "payable": false,
+          "environment_reads": [
+            "msg.sender",
+            "now"
+          ],
+          "matched_states": [
+            "SmartBugsTimeLockHarness.earlyWithdrawalObserved"
+          ],
+          "effect_ids": [
+            "5b5c5d820499f687"
+          ],
+          "analysis_status": "candidate_only"
+        }
+      ],
+      "cross_contract": {
+        "observations": [],
+        "opaque_property_calls": [],
+        "candidate_actions": [],
+        "prerequisite_states": [],
+        "unresolved_observations": [],
+        "unmatched_observations": [],
+        "alias_unproven_observations": [],
+        "opaque_call_candidates": [],
+        "opaque_candidates_truncated": false,
+        "matching_rule": "仅相同的根合约状态槽接收者路径属于已确认静态路径；状态定义重叠只列可能实例别名，不证明运行时对象相同。"
+      },
+      "evidence_ids": [
+        "57c4f98ffb9d7486",
+        "5b5c5d820499f687",
+        "6e1f8a59a55f6c04",
+        "b1ab46918d607e38",
+        "cda9e6024f9dcf25",
+        "d9be46f9d0af1595"
+      ],
+      "evidence_summary": {
+        "candidate_links": 1,
+        "links_with_write_site": 1,
+        "alias_unproven_links": 0,
+        "unmatched_observations": 0,
+        "opaque_call_candidates": 0
+      },
+      "analysis_class": "stateful_context_available",
+      "analysis_status": "analyzed",
+      "context_status": "candidate_with_write_site",
+      "dependency_status": "statically_closed",
+      "unresolved_effect_actions": [],
+      "prerequisite_state_closure": [
+        {
+          "state": "SmartBugsTimeLockHarness.lockTime",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SmartBugsTimeLockHarness.deposit()",
+              "effect_ids": [
+                "57c4f98ffb9d7486"
+              ]
+            },
+            {
+              "function": "SmartBugsTimeLockHarness.increaseLockTime(uint256)",
+              "effect_ids": [
+                "b1ab46918d607e38"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "SmartBugsTimeLockHarness.balances",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SmartBugsTimeLockHarness.deposit()",
+              "effect_ids": [
+                "d9be46f9d0af1595"
+              ]
+            },
+            {
+              "function": "SmartBugsTimeLockHarness.withdraw()",
+              "effect_ids": [
+                "6e1f8a59a55f6c04"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        },
+        {
+          "state": "SmartBugsTimeLockHarness.initialUnlockTime",
+          "depth": 0,
+          "declaration_initializer": null,
+          "constructor_writers": [],
+          "possible_setup_actions": [
+            {
+              "function": "SmartBugsTimeLockHarness.deposit()",
+              "effect_ids": [
+                "cda9e6024f9dcf25"
+              ]
+            }
+          ],
+          "note": "当前状态可能已满足条件；这些写入函数是可选建立路径，并非必需交易。"
+        }
+      ],
+      "unknowns": [],
+      "interpretation": "静态候选和必要守卫；不证明路径可行、参数可满足或属性可被违反。"
+    }
+  ],
+  "effect_catalog": {
+    "57c4f98ffb9d7486": {
+      "state": "SmartBugsTimeLockHarness.lockTime",
+      "writer": "SmartBugsTimeLockHarness.deposit()",
+      "expression": "lockTime[msg.sender] = now + 604800",
+      "index_accesses": [
+        {
+          "base": "lockTime",
+          "key": "msg.sender",
+          "reference": "REF_1"
+        }
+      ],
+      "source_index_accesses": [
+        "lockTime[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#24",
+      "call_path": [
+        {
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "expression": "require(bool)(msg.value > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#22"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.deposit()",
+                "expression": "require(bool)(msg.value > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#22"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "57c4f98ffb9d7486"
+    },
+    "5b5c5d820499f687": {
+      "state": "SmartBugsTimeLockHarness.earlyWithdrawalObserved",
+      "writer": "SmartBugsTimeLockHarness.withdraw()",
+      "expression": "earlyWithdrawalObserved = true",
+      "index_accesses": [],
+      "source_index_accesses": [],
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#40",
+      "call_path": [
+        {
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "expression": "require(bool)(balances[msg.sender] > 0)",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsTimeLockHarness.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsTimeLockHarness.balances",
+              "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#12"
+            }
+          ],
+          "variables_read": [
+            "balances",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "balances": [
+              "balances"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#37"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "expression": "require(bool)(now > lockTime[msg.sender])",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsTimeLockHarness.lockTime"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsTimeLockHarness.lockTime",
+              "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "lockTime",
+            "msg.sender",
+            "now"
+          ],
+          "data_dependencies": {
+            "lockTime": [
+              "lockTime"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#38"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "expression": "now <= initialUnlockTime[msg.sender]",
+          "branch": "true",
+          "state_reads": [
+            "SmartBugsTimeLockHarness.initialUnlockTime"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsTimeLockHarness.initialUnlockTime",
+              "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "initialUnlockTime",
+            "msg.sender",
+            "now"
+          ],
+          "data_dependencies": {
+            "initialUnlockTime": [
+              "initialUnlockTime"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#39"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "require(bool)(balances[msg.sender] > 0)",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#12"
+                  }
+                ],
+                "variables_read": [
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "balances": [
+                    "balances"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#37"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "require(bool)(now > lockTime[msg.sender])",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.lockTime"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.lockTime",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "lockTime",
+                  "msg.sender",
+                  "now"
+                ],
+                "data_dependencies": {
+                  "lockTime": [
+                    "lockTime"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#38"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "now <= initialUnlockTime[msg.sender]",
+                "branch": "true",
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.initialUnlockTime"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.initialUnlockTime",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "initialUnlockTime",
+                  "msg.sender",
+                  "now"
+                ],
+                "data_dependencies": {
+                  "initialUnlockTime": [
+                    "initialUnlockTime"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#39"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "5b5c5d820499f687"
+    },
+    "6e1f8a59a55f6c04": {
+      "state": "SmartBugsTimeLockHarness.balances",
+      "writer": "SmartBugsTimeLockHarness.withdraw()",
+      "expression": "balances[msg.sender] = 0",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "msg.sender",
+          "reference": "REF_12"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#43",
+      "call_path": [
+        {
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "expression": "require(bool)(balances[msg.sender] > 0)",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsTimeLockHarness.balances"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsTimeLockHarness.balances",
+              "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#12"
+            }
+          ],
+          "variables_read": [
+            "balances",
+            "msg.sender"
+          ],
+          "data_dependencies": {
+            "balances": [
+              "balances"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#37"
+        },
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "expression": "require(bool)(now > lockTime[msg.sender])",
+          "branch": null,
+          "state_reads": [
+            "SmartBugsTimeLockHarness.lockTime"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsTimeLockHarness.lockTime",
+              "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#13"
+            }
+          ],
+          "variables_read": [
+            "lockTime",
+            "msg.sender",
+            "now"
+          ],
+          "data_dependencies": {
+            "lockTime": [
+              "lockTime"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#38"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsTimeLockHarness.withdraw()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "require(bool)(balances[msg.sender] > 0)",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#12"
+                  }
+                ],
+                "variables_read": [
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "balances": [
+                    "balances"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#37"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "require(bool)(now > lockTime[msg.sender])",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.lockTime"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.lockTime",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "lockTime",
+                  "msg.sender",
+                  "now"
+                ],
+                "data_dependencies": {
+                  "lockTime": [
+                    "lockTime"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#38"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "now <= initialUnlockTime[msg.sender]",
+                "branch": "true",
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.initialUnlockTime"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.initialUnlockTime",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "initialUnlockTime",
+                  "msg.sender",
+                  "now"
+                ],
+                "data_dependencies": {
+                  "initialUnlockTime": [
+                    "initialUnlockTime"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#39"
+              }
+            ],
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "require(bool)(balances[msg.sender] > 0)",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.balances"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.balances",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#12"
+                  }
+                ],
+                "variables_read": [
+                  "balances",
+                  "msg.sender"
+                ],
+                "data_dependencies": {
+                  "balances": [
+                    "balances"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#37"
+              },
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "require(bool)(now > lockTime[msg.sender])",
+                "branch": null,
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.lockTime"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.lockTime",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#13"
+                  }
+                ],
+                "variables_read": [
+                  "lockTime",
+                  "msg.sender",
+                  "now"
+                ],
+                "data_dependencies": {
+                  "lockTime": [
+                    "lockTime"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#38"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SmartBugsTimeLockHarness.withdraw()",
+                "expression": "now <= initialUnlockTime[msg.sender]",
+                "branch": "false",
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.initialUnlockTime"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.initialUnlockTime",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "initialUnlockTime",
+                  "msg.sender",
+                  "now"
+                ],
+                "data_dependencies": {
+                  "initialUnlockTime": [
+                    "initialUnlockTime"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#39"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "6e1f8a59a55f6c04"
+    },
+    "b1ab46918d607e38": {
+      "state": "SmartBugsTimeLockHarness.lockTime",
+      "writer": "SmartBugsTimeLockHarness.increaseLockTime(uint256)",
+      "expression": "lockTime[msg.sender] += _secondsToIncrease",
+      "index_accesses": [
+        {
+          "base": "lockTime",
+          "key": "msg.sender",
+          "reference": "REF_6"
+        }
+      ],
+      "source_index_accesses": [
+        "lockTime[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#32",
+      "call_path": [
+        {
+          "function": "SmartBugsTimeLockHarness.increaseLockTime(uint256)",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsTimeLockHarness.increaseLockTime(uint256)",
+          "paths": [
+            []
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "b1ab46918d607e38"
+    },
+    "cda9e6024f9dcf25": {
+      "state": "SmartBugsTimeLockHarness.initialUnlockTime",
+      "writer": "SmartBugsTimeLockHarness.deposit()",
+      "expression": "initialUnlockTime[msg.sender] = now + 604800",
+      "index_accesses": [
+        {
+          "base": "initialUnlockTime",
+          "key": "msg.sender",
+          "reference": "REF_4"
+        }
+      ],
+      "source_index_accesses": [
+        "initialUnlockTime[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#26",
+      "call_path": [
+        {
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "expression": "require(bool)(msg.value > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#22"
+        },
+        {
+          "kind": "control_branch",
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "expression": "initialUnlockTime[msg.sender] == 0 || now + 604800 > initialUnlockTime[msg.sender]",
+          "branch": "true",
+          "state_reads": [
+            "SmartBugsTimeLockHarness.initialUnlockTime"
+          ],
+          "state_read_definitions": [
+            {
+              "state": "SmartBugsTimeLockHarness.initialUnlockTime",
+              "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#14"
+            }
+          ],
+          "variables_read": [
+            "initialUnlockTime",
+            "msg.sender",
+            "now"
+          ],
+          "data_dependencies": {
+            "initialUnlockTime": [
+              "initialUnlockTime"
+            ]
+          },
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#25"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.deposit()",
+                "expression": "require(bool)(msg.value > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#22"
+              },
+              {
+                "kind": "control_branch",
+                "function": "SmartBugsTimeLockHarness.deposit()",
+                "expression": "initialUnlockTime[msg.sender] == 0 || now + 604800 > initialUnlockTime[msg.sender]",
+                "branch": "true",
+                "state_reads": [
+                  "SmartBugsTimeLockHarness.initialUnlockTime"
+                ],
+                "state_read_definitions": [
+                  {
+                    "state": "SmartBugsTimeLockHarness.initialUnlockTime",
+                    "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#14"
+                  }
+                ],
+                "variables_read": [
+                  "initialUnlockTime",
+                  "msg.sender",
+                  "now"
+                ],
+                "data_dependencies": {
+                  "initialUnlockTime": [
+                    "initialUnlockTime"
+                  ]
+                },
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#25"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "cda9e6024f9dcf25"
+    },
+    "d9be46f9d0af1595": {
+      "state": "SmartBugsTimeLockHarness.balances",
+      "writer": "SmartBugsTimeLockHarness.deposit()",
+      "expression": "balances[msg.sender] += msg.value",
+      "index_accesses": [
+        {
+          "base": "balances",
+          "key": "msg.sender",
+          "reference": "REF_0"
+        }
+      ],
+      "source_index_accesses": [
+        "balances[msg.sender]"
+      ],
+      "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#23",
+      "call_path": [
+        {
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "bindings": {},
+          "call_source": null
+        }
+      ],
+      "guards": [
+        {
+          "kind": "require_or_assert",
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "expression": "require(bool)(msg.value > 0)",
+          "branch": null,
+          "state_reads": [],
+          "state_read_definitions": [],
+          "variables_read": [
+            "msg.value"
+          ],
+          "data_dependencies": {},
+          "predicate_calls": [],
+          "predicate_logic": [],
+          "predicate_returns": [],
+          "external_calls": [],
+          "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#22"
+        }
+      ],
+      "cfg_guard_alternatives": [
+        {
+          "function": "SmartBugsTimeLockHarness.deposit()",
+          "paths": [
+            [
+              {
+                "kind": "require_or_assert",
+                "function": "SmartBugsTimeLockHarness.deposit()",
+                "expression": "require(bool)(msg.value > 0)",
+                "branch": null,
+                "state_reads": [],
+                "state_read_definitions": [],
+                "variables_read": [
+                  "msg.value"
+                ],
+                "data_dependencies": {},
+                "predicate_calls": [],
+                "predicate_logic": [],
+                "predicate_returns": [],
+                "external_calls": [],
+                "source": "sol/单合约测试/SmartBugsTimeLock/SmartBugsTimeLockHarness.sol#22"
+              }
+            ]
+          ],
+          "truncated": false
+        }
+      ],
+      "external_calls_in_reachable_functions": [],
+      "expression_call_constraints": [],
+      "id": "d9be46f9d0af1595"
+    }
+  },
+  "global_unknowns": [],
+  "contract_issues": [],
+  "source_issues": [],
+  "errors": [],
+  "execution_status": "success"
+}
